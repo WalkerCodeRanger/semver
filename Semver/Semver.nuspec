@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://max.mit-license.org/</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>A semver implementation in .Net based on the v2.0.0-rc.1 of the spec found at http://semver.org/.</releaseNotes>
+    <copyright>Copyright 2013</copyright>
+    <tags>semver</tags>
+  </metadata>
+</package>
