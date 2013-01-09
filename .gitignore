@@ -3,3 +3,4 @@ obj/
 TestResults/
 *.csproj.user
 *.suo
+*.nupkg
