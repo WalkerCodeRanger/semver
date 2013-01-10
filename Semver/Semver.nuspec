@@ -9,7 +9,7 @@
     <licenseUrl>http://max.mit-license.org/</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A semver implementation in .Net based on the v2.0.0-rc.1 of the spec found at http://semver.org/.</description>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>Github repository: https://github.com/maxhauser/semver.</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>semver semantic version</tags>
   </metadata>
