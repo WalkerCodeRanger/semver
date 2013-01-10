@@ -2,15 +2,15 @@
 <package >
   <metadata>
     <id>semver</id>
-    <version>$version$</version>
+    <version>1.0.1</version>
     <title>semver</title>
     <authors>Max Hauser</authors>
-    <owners>Max Hause</owners>
+    <owners>Max Hauser</owners>
     <licenseUrl>http://max.mit-license.org/</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A semver implementation in .Net based on the v2.0.0-rc.1 of the spec found at http://semver.org/.</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2013</copyright>
-    <tags>semver</tags>
+    <tags>semver semantic version</tags>
   </metadata>
 </package>
