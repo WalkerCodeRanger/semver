@@ -2,8 +2,8 @@
 <package >
   <metadata>
     <id>semver</id>
-    <version>1.0.2</version>
-    <title>semver</title>
+    <version>1.0.3</version>
+    <title>Semantic versioning</title>
     <authors>Max Hauser</authors>
     <owners>Max Hauser</owners>
     <licenseUrl>http://max.mit-license.org/</licenseUrl>
