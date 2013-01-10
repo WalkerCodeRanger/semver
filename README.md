@@ -8,7 +8,7 @@ complies to v2.0.0-rc.1 of the spec from http://semver.org.
 
 With the nuget console:
 
-     Package-Install semver
+     Install-Package semver
 
 **Parsing**
 
