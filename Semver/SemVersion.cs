@@ -6,7 +6,7 @@ namespace Semver
 {
     /// <summary>
     /// A semantic version implementation.
-    /// Conforms to v2.0.0-rc.1 of http://semver.org/
+    /// Conforms to v2.0.0 of http://semver.org/
     /// </summary>
     public sealed class SemVersion : IComparable<SemVersion>, IComparable
     {
@@ -36,8 +36,8 @@ namespace Semver
             this.Prerelease = String.Intern(prerelease ?? "");
             this.Build = String.Intern(build ?? "");
         }
-        
-        // <summary>
+
+        /// <summary>
         /// Parses the specified string to a semantic version.
         /// </summary>
         /// <param name="version">The version string.</param>
@@ -211,6 +211,40 @@ namespace Semver
             if (ReferenceEquals(other, null))
                 return 1;
 
+            var r = this.CompareByPrecedence(other);
+            if (r != 0)
+                return r;
+
+            r = CompareComponent(this.Build, other.Build);
+            return r;
+        }
+
+        /// <summary>
+        /// Compares to semantic versions by precedence. This does the same as a Equals, but ignores the build information.
+        /// </summary>
+        /// <param name="other">The semantic version.</param>
+        /// <returns><c>true</c> if the version precedence matches.</returns>
+        public bool PrecedenceMatches(SemVersion other)
+        {
+            return CompareByPrecedence(other) == 0;
+        }
+
+        /// <summary>
+        /// Compares to semantic versions by precedence. This does the same as a Equals, but ignores the build information.
+        /// </summary>
+        /// <param name="other">The semantic version.</param>
+        /// <returns>
+        /// A value that indicates the relative order of the objects being compared. 
+        /// The return value has these meanings: Value Meaning Less than zero 
+        ///  This instance precedes <paramref name="other" /> in the version precedence.
+        ///  Zero This instance has the same precedence as <paramref name="other" />. i
+        ///  Greater than zero This instance has creater precedence as <paramref name="other" />.
+        /// </returns>
+        public int CompareByPrecedence(SemVersion other)
+        {
+            if (ReferenceEquals(other, null))
+                return 1;
+
             var r = this.Major.CompareTo(other.Major);
             if (r != 0) return r;
 
@@ -221,9 +255,6 @@ namespace Semver
             if (r != 0) return r;
 
             r = CompareComponent(this.Prerelease, other.Prerelease, true);
-            if (r != 0) return r;
-
-            r = CompareComponent(this.Build, other.Build);
             return r;
         }
 

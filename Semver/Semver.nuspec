@@ -2,14 +2,15 @@
 <package >
   <metadata>
     <id>semver</id>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <title>Semantic versioning</title>
     <authors>Max Hauser</authors>
     <owners>Max Hauser</owners>
+    <projectUrl>https://github.com/maxhauser/semver/></projectUrl>
     <licenseUrl>http://max.mit-license.org/</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A semver implementation in .Net based on the v2.0.0-rc.1 of the spec found at http://semver.org/.</description>
-    <releaseNotes>Github repository: https://github.com/maxhauser/semver.</releaseNotes>
+    <description>A semver implementation in .Net based on the v2.0.0 of the spec found at http://semver.org/.</description>
+    <releaseNotes>Add precedence comparison methods in conformance of changed precedence rules in v2.0.0 (ignore build information on precedence comparison).</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>semver semantic version</tags>
   </metadata>
