@@ -6,7 +6,7 @@
     <title>Semantic versioning</title>
     <authors>Max Hauser</authors>
     <owners>Max Hauser</owners>
-    <projectUrl>https://github.com/maxhauser/semver/></projectUrl>
+    <projectUrl>https://github.com/maxhauser/semver/</projectUrl>
     <licenseUrl>http://max.mit-license.org/</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A semver implementation in .Net based on the v2.0.0 of the spec found at http://semver.org/.</description>
