@@ -214,6 +214,48 @@ namespace Semver.Test
         }
 
         [TestMethod]
+        public void TryParseTest1()
+        {
+            SemVersion v;
+            Assert.IsTrue(SemVersion.TryParse("1.2.45-alpha-beta+nightly.23.43-bla", out v));
+        }
+
+        [TestMethod]
+        public void TryParseTest2()
+        {
+            SemVersion v;
+            Assert.IsFalse(SemVersion.TryParse("ui-2.1-alpha", out v));
+        }
+
+        [TestMethod]
+        public void TryParseTest3()
+        {
+            SemVersion v;
+            Assert.IsFalse(SemVersion.TryParse("", out v));
+        }
+
+        [TestMethod]
+        public void TryParseTest4()
+        {
+            SemVersion v;
+            Assert.IsFalse(SemVersion.TryParse(null, out v));
+        }
+
+        [TestMethod]
+        public void TryParseTest5()
+        {
+            SemVersion v;
+            Assert.IsTrue(SemVersion.TryParse("1.2", out v, false));
+        }
+
+        [TestMethod]
+        public void TryParseTest6()
+        {
+            SemVersion v;
+            Assert.IsFalse(SemVersion.TryParse("1.2", out v, true));
+        }
+
+        [TestMethod]
         public void ToStringTest()
         {
             var version = new SemVersion(1, 2, 0, "beta", "dev-mha.120");

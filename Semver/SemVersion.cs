@@ -102,6 +102,29 @@ namespace Semver
         }
 
         /// <summary>
+        /// Parses the specified string to a semantic version.
+        /// </summary>
+        /// <param name="version">The version string.</param>
+        /// <param name="semver">When the method returns, contains a SemVersion instance equivalent 
+        /// to the version string passed in, if the version string was valid, or <c>null</c> if the 
+        /// version string was not valid.</param>
+        /// <param name="strict">If set to <c>true</c> minor and patch version are required, else they default to 0.</param>
+        /// <returns><c>False</c> when a invalid version string is passed, otherwise <c>true</c>.</returns>
+        public static bool TryParse(string version, out SemVersion semver, bool strict = false)
+        {
+            try
+            {
+                semver = Parse(version, strict);
+                return true;
+            }
+            catch(Exception ex)
+            {
+                semver = null;
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Tests the specified versions for equality.
         /// </summary>
         /// <param name="versionA">The first version.</param>
