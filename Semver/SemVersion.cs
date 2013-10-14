@@ -38,6 +38,35 @@ namespace Semver
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="SemVersion"/> class.
+        /// </summary>
+        /// <param name="version">The <see cref="System.Version"/> that is used to initialize 
+        /// the Major, Minor, Patch and Build properties.</param>
+        public SemVersion(Version version)
+        {
+            version = version ?? new Version();
+
+            this.Major = version.Major;
+            this.Minor = version.Minor;
+
+            if (version.Revision >= 0)
+            {
+                this.Patch = version.Revision;
+            }
+
+            this.Prerelease = String.Intern("");
+
+            if (version.Build > 0)
+            {
+                this.Build = String.Intern(version.Build.ToString());
+            }
+            else
+            {
+                this.Build = String.Intern("");
+            }
+        }
+
+        /// <summary>
         /// Parses the specified string to a semantic version.
         /// </summary>
         /// <param name="version">The version string.</param>

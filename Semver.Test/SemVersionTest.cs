@@ -20,7 +20,7 @@ namespace Semver.Test
         }
 
         [TestMethod]
-        public void MyTestMethod()
+        public void CompareTestWithStrings3()
         {
             var v = new SemVersion(1, 2);
             Assert.IsTrue(v > "1.0.0");
@@ -48,6 +48,57 @@ namespace Semver.Test
             Assert.AreEqual(3, v.Patch);
             Assert.AreEqual("", v.Prerelease);
             Assert.AreEqual("", v.Build);
+        }
+
+        [TestMethod]
+        public void CreateVersionTestWithSystemVersion1()
+        {
+            var nonSemanticVersion = new Version();
+            var v = new SemVersion(nonSemanticVersion);
+
+            Assert.AreEqual(0, v.Major);
+            Assert.AreEqual(0, v.Minor);
+            Assert.AreEqual(0, v.Patch);
+            Assert.AreEqual("", v.Build);
+            Assert.AreEqual("", v.Prerelease);
+        }
+
+        [TestMethod]
+        public void CreateVersionTestWithSystemVersion2()
+        {
+            var v = new SemVersion(null);
+
+            Assert.AreEqual(0, v.Major);
+            Assert.AreEqual(0, v.Minor);
+            Assert.AreEqual(0, v.Patch);
+            Assert.AreEqual("", v.Build);
+            Assert.AreEqual("", v.Prerelease);
+        }
+
+        [TestMethod]
+        public void CreateVersionTestWithSystemVersion3()
+        {
+            var nonSemanticVersion = new Version(1, 2, 0, 3);
+            var v = new SemVersion(nonSemanticVersion);
+
+            Assert.AreEqual(1, v.Major);
+            Assert.AreEqual(2, v.Minor);
+            Assert.AreEqual(3, v.Patch);
+            Assert.AreEqual("", v.Build);
+            Assert.AreEqual("", v.Prerelease);
+        }
+
+        [TestMethod]
+        public void CreateVersionTestWithSystemVersion4()
+        {
+            var nonSemanticVersion = new Version(1, 2, 4, 3);
+            var v = new SemVersion(nonSemanticVersion);
+
+            Assert.AreEqual(1, v.Major);
+            Assert.AreEqual(2, v.Minor);
+            Assert.AreEqual(3, v.Patch);
+            Assert.AreEqual("4", v.Build);
+            Assert.AreEqual("", v.Prerelease);
         }
 
         [TestMethod]
