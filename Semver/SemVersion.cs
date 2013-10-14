@@ -435,6 +435,17 @@ namespace Semver
         }
 
         /// <summary>
+        /// The override of the greater than or equal operator. 
+        /// </summary>
+        /// <param name="left">The left value.</param>
+        /// <param name="right">The right value.</param>
+        /// <returns>If left is greater than or equal to right <c>true</c>, else <c>false</c>.</returns>
+        public static bool operator >=(SemVersion left, SemVersion right)
+        {
+            return left == right || left > right;
+        }
+
+        /// <summary>
         /// The override of the less operator. 
         /// </summary>
         /// <param name="left">The left value.</param>
@@ -444,6 +455,16 @@ namespace Semver
         {
             return SemVersion.Compare(left, right) == -1;
         }
+
+        /// <summary>
+        /// The override of the less than or equal operator. 
+        /// </summary>
+        /// <param name="left">The left value.</param>
+        /// <param name="right">The right value.</param>
+        /// <returns>If left is less than or equal to right <c>true</c>, else <c>false</c>.</returns>
+        public static bool operator <=(SemVersion left, SemVersion right)
+        {
+            return left == right || left < right;
+        }
     }
 }
-

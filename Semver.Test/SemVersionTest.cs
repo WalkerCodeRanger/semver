@@ -580,12 +580,52 @@ namespace Semver.Test
         }
 
         [TestMethod]
+        public void GreaterOrEqualOperatorTest1()
+        {
+            var v1 = new SemVersion(1);
+            var v2 = new SemVersion(1);
+
+            var r = v1 >= v2;
+            Assert.IsTrue(r);
+        }
+
+        [TestMethod]
+        public void GreaterOrEqualOperatorTest2()
+        {
+            var v1 = new SemVersion(2);
+            var v2 = new SemVersion(1);
+
+            var r = v1 >= v2;
+            Assert.IsTrue(r);
+        }
+
+        [TestMethod]
         public void LessOperatorTest()
         {
             var v1 = new SemVersion(1);
             var v2 = new SemVersion(2);
 
             var r = v1 < v2;
+            Assert.IsTrue(r);
+        }
+
+        [TestMethod]
+        public void LessOrEqualOperatorTest1()
+        {
+            var v1 = new SemVersion(1);
+            var v2 = new SemVersion(1);
+
+            var r = v1 <= v2;
+            Assert.IsTrue(r);
+        }
+
+        [TestMethod]
+        public void LessOrEqualOperatorTest2()
+        {
+            var v1 = new SemVersion(1);
+            var v2 = new SemVersion(2);
+
+            var r = v1 <= v2;
             Assert.IsTrue(r);
         }
 
