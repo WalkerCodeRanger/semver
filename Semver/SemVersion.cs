@@ -38,6 +38,35 @@ namespace Semver
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="SemVersion"/> class.
+        /// </summary>
+        /// <param name="version">The <see cref="System.Version"/> that is used to initialize 
+        /// the Major, Minor, Patch and Build properties.</param>
+        public SemVersion(Version version)
+        {
+            version = version ?? new Version();
+
+            this.Major = version.Major;
+            this.Minor = version.Minor;
+
+            if (version.Revision >= 0)
+            {
+                this.Patch = version.Revision;
+            }
+
+            this.Prerelease = String.Intern("");
+
+            if (version.Build > 0)
+            {
+                this.Build = String.Intern(version.Build.ToString());
+            }
+            else
+            {
+                this.Build = String.Intern("");
+            }
+        }
+
+        /// <summary>
         /// Parses the specified string to a semantic version.
         /// </summary>
         /// <param name="version">The version string.</param>
@@ -70,6 +99,29 @@ namespace Semver
             var build = match.Groups["build"].Value;
 
             return new SemVersion(major, minor, patch, prerelease, build);
+        }
+
+        /// <summary>
+        /// Parses the specified string to a semantic version.
+        /// </summary>
+        /// <param name="version">The version string.</param>
+        /// <param name="semver">When the method returns, contains a SemVersion instance equivalent 
+        /// to the version string passed in, if the version string was valid, or <c>null</c> if the 
+        /// version string was not valid.</param>
+        /// <param name="strict">If set to <c>true</c> minor and patch version are required, else they default to 0.</param>
+        /// <returns><c>False</c> when a invalid version string is passed, otherwise <c>true</c>.</returns>
+        public static bool TryParse(string version, out SemVersion semver, bool strict = false)
+        {
+            try
+            {
+                semver = Parse(version, strict);
+                return true;
+            }
+            catch(Exception ex)
+            {
+                semver = null;
+                return false;
+            }
         }
 
         /// <summary>
@@ -383,6 +435,17 @@ namespace Semver
         }
 
         /// <summary>
+        /// The override of the greater than or equal operator. 
+        /// </summary>
+        /// <param name="left">The left value.</param>
+        /// <param name="right">The right value.</param>
+        /// <returns>If left is greater than or equal to right <c>true</c>, else <c>false</c>.</returns>
+        public static bool operator >=(SemVersion left, SemVersion right)
+        {
+            return left == right || left > right;
+        }
+
+        /// <summary>
         /// The override of the less operator. 
         /// </summary>
         /// <param name="left">The left value.</param>
@@ -392,6 +455,16 @@ namespace Semver
         {
             return SemVersion.Compare(left, right) == -1;
         }
+
+        /// <summary>
+        /// The override of the less than or equal operator. 
+        /// </summary>
+        /// <param name="left">The left value.</param>
+        /// <param name="right">The right value.</param>
+        /// <returns>If left is less than or equal to right <c>true</c>, else <c>false</c>.</returns>
+        public static bool operator <=(SemVersion left, SemVersion right)
+        {
+            return left == right || left < right;
+        }
     }
 }
-

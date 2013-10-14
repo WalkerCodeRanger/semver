@@ -20,7 +20,7 @@ namespace Semver.Test
         }
 
         [TestMethod]
-        public void MyTestMethod()
+        public void CompareTestWithStrings3()
         {
             var v = new SemVersion(1, 2);
             Assert.IsTrue(v > "1.0.0");
@@ -48,6 +48,57 @@ namespace Semver.Test
             Assert.AreEqual(3, v.Patch);
             Assert.AreEqual("", v.Prerelease);
             Assert.AreEqual("", v.Build);
+        }
+
+        [TestMethod]
+        public void CreateVersionTestWithSystemVersion1()
+        {
+            var nonSemanticVersion = new Version();
+            var v = new SemVersion(nonSemanticVersion);
+
+            Assert.AreEqual(0, v.Major);
+            Assert.AreEqual(0, v.Minor);
+            Assert.AreEqual(0, v.Patch);
+            Assert.AreEqual("", v.Build);
+            Assert.AreEqual("", v.Prerelease);
+        }
+
+        [TestMethod]
+        public void CreateVersionTestWithSystemVersion2()
+        {
+            var v = new SemVersion(null);
+
+            Assert.AreEqual(0, v.Major);
+            Assert.AreEqual(0, v.Minor);
+            Assert.AreEqual(0, v.Patch);
+            Assert.AreEqual("", v.Build);
+            Assert.AreEqual("", v.Prerelease);
+        }
+
+        [TestMethod]
+        public void CreateVersionTestWithSystemVersion3()
+        {
+            var nonSemanticVersion = new Version(1, 2, 0, 3);
+            var v = new SemVersion(nonSemanticVersion);
+
+            Assert.AreEqual(1, v.Major);
+            Assert.AreEqual(2, v.Minor);
+            Assert.AreEqual(3, v.Patch);
+            Assert.AreEqual("", v.Build);
+            Assert.AreEqual("", v.Prerelease);
+        }
+
+        [TestMethod]
+        public void CreateVersionTestWithSystemVersion4()
+        {
+            var nonSemanticVersion = new Version(1, 2, 4, 3);
+            var v = new SemVersion(nonSemanticVersion);
+
+            Assert.AreEqual(1, v.Major);
+            Assert.AreEqual(2, v.Minor);
+            Assert.AreEqual(3, v.Patch);
+            Assert.AreEqual("4", v.Build);
+            Assert.AreEqual("", v.Prerelease);
         }
 
         [TestMethod]
@@ -160,6 +211,48 @@ namespace Semver.Test
         public void ParseTestStrict4()
         {
             var version = SemVersion.Parse("1.3-alpha", true);
+        }
+
+        [TestMethod]
+        public void TryParseTest1()
+        {
+            SemVersion v;
+            Assert.IsTrue(SemVersion.TryParse("1.2.45-alpha-beta+nightly.23.43-bla", out v));
+        }
+
+        [TestMethod]
+        public void TryParseTest2()
+        {
+            SemVersion v;
+            Assert.IsFalse(SemVersion.TryParse("ui-2.1-alpha", out v));
+        }
+
+        [TestMethod]
+        public void TryParseTest3()
+        {
+            SemVersion v;
+            Assert.IsFalse(SemVersion.TryParse("", out v));
+        }
+
+        [TestMethod]
+        public void TryParseTest4()
+        {
+            SemVersion v;
+            Assert.IsFalse(SemVersion.TryParse(null, out v));
+        }
+
+        [TestMethod]
+        public void TryParseTest5()
+        {
+            SemVersion v;
+            Assert.IsTrue(SemVersion.TryParse("1.2", out v, false));
+        }
+
+        [TestMethod]
+        public void TryParseTest6()
+        {
+            SemVersion v;
+            Assert.IsFalse(SemVersion.TryParse("1.2", out v, true));
         }
 
         [TestMethod]
@@ -487,12 +580,52 @@ namespace Semver.Test
         }
 
         [TestMethod]
+        public void GreaterOrEqualOperatorTest1()
+        {
+            var v1 = new SemVersion(1);
+            var v2 = new SemVersion(1);
+
+            var r = v1 >= v2;
+            Assert.IsTrue(r);
+        }
+
+        [TestMethod]
+        public void GreaterOrEqualOperatorTest2()
+        {
+            var v1 = new SemVersion(2);
+            var v2 = new SemVersion(1);
+
+            var r = v1 >= v2;
+            Assert.IsTrue(r);
+        }
+
+        [TestMethod]
         public void LessOperatorTest()
         {
             var v1 = new SemVersion(1);
             var v2 = new SemVersion(2);
 
             var r = v1 < v2;
+            Assert.IsTrue(r);
+        }
+
+        [TestMethod]
+        public void LessOrEqualOperatorTest1()
+        {
+            var v1 = new SemVersion(1);
+            var v2 = new SemVersion(1);
+
+            var r = v1 <= v2;
+            Assert.IsTrue(r);
+        }
+
+        [TestMethod]
+        public void LessOrEqualOperatorTest2()
+        {
+            var v1 = new SemVersion(1);
+            var v2 = new SemVersion(2);
+
+            var r = v1 <= v2;
             Assert.IsTrue(r);
         }
 
