@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>semver</id>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <title>Semantic versioning</title>
     <authors>Max Hauser</authors>
     <owners>Max Hauser</owners>

@@ -117,7 +117,7 @@ namespace Semver
                 semver = Parse(version, strict);
                 return true;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 semver = null;
                 return false;
