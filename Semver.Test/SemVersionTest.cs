@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Semver.Test
@@ -693,5 +696,21 @@ namespace Semver.Test
             Assert.AreEqual("alpha", v2.Prerelease);
             Assert.AreEqual("rel", v2.Build);
         }
+
+        [TestMethod]
+        public void TestSerialization()
+        {
+            var semVer = new SemVersion(1, 2, 3, "alpha", "dev");
+            SemVersion semVerSerializedDeserialized;
+            using (var ms = new MemoryStream())
+            {
+                var bf = new BinaryFormatter();
+                bf.Serialize(ms, semVer);
+                ms.Position = 0;
+                semVerSerializedDeserialized = (SemVersion) bf.Deserialize(ms);
+            }
+            Assert.AreEqual(semVer, semVerSerializedDeserialized);
+        }
+
     }
 }

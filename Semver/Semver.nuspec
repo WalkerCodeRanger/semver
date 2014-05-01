@@ -13,4 +13,11 @@
     <copyright>Copyright 2013</copyright>
     <tags>semver semantic version</tags>
   </metadata>
+  <files>
+      <file src="$outputfolder$\v2.0\semver.dll" target="lib\net20" />
+      <file src="$outputfolder$\v3.5\semver.dll" target="lib\net35" />
+      <file src="$outputfolder$\v4.0\semver.dll" target="lib\net40" />
+      <file src="$outputfolder$\v4.5\semver.dll" target="lib\net45" />
+      <file src="$outputfolder$\v4.5.1\semver.dll" target="lib\net451" />
+  </files>
 </package>
