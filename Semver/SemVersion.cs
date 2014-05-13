@@ -27,7 +27,7 @@ namespace Semver
         /// <param name="info"></param>
         /// <param name="context"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public SemVersion(SerializationInfo info, StreamingContext context)
+        private SemVersion(SerializationInfo info, StreamingContext context)
         {
             if (info == null) throw new ArgumentNullException("info");
             var semVersion = Parse(info.GetString("SemVersion"));
