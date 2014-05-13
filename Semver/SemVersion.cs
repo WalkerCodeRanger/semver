@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 using System.Text.RegularExpressions;
 
 namespace Semver
@@ -8,7 +10,8 @@ namespace Semver
     /// A semantic version implementation.
     /// Conforms to v2.0.0 of http://semver.org/
     /// </summary>
-    public sealed class SemVersion : IComparable<SemVersion>, IComparable
+    [Serializable]
+    public sealed class SemVersion : IComparable<SemVersion>, IComparable, ISerializable
     {
         static Regex parseEx =
             new Regex(@"^(?<major>\d+)" +
@@ -17,6 +20,23 @@ namespace Semver
                 @"(\-(?<pre>[0-9A-Za-z\-\.]+))?" +
                 @"(\+(?<build>[0-9A-Za-z\-\.]+))?$",
                 RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SemVersion" /> class.
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="context"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        private SemVersion(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null) throw new ArgumentNullException("info");
+            var semVersion = Parse(info.GetString("SemVersion"));
+            Major = semVersion.Major;
+            Minor = semVersion.Minor;
+            Patch = semVersion.Patch;
+            Prerelease = semVersion.Prerelease;
+            Build = semVersion.Build;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SemVersion" /> class.
@@ -117,7 +137,7 @@ namespace Semver
                 semver = Parse(version, strict);
                 return true;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 semver = null;
                 return false;
@@ -389,6 +409,13 @@ namespace Semver
                 result = result * 31 + this.Build.GetHashCode();
                 return result;
             }
+        }
+
+        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null) throw new ArgumentNullException("info");
+            info.AddValue("SemVersion", ToString());
         }
 
         /// <summary>

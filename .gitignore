@@ -1,3 +1,4 @@
+.buildtools/
 bin/
 obj/
 TestResults/
