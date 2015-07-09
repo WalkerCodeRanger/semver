@@ -353,15 +353,22 @@ namespace Semver
                 int anum, bnum;
                 var isanum = Int32.TryParse(ac, out anum);
                 var isbnum = Int32.TryParse(bc, out bnum);
+                int r;
                 if (isanum && isbnum)
-                    return anum.CompareTo(bnum);
-                if (isanum)
-                    return -1;
-                if (isbnum)
-                    return 1;
-                var r = String.CompareOrdinal(ac, bc);
-                if (r != 0)
-                    return r;
+                {
+                    r = anum.CompareTo(bnum);
+                    if (r != 0) return anum.CompareTo(bnum);
+                }
+                else
+                {
+                    if (isanum)
+                        return -1;
+                    if (isbnum)
+                        return 1;
+                    r = String.CompareOrdinal(ac, bc);
+                    if (r != 0)
+                        return r;
+                }
             }
 
             return aComps.Length.CompareTo(bComps.Length);

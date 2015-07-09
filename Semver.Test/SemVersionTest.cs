@@ -456,6 +456,46 @@ namespace Semver.Test
         }
 
         [TestMethod]
+        public void CompareTest13()
+        {
+            var v1 = SemVersion.Parse("0.1.1-gamma.12.87");
+            var v2 = SemVersion.Parse("0.1.1-gamma.12.88");
+
+            var r = v1.CompareTo(v2);
+            Assert.AreEqual(-1, r);
+        }
+
+        [TestMethod]
+        public void CompareTest14()
+        {
+            var v1 = SemVersion.Parse("0.1.1-gamma.12.87");
+            var v2 = SemVersion.Parse("0.1.1-gamma.12.87.1");
+
+            var r = v1.CompareTo(v2);
+            Assert.AreEqual(-1, r);
+        }
+
+        [TestMethod]
+        public void CompareTest15()
+        {
+            var v1 = SemVersion.Parse("0.1.1-gamma.12.87.99");
+            var v2 = SemVersion.Parse("0.1.1-gamma.12.87.X");
+
+            var r = v1.CompareTo(v2);
+            Assert.AreEqual(-1, r);
+        }
+
+        [TestMethod]
+        public void CompareTest16()
+        {
+            var v1 = SemVersion.Parse("0.1.1-gamma.12.87");
+            var v2 = SemVersion.Parse("0.1.1-gamma.12.87.X");
+
+            var r = v1.CompareTo(v2);
+            Assert.AreEqual(-1, r);
+        }
+
+        [TestMethod]
         public void CompareNullTest()
         {
             var v1 = SemVersion.Parse("0.0.1+bu");
