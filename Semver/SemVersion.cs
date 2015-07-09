@@ -162,7 +162,7 @@ namespace Semver
         /// </summary>
         /// <param name="versionA">The version to compare to.</param>
         /// <param name="versionB">The version to compare against.</param>
-        /// <returns>If versionA &lt; versionB <c>-1</c>, if versionA &gt; versionB <c>1</c>,
+        /// <returns>If versionA &lt; versionB <c>&lt; 0</c>, if versionA &gt; versionB <c>&gt; 0</c>,
         /// if versionA is equal to versionB <c>0</c>.</returns>
         public static int Compare(SemVersion versionA, SemVersion versionB)
         {
@@ -458,7 +458,7 @@ namespace Semver
         /// <returns>If left is greater than right <c>true</c>, else <c>false</c>.</returns>
         public static bool operator >(SemVersion left, SemVersion right)
         {
-            return SemVersion.Compare(left, right) == 1;
+            return SemVersion.Compare(left, right) > 0;
         }
 
         /// <summary>
@@ -480,7 +480,7 @@ namespace Semver
         /// <returns>If left is less than right <c>true</c>, else <c>false</c>.</returns>
         public static bool operator <(SemVersion left, SemVersion right)
         {
-            return SemVersion.Compare(left, right) == -1;
+            return SemVersion.Compare(left, right) < 0;
         }
 
         /// <summary>
