@@ -578,8 +578,28 @@ namespace Semver.Test
             var v1 = new SemVersion(1);
             var v2 = new SemVersion(2);
 
-            var r = v1 > v2;
-            Assert.IsFalse(r);
+            var r = v2 > v1;
+            Assert.IsTrue(r);
+        }
+
+        [TestMethod]
+        public void GreaterOperatorTest2()
+        {
+            var v1 = new SemVersion( 1, 0, 0, "alpha" );
+            var v2 = new SemVersion( 1, 0, 0, "rc" );
+
+            var r = v2 > v1;
+            Assert.IsTrue( r );
+        }
+
+        [TestMethod]
+        public void GreaterOperatorTest3()
+        {
+            var v1 = new SemVersion( 1, 0, 0, "-ci.1" );
+            var v2 = new SemVersion( 1, 0, 0, "alpha" );
+
+            var r = v2 > v1;
+            Assert.IsTrue( r );
         }
 
         [TestMethod]
@@ -610,6 +630,26 @@ namespace Semver.Test
 
             var r = v1 < v2;
             Assert.IsTrue(r);
+        }
+
+        [TestMethod]
+        public void LessOperatorTest2()
+        {
+            var v1 = new SemVersion( 1, 0, 0, "alpha" );
+            var v2 = new SemVersion( 1, 0, 0, "rc" );
+
+            var r = v1 < v2;
+            Assert.IsTrue( r );
+        }
+
+        [TestMethod]
+        public void LessOperatorTest3()
+        {
+            var v1 = new SemVersion( 1, 0, 0, "-ci.1" );
+            var v2 = new SemVersion( 1, 0, 0, "alpha" );
+
+            var r = v1 < v2;
+            Assert.IsTrue( r );
         }
 
         [TestMethod]
