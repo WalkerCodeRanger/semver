@@ -1,0 +1,24 @@
+﻿{
+  "version": "2.0.0",
+  "description": "A semver implementation in .Net based on the v2.0.0 of the spec found at http://semver.org/.",
+  "title": "Semantic versioning",
+  "owners": [ "Max Hauser" ],
+  "authors": [ "Dan" ],
+  "tags": [ "semver semantic version" ],
+  "projectUrl": "https://github.com/maxhauser/semver/",
+  "licenseUrl": "http://max.mit-license.org/",
+  "requireLicenseAcceptance": false,
+  "frameworks": {
+    "net451": { },
+    "dotnet5.4": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Text.RegularExpressions": "4.0.11-beta-23516",
+        "System.Threading": "4.0.11-beta-23516"
+      }
+    }
+  }
+}
