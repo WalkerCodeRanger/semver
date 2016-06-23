@@ -1,12 +1,15 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyDescription("A semantic version implementation.")]
-[assembly: AssemblyCompany("Max Hauser")]
-[assembly: AssemblyProduct("Semver")]
-[assembly: AssemblyCopyright("Copyright © 2013 Max Hauser")]
+// General Information about an assembly is controlled through the following
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Semver.Core")]
+[assembly: AssemblyTrademark("")]
+
+// Setting ComVisible to false makes the types in this assembly not visible
+// to COM components.  If you need to access a type in this assembly from
+// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
-[assembly: Guid("e208ca67-5b59-45d9-a29a-7f30137d3beb")]
-[assembly: AssemblyVersion("1.1.2")]
-[assembly: AssemblyFileVersion("1.1.2")]
-[assembly: AssemblyInformationalVersion("1.1.2")]
