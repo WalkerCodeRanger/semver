@@ -5,3 +5,6 @@ TestResults/
 *.csproj.user
 *.suo
 *.nupkg
+/.vscode
+/.vs
+*.user
