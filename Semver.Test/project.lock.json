@@ -516,19 +516,6 @@
         "runtime": {
           "lib/net45/xunit.execution.desktop.dll": {}
         }
-      },
-      "Semver.Core/1.0.0": {
-        "type": "project",
-        "framework": ".NETFramework,Version=v2.0",
-        "dependencies": {
-          "NETStandard.Library": "1.5.0-rc2-24027"
-        },
-        "compile": {
-          "net20/Semver.Core.dll": {}
-        },
-        "runtime": {
-          "net20/Semver.Core.dll": {}
-        }
       }
     }
   },
@@ -2927,11 +2914,6 @@
         "xunit.extensibility.execution.2.2.0-beta1-build3239.nupkg.sha512",
         "xunit.extensibility.execution.nuspec"
       ]
-    },
-    "Semver.Core/1.0.0": {
-      "type": "project",
-      "path": "../Semver.Core/project.json",
-      "msbuildProject": "../Semver.Core/Semver.Core.xproj"
     }
   },
   "projectFileDependencyGroups": {
