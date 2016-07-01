@@ -1,0 +1,33 @@
+﻿{
+  "title": "Semantic Versioning",
+  
+  "authors": [
+    "Max Hauser",
+    "Adam Pawsey"
+  ],
+  "packOptions": {
+    "licenseUrl": "http://max.mit-license.org/",
+    "tags": [
+      "semver",
+      "semantic",
+      "version"
+    ],
+    "owners": [
+      "Adam Pawsey"
+    ],
+    "projectUrl": "https://github.com/apawsey/semver"
+  },
+  "description": "A semver implementation in .Net based on the v2.0.0 of the spec found at http://semver.org/.  This was forked from the semver package from Max Hauser, and is rebuilt to be compatible with .net 2+ and .net Standard 1+.",
+  "copyright": "Copyright 2016",
+  "version": "2.0.0-*",
+  "frameworks": {
+    "netstandard1": {
+      "imports": "dnxcore50",
+      "dependencies": {
+        "NETStandard.Library": "1.6.0"
+      }
+    },
+    "net20" : {
+    }
+  }
+}
