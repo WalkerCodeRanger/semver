@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 #if !NETSTANDARD
 using System.Runtime.Serialization;
 using System.Security.Permissions;
@@ -64,14 +63,8 @@ namespace Semver
             this.Minor = minor;
             this.Patch = patch;
 
-#if NETSTANDARD
-            this.Prerelease = String.Empty;
-            this.Build = String.Empty;
-#else
-            // strings are interned to be able to compare by reference in equals method
-            this.Prerelease = String.Intern(prerelease ?? "");
-            this.Build = String.Intern(build ?? "");
-#endif
+            this.Prerelease = prerelease ?? "";
+            this.Build = build ?? "";
         }
 
         /// <summary>
@@ -92,27 +85,15 @@ namespace Semver
                 this.Patch = version.Revision;
             }
 
-#if NETSTANDARD
             this.Prerelease = String.Empty;
-#else
-            this.Prerelease = String.Intern("");
-#endif
 
             if (version.Build > 0)
             {
-#if NETSTANDARD
                 this.Build = version.Build.ToString();
-#else
-                this.Build = String.Intern(version.Build.ToString());
-#endif
             }
             else
             {
-#if NETSTANDARD
                 this.Build = String.Empty;
-#else
-                this.Build = String.Intern("");
-#endif
             }
         }
 
@@ -129,21 +110,13 @@ namespace Semver
             if (!match.Success)
                 throw new ArgumentException("Invalid version.", "version");
 
-#if NETSTANDARD
-            var major = Int32.Parse(match.Groups["major"].Value);
-#else
-            var major = Int32.Parse(match.Groups["major"].Value, CultureInfo.InvariantCulture);
-#endif
+            var major = int.Parse(match.Groups["major"].Value);
 
             var minorMatch = match.Groups["minor"];
             int minor = 0;
             if (minorMatch.Success) 
             {
-#if NETSTANDARD
-                minor = Int32.Parse(minorMatch.Value);
-#else
-                minor = Int32.Parse(minorMatch.Value, CultureInfo.InvariantCulture);
-#endif
+                minor = int.Parse(minorMatch.Value);
             }
             else if (strict)
             {
@@ -154,11 +127,7 @@ namespace Semver
             int patch = 0;
             if (patchMatch.Success)
             {
-#if NETSTANDARD
-                patch = Int32.Parse(patchMatch.Value);
-#else
-                patch = Int32.Parse(patchMatch.Value, CultureInfo.InvariantCulture);
-#endif
+                patch = int.Parse(patchMatch.Value);
             }
             else if (strict) 
             {
@@ -441,12 +410,11 @@ namespace Semver
 
             var other = (SemVersion)obj;
 
-            // do string comparison by reference (possible because strings are interned in ctor)
             return this.Major == other.Major &&
                 this.Minor == other.Minor &&
                 this.Patch == other.Patch &&
-                ReferenceEquals(this.Prerelease, other.Prerelease) &&
-                ReferenceEquals(this.Build, other.Build);
+                string.Equals(this.Prerelease, other.Prerelease, StringComparison.Ordinal) &&
+                string.Equals(this.Build, other.Build, StringComparison.Ordinal);
         }
 
         /// <summary>

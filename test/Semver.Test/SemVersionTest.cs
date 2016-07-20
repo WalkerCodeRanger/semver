@@ -69,13 +69,10 @@ namespace Semver.Test
         [Fact]
         public void CreateVersionTestWithSystemVersion2()
         {
-            var v = new SemVersion(null);
-
-            Assert.Equal(0, v.Major);
-            Assert.Equal(0, v.Minor);
-            Assert.Equal(0, v.Patch);
-            Assert.Equal("", v.Build);
-            Assert.Equal("", v.Prerelease);
+            Assert.Throws(typeof(ArgumentNullException), () =>
+            {
+                var v = new SemVersion(null);
+            });
         }
 
         [Fact]
@@ -621,21 +618,21 @@ namespace Semver.Test
         [Fact]
         public void GreaterOperatorTest2()
         {
-            var v1 = new SemVersion( 1, 0, 0, "alpha" );
-            var v2 = new SemVersion( 1, 0, 0, "rc" );
+            var v1 = new SemVersion(1, 0, 0, "alpha");
+            var v2 = new SemVersion(1, 0, 0, "rc");
 
             var r = v2 > v1;
-            Assert.True( r );
+            Assert.True(r);
         }
 
         [Fact]
         public void GreaterOperatorTest3()
         {
-            var v1 = new SemVersion( 1, 0, 0, "-ci.1" );
-            var v2 = new SemVersion( 1, 0, 0, "alpha" );
+            var v1 = new SemVersion(1, 0, 0, "-ci.1");
+            var v2 = new SemVersion(1, 0, 0, "alpha");
 
             var r = v2 > v1;
-            Assert.True( r );
+            Assert.True(r);
         }
 
         [Fact]
@@ -671,21 +668,21 @@ namespace Semver.Test
         [Fact]
         public void LessOperatorTest2()
         {
-            var v1 = new SemVersion( 1, 0, 0, "alpha" );
-            var v2 = new SemVersion( 1, 0, 0, "rc" );
+            var v1 = new SemVersion(1, 0, 0, "alpha");
+            var v2 = new SemVersion(1, 0, 0, "rc");
 
             var r = v1 < v2;
-            Assert.True( r );
+            Assert.True(r);
         }
 
         [Fact]
         public void LessOperatorTest3()
         {
-            var v1 = new SemVersion( 1, 0, 0, "-ci.1" );
-            var v2 = new SemVersion( 1, 0, 0, "alpha" );
+            var v1 = new SemVersion(1, 0, 0, "-ci.1");
+            var v2 = new SemVersion(1, 0, 0, "alpha");
 
             var r = v1 < v2;
-            Assert.True( r );
+            Assert.True(r);
         }
 
         [Fact]
