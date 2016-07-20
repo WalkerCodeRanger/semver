@@ -1,5 +1,6 @@
 ﻿using System;
 #if !NETSTANDARD
+using System.Globalization;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 #endif
@@ -110,13 +111,21 @@ namespace Semver
             if (!match.Success)
                 throw new ArgumentException("Invalid version.", "version");
 
+#if NETSTANDARD
             var major = int.Parse(match.Groups["major"].Value);
+#else
+            var major = int.Parse(match.Groups["major"].Value, CultureInfo.InvariantCulture);
+#endif
 
             var minorMatch = match.Groups["minor"];
             int minor = 0;
             if (minorMatch.Success) 
             {
+#if NETSTANDARD
                 minor = int.Parse(minorMatch.Value);
+#else
+                minor = int.Parse(minorMatch.Value, CultureInfo.InvariantCulture);
+#endif
             }
             else if (strict)
             {
@@ -127,7 +136,11 @@ namespace Semver
             int patch = 0;
             if (patchMatch.Success)
             {
+#if NETSTANDARD
                 patch = int.Parse(patchMatch.Value);
+#else
+                patch = int.Parse(patchMatch.Value, CultureInfo.InvariantCulture);
+#endif
             }
             else if (strict) 
             {
