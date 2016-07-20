@@ -5,3 +5,8 @@ TestResults/
 *.csproj.user
 *.suo
 *.nupkg
+
+# project.json
+*.lock.json
+.vs
+*.user

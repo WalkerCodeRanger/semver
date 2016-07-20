@@ -1,15 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semver", "Semver\Semver.csproj", "{95B2542C-E371-4AB4-9E2D-B2665CBBD629}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semver.Test", "Semver.Test\Semver.Test.csproj", "{EAE17B6B-5380-4017-8046-1757EB77DF53}"
-EndProject
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AC069663-5FE9-438A-A9F4-C5293D695D98}"
 	ProjectSection(SolutionItems) = preProject
 		License.txt = License.txt
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Semver", "src\Semver\Semver.xproj", "{DA3E84C8-A960-420C-A85A-718005AACC36}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Semver.Test", "test\Semver.Test\Semver.Test.xproj", "{DA03E4C4-CB6C-447B-B617-15B5689E9029}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,14 +19,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{95B2542C-E371-4AB4-9E2D-B2665CBBD629}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{95B2542C-E371-4AB4-9E2D-B2665CBBD629}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{95B2542C-E371-4AB4-9E2D-B2665CBBD629}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{95B2542C-E371-4AB4-9E2D-B2665CBBD629}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EAE17B6B-5380-4017-8046-1757EB77DF53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EAE17B6B-5380-4017-8046-1757EB77DF53}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EAE17B6B-5380-4017-8046-1757EB77DF53}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EAE17B6B-5380-4017-8046-1757EB77DF53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA3E84C8-A960-420C-A85A-718005AACC36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA3E84C8-A960-420C-A85A-718005AACC36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA3E84C8-A960-420C-A85A-718005AACC36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA3E84C8-A960-420C-A85A-718005AACC36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA03E4C4-CB6C-447B-B617-15B5689E9029}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA03E4C4-CB6C-447B-B617-15B5689E9029}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA03E4C4-CB6C-447B-B617-15B5689E9029}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA03E4C4-CB6C-447B-B617-15B5689E9029}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
