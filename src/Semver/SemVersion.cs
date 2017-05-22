@@ -467,6 +467,16 @@ namespace Semver
         {
             return SemVersion.Parse(version);
         }
+        
+        /// <summary>
+        /// Implicit conversion from System.Version to SemVersion.
+        /// </summary>
+        /// <param name="version">The System.Version object.</param>
+        /// <returns>The SemVersion object.</returns>
+        public static implicit operator SemVersion(Version version)
+        {
+            return new SemVersion(version);
+        }
 
         /// <summary>
         /// The override of the equals operator. 
