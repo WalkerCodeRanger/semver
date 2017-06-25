@@ -12,21 +12,21 @@ namespace Semver.Test
         [Fact]
         public void CompareTestWithStrings1()
         {
-            Assert.True(SemVersion.Equals("1.0.0", "1"));
+            Assert.True(SemVersion.Equals((SemVersion)"1.0.0", (SemVersion)"1"));
         }
 
         [Fact]
         public void CompareTestWithStrings2()
         {
             var v = new SemVersion(1, 0, 0);
-            Assert.True(v < "1.1");
+            Assert.True(v < (SemVersion)"1.1");
         }
 
         [Fact]
         public void CompareTestWithStrings3()
         {
             var v = new SemVersion(1, 2);
-            Assert.True(v > "1.0.0");
+            Assert.True(v > (SemVersion)"1.0.0");
         }
 
         [Fact]
@@ -509,10 +509,35 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void TestStringConversion()
+        public void Operator_SemVersion_Converts_Correctly()
         {
-            SemVersion v = "1.0.0";
-            Assert.Equal(1, v.Major);
+            var v1 = (SemVersion)"1.0.0";
+            var v2 = new SemVersion(1, 0, 0);
+            Assert.Equal(v1, v2);
+        }
+
+        [Fact]
+        public void Operator_SemVersion_Propagates_Null()
+        {
+            string s = null;
+            SemVersion v = (SemVersion)s;
+            Assert.Equal(null, v);
+        }
+
+        [Fact]
+        public void Operator_String_Converts_Correctly()
+        {
+            SemVersion v = new SemVersion(1, 0, 0);
+            string s = v;
+            Assert.Equal("1.0.0", s);
+        }
+
+        [Fact]
+        public void Operator_String_Propagates_Null()
+        {
+            SemVersion v = null;
+            string s = v;
+            Assert.Equal(null, s);
         }
 
         [Fact]
