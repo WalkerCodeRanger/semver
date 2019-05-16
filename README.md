@@ -1,4 +1,5 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/kek3h7gflo3qqidb?svg=true)](https://ci.appveyor.com/project/maxhauser/semver)
+[![NuGet](https://img.shields.io/nuget/v/semver.svg)](https://www.nuget.org/packages/semver/)
 
 A semantic version library for .Net
 ===================================
