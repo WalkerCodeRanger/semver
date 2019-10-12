@@ -1,7 +1,7 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26114.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AC069663-5FE9-438A-A9F4-C5293D695D98}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,9 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Semver", "src\Semver\Semver.xproj", "{DA3E84C8-A960-420C-A85A-718005AACC36}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semver", "src\Semver\Semver.csproj", "{DA3E84C8-A960-420C-A85A-718005AACC36}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Semver.Test", "test\Semver.Test\Semver.Test.xproj", "{DA03E4C4-CB6C-447B-B617-15B5689E9029}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semver.Test", "test\Semver.Test\Semver.Test.csproj", "{DA03E4C4-CB6C-447B-B617-15B5689E9029}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
