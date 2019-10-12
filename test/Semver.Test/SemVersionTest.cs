@@ -101,82 +101,40 @@ namespace Semver.Test
             Assert.Equal("", v.Prerelease);
         }
 
-        [Fact]
-        public void ParseTest1()
+        [Theory]
+        // Major, Minor, Patch
+        [InlineData("1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, "alpha-beta", "nightly.23.43-bla")]
+        [InlineData("1.2.45-alpha+nightly.23", 1, 2, 45, "alpha", "nightly.23")]
+        [InlineData("3.2.1-beta", 3, 2, 1, "beta", "")]
+        [InlineData("2.0.0+nightly.23.43-bla", 2, 0, 0, "", "nightly.23.43-bla")]
+        [InlineData("5.6.7", 5, 6, 7, "", "")]
+        // Major, Minor
+        [InlineData("1.6-zeta.5+nightly.23.43-bla", 1, 6, 0, "zeta.5", "nightly.23.43-bla")]
+        [InlineData("2.0+nightly.23.43-bla", 2, 0, 0, "", "nightly.23.43-bla")]
+        [InlineData("2.1-alpha", 2, 1, 0, "alpha", "")]
+        [InlineData("5.6+nightly.23.43-bla", 5, 6, 0, "", "nightly.23.43-bla")]
+        [InlineData("3.2", 3, 2, 0, "", "")]
+        // Major
+        [InlineData("1-beta+dev.123", 1, 0, 0, "beta", "dev.123")]
+        [InlineData("7-rc.1", 7, 0, 0, "rc.1", "")]
+        [InlineData("6+sha.a3456b", 6, 0, 0, "", "sha.a3456b")]
+        [InlineData("64", 64, 0, 0, "", "")]
+        public void TestParseValidNonStrict(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
-            var version = SemVersion.Parse("1.2.45-alpha+nightly.23");
+            var version = SemVersion.Parse(versionString);
 
-            Assert.Equal(1, version.Major);
-            Assert.Equal(2, version.Minor);
-            Assert.Equal(45, version.Patch);
-            Assert.Equal("alpha", version.Prerelease);
-            Assert.Equal("nightly.23", version.Build);
+            Assert.Equal(major, version.Major);
+            Assert.Equal(minor, version.Minor);
+            Assert.Equal(patch, version.Patch);
+            Assert.Equal(prerelease, version.Prerelease);
+            Assert.Equal(build, version.Build);
         }
 
-        [Fact]
-        public void ParseTest2()
+        [Theory]
+        [InlineData("ui-2.1-alpha")]
+        public void TestParseInvalidNonStrict(string versionString)
         {
-            var version = SemVersion.Parse("1");
-
-            Assert.Equal(1, version.Major);
-            Assert.Equal(0, version.Minor);
-            Assert.Equal(0, version.Patch);
-            Assert.Equal("", version.Prerelease);
-            Assert.Equal("", version.Build);
-        }
-
-        [Fact]
-        public void ParseTest3()
-        {
-            var version = SemVersion.Parse("1.2.45-alpha-beta+nightly.23.43-bla");
-
-            Assert.Equal(1, version.Major);
-            Assert.Equal(2, version.Minor);
-            Assert.Equal(45, version.Patch);
-            Assert.Equal("alpha-beta", version.Prerelease);
-            Assert.Equal("nightly.23.43-bla", version.Build);
-        }
-
-        [Fact]
-        public void ParseTest4()
-        {
-            var version = SemVersion.Parse("2.0.0+nightly.23.43-bla");
-
-            Assert.Equal(2, version.Major);
-            Assert.Equal(0, version.Minor);
-            Assert.Equal(0, version.Patch);
-            Assert.Equal("", version.Prerelease);
-            Assert.Equal("nightly.23.43-bla", version.Build);
-        }
-
-        [Fact]
-        public void ParseTest5()
-        {
-            var version = SemVersion.Parse("2.0+nightly.23.43-bla");
-
-            Assert.Equal(2, version.Major);
-            Assert.Equal(0, version.Minor);
-            Assert.Equal(0, version.Patch);
-            Assert.Equal("", version.Prerelease);
-            Assert.Equal("nightly.23.43-bla", version.Build);
-        }
-
-        [Fact]
-        public void ParseTest6()
-        {
-            var version = SemVersion.Parse("2.1-alpha");
-
-            Assert.Equal(2, version.Major);
-            Assert.Equal(1, version.Minor);
-            Assert.Equal(0, version.Patch);
-            Assert.Equal("alpha", version.Prerelease);
-            Assert.Equal("", version.Build);
-        }
-
-        [Fact]
-        public void ParseTest7()
-        {
-            Assert.Throws<ArgumentException>(() => SemVersion.Parse("ui-2.1-alpha"));
+            Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString));
         }
 
         [Fact]
@@ -328,11 +286,9 @@ namespace Semver.Test
             Assert.True(r);
         }
 
-        // TODO switch this to strict parsing
         [Theory]
         [InlineData("1.0.0", "2.0.0", -1)]
-        [InlineData("1.0.0-beta+dev.123", "1-beta+dev.123", 0)] // TODO this is really a test of parsing
-        [InlineData("1.0.0-alpha+dev.123", "1-beta+dev.123", -1)]
+        [InlineData("1.0.0-alpha+dev.123", "1.0.0-beta+dev.123", -1)]
         [InlineData("1.0.0-alpha", "1.0.0", -1)]
         [InlineData("1.0.0", "1.0.1-alpha", -1)]
         [InlineData("0.0.1", "0.0.1+build.12", -1)]
@@ -347,8 +303,8 @@ namespace Semver.Test
         [InlineData("0.1.1-gamma.12.87", "0.1.1-gamma.12.87.X", -1)]
         public void TestCompareTo(string s1, string s2, int expected)
         {
-            var v1 = SemVersion.Parse(s1);
-            var v2 = SemVersion.Parse(s2);
+            var v1 = SemVersion.Parse(s1, true);
+            var v2 = SemVersion.Parse(s2, true);
 
             var r1 = v1.CompareTo(v2);
             var r2 = v2.CompareTo(v1);
