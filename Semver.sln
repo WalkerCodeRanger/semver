@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26114.2
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29403.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AC069663-5FE9-438A-A9F4-C5293D695D98}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,9 +8,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semver", "src\Semver\Semver.csproj", "{DA3E84C8-A960-420C-A85A-718005AACC36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semver", "src\Semver\Semver.csproj", "{DA3E84C8-A960-420C-A85A-718005AACC36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semver.Test", "test\Semver.Test\Semver.Test.csproj", "{DA03E4C4-CB6C-447B-B617-15B5689E9029}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semver.Test", "test\Semver.Test\Semver.Test.csproj", "{DA03E4C4-CB6C-447B-B617-15B5689E9029}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +29,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A05F4B16-7ADB-4D56-B2BD-23F27721AF37}
 	EndGlobalSection
 EndGlobal
