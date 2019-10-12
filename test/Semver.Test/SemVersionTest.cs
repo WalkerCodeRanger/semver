@@ -287,9 +287,7 @@ namespace Semver.Test
         }
 
         [Theory]
-        [InlineData("1.0.0", "2.0.0", -1)]
         [InlineData("1.0.0-alpha+dev.123", "1.0.0-beta+dev.123", -1)]
-        [InlineData("1.0.0-alpha", "1.0.0", -1)]
         [InlineData("1.0.0", "1.0.1-alpha", -1)]
         [InlineData("0.0.1", "0.0.1+build.12", -1)]
         [InlineData("0.0.1+build.13", "0.0.1+build.12.2", 1)]
@@ -301,6 +299,18 @@ namespace Semver.Test
         [InlineData("0.1.1-gamma.12.87", "0.1.1-gamma.12.87.1", -1)]
         [InlineData("0.1.1-gamma.12.87.99", "0.1.1-gamma.12.87.X", -1)]
         [InlineData("0.1.1-gamma.12.87", "0.1.1-gamma.12.87.X", -1)]
+        // Examples from spec
+        [InlineData("1.0.0", "2.0.0", -1)]
+        [InlineData("2.0.0", "2.1.0", -1)]
+        [InlineData("2.1.0", "2.1.1", -1)]
+        [InlineData("1.0.0-alpha", "1.0.0", -1)]
+        [InlineData("1.0.0-alpha", "1.0.0-alpha.1", -1)]
+        [InlineData("1.0.0-alpha.1", "1.0.0-alpha.beta", -1)]
+        [InlineData("1.0.0-alpha.beta", "1.0.0-beta", -1)]
+        [InlineData("1.0.0-beta", "1.0.0-beta.2", -1)]
+        [InlineData("1.0.0-beta.2", "1.0.0-beta.11", -1)]
+        //[InlineData("1.0.0-beta.11", "1.0.0-rc.1", -1)] // TODO currently gives -16 which is correct but surprising
+        [InlineData("1.0.0-rc.1", "1.0.0", -1)]
         public void TestCompareTo(string s1, string s2, int expected)
         {
             var v1 = SemVersion.Parse(s1, true);
@@ -321,6 +331,50 @@ namespace Semver.Test
             Assert.Equal(1, r);
         }
 
+        [Theory]
+        [InlineData("1.0.0-alpha+dev.123", "1.0.0-beta+dev.123", -1)]
+        [InlineData("1.0.0", "1.0.1-alpha", -1)]
+        [InlineData("0.0.1", "0.0.1+build.12", 0)]
+        [InlineData("0.0.1+build.13", "0.0.1+build.12.2", 0)]
+        [InlineData("0.0.1-13", "0.0.1-b", -1)]
+        [InlineData("0.0.1+uiui", "0.0.1+12", 0)]
+        [InlineData("0.0.1+bu", "0.0.1", 0)]
+        [InlineData("0.1.1+bu", "0.2.1", -1)]
+        [InlineData("0.1.1-gamma.12.87", "0.1.1-gamma.12.88", -1)]
+        [InlineData("0.1.1-gamma.12.87", "0.1.1-gamma.12.87.1", -1)]
+        [InlineData("0.1.1-gamma.12.87.99", "0.1.1-gamma.12.87.X", -1)]
+        [InlineData("0.1.1-gamma.12.87", "0.1.1-gamma.12.87.X", -1)]
+        // Examples from spec
+        [InlineData("1.0.0", "2.0.0", -1)]
+        [InlineData("2.0.0", "2.1.0", -1)]
+        [InlineData("2.1.0", "2.1.1", -1)]
+        [InlineData("1.0.0-alpha", "1.0.0", -1)]
+        [InlineData("1.0.0-alpha", "1.0.0-alpha.1", -1)]
+        [InlineData("1.0.0-alpha.1", "1.0.0-alpha.beta", -1)]
+        [InlineData("1.0.0-alpha.beta", "1.0.0-beta", -1)]
+        [InlineData("1.0.0-beta", "1.0.0-beta.2", -1)]
+        [InlineData("1.0.0-beta.2", "1.0.0-beta.11", -1)]
+        //[InlineData("1.0.0-beta.11", "1.0.0-rc.1", -1)] // TODO currently gives -16 which is correct but surprising
+        [InlineData("1.0.0-rc.1", "1.0.0", -1)]
+        public void TestCompareByPrecedence(string s1, string s2, int expected)
+        {
+            var v1 = SemVersion.Parse(s1, true);
+            var v2 = SemVersion.Parse(s2, true);
+
+            var r1 = v1.CompareByPrecedence(v2);
+            var r2 = v2.CompareByPrecedence(v1);
+
+            Assert.Equal(expected, r1);
+            Assert.Equal(-expected, r2);
+        }
+
+        [Fact]
+        public void TestCompareByPrecedenceToNull()
+        {
+            var v1 = SemVersion.Parse("0.0.1+bu");
+            var r = v1.CompareByPrecedence(null);
+            Assert.Equal(1, r);
+        }
         [Fact]
         public void TestHashCode()
         {
