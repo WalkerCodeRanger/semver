@@ -137,34 +137,37 @@ namespace Semver.Test
             Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString));
         }
 
-        [Fact]
-        public void ParseTestStrict1()
+        [Theory]
+        [InlineData("1.3.4", 1, 3, 4, "", "")]
+        public void TestParseStrict(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
-            var version = SemVersion.Parse("1.3.4", true);
+            var version = SemVersion.Parse(versionString, true);
 
-            Assert.Equal(1, version.Major);
-            Assert.Equal(3, version.Minor);
-            Assert.Equal(4, version.Patch);
-            Assert.Equal("", version.Prerelease);
-            Assert.Equal("", version.Build);
+            Assert.Equal(major, version.Major);
+            Assert.Equal(minor, version.Minor);
+            Assert.Equal(patch, version.Patch);
+            Assert.Equal(prerelease, version.Prerelease);
+            Assert.Equal(build, version.Build);
         }
 
-        [Fact]
-        public void ParseTestStrict2()
+        [Theory]
+        [InlineData("1.0.0-a@")]
+        [InlineData("1.0.0-á")]
+        public void TestParseInvalidStrict1(string versionString)
         {
-            Assert.Throws<InvalidOperationException>(() => SemVersion.Parse("1", true));
+            Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString, true));
         }
 
-        [Fact]
-        public void ParseTestStrict3()
+        [Theory]
+        [InlineData("1")]
+        [InlineData("1.3")]
+        [InlineData("1.3-alpha")]
+        // TODO these should be rejected
+        //[InlineData("01.02.03")] 
+        //[InlineData("1.0.0-alpha.01")]
+        public void TestParseInvalidStrict2(string versionString)
         {
-            Assert.Throws<InvalidOperationException>(() => SemVersion.Parse("1.3", true));
-        }
-
-        [Fact]
-        public void ParseTestStrict4()
-        {
-            Assert.Throws<InvalidOperationException>(() => SemVersion.Parse("1.3-alpha", true));
+            Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
         }
 
         [Fact]
