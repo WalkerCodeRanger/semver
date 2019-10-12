@@ -334,7 +334,6 @@ namespace Semver.Test
         [InlineData("1.0.0-beta+dev.123", "1-beta+dev.123", 0)] // TODO this is really a test of parsing
         [InlineData("1.0.0-alpha+dev.123", "1-beta+dev.123", -1)]
         [InlineData("1.0.0-alpha", "1.0.0", -1)]
-        [InlineData("1.0.0", "1.0.0-alpha", 1)]
         [InlineData("1.0.0", "1.0.1-alpha", -1)]
         [InlineData("0.0.1", "0.0.1+build.12", -1)]
         [InlineData("0.0.1+build.13", "0.0.1+build.12.2", 1)]
@@ -351,8 +350,11 @@ namespace Semver.Test
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
 
-            var r = v1.CompareTo(v2);
-            Assert.Equal(expected, r);
+            var r1 = v1.CompareTo(v2);
+            var r2 = v2.CompareTo(v1);
+
+            Assert.Equal(expected, r1);
+            Assert.Equal(-expected, r2);
         }
 
         [Fact]
