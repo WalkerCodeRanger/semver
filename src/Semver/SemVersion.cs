@@ -119,7 +119,7 @@ namespace Semver
 
             var minorMatch = match.Groups["minor"];
             int minor = 0;
-            if (minorMatch.Success) 
+            if (minorMatch.Success)
             {
 #if NETSTANDARD
                 minor = int.Parse(minorMatch.Value);
@@ -142,7 +142,7 @@ namespace Semver
                 patch = int.Parse(patchMatch.Value, CultureInfo.InvariantCulture);
 #endif
             }
-            else if (strict) 
+            else if (strict)
             {
                 throw new InvalidOperationException("Invalid version (no patch version given in strict mode)");
             }

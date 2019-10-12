@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 #if !NETSTANDARD
+using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
 using Xunit;
@@ -328,168 +328,35 @@ namespace Semver.Test
             Assert.True(r);
         }
 
-        [Fact]
-        public void CompareTest1()
+        // TODO switch this to strict parsing
+        [Theory]
+        [InlineData("1.0.0", "2.0.0", -1)]
+        [InlineData("1.0.0-beta+dev.123", "1-beta+dev.123", 0)] // TODO this is really a test of parsing
+        [InlineData("1.0.0-alpha+dev.123", "1-beta+dev.123", -1)]
+        [InlineData("1.0.0-alpha", "1.0.0", -1)]
+        [InlineData("1.0.0", "1.0.0-alpha", 1)]
+        [InlineData("1.0.0", "1.0.1-alpha", -1)]
+        [InlineData("0.0.1", "0.0.1+build.12", -1)]
+        [InlineData("0.0.1+build.13", "0.0.1+build.12.2", 1)]
+        [InlineData("0.0.1-13", "0.0.1-b", -1)]
+        [InlineData("0.0.1+uiui", "0.0.1+12", 1)]
+        [InlineData("0.0.1+bu", "0.0.1", 1)]
+        [InlineData("0.1.1+bu", "0.2.1", -1)]
+        [InlineData("0.1.1-gamma.12.87", "0.1.1-gamma.12.88", -1)]
+        [InlineData("0.1.1-gamma.12.87", "0.1.1-gamma.12.87.1", -1)]
+        [InlineData("0.1.1-gamma.12.87.99", "0.1.1-gamma.12.87.X", -1)]
+        [InlineData("0.1.1-gamma.12.87", "0.1.1-gamma.12.87.X", -1)]
+        public void TestCompareTo(string s1, string s2, int expected)
         {
-            var v1 = SemVersion.Parse("1.0.0");
-            var v2 = SemVersion.Parse("2.0.0");
+            var v1 = SemVersion.Parse(s1);
+            var v2 = SemVersion.Parse(s2);
 
             var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
+            Assert.Equal(expected, r);
         }
 
         [Fact]
-        public void CompareTest2()
-        {
-            var v1 = SemVersion.Parse("1.0.0-beta+dev.123");
-            var v2 = SemVersion.Parse("1-beta+dev.123");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(0, r);
-        }
-
-        [Fact]
-        public void CompareTest3()
-        {
-            var v1 = SemVersion.Parse("1.0.0-alpha+dev.123");
-            var v2 = SemVersion.Parse("1-beta+dev.123");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void CompareTest4()
-        {
-            var v1 = SemVersion.Parse("1.0.0-alpha");
-            var v2 = SemVersion.Parse("1.0.0");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void CompareTest5()
-        {
-            var v1 = SemVersion.Parse("1.0.0");
-            var v2 = SemVersion.Parse("1.0.0-alpha");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(1, r);
-        }
-
-        [Fact]
-        public void CompareTest6()
-        {
-            var v1 = SemVersion.Parse("1.0.0");
-            var v2 = SemVersion.Parse("1.0.1-alpha");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void CompareTest7()
-        {
-            var v1 = SemVersion.Parse("0.0.1");
-            var v2 = SemVersion.Parse("0.0.1+build.12");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void CompareTest8()
-        {
-            var v1 = SemVersion.Parse("0.0.1+build.13");
-            var v2 = SemVersion.Parse("0.0.1+build.12.2");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(1, r);
-        }
-
-        [Fact]
-        public void CompareTest9()
-        {
-            var v1 = SemVersion.Parse("0.0.1-13");
-            var v2 = SemVersion.Parse("0.0.1-b");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void CompareTest10()
-        {
-            var v1 = SemVersion.Parse("0.0.1+uiui");
-            var v2 = SemVersion.Parse("0.0.1+12");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(1, r);
-        }
-
-        [Fact]
-        public void CompareTest11()
-        {
-            var v1 = SemVersion.Parse("0.0.1+bu");
-            var v2 = SemVersion.Parse("0.0.1");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(1, r);
-        }
-
-        [Fact]
-        public void CompareTest12()
-        {
-            var v1 = SemVersion.Parse("0.1.1+bu");
-            var v2 = SemVersion.Parse("0.2.1");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void CompareTest13()
-        {
-            var v1 = SemVersion.Parse("0.1.1-gamma.12.87");
-            var v2 = SemVersion.Parse("0.1.1-gamma.12.88");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void CompareTest14()
-        {
-            var v1 = SemVersion.Parse("0.1.1-gamma.12.87");
-            var v2 = SemVersion.Parse("0.1.1-gamma.12.87.1");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void CompareTest15()
-        {
-            var v1 = SemVersion.Parse("0.1.1-gamma.12.87.99");
-            var v2 = SemVersion.Parse("0.1.1-gamma.12.87.X");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void CompareTest16()
-        {
-            var v1 = SemVersion.Parse("0.1.1-gamma.12.87");
-            var v2 = SemVersion.Parse("0.1.1-gamma.12.87.X");
-
-            var r = v1.CompareTo(v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void CompareNullTest()
+        public void TestCompareToNull()
         {
             var v1 = SemVersion.Parse("0.0.1+bu");
             var r = v1.CompareTo(null);
@@ -768,7 +635,7 @@ namespace Semver.Test
                 var bf = new BinaryFormatter();
                 bf.Serialize(ms, semVer);
                 ms.Position = 0;
-                semVerSerializedDeserialized = (SemVersion) bf.Deserialize(ms);
+                semVerSerializedDeserialized = (SemVersion)bf.Deserialize(ms);
             }
             Assert.Equal(semVer, semVerSerializedDeserialized);
         }
