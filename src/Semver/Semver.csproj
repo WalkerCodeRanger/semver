@@ -2,9 +2,8 @@
 
   <PropertyGroup>
     <Description>A semver implementation in .Net based on the v2.0.0 of the spec found at http://semver.org/.</Description>
-    <Copyright>Copyright (c) 2013</Copyright>
+    <Copyright>Copyright © 2013 Max Hauser</Copyright>
     <AssemblyTitle>Semantic versioning</AssemblyTitle>
-    <VersionPrefix>99.99.99-dev</VersionPrefix>
     <Authors>Max Hauser</Authors>
     <TargetFrameworks>netstandard1.1;net452</TargetFrameworks>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
@@ -16,16 +15,12 @@
     <PackageTags>semver;semantic;version</PackageTags>
     <PackageReleaseNotes>https://github.com/maxhauser/semver/releases</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/maxhauser/semver</PackageProjectUrl>
-    <PackageLicenseUrl>http://max.mit-license.org/</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/maxhauser/semver</RepositoryUrl>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <RepositoryUrl>https://github.com/maxhauser/semver.git</RepositoryUrl>
+    <Company></Company>
+    <Version>0.0.0-dev</Version>
+    <InformationalVersion>0.0.0-dev+0000000000</InformationalVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
