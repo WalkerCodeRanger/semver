@@ -139,6 +139,11 @@ namespace Semver.Test
 
         [Theory]
         [InlineData("1.3.4", 1, 3, 4, "", "")]
+        // TODO these invalid versions are accepted (issue #16)
+        [InlineData("01.2.3", 1, 2, 3, "", "")]
+        [InlineData("1.02.3", 1, 2, 3, "", "")]
+        [InlineData("1.2.03", 1, 2, 3, "", "")]
+        [InlineData("1.0.0-alpha.01", 1, 0, 0, "alpha.01", "")]
         public void TestParseStrict(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             var version = SemVersion.Parse(versionString, true);
@@ -162,9 +167,7 @@ namespace Semver.Test
         [InlineData("1")]
         [InlineData("1.3")]
         [InlineData("1.3-alpha")]
-        // TODO these should be rejected
-        //[InlineData("01.02.03")] 
-        //[InlineData("1.0.0-alpha.01")]
+
         public void TestParseInvalidStrict2(string versionString)
         {
             Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
