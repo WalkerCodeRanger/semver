@@ -309,7 +309,8 @@ namespace Semver.Test
         [InlineData("1.0.0-alpha.beta", "1.0.0-beta", -1)]
         [InlineData("1.0.0-beta", "1.0.0-beta.2", -1)]
         [InlineData("1.0.0-beta.2", "1.0.0-beta.11", -1)]
-        //[InlineData("1.0.0-beta.11", "1.0.0-rc.1", -1)] // TODO currently gives -16 which is correct but surprising
+        // TODO comparison distinguished by string order currently gives numbers outside -1,0,1 (issue #26)
+        [InlineData("1.0.0-beta.11", "1.0.0-rc.1", -16)]
         [InlineData("1.0.0-rc.1", "1.0.0", -1)]
         public void TestCompareTo(string s1, string s2, int expected)
         {
@@ -354,7 +355,8 @@ namespace Semver.Test
         [InlineData("1.0.0-alpha.beta", "1.0.0-beta", -1)]
         [InlineData("1.0.0-beta", "1.0.0-beta.2", -1)]
         [InlineData("1.0.0-beta.2", "1.0.0-beta.11", -1)]
-        //[InlineData("1.0.0-beta.11", "1.0.0-rc.1", -1)] // TODO currently gives -16 which is correct but surprising
+        // TODO comparison distinguished by string order currently gives numbers outside -1,0,1 (issue #26)
+        [InlineData("1.0.0-beta.11", "1.0.0-rc.1", -16)]
         [InlineData("1.0.0-rc.1", "1.0.0", -1)]
         public void TestCompareByPrecedence(string s1, string s2, int expected)
         {
@@ -375,6 +377,7 @@ namespace Semver.Test
             var r = v1.CompareByPrecedence(null);
             Assert.Equal(1, r);
         }
+
         [Fact]
         public void TestHashCode()
         {
