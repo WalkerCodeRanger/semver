@@ -69,7 +69,7 @@ namespace Semver.Test
         [Fact]
         public void CreateVersionTestWithSystemVersion2()
         {
-            Assert.Throws(typeof(ArgumentNullException), () =>
+            Assert.Throws<ArgumentNullException>(() =>
             {
                 var v = new SemVersion(null);
             });

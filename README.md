@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/kek3h7gflo3qqidb?svg=true)](https://ci.appveyor.com/project/maxhauser/semver)
+[![Build status](https://ci.appveyor.com/api/projects/status/kek3h7gflo3qqidb/branch/master?svg=true)](https://ci.appveyor.com/project/maxhauser/semver/branch/master)
 
 A semantic version library for .Net
 ===================================
@@ -8,7 +8,7 @@ complies to v2.0.0 of the spec from http://semver.org.
 
 **Installation**
 
-With the nuget console:
+With the NuGet console:
 
      Install-Package semver
 

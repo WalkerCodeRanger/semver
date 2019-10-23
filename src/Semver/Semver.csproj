@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>A semver implementation in .Net based on the v2.0.0 of the spec found at http://semver.org/.</Description>
+    <Copyright>Copyright © 2013 Max Hauser</Copyright>
+    <AssemblyTitle>Semantic versioning</AssemblyTitle>
+    <Authors>Max Hauser</Authors>
+    <TargetFrameworks>netstandard1.1;net452</TargetFrameworks>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DebugType>portable</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <AssemblyName>Semver</AssemblyName>
+    <PackageId>Semver</PackageId>
+    <PackageTags>semver;semantic;version</PackageTags>
+    <PackageReleaseNotes>https://github.com/maxhauser/semver/releases</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/maxhauser/semver</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/maxhauser/semver.git</RepositoryUrl>
+    <Company></Company>
+    <Version>0.0.0-dev</Version>
+    <InformationalVersion>0.0.0-dev+0000000000</InformationalVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD;NETSTANDARD1_1</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <Reference Include="System.Runtime" />
+    <Reference Include="System.Threading.Tasks" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

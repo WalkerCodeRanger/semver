@@ -1,12 +1,7 @@
-.buildtools/
+.vs/
 bin/
 obj/
 TestResults/
-*.csproj.user
+*.user
 *.suo
 *.nupkg
-
-# project.json
-*.lock.json
-.vs
-*.user
