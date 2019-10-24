@@ -49,6 +49,13 @@ namespace Semver.Test
         [InlineData(-1, 0, 0, "", "")]
         [InlineData(0, -1, 0, "", "")]
         [InlineData(0, 0, -1, "", "")]
+        // TODO these should be invalid and throw argument exceptions issue #41
+        [InlineData(1, 2, 3, "😞", "b")]
+        [InlineData(1, 2, 3, "a", "😞")]
+        [InlineData(1, 2, 3, "01", "b")]
+        [InlineData(1, 2, 3, "a.01", "b")]
+        [InlineData(1, 2, 3, "a..empty", "b")]
+        [InlineData(1, 2, 3, "a", "b..empty")]
         public void ConstructSemVersion(int major, int minor, int patch, string prerelease, string build)
         {
             var v = new SemVersion(major, minor, patch, prerelease, build);
