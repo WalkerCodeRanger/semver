@@ -131,10 +131,12 @@ namespace Semver.Test
         }
 
         [Theory]
-        [InlineData("ui-2.1-alpha")]
-        public void TestParseInvalidNonStrict(string versionString)
+        [InlineData("ui-2.1-alpha", "Invalid version.\r\nParameter name: version")]
+        // TODO add tests for: leading v, leading V, too large integer, null
+        public void TestParseInvalidNonStrict(string versionString, string expectedMsg)
         {
-            Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString));
+            var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString));
+            Assert.Equal(expectedMsg, ex.Message);
         }
 
         [Theory]
@@ -155,22 +157,26 @@ namespace Semver.Test
             Assert.Equal(build, version.Build);
         }
 
+        // TODO These exceptions should be FormatException etc.
         [Theory]
-        [InlineData("1.0.0-a@")]
-        [InlineData("1.0.0-á")]
-        public void TestParseInvalidStrict1(string versionString)
+        [InlineData("1.0.0-a@", "Invalid version.\r\nParameter name: version")]
+        [InlineData("1.0.0-á", "Invalid version.\r\nParameter name: version")]
+        // TODO add tests for: leading v, leading V, too large integer, null
+        public void TestParseInvalidStrict(string versionString, string expectedMsg)
         {
-            Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString, true));
+            var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString, true));
+            Assert.Equal(expectedMsg, ex.Message);
         }
 
+        // TODO These exceptions should be FormatException etc.
         [Theory]
-        [InlineData("1")]
-        [InlineData("1.3")]
-        [InlineData("1.3-alpha")]
-
-        public void TestParseInvalidStrict2(string versionString)
+        [InlineData("1", "Invalid version (no minor version given in strict mode)")]
+        [InlineData("1.3", "Invalid version (no patch version given in strict mode)")]
+        [InlineData("1.3-alpha", "Invalid version (no patch version given in strict mode)")]
+        public void TestParseInvalidStrictThrowInvalidOperation(string versionString, string expectedMsg)
         {
-            Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
+            var ex = Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
+            Assert.Equal(expectedMsg, ex.Message);
         }
 
         [Fact]
