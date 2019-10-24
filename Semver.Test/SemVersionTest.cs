@@ -617,7 +617,7 @@ namespace Semver.Test
 
 #if !NETSTANDARD
         [Fact]
-        public void TestSerialization()
+        public void SerializationTest()
         {
             var semVer = new SemVersion(1, 2, 3, "alpha", "dev");
             SemVersion semVerSerializedDeserialized;
