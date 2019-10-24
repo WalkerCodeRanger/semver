@@ -493,7 +493,7 @@ namespace Semver
         /// <returns>If left is greater than or equal to right <see langword="true"/>, else <see langword="false"/>.</returns>
         public static bool operator >=(SemVersion left, SemVersion right)
         {
-            return left == right || left > right;
+            return Compare(left, right) >= 0;
         }
 
         /// <summary>
@@ -515,7 +515,7 @@ namespace Semver
         /// <returns>If left is less than or equal to right <see langword="true"/>, else <see langword="false"/>.</returns>
         public static bool operator <=(SemVersion left, SemVersion right)
         {
-            return left == right || left < right;
+            return Compare(left, right) <= 0;
         }
     }
 }
