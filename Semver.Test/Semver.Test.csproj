@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Semver\Semver.csproj" />
+    <ProjectReference Include="..\Semver\Semver.csproj" />
   </ItemGroup>
 
   <ItemGroup>
