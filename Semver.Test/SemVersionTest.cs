@@ -29,77 +29,58 @@ namespace Semver.Test
             Assert.True(v > "1.0.0");
         }
 
+        #region Constructors
         [Fact]
-        public void CreateVersionTest()
+        public void ConstructSemVersionDefaultValues()
         {
-            var v = new SemVersion(1, 2, 3, "a", "b");
+            var v = new SemVersion(1);
 
             Assert.Equal(1, v.Major);
-            Assert.Equal(2, v.Minor);
-            Assert.Equal(3, v.Patch);
-            Assert.Equal("a", v.Prerelease);
-            Assert.Equal("b", v.Build);
-        }
-
-        [Fact]
-        public void CreateVersionTestWithNulls()
-        {
-            var v = new SemVersion(1, 2, 3, null, null);
-
-            Assert.Equal(1, v.Major);
-            Assert.Equal(2, v.Minor);
-            Assert.Equal(3, v.Patch);
-            Assert.Equal("", v.Prerelease);
-            Assert.Equal("", v.Build);
-        }
-
-        [Fact]
-        public void CreateVersionTestWithSystemVersion1()
-        {
-            var nonSemanticVersion = new Version(0, 0);
-            var v = new SemVersion(nonSemanticVersion);
-
-            Assert.Equal(0, v.Major);
             Assert.Equal(0, v.Minor);
             Assert.Equal(0, v.Patch);
-            Assert.Equal("", v.Build);
             Assert.Equal("", v.Prerelease);
+            Assert.Equal("", v.Build);
         }
 
-        [Fact]
-        public void CreateVersionTestWithSystemVersion2()
+        [Theory]
+        [InlineData(1, 2, 3, "a", "b")]
+        [InlineData(1, 2, 3, null, null)]
+        public void ConstructSemVersion(int major, int minor, int patch, string prerelease, string build)
         {
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                var v = new SemVersion(null);
-            });
+            var v = new SemVersion(major, minor, patch, prerelease, build);
+
+            Assert.Equal(major, v.Major);
+            Assert.Equal(minor, v.Minor);
+            Assert.Equal(patch, v.Patch);
+            Assert.Equal(prerelease ?? "", v.Prerelease);
+            Assert.Equal(build ?? "", v.Build);
         }
 
-        [Fact]
-        public void CreateVersionTestWithSystemVersion3()
+        [Theory]
+        [InlineData(0, 0, 0, 0)]
+        [InlineData(1, 2, 0, 3)]
+        [InlineData(1, 2, 4, 3)]
+        public void ConstructSemVersionFromSystemVersion(int major, int minor, int build, int revision)
         {
-            var nonSemanticVersion = new Version(1, 2, 0, 3);
+            var nonSemanticVersion = new Version(major, minor, build, revision);
+
             var v = new SemVersion(nonSemanticVersion);
 
-            Assert.Equal(1, v.Major);
-            Assert.Equal(2, v.Minor);
-            Assert.Equal(3, v.Patch);
-            Assert.Equal("", v.Build);
+            Assert.Equal(major, v.Major);
+            Assert.Equal(minor, v.Minor);
+            Assert.Equal(revision, v.Patch);
             Assert.Equal("", v.Prerelease);
+            Assert.Equal(build > 0 ? build.ToString() : "", v.Build);
         }
 
         [Fact]
-        public void CreateVersionTestWithSystemVersion4()
+        public void ConstructSemVersionFromNullSystemVersion()
         {
-            var nonSemanticVersion = new Version(1, 2, 4, 3);
-            var v = new SemVersion(nonSemanticVersion);
+            var ex = Assert.Throws<ArgumentNullException>(() => new SemVersion(null));
 
-            Assert.Equal(1, v.Major);
-            Assert.Equal(2, v.Minor);
-            Assert.Equal(3, v.Patch);
-            Assert.Equal("4", v.Build);
-            Assert.Equal("", v.Prerelease);
+            Assert.Equal("Value cannot be null.\r\nParameter name: version", ex.Message);
         }
+        #endregion
 
         [Theory]
         // Major, Minor, Patch
