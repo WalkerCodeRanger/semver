@@ -75,6 +75,9 @@ namespace Semver.Test
         #endregion
 
         #region Parsing
+        // TODO Come up with a better way to manage test data shared by tests
+        // TODO use examples given with sample regexs
+
         [Theory]
         // Major, Minor, Patch
         [InlineData("1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, "alpha-beta", "nightly.23.43-bla")]
@@ -282,68 +285,25 @@ namespace Semver.Test
         #endregion
 
         #region Equality
-        [Fact]
-        public void EqualTest1()
+        [Theory]
+        [InlineData("1.2+nightly", "1.2+nightly", true)]
+        [InlineData("1.2-alpha+dev", "1.2-alpha+dev", true)]
+        [InlineData("1.2-nightly+dev", "1.2.0-nightly", false)]
+        [InlineData("1.2-nightly", "1.2.0-nightly2", false)]
+        [InlineData("1.2.1", "1.2.0", false)]
+        [InlineData("1.4.0", "1.2.0", false)]
+        public void EqualsTest(string s1, string s2, bool equal)
         {
-            var v1 = new SemVersion(1, 2, build: "nightly");
-            var v2 = new SemVersion(1, 2, build: "nightly");
+            var v1 = SemVersion.Parse(s1);
+            var v2 = SemVersion.Parse(s2);
 
             var r = v1.Equals(v2);
-            Assert.True(r);
+
+            Assert.Equal(equal, r);
         }
 
         [Fact]
-        public void EqualTest2()
-        {
-            var v1 = new SemVersion(1, 2, prerelease: "alpha", build: "dev");
-            var v2 = new SemVersion(1, 2, prerelease: "alpha", build: "dev");
-
-            var r = v1.Equals(v2);
-            Assert.True(r);
-        }
-
-        [Fact]
-        public void EqualTest3()
-        {
-            var v1 = SemVersion.Parse("1.2-nightly+dev");
-            var v2 = SemVersion.Parse("1.2.0-nightly");
-
-            var r = v1.Equals(v2);
-            Assert.False(r);
-        }
-
-        [Fact]
-        public void EqualTest4()
-        {
-            var v1 = SemVersion.Parse("1.2-nightly");
-            var v2 = SemVersion.Parse("1.2.0-nightly2");
-
-            var r = v1.Equals(v2);
-            Assert.False(r);
-        }
-
-        [Fact]
-        public void EqualTest5()
-        {
-            var v1 = SemVersion.Parse("1.2.1");
-            var v2 = SemVersion.Parse("1.2.0");
-
-            var r = v1.Equals(v2);
-            Assert.False(r);
-        }
-
-        [Fact]
-        public void EqualTest6()
-        {
-            var v1 = SemVersion.Parse("1.4.0");
-            var v2 = SemVersion.Parse("1.2.0");
-
-            var r = v1.Equals(v2);
-            Assert.False(r);
-        }
-
-        [Fact]
-        public void EqualByReferenceTest()
+        public void EqualsSameTest()
         {
             var v1 = SemVersion.Parse("1.2-nightly");
 
@@ -351,30 +311,19 @@ namespace Semver.Test
             Assert.True(r);
         }
 
-        [Fact]
-        public void StaticEqualsTest1()
+        [Theory]
+        [InlineData("1.2.3", "1.2.3", true)]
+        [InlineData(null, "1.2.3", false)]
+        [InlineData("1.2.3", null, false)]
+        [InlineData(null, null, true)]
+        public void StaticEqualsTest(string s1, string s2, bool equal)
         {
-            var v1 = new SemVersion(1, 2, 3);
-            var v2 = new SemVersion(1, 2, 3);
+            var v1 = s1 is null ? null : SemVersion.Parse(s1);
+            var v2 = s2 is null ? null : SemVersion.Parse(s2);
 
             var r = SemVersion.Equals(v1, v2);
-            Assert.True(r);
-        }
 
-        [Fact]
-        public void StaticEqualsTest2()
-        {
-            var r = SemVersion.Equals(null, null);
-            Assert.True(r);
-        }
-
-        [Fact]
-        public void StaticEqualsTest3()
-        {
-            var v1 = new SemVersion(1);
-
-            var r = SemVersion.Equals(v1, null);
-            Assert.False(r);
+            Assert.Equal(equal, r);
         }
         #endregion
 
@@ -501,7 +450,7 @@ namespace Semver.Test
         // TODO comparison distinguished by string order currently gives numbers outside -1,0,1 (issue #26)
         [InlineData("1.0.0-beta.11", "1.0.0-rc.1", -16)]
         [InlineData("1.0.0-rc.1", "1.0.0", -1)]
-        public void TestCompareByPrecedence(string s1, string s2, int expected)
+        public void CompareByPrecedenceTest(string s1, string s2, int expected)
         {
             var v1 = SemVersion.Parse(s1, true);
             var v2 = SemVersion.Parse(s2, true);
@@ -514,7 +463,7 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void TestCompareByPrecedenceToNull()
+        public void CompareByPrecedenceToNullTest()
         {
             var v1 = SemVersion.Parse("0.0.1+bu");
             var r = v1.CompareByPrecedence(null);
@@ -661,7 +610,7 @@ namespace Semver.Test
             Assert.Equal(1, v2.Major);
             Assert.Equal(2, v2.Minor);
             Assert.Equal(3, v2.Patch);
-            Assert.Equal("beta", v2.Prerelease);
+            Assert.Equal("alpha", v2.Prerelease);
             Assert.Equal("gamma", v2.Build);
         }
         #endregion
