@@ -69,6 +69,7 @@ namespace Semver.Test
 
         [Theory]
         [InlineData(0, 0, 0, 0)]
+        // TODO this is a strange conversion (issue #32)
         [InlineData(1, 2, 0, 3)]
         [InlineData(1, 2, 4, 3)]
         public void ConstructSemVersionFromSystemVersion(int major, int minor, int build, int revision)
@@ -93,6 +94,7 @@ namespace Semver.Test
         }
         #endregion
 
+        #region Parsing
         [Theory]
         // Major, Minor, Patch
         [InlineData("1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, "alpha-beta", "nightly.23.43-bla")]
@@ -170,6 +172,7 @@ namespace Semver.Test
             var ex = Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
             Assert.Equal(expectedMsg, ex.Message);
         }
+        #endregion
 
         [Fact]
         public void TryParseTest1()
