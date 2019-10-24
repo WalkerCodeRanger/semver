@@ -9,26 +9,6 @@ namespace Semver.Test
 {
     public class SemverTests
     {
-        [Fact]
-        public void CompareTestWithStrings1()
-        {
-            Assert.True(SemVersion.Equals("1.0.0", "1"));
-        }
-
-        [Fact]
-        public void CompareTestWithStrings2()
-        {
-            var v = new SemVersion(1, 0, 0);
-            Assert.True(v < "1.1");
-        }
-
-        [Fact]
-        public void CompareTestWithStrings3()
-        {
-            var v = new SemVersion(1, 2);
-            Assert.True(v > "1.0.0");
-        }
-
         #region Constructors
         [Fact]
         public void ConstructSemVersionDefaultValuesTest()
@@ -301,15 +281,7 @@ namespace Semver.Test
         }
         #endregion
 
-        [Fact]
-        public void ToStringTest()
-        {
-            var version = new SemVersion(1, 2, 3, "beta-x.2", "dev-mha.120");
-
-            Assert.Equal("1.2.3-beta-x.2+dev-mha.120", version.ToString());
-        }
-
-        #region Equality 
+        #region Equality
         [Fact]
         public void EqualTest1()
         {
@@ -406,6 +378,18 @@ namespace Semver.Test
         }
         #endregion
 
+        [Fact]
+        public void GetHashCodeTest()
+        {
+            var v1 = SemVersion.Parse("1.0.0-1+b");
+            var v2 = SemVersion.Parse("1.0.0-1+c");
+
+            var h1 = v1.GetHashCode();
+            var h2 = v2.GetHashCode();
+
+            Assert.NotEqual(h1, h2);
+        }
+
         #region Comparison
         [Theory]
         [InlineData("1.0.0-alpha+dev.123", "1.0.0-beta+dev.123", -1)]
@@ -433,7 +417,7 @@ namespace Semver.Test
         // TODO comparison distinguished by string order currently gives numbers outside -1,0,1 (issue #26)
         [InlineData("1.0.0-beta.11", "1.0.0-rc.1", -16)]
         [InlineData("1.0.0-rc.1", "1.0.0", -1)]
-        public void TestCompareTo(string s1, string s2, int expected)
+        public void CompareToTest(string s1, string s2, int expected)
         {
             var v1 = SemVersion.Parse(s1, true);
             var v2 = SemVersion.Parse(s2, true);
@@ -446,15 +430,51 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void TestCompareToNull()
+        public void CompareToNullTest()
         {
             var v1 = SemVersion.Parse("0.0.1+bu");
             var r = v1.CompareTo(null);
             Assert.Equal(1, r);
         }
+
+        [Fact]
+        public void CompareToSemVersionAsObjectTest()
+        {
+            var v1 = new SemVersion(1);
+            var c = v1.CompareTo((object)v1);
+
+            Assert.Equal(0, c);
+        }
+
+        [Fact]
+        public void CompareToNonSemVersionTest()
+        {
+            var v = new SemVersion(1);
+            // TODO issue #39 should throw argument exception
+            var ex = Assert.Throws<InvalidCastException>(() => v.CompareTo(new object()));
+
+            Assert.Equal("Unable to cast object of type 'System.Object' to type 'Semver.SemVersion'.", ex.Message);
+        }
+
+        [Theory]
+        [InlineData("1.0.0", "2.0.0", -1)]
+        [InlineData("1.0.0", "1.0.0", 0)]
+        [InlineData(null, "1.0.0", -1)]
+        [InlineData("1.0.0", null, 1)]
+        [InlineData(null, null, 0)]
+        public void StaticCompareTest(string s1, string s2, int expected)
+        {
+            var v1 = s1 is null ? null : SemVersion.Parse(s1);
+            var v2 = s2 is null ? null : SemVersion.Parse(s2);
+
+            var r = SemVersion.Compare(v1, v2);
+            Assert.Equal(expected, r);
+        }
         #endregion
 
         #region Precedence
+
+
         [Theory]
         [InlineData("1.0.0-alpha+dev.123", "1.0.0-beta+dev.123", -1)]
         [InlineData("1.0.0", "1.0.1-alpha", -1)]
@@ -503,15 +523,11 @@ namespace Semver.Test
         #endregion
 
         [Fact]
-        public void GetHashCodeTest()
+        public void ToStringTest()
         {
-            var v1 = SemVersion.Parse("1.0.0-1+b");
-            var v2 = SemVersion.Parse("1.0.0-1+c");
+            var version = new SemVersion(1, 2, 3, "beta-x.2", "dev-mha.120");
 
-            var h1 = v1.GetHashCode();
-            var h2 = v2.GetHashCode();
-
-            Assert.NotEqual(h1, h2);
+            Assert.Equal("1.2.3-beta-x.2+dev-mha.120", version.ToString());
         }
 
         [Fact]
@@ -519,50 +535,6 @@ namespace Semver.Test
         {
             SemVersion v = "1.0.0";
             Assert.Equal(1, v.Major);
-        }
-
-        [Fact]
-        public void CompareToObjectTest()
-        {
-            var v1 = new SemVersion(1);
-            var c = v1.CompareTo((object)v1);
-
-            Assert.Equal(0, c);
-        }
-
-        [Fact]
-        public void StaticCompareTest1()
-        {
-            var v1 = new SemVersion(1);
-            var v2 = new SemVersion(2);
-
-            var r = SemVersion.Compare(v1, v2);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void StaticCompareTest2()
-        {
-            var v1 = new SemVersion(1);
-
-            var r = SemVersion.Compare(v1, null);
-            Assert.Equal(1, r);
-        }
-
-        [Fact]
-        public void StaticCompareTest3()
-        {
-            var v1 = new SemVersion(1);
-
-            var r = SemVersion.Compare(null, v1);
-            Assert.Equal(-1, r);
-        }
-
-        [Fact]
-        public void StaticCompareTest4()
-        {
-            var r = SemVersion.Compare(null, null);
-            Assert.Equal(0, r);
         }
 
         #region Operators
@@ -590,10 +562,10 @@ namespace Semver.Test
         [InlineData("1.0.0", "2.0.0")]
         [InlineData("1.0.0-alpha", "1.0.0-rc")]
         [InlineData("1.0.0-alpha", "1.0.0-ci.1")]
-        public void ComparisonOperatorTest(string v1String, string v2String)
+        public void ComparisonOperatorTest(string s1, string s2)
         {
-            var v1 = SemVersion.Parse(v1String);
-            var v2 = SemVersion.Parse(v2String);
+            var v1 = SemVersion.Parse(s1);
+            var v2 = SemVersion.Parse(s2);
 
             Assert.True(v1 < v2, "v1 < v2");
             Assert.True(v2 > v1, "v2 > v1");
@@ -603,10 +575,10 @@ namespace Semver.Test
         [InlineData("1.0.0", "2.0.0")]
         [InlineData("1.0.0-alpha", "1.0.0-rc")]
         [InlineData("1.0.0-alpha", "1.0.0-ci.1")]
-        public void CompareOrEqualOperatorTest(string v1String, string v2String)
+        public void CompareOrEqualOperatorTest(string s1, string s2)
         {
-            var v1 = SemVersion.Parse(v1String);
-            var v2 = SemVersion.Parse(v2String);
+            var v1 = SemVersion.Parse(s1);
+            var v2 = SemVersion.Parse(s2);
 
             Assert.True(v1 <= v2, "v1 <= v2");
             Assert.True(v2 >= v1, "v2 >= v1");
@@ -617,10 +589,10 @@ namespace Semver.Test
         [InlineData("1.0.0-alpha", "1.0.0-alpha")]
         [InlineData("1.0.0-rc.1", "1.0.0-rc.1")]
         [InlineData("1.0.0-beta-34+0f45", "1.0.0-beta-34+0f45")]
-        public void CompareOrEqualOperatorWhenEqualTest(string v1String, string v2String)
+        public void CompareOrEqualOperatorWhenEqualTest(string s1, string s2)
         {
-            var v1 = SemVersion.Parse(v1String);
-            var v2 = SemVersion.Parse(v2String);
+            var v1 = SemVersion.Parse(s1);
+            var v2 = SemVersion.Parse(s2);
 
             Assert.True(v1 <= v2, "v1 <= v2");
             Assert.True(v1 >= v2, "v1 >= v2");
@@ -678,6 +650,19 @@ namespace Semver.Test
             Assert.Equal(3, v2.Patch);
             Assert.Equal("beta", v2.Prerelease);
             Assert.Equal("dev", v2.Build);
+        }
+
+        [Fact]
+        public void ChangeBuildTest()
+        {
+            var v1 = new SemVersion(1, 2, 3, "alpha", "dev");
+            var v2 = v1.Change(build: "gamma");
+
+            Assert.Equal(1, v2.Major);
+            Assert.Equal(2, v2.Minor);
+            Assert.Equal(3, v2.Patch);
+            Assert.Equal("beta", v2.Prerelease);
+            Assert.Equal("gamma", v2.Build);
         }
         #endregion
 
