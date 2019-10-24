@@ -422,6 +422,23 @@ namespace Semver.Test
         #endregion
 
         #region Precedence
+        [Theory]
+        [InlineData("1.2+nightly", "1.2+nightly", true)]
+        [InlineData("1.2-alpha+dev", "1.2-alpha+dev", true)]
+        [InlineData("1.2-nightly+dev", "1.2.0-nightly", true)]
+        [InlineData("1.2-nightly+45", "1.2.0-nightly+ab", true)]
+        [InlineData("1.2-nightly", "1.2.0-nightly2", false)]
+        [InlineData("1.2.1", "1.2.0", false)]
+        [InlineData("1.4.0", "1.2.0", false)]
+        public void PrecedenceMatchesTest(string s1, string s2, bool equal)
+        {
+            var v1 = SemVersion.Parse(s1);
+            var v2 = SemVersion.Parse(s2);
+
+            var r = v1.PrecedenceMatches(v2);
+
+            Assert.Equal(equal, r);
+        }
 
 
         [Theory]
