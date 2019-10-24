@@ -126,7 +126,7 @@ namespace Semver
             if (patchMatch.Success)
             {
 #if NETSTANDARD
-                patch = int.Parse(patchMatch.Value);
+                patch = int.Parse(patchMatch.Value); // TODO pass CultureInfo.InvariantCulture here too?
 #else
                 patch = int.Parse(patchMatch.Value, CultureInfo.InvariantCulture);
 #endif
@@ -300,15 +300,10 @@ namespace Semver
         /// </returns>
         public int CompareTo(SemVersion other)
         {
-            if (ReferenceEquals(other, null))
-                return 1;
-
             var r = CompareByPrecedence(other);
-            if (r != 0)
-                return r;
+            if (r != 0) return r;
 
-            r = CompareComponent(Build, other.Build);
-            return r;
+            return CompareComponent(Build, other.Build);
         }
 
         /// <summary>
@@ -334,7 +329,7 @@ namespace Semver
         /// </returns>
         public int CompareByPrecedence(SemVersion other)
         {
-            if (ReferenceEquals(other, null))
+            if (other is null)
                 return 1;
 
             var r = Major.CompareTo(other.Major);
@@ -346,8 +341,7 @@ namespace Semver
             r = Patch.CompareTo(other.Patch);
             if (r != 0) return r;
 
-            r = CompareComponent(this.Prerelease, other.Prerelease, true);
-            return r;
+            return CompareComponent(Prerelease, other.Prerelease, true);
         }
 
         private static int CompareComponent(string a, string b, bool lower = false)
@@ -377,7 +371,7 @@ namespace Semver
                 if (aIsNum && bIsNum)
                 {
                     r = aNum.CompareTo(bNum);
-                    if (r != 0) return aNum.CompareTo(bNum);
+                    if (r != 0) return r;
                 }
                 else
                 {
@@ -403,7 +397,7 @@ namespace Semver
         /// </returns>
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(obj, null))
+            if (obj is null)
                 return false;
 
             if (ReferenceEquals(this, obj))
@@ -411,11 +405,11 @@ namespace Semver
 
             var other = (SemVersion)obj;
 
-            return Major == other.Major &&
-                Minor == other.Minor &&
-                Patch == other.Patch &&
-                string.Equals(Prerelease, other.Prerelease, StringComparison.Ordinal) &&
-                string.Equals(Build, other.Build, StringComparison.Ordinal);
+            return Major == other.Major
+                && Minor == other.Minor
+                && Patch == other.Patch
+                && string.Equals(Prerelease, other.Prerelease, StringComparison.Ordinal)
+                && string.Equals(Build, other.Build, StringComparison.Ordinal);
         }
 
         /// <summary>

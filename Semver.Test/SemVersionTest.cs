@@ -311,6 +311,16 @@ namespace Semver.Test
             Assert.True(r);
         }
 
+        [Fact]
+        public void EqualsNonSemVersionTest()
+        {
+            var v = new SemVersion(1);
+            // TODO should throw argument exception
+            var ex = Assert.Throws<InvalidCastException>(() => v.CompareTo(new object()));
+
+            Assert.Equal("Unable to cast object of type 'System.Object' to type 'Semver.SemVersion'.", ex.Message);
+        }
+
         [Theory]
         [InlineData("1.2.3", "1.2.3", true)]
         [InlineData(null, "1.2.3", false)]
