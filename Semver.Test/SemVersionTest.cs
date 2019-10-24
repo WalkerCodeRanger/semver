@@ -113,7 +113,14 @@ namespace Semver.Test
         [InlineData("7-rc.1", 7, 0, 0, "rc.1", "")]
         [InlineData("6+sha.a3456b", 6, 0, 0, "", "sha.a3456b")]
         [InlineData("64", 64, 0, 0, "", "")]
-        public void ParseValidNonStrictTest(string versionString, int major, int minor, int patch, string prerelease, string build)
+        // Leading Zeros
+        [InlineData("01.2.3", 1, 2, 3, "", "")]
+        [InlineData("1.02.3", 1, 2, 3, "", "")]
+        [InlineData("1.2.03", 1, 2, 3, "", "")]
+        // TODO these should have leading zeros removed
+        [InlineData("1.2.3-01", 1, 2, 3, "01", "")]
+        [InlineData("1.2.3-a.01", 1, 2, 3, "a.01", "")]
+        public void ParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             var v = SemVersion.Parse(versionString);
 
@@ -126,11 +133,36 @@ namespace Semver.Test
 
         [Theory]
         [InlineData("ui-2.1-alpha", "Invalid version.\r\nParameter name: version")]
-        // TODO add tests for: leading v, leading V, too large integer, null
-        public void ParseInvalidNonStrictTest(string versionString, string expectedMsg)
+        [InlineData("v1.2.3", "Invalid version.\r\nParameter name: version")]
+        [InlineData("V1.2.3", "Invalid version.\r\nParameter name: version")]
+        [InlineData("", "Invalid version.\r\nParameter name: version")]
+        [InlineData("1.0.0-a@", "Invalid version.\r\nParameter name: version")]
+        [InlineData("1.0.0-á", "Invalid version.\r\nParameter name: version")]
+        [InlineData("1.0.0+a@", "Invalid version.\r\nParameter name: version")]
+        [InlineData("1.0.0+á", "Invalid version.\r\nParameter name: version")]
+        public void ParseLooseInvalidThrowsArgumentExceptionTest(string versionString, string expectedMsg)
         {
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString));
             Assert.Equal(expectedMsg, ex.Message);
+        }
+
+        [Theory]
+        // int.Max+1
+        [InlineData("2147483648.2.3", "Value was either too large or too small for an Int32.")]
+        [InlineData("1.2147483648.3", "Value was either too large or too small for an Int32.")]
+        [InlineData("1.2.2147483648", "Value was either too large or too small for an Int32.")]
+        public void ParseLooseInvalidThrowsOverflowExceptionTest(string versionString, string expectedMsg)
+        {
+            var ex = Assert.Throws<OverflowException>(() => SemVersion.Parse(versionString));
+            Assert.Equal(expectedMsg, ex.Message);
+        }
+
+        [Fact]
+        public void ParseLooseNullTest()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null));
+            // TODO that is a strange error message, should be version
+            Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);
         }
 
         [Theory]
@@ -139,8 +171,9 @@ namespace Semver.Test
         [InlineData("01.2.3", 1, 2, 3, "", "")]
         [InlineData("1.02.3", 1, 2, 3, "", "")]
         [InlineData("1.2.03", 1, 2, 3, "", "")]
+        [InlineData("1.0.0-01", 1, 0, 0, "01", "")]
         [InlineData("1.0.0-alpha.01", 1, 0, 0, "alpha.01", "")]
-        public void ParseStrictTest(string versionString, int major, int minor, int patch, string prerelease, string build)
+        public void ParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             var v = SemVersion.Parse(versionString, true);
 
@@ -155,8 +188,9 @@ namespace Semver.Test
         [Theory]
         [InlineData("1.0.0-a@", "Invalid version.\r\nParameter name: version")]
         [InlineData("1.0.0-á", "Invalid version.\r\nParameter name: version")]
-        // TODO add tests for: leading v, leading V, too large integer, null
-        public void ParseInvalidStrictTest(string versionString, string expectedMsg)
+        [InlineData("1.0.0+a@", "Invalid version.\r\nParameter name: version")]
+        [InlineData("1.0.0+á", "Invalid version.\r\nParameter name: version")]
+        public void ParseStrictInvalidThrowsArgumentExceptionTest(string versionString, string expectedMsg)
         {
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString, true));
             Assert.Equal(expectedMsg, ex.Message);
@@ -167,16 +201,38 @@ namespace Semver.Test
         [InlineData("1", "Invalid version (no minor version given in strict mode)")]
         [InlineData("1.3", "Invalid version (no patch version given in strict mode)")]
         [InlineData("1.3-alpha", "Invalid version (no patch version given in strict mode)")]
-        public void ParseInvalidStrictThrowInvalidOperationTest(string versionString, string expectedMsg)
+        public void ParseStrictInvalidThrowsInvalidOperationTest(string versionString, string expectedMsg)
         {
             var ex = Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
             Assert.Equal(expectedMsg, ex.Message);
         }
 
         [Theory]
+        // Major, Minor, Patch
         [InlineData("1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, "alpha-beta", "nightly.23.43-bla")]
-        [InlineData("1.2", 1, 2, 0, "", "")]
-        public void TryParseTest(string versionString, int major, int minor, int patch, string prerelease, string build)
+        [InlineData("1.2.45-alpha+nightly.23", 1, 2, 45, "alpha", "nightly.23")]
+        [InlineData("3.2.1-beta", 3, 2, 1, "beta", "")]
+        [InlineData("2.0.0+nightly.23.43-bla", 2, 0, 0, "", "nightly.23.43-bla")]
+        [InlineData("5.6.7", 5, 6, 7, "", "")]
+        // Major, Minor
+        [InlineData("1.6-zeta.5+nightly.23.43-bla", 1, 6, 0, "zeta.5", "nightly.23.43-bla")]
+        [InlineData("2.0+nightly.23.43-bla", 2, 0, 0, "", "nightly.23.43-bla")]
+        [InlineData("2.1-alpha", 2, 1, 0, "alpha", "")]
+        [InlineData("5.6+nightly.23.43-bla", 5, 6, 0, "", "nightly.23.43-bla")]
+        [InlineData("3.2", 3, 2, 0, "", "")]
+        // Major
+        [InlineData("1-beta+dev.123", 1, 0, 0, "beta", "dev.123")]
+        [InlineData("7-rc.1", 7, 0, 0, "rc.1", "")]
+        [InlineData("6+sha.a3456b", 6, 0, 0, "", "sha.a3456b")]
+        [InlineData("64", 64, 0, 0, "", "")]
+        // Leading Zeros
+        [InlineData("01.2.3", 1, 2, 3, "", "")]
+        [InlineData("1.02.3", 1, 2, 3, "", "")]
+        [InlineData("1.2.03", 1, 2, 3, "", "")]
+        // TODO these should have leading zeros removed
+        [InlineData("1.2.3-01", 1, 2, 3, "01", "")]
+        [InlineData("1.2.3-a.01", 1, 2, 3, "a.01", "")]
+        public void TryParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             Assert.True(SemVersion.TryParse(versionString, out var v));
 
@@ -189,19 +245,53 @@ namespace Semver.Test
 
         [Theory]
         [InlineData("ui-2.1-alpha")]
+        [InlineData("v1.2.3")]
+        [InlineData("V1.2.3")]
         [InlineData("")]
         [InlineData(null)]
-
-        public void TryParseInvalidTest(string versionString)
+        // int.Max+1
+        [InlineData("2147483648.2.3")]
+        [InlineData("1.2147483648.3")]
+        [InlineData("1.2.2147483648")]
+        // Illegal characters
+        [InlineData("1.0.0-a@")]
+        [InlineData("1.0.0-á")]
+        [InlineData("1.0.0+a@")]
+        [InlineData("1.0.0+á")]
+        public void TryParseLooseInvalidTest(string versionString)
         {
             Assert.False(SemVersion.TryParse(versionString, out _));
         }
 
+        [Theory]
+        [InlineData("1.3.4", 1, 3, 4, "", "")]
+        // TODO these invalid versions are accepted (issue #16)
+        [InlineData("01.2.3", 1, 2, 3, "", "")]
+        [InlineData("1.02.3", 1, 2, 3, "", "")]
+        [InlineData("1.2.03", 1, 2, 3, "", "")]
+        [InlineData("1.0.0-01", 1, 0, 0, "01", "")]
+        [InlineData("1.0.0-alpha.01", 1, 0, 0, "alpha.01", "")]
+        public void TryParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
+        {
+            Assert.True(SemVersion.TryParse(versionString, out var v));
+
+            Assert.Equal(major, v.Major);
+            Assert.Equal(minor, v.Minor);
+            Assert.Equal(patch, v.Patch);
+            Assert.Equal(prerelease, v.Prerelease);
+            Assert.Equal(build, v.Build);
+        }
 
         [Theory]
         [InlineData("1.2")]
+        [InlineData("1.0.0-a@")]
+        [InlineData("1.0.0-á")]
+        [InlineData("1.0.0+a@")]
+        [InlineData("1.0.0+á")]
+        [InlineData("1")]
+        [InlineData("1.3")]
+        [InlineData("1.3-alpha")]
         [InlineData(null)]
-
         public void TryParseStrictInvalidTest(string versionString)
         {
             Assert.False(SemVersion.TryParse(versionString, out _, true));
@@ -216,6 +306,7 @@ namespace Semver.Test
             Assert.Equal("1.2.0-beta+dev-mha.120", version.ToString());
         }
 
+        #region Comparison
         [Fact]
         public void EqualTest1()
         {
@@ -330,7 +421,9 @@ namespace Semver.Test
             var r = v1.CompareTo(null);
             Assert.Equal(1, r);
         }
+        #endregion
 
+        #region Precedence
         [Theory]
         [InlineData("1.0.0-alpha+dev.123", "1.0.0-beta+dev.123", -1)]
         [InlineData("1.0.0", "1.0.1-alpha", -1)]
@@ -376,6 +469,7 @@ namespace Semver.Test
             var r = v1.CompareByPrecedence(null);
             Assert.Equal(1, r);
         }
+        #endregion
 
         [Fact]
         public void TestHashCode()
