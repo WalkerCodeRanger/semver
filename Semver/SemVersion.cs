@@ -102,35 +102,19 @@ namespace Semver
             if (!match.Success)
                 throw new ArgumentException("Invalid version.", nameof(version));
 
-#if NETSTANDARD
-            var major = int.Parse(match.Groups["major"].Value); // TODO pass CultureInfo.InvariantCulture here too?
-#else
             var major = int.Parse(match.Groups["major"].Value, CultureInfo.InvariantCulture);
-#endif
 
             var minorMatch = match.Groups["minor"];
             int minor = 0;
             if (minorMatch.Success)
-            {
-#if NETSTANDARD
-                minor = int.Parse(minorMatch.Value); // TODO pass CultureInfo.InvariantCulture here too?
-#else
                 minor = int.Parse(minorMatch.Value, CultureInfo.InvariantCulture);
-#endif
-            }
             else if (strict)
                 throw new InvalidOperationException("Invalid version (no minor version given in strict mode)");
 
             var patchMatch = match.Groups["patch"];
             int patch = 0;
             if (patchMatch.Success)
-            {
-#if NETSTANDARD
-                patch = int.Parse(patchMatch.Value); // TODO pass CultureInfo.InvariantCulture here too?
-#else
                 patch = int.Parse(patchMatch.Value, CultureInfo.InvariantCulture);
-#endif
-            }
             else if (strict)
                 throw new InvalidOperationException("Invalid version (no patch version given in strict mode)");
 
