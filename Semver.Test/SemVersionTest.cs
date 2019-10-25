@@ -75,37 +75,67 @@ namespace Semver.Test
         #endregion
 
         #region Parsing
-        // TODO Come up with a better way to manage test data shared by tests
         // TODO use examples given with sample regexs
 
+        public static readonly TheoryData<string, int, int, int, string, string> Valid =
+            new TheoryData<string, int, int, int, string, string>()
+            {
+                // Major, Minor, Patch
+                {"1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, "alpha-beta", "nightly.23.43-bla"},
+                {"1.2.45-alpha+nightly.23", 1, 2, 45, "alpha", "nightly.23"},
+                {"3.2.1-beta", 3, 2, 1, "beta", ""},
+                {"2.0.0+nightly.23.43-bla", 2, 0, 0, "", "nightly.23.43-bla"},
+                {"5.6.7", 5, 6, 7, "", ""},
+                // Valid unusual versions
+                {"1.0.0--ci.1", 1, 0, 0, "-ci.1", ""},
+                {"1.0.0-0A", 1, 0, 0, "0A", ""},
+            };
+
+        public static readonly TheoryData<string, int, int, int, string, string> MissingPatch =
+            new TheoryData<string, int, int, int, string, string>()
+            {
+                // Major, Minor
+                {"1.6-zeta.5+nightly.23.43-bla", 1, 6, 0, "zeta.5", "nightly.23.43-bla"},
+                {"2.0+nightly.23.43-bla", 2, 0, 0, "", "nightly.23.43-bla"},
+                {"2.1-alpha", 2, 1, 0, "alpha", ""},
+                {"5.6+nightly.23.43-bla", 5, 6, 0, "", "nightly.23.43-bla"},
+                {"3.2", 3, 2, 0, "", ""},
+            };
+
+        public static readonly TheoryData<string, int, int, int, string, string> MissingMinorPatch =
+            new TheoryData<string, int, int, int, string, string>()
+            {
+                // Major
+                {"1-beta+dev.123", 1, 0, 0, "beta", "dev.123"},
+                {"7-rc.1", 7, 0, 0, "rc.1", ""},
+                {"6+sha.a3456b", 6, 0, 0, "", "sha.a3456b"},
+                {"64", 64, 0, 0, "", ""},
+            };
+        public static readonly TheoryData<string, int, int, int, string, string> LeadingZeros =
+            new TheoryData<string, int, int, int, string, string>()
+            {
+                {"01.2.3", 1, 2, 3, "", ""},
+                {"1.02.3", 1, 2, 3, "", ""},
+                {"1.2.03", 1, 2, 3, "", ""},
+                // TODO these should have leading zeros removed
+                {"1.2.3-01", 1, 2, 3, "01", ""},
+                {"1.2.3-a.01", 1, 2, 3, "a.01", ""},
+            };
+
+        public static readonly TheoryData<string> Overflow =
+            new TheoryData<string>()
+            {
+                // int.Max+1
+                {"2147483648.2.3"},
+                {"1.2147483648.3"},
+                {"1.2.2147483648"},
+            };
+
         [Theory]
-        // Major, Minor, Patch
-        [InlineData("1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, "alpha-beta", "nightly.23.43-bla")]
-        [InlineData("1.2.45-alpha+nightly.23", 1, 2, 45, "alpha", "nightly.23")]
-        [InlineData("3.2.1-beta", 3, 2, 1, "beta", "")]
-        [InlineData("2.0.0+nightly.23.43-bla", 2, 0, 0, "", "nightly.23.43-bla")]
-        [InlineData("5.6.7", 5, 6, 7, "", "")]
-        // Major, Minor
-        [InlineData("1.6-zeta.5+nightly.23.43-bla", 1, 6, 0, "zeta.5", "nightly.23.43-bla")]
-        [InlineData("2.0+nightly.23.43-bla", 2, 0, 0, "", "nightly.23.43-bla")]
-        [InlineData("2.1-alpha", 2, 1, 0, "alpha", "")]
-        [InlineData("5.6+nightly.23.43-bla", 5, 6, 0, "", "nightly.23.43-bla")]
-        [InlineData("3.2", 3, 2, 0, "", "")]
-        // Major
-        [InlineData("1-beta+dev.123", 1, 0, 0, "beta", "dev.123")]
-        [InlineData("7-rc.1", 7, 0, 0, "rc.1", "")]
-        [InlineData("6+sha.a3456b", 6, 0, 0, "", "sha.a3456b")]
-        [InlineData("64", 64, 0, 0, "", "")]
-        // Leading Zeros
-        [InlineData("01.2.3", 1, 2, 3, "", "")]
-        [InlineData("1.02.3", 1, 2, 3, "", "")]
-        [InlineData("1.2.03", 1, 2, 3, "", "")]
-        // TODO these should have leading zeros removed
-        [InlineData("1.2.3-01", 1, 2, 3, "01", "")]
-        [InlineData("1.2.3-a.01", 1, 2, 3, "a.01", "")]
-        // Valid unusual versions
-        [InlineData("1.0.0--ci.1", 1, 0, 0, "-ci.1", "")]
-        [InlineData("1.0.0-0A", 1, 0, 0, "0A", "")]
+        [MemberData(nameof(Valid))]
+        [MemberData(nameof(MissingPatch))]
+        [MemberData(nameof(MissingMinorPatch))]
+        [MemberData(nameof(LeadingZeros))]
         public void ParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             var v = SemVersion.Parse(versionString);
@@ -133,14 +163,11 @@ namespace Semver.Test
         }
 
         [Theory]
-        // int.Max+1
-        [InlineData("2147483648.2.3", "Value was either too large or too small for an Int32.")]
-        [InlineData("1.2147483648.3", "Value was either too large or too small for an Int32.")]
-        [InlineData("1.2.2147483648", "Value was either too large or too small for an Int32.")]
-        public void ParseLooseInvalidThrowsOverflowExceptionTest(string versionString, string expectedMsg)
+        [MemberData(nameof(Overflow))]
+        public void ParseLooseInvalidThrowsOverflowExceptionTest(string versionString)
         {
             var ex = Assert.Throws<OverflowException>(() => SemVersion.Parse(versionString));
-            Assert.Equal(expectedMsg, ex.Message);
+            Assert.Equal("Value was either too large or too small for an Int32.", ex.Message);
         }
 
         [Fact]
@@ -152,6 +179,7 @@ namespace Semver.Test
         }
 
         [Theory]
+        [MemberData(nameof(Valid))]
         [InlineData("1.3.4", 1, 3, 4, "", "")]
         // TODO these invalid versions are accepted (issue #16)
         [InlineData("01.2.3", 1, 2, 3, "", "")]
@@ -182,6 +210,14 @@ namespace Semver.Test
             Assert.Equal(expectedMsg, ex.Message);
         }
 
+        [Theory]
+        [MemberData(nameof(Overflow))]
+        public void ParseStringInvalidThrowsOverflowExceptionTest(string versionString)
+        {
+            var ex = Assert.Throws<OverflowException>(() => SemVersion.Parse(versionString));
+            Assert.Equal("Value was either too large or too small for an Int32.", ex.Message);
+        }
+
         // TODO These exceptions should be FormatException etc.
         [Theory]
         [InlineData("1", "Invalid version (no minor version given in strict mode)")]
@@ -194,30 +230,11 @@ namespace Semver.Test
         }
 
         [Theory]
-        // Major, Minor, Patch
-        [InlineData("1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, "alpha-beta", "nightly.23.43-bla")]
-        [InlineData("1.2.45-alpha+nightly.23", 1, 2, 45, "alpha", "nightly.23")]
-        [InlineData("3.2.1-beta", 3, 2, 1, "beta", "")]
-        [InlineData("2.0.0+nightly.23.43-bla", 2, 0, 0, "", "nightly.23.43-bla")]
-        [InlineData("5.6.7", 5, 6, 7, "", "")]
-        // Major, Minor
-        [InlineData("1.6-zeta.5+nightly.23.43-bla", 1, 6, 0, "zeta.5", "nightly.23.43-bla")]
-        [InlineData("2.0+nightly.23.43-bla", 2, 0, 0, "", "nightly.23.43-bla")]
-        [InlineData("2.1-alpha", 2, 1, 0, "alpha", "")]
-        [InlineData("5.6+nightly.23.43-bla", 5, 6, 0, "", "nightly.23.43-bla")]
-        [InlineData("3.2", 3, 2, 0, "", "")]
-        // Major
-        [InlineData("1-beta+dev.123", 1, 0, 0, "beta", "dev.123")]
-        [InlineData("7-rc.1", 7, 0, 0, "rc.1", "")]
-        [InlineData("6+sha.a3456b", 6, 0, 0, "", "sha.a3456b")]
-        [InlineData("64", 64, 0, 0, "", "")]
-        // Leading Zeros
-        [InlineData("01.2.3", 1, 2, 3, "", "")]
-        [InlineData("1.02.3", 1, 2, 3, "", "")]
-        [InlineData("1.2.03", 1, 2, 3, "", "")]
-        // TODO these should have leading zeros removed
-        [InlineData("1.2.3-01", 1, 2, 3, "01", "")]
-        [InlineData("1.2.3-a.01", 1, 2, 3, "a.01", "")]
+        [MemberData(nameof(Valid))]
+        [MemberData(nameof(MissingPatch))]
+        [MemberData(nameof(MissingMinorPatch))]
+        [MemberData(nameof(Valid))]
+        [MemberData(nameof(LeadingZeros))]
         public void TryParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             Assert.True(SemVersion.TryParse(versionString, out var v));
@@ -235,10 +252,7 @@ namespace Semver.Test
         [InlineData("V1.2.3")]
         [InlineData("")]
         [InlineData(null)]
-        // int.Max+1
-        [InlineData("2147483648.2.3")]
-        [InlineData("1.2147483648.3")]
-        [InlineData("1.2.2147483648")]
+        [MemberData(nameof(Overflow))]
         // Illegal characters
         [InlineData("1.0.0-a@")]
         [InlineData("1.0.0-á")]
