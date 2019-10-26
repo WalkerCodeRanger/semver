@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 #if !NETSTANDARD
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -62,7 +63,7 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(revision, v.Patch);
             Assert.Equal("", v.Prerelease);
-            Assert.Equal(build > 0 ? build.ToString() : "", v.Build);
+            Assert.Equal(build > 0 ? build.ToString(CultureInfo.InvariantCulture) : "", v.Build);
         }
 
         [Fact]

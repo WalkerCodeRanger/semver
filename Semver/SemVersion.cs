@@ -32,6 +32,7 @@ namespace Semver
 #endif
 
 #if !NETSTANDARD
+#pragma warning disable CA1801 // Parameter unused
         /// <summary>
         /// Initializes a new instance of the <see cref="SemVersion" /> class.
         /// </summary>
@@ -39,6 +40,7 @@ namespace Semver
         /// <param name="context"></param>
         /// <exception cref="ArgumentNullException"></exception>
         private SemVersion(SerializationInfo info, StreamingContext context)
+#pragma warning restore CA1801 // Parameter unused
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             var semVersion = Parse(info.GetString("SemVersion"));
@@ -86,7 +88,7 @@ namespace Semver
 
             Prerelease = "";
 
-            Build = version.Build > 0 ? version.Build.ToString() : "";
+            Build = version.Build > 0 ? version.Build.ToString(CultureInfo.InvariantCulture) : "";
         }
 
         /// <summary>
@@ -309,7 +311,10 @@ namespace Semver
             var r = CompareByPrecedence(other);
             if (r != 0) return r;
 
+#pragma warning disable CA1062 // Validate arguments of public methods
+            // If other is null, CompareByPrecedence() returns 1
             return CompareComponent(Build, other.Build);
+#pragma warning restore CA1062 // Validate arguments of public methods
         }
 
         /// <summary>
@@ -446,12 +451,14 @@ namespace Semver
         }
 #endif
 
+#pragma warning disable CA2225 // Operator overloads have named alternates
         /// <summary>
         /// Implicit conversion from string to SemVersion.
         /// </summary>
         /// <param name="version">The semantic version.</param>
         /// <returns>The SemVersion object.</returns>
         public static implicit operator SemVersion(string version)
+#pragma warning restore CA2225 // Operator overloads have named alternates
         {
             return Parse(version);
         }
