@@ -656,6 +656,7 @@ namespace Semver.Test
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
 
+            // TODO it is a bug that none of these comparisons are true (issue #53)
             Assert.False(v1 < v2, $"{v1} < {v2}");
             Assert.False(v1 <= v2, $"{v1} <= {v2}");
             Assert.False(v1 > v2, $"{v1} > {v2}");
@@ -671,6 +672,7 @@ namespace Semver.Test
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
 
+            // TODO it is a bug that none of these comparisons are true (issue #53)
             Assert.False(v1 < v2, $"{v1} < {v2}");
             Assert.False(v1 <= v2, $"{v1} <= {v2}");
             Assert.False(v1 > v2, $"{v1} > {v2}");
