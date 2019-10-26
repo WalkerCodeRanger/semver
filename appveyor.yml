@@ -39,10 +39,7 @@ build:
   publish_nuget: true
   publish_nuget_symbols: true
 
-# Disable xUnit test runner by excluding assemblies.
-# The 'dotnet test' run picks them up
-test:
-  assemblies:
-    except:
-     - '**\*.dll'
-
+# Test Discovery was running both xUnit and dotnet test.
+# To prevent that, use a test script to run dotnet test.
+test_script:
+  - dotnet test "Semver.Test"
