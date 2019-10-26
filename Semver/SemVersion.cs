@@ -101,7 +101,8 @@ namespace Semver
         /// <param name="strict">If set to <see langword="true"/> minor and patch version are required.
         /// otherwise they are optional.</param>
         /// <returns>The <see cref="SemVersion"/> object.</returns>
-        /// <exception cref="ArgumentNullException">The version number has an invalid format.</exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
         /// <exception cref="InvalidOperationException">The version number is missing Minor or Patch versions when they are required.</exception>
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
         public static SemVersion Parse(string version, bool strict = false)
@@ -258,7 +259,7 @@ namespace Semver
         /// Gets the prerelease version.
         /// </summary>
         /// <value>
-        /// The prerelease version.
+        /// The prerelease version. Empty string if this is a release version.
         /// </value>
         public string Prerelease { get; }
 
@@ -266,7 +267,7 @@ namespace Semver
         /// Gets the build metadata.
         /// </summary>
         /// <value>
-        /// The build metadata.
+        /// The build metadata. Empty string if there is no build metadata.
         /// </value>
         public string Build { get; }
 
@@ -299,6 +300,7 @@ namespace Semver
         ///  Zero: This instance occurs in the same position in the sort order as <paramref name="obj" />.
         ///  Greater than zero: This instance follows <paramref name="obj" /> in the sort order.
         /// </returns>
+        /// <exception cref="InvalidCastException">The <paramref name="obj"/> is not a <see cref="SemVersion"/>.</exception>
         public int CompareTo(object obj)
         {
             return CompareTo((SemVersion)obj);
@@ -418,6 +420,7 @@ namespace Semver
         /// <returns>
         ///   <see langword="true"/> if the specified <see cref="object" /> is equal to this instance; otherwise, <see langword="false"/>.
         /// </returns>
+        /// <exception cref="InvalidCastException">The <paramref name="obj"/> is not a <see cref="SemVersion"/>.</exception>
         public override bool Equals(object obj)
         {
             if (obj is null)
@@ -475,6 +478,9 @@ namespace Semver
         /// </summary>
         /// <param name="version">The semantic version.</param>
         /// <returns>The <see cref="SemVersion"/> object.</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
+        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
         public static implicit operator SemVersion(string version)
 #pragma warning restore CA2225 // Operator overloads have named alternates
         {
