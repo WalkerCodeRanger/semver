@@ -10,7 +10,7 @@ namespace Semver
 {
     /// <summary>
     /// A semantic version implementation.
-    /// Conforms to v2.0.0 of http://semver.org/
+    /// Conforms with v2.0.0 of http://semver.org
     /// </summary>
 #if NETSTANDARD
     public sealed class SemVersion : IComparable<SemVersion>, IComparable
@@ -34,11 +34,9 @@ namespace Semver
 #if !NETSTANDARD
 #pragma warning disable CA1801 // Parameter unused
         /// <summary>
-        /// Initializes a new instance of the <see cref="SemVersion" /> class.
+        /// Deserialize a <see cref="SemVersion"/>.
         /// </summary>
-        /// <param name="info"></param>
-        /// <param name="context"></param>
-        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException">The <paramref name="info"/> parameter is null.</exception>
         private SemVersion(SerializationInfo info, StreamingContext context)
 #pragma warning restore CA1801 // Parameter unused
         {
@@ -53,13 +51,13 @@ namespace Semver
 #endif
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SemVersion" /> class.
+        /// Constructs a new instance of the <see cref="SemVersion" /> class.
         /// </summary>
         /// <param name="major">The major version.</param>
         /// <param name="minor">The minor version.</param>
         /// <param name="patch">The patch version.</param>
-        /// <param name="prerelease">The prerelease version (eg. "alpha").</param>
-        /// <param name="build">The build eg ("nightly.232").</param>
+        /// <param name="prerelease">The prerelease version (e.g. "alpha").</param>
+        /// <param name="build">The build metadata (e.g. "nightly.232").</param>
         public SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "")
         {
             Major = major;
@@ -71,10 +69,15 @@ namespace Semver
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SemVersion"/> class.
+        /// Constructs a new instance of the <see cref="SemVersion"/> class from
+        /// a <see cref="System.Version"/>.
         /// </summary>
         /// <param name="version">The <see cref="Version"/> that is used to initialize
-        /// the Major, Minor, Patch and Build properties.</param>
+        /// the Major, Minor, Patch and Build.</param>
+        /// <returns>A <see cref="SemVersion"/> with the same Major and Minor version.
+        /// The Patch version will be the fourth part of the version number. The
+        /// build meta data will contain the third part of the version number if
+        /// it is greater than zero.</returns>
         public SemVersion(Version version)
         {
             if (version == null)
@@ -92,12 +95,15 @@ namespace Semver
         }
 
         /// <summary>
-        /// Parses the specified string to a semantic version.
+        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/> equivalent.
         /// </summary>
         /// <param name="version">The version string.</param>
-        /// <param name="strict">If set to <see langword="true"/> minor and patch version are required, else they default to 0.</param>
-        /// <returns>The SemVersion object.</returns>
-        /// <exception cref="InvalidOperationException">When a invalid version string is passed.</exception>
+        /// <param name="strict">If set to <see langword="true"/> minor and patch version are required.
+        /// otherwise they are optional.</param>
+        /// <returns>The <see cref="SemVersion"/> object.</returns>
+        /// <exception cref="ArgumentNullException">The version number has an invalid format.</exception>
+        /// <exception cref="InvalidOperationException">The version number is missing Minor or Patch versions when they are required.</exception>
+        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
         public static SemVersion Parse(string version, bool strict = false)
         {
             var match = ParseEx.Match(version);
@@ -127,13 +133,15 @@ namespace Semver
         }
 
         /// <summary>
-        /// Parses the specified string to a semantic version.
+        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
+        /// equivalent and returns a value that indicates whether the conversion succeeded.
         /// </summary>
         /// <param name="version">The version string.</param>
-        /// <param name="semver">When the method returns, contains a SemVersion instance equivalent
-        /// to the version string passed in, if the version string was valid, or <c>null</c> if the
+        /// <param name="semver">When the method returns, contains a <see cref="SemVersion"/> instance equivalent
+        /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
         /// version string was not valid.</param>
-        /// <param name="strict">If set to <see langword="true"/>, minor and patch version are required, else they default to 0.</param>
+        /// <param name="strict">If set to <see langword="true"/> minor and patch version are required.
+        /// otherwise they are optional.</param>
         /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
         public static bool TryParse(string version, out SemVersion semver, bool strict = false)
         {
@@ -172,11 +180,11 @@ namespace Semver
         }
 
         /// <summary>
-        /// Tests the specified versions for equality.
+        /// Checks whether two semantic versions are equal.
         /// </summary>
-        /// <param name="versionA">The first version.</param>
-        /// <param name="versionB">The second version.</param>
-        /// <returns>If versionA is equal to versionB <see langword="true"/>, else <see langword="false"/>.</returns>
+        /// <param name="versionA">The first version to compare.</param>
+        /// <param name="versionB">The second version to compare.</param>
+        /// <returns><see langword="true"/> if the two values are equal; otherwise, <see langword="false"/>.</returns>
         public static bool Equals(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return true;
@@ -187,10 +195,9 @@ namespace Semver
         /// <summary>
         /// Compares the specified versions.
         /// </summary>
-        /// <param name="versionA">The version to compare to.</param>
-        /// <param name="versionB">The version to compare against.</param>
-        /// <returns>If versionA &lt; versionB <c>&lt; 0</c>, if versionA &gt; versionB <c>&gt; 0</c>,
-        /// if versionA is equal to versionB <c>0</c>.</returns>
+        /// <param name="versionA">The first version to compare.</param>
+        /// <param name="versionB">The second version to compare.</param>
+        /// <returns>A signed number indicating the relative values of <code>versionA</code> and <code>versionB</code>.</returns>
         public static int Compare(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return 0;
@@ -200,14 +207,18 @@ namespace Semver
         }
 
         /// <summary>
-        /// Make a copy of the current instance with optional altered fields.
+        /// Make a copy of the current instance with changed properties.
         /// </summary>
-        /// <param name="major">The major version.</param>
-        /// <param name="minor">The minor version.</param>
-        /// <param name="patch">The patch version.</param>
-        /// <param name="prerelease">The prerelease text.</param>
-        /// <param name="build">The build text.</param>
+        /// <param name="major">The value to replace the major version or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="minor">The value to replace the minor version or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="patch">The value to replace the patch version or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="prerelease">The value to replace the prerelease version or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="build">The value to replace the build metadata or <see langword="null"/> to leave it unchanged.</param>
         /// <returns>The new version object.</returns>
+        /// <remarks>
+        /// The change method is intended to be called using named argument syntax.
+        /// For example, to change the patch version, use <code>version.Change(patch: 4)</code>.
+        /// </remarks>
         public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
             string prerelease = null, string build = null)
         {
@@ -244,26 +255,26 @@ namespace Semver
         public int Patch { get; }
 
         /// <summary>
-        /// Gets the pre-release version.
+        /// Gets the prerelease version.
         /// </summary>
         /// <value>
-        /// The pre-release version.
+        /// The prerelease version.
         /// </value>
         public string Prerelease { get; }
 
         /// <summary>
-        /// Gets the build version.
+        /// Gets the build metadata.
         /// </summary>
         /// <value>
-        /// The build version.
+        /// The build metadata.
         /// </value>
         public string Build { get; }
 
         /// <summary>
-        /// Returns a <see cref="string" /> that represents this instance.
+        /// Returns the <see cref="string" /> equivalent of this version.
         /// </summary>
         /// <returns>
-        /// A <see cref="string" /> that represents this instance.
+        /// The <see cref="string" /> equivalent of this version.
         /// </returns>
         public override string ToString()
         {
@@ -283,10 +294,10 @@ namespace Semver
         /// <param name="obj">An object to compare with this instance.</param>
         /// <returns>
         /// A value that indicates the relative order of the objects being compared.
-        /// The return value has these meanings: Value Meaning Less than zero
-        ///  This instance precedes <paramref name="obj" /> in the sort order.
-        ///  Zero This instance occurs in the same position in the sort order as <paramref name="obj" />. i
-        ///  Greater than zero This instance follows <paramref name="obj" /> in the sort order.
+        /// The return value has these meanings:
+        ///  Less than zero: This instance precedes <paramref name="obj" /> in the sort order.
+        ///  Zero: This instance occurs in the same position in the sort order as <paramref name="obj" />.
+        ///  Greater than zero: This instance follows <paramref name="obj" /> in the sort order.
         /// </returns>
         public int CompareTo(object obj)
         {
@@ -301,10 +312,10 @@ namespace Semver
         /// <param name="other">An object to compare with this instance.</param>
         /// <returns>
         /// A value that indicates the relative order of the objects being compared.
-        /// The return value has these meanings: Value Meaning Less than zero
-        ///  This instance precedes <paramref name="other" /> in the sort order.
-        ///  Zero This instance occurs in the same position in the sort order as <paramref name="other" />. i
-        ///  Greater than zero This instance follows <paramref name="other" /> in the sort order.
+        /// The return value has these meanings:
+        ///  Less than zero: This instance precedes <paramref name="other" /> in the sort order.
+        ///  Zero: This instance occurs in the same position in the sort order as <paramref name="other" />.
+        ///  Greater than zero: This instance follows <paramref name="other" /> in the sort order.
         /// </returns>
         public int CompareTo(SemVersion other)
         {
@@ -318,25 +329,27 @@ namespace Semver
         }
 
         /// <summary>
-        /// Compares to semantic versions by precedence. This does the same as a Equals, but ignores the build information.
+        /// Returns whether two semantic versions have the same precedence. Versions
+        /// that differ only by build metadata have the same precedence.
         /// </summary>
-        /// <param name="other">The semantic version.</param>
-        /// <returns><see langword="true"/> if the version precedence matches.</returns>
+        /// <param name="other">The semantic version to compare to.</param>
+        /// <returns><see langword="true"/> if the version precedences are equal.</returns>
         public bool PrecedenceMatches(SemVersion other)
         {
             return CompareByPrecedence(other) == 0;
         }
 
         /// <summary>
-        /// Compares to semantic versions by precedence. This does the same as a Equals, but ignores the build information.
+        /// Compares two semantic versions by precedence as defined in the SemVer spec. Versions
+        /// that differ only by build metadata have the same precedence.
         /// </summary>
         /// <param name="other">The semantic version.</param>
         /// <returns>
         /// A value that indicates the relative order of the objects being compared.
-        /// The return value has these meanings: Value Meaning Less than zero
-        ///  This instance precedes <paramref name="other" /> in the version precedence.
-        ///  Zero This instance has the same precedence as <paramref name="other" />. i
-        ///  Greater than zero This instance has greater precedence as <paramref name="other" />.
+        /// The return value has these meanings:
+        ///  Less than zero: This instance precedes <paramref name="other" /> in the sort order.
+        ///  Zero: This instance occurs in the same position in the sort order as <paramref name="other" />.
+        ///  Greater than zero: This instance follows <paramref name="other" /> in the sort order.
         /// </returns>
         public int CompareByPrecedence(SemVersion other)
         {
@@ -443,6 +456,11 @@ namespace Semver
         }
 
 #if !NETSTANDARD
+        /// <summary>
+        /// Populates a <see cref="SerializationInfo"/> with the data needed to serialize the target object.
+        /// </summary>
+        /// <param name="info">The <see cref="SerializationInfo"/> to populate with data.</param>
+        /// <param name="context">The destination (see <see cref="SerializationInfo"/>) for this serialization.</param>
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
@@ -453,10 +471,10 @@ namespace Semver
 
 #pragma warning disable CA2225 // Operator overloads have named alternates
         /// <summary>
-        /// Implicit conversion from string to SemVersion.
+        /// Implicit conversion from <see cref="string"/> to <see cref="SemVersion"/>.
         /// </summary>
         /// <param name="version">The semantic version.</param>
-        /// <returns>The SemVersion object.</returns>
+        /// <returns>The <see cref="SemVersion"/> object.</returns>
         public static implicit operator SemVersion(string version)
 #pragma warning restore CA2225 // Operator overloads have named alternates
         {
@@ -464,66 +482,66 @@ namespace Semver
         }
 
         /// <summary>
-        /// The override of the equals operator.
+        /// Compares two semantic versions for equality.
         /// </summary>
         /// <param name="left">The left value.</param>
         /// <param name="right">The right value.</param>
-        /// <returns>If left is equal to right <see langword="true"/>, else <see langword="false"/>.</returns>
+        /// <returns>If left is equal to right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
         public static bool operator ==(SemVersion left, SemVersion right)
         {
             return Equals(left, right);
         }
 
         /// <summary>
-        /// The override of the un-equal operator.
+        /// Compares two semantic versions for inequality.
         /// </summary>
         /// <param name="left">The left value.</param>
         /// <param name="right">The right value.</param>
-        /// <returns>If left is not equal to right <see langword="true"/>, else <see langword="false"/>.</returns>
+        /// <returns>If left is not equal to right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
         public static bool operator !=(SemVersion left, SemVersion right)
         {
             return !Equals(left, right);
         }
 
         /// <summary>
-        /// The override of the greater operator.
+        /// Compares two semantic versions.
         /// </summary>
         /// <param name="left">The left value.</param>
         /// <param name="right">The right value.</param>
-        /// <returns>If left is greater than right <see langword="true"/>, else <see langword="false"/>.</returns>
+        /// <returns>If left is greater than right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
         public static bool operator >(SemVersion left, SemVersion right)
         {
             return Compare(left, right) > 0;
         }
 
         /// <summary>
-        /// The override of the greater than or equal operator.
+        /// Compares two semantic versions.
         /// </summary>
         /// <param name="left">The left value.</param>
         /// <param name="right">The right value.</param>
-        /// <returns>If left is greater than or equal to right <see langword="true"/>, else <see langword="false"/>.</returns>
+        /// <returns>If left is greater than or equal to right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
         public static bool operator >=(SemVersion left, SemVersion right)
         {
             return Compare(left, right) >= 0;
         }
 
         /// <summary>
-        /// The override of the less operator.
+        /// Compares two semantic versions.
         /// </summary>
         /// <param name="left">The left value.</param>
         /// <param name="right">The right value.</param>
-        /// <returns>If left is less than right <see langword="true"/>, else <see langword="false"/>.</returns>
+        /// <returns>If left is less than right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
         public static bool operator <(SemVersion left, SemVersion right)
         {
             return Compare(left, right) < 0;
         }
 
         /// <summary>
-        /// The override of the less than or equal operator.
+        /// Compares two semantic versions.
         /// </summary>
         /// <param name="left">The left value.</param>
         /// <param name="right">The right value.</param>
-        /// <returns>If left is less than or equal to right <see langword="true"/>, else <see langword="false"/>.</returns>
+        /// <returns>If left is less than or equal to right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
         public static bool operator <=(SemVersion left, SemVersion right)
         {
             return Compare(left, right) <= 0;
