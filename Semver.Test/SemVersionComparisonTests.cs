@@ -657,9 +657,9 @@ namespace Semver.Test
             var v2 = SemVersion.Parse(s2);
 
             Assert.False(v1 < v2, $"{v1} < {v2}");
-            Assert.True(v1 <= v2, $"{v1} <= {v2}");
+            Assert.False(v1 <= v2, $"{v1} <= {v2}");
             Assert.False(v1 > v2, $"{v1} > {v2}");
-            Assert.True(v1 >= v2, $"{v1} >= {v2}");
+            Assert.False(v1 >= v2, $"{v1} >= {v2}");
         }
 
         [Theory]
@@ -672,9 +672,9 @@ namespace Semver.Test
             var v2 = SemVersion.Parse(s2);
 
             Assert.False(v1 < v2, $"{v1} < {v2}");
-            Assert.True(v1 <= v2, $"{v1} <= {v2}");
+            Assert.False(v1 <= v2, $"{v1} <= {v2}");
             Assert.False(v1 > v2, $"{v1} > {v2}");
-            Assert.True(v1 >= v2, $"{v1} >= {v2}");
+            Assert.False(v1 >= v2, $"{v1} >= {v2}");
         }
 
         [Fact]
