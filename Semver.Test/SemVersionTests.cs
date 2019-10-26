@@ -8,9 +8,15 @@ using Xunit;
 
 namespace Semver.Test
 {
+    /// <summary>
+    /// Tests of basic <see cref="SemVersion"/> functionality.
+    /// </summary>
     public class SemVersionTests
     {
         #region Constructors
+        /// <summary>
+        /// Verifies the default values of the arguments to the primary constructor.
+        /// </summary>
         [Fact]
         public void ConstructSemVersionDefaultValuesTest()
         {
@@ -24,19 +30,81 @@ namespace Semver.Test
         }
 
         [Theory]
+        // Basic version
         [InlineData(1, 2, 3, "a", "b")]
+        // Letter Limits
+        [InlineData(1, 2, 3, "A-Z.a-z.0-9", "A-Z.a-z.0-9")]
+        // Dash in strange places
+        [InlineData(1, 2, 3, "-", "b")]
+        [InlineData(1, 2, 3, "--", "b")]
+        [InlineData(1, 2, 3, "a", "-")]
+        [InlineData(1, 2, 3, "a", "--")]
+        [InlineData(1, 2, 3, "-a", "b")]
+        [InlineData(1, 2, 3, "--a", "b")]
+        [InlineData(1, 2, 3, "a", "-b")]
+        [InlineData(1, 2, 3, "a", "--b")]
+        [InlineData(1, 2, 3, "a-", "b")]
+        [InlineData(1, 2, 3, "a--", "b")]
+        [InlineData(1, 2, 3, "a", "b-")]
+        [InlineData(1, 2, 3, "a", "b--")]
+        [InlineData(1, 2, 3, "-.a", "b")]
+        [InlineData(1, 2, 3, "a", "-.b")]
+        [InlineData(1, 2, 3, "a.-", "b")]
+        [InlineData(1, 2, 3, "a.-.c", "b")]
+        [InlineData(1, 2, 3, "a", "b.-")]
+        [InlineData(1, 2, 3, "a", "b.-.c")]
+        // Leading Zero on prerelease Alphanumeric Identifiers
+        [InlineData(1, 2, 3, "0a", "b")]
+        [InlineData(1, 2, 3, "00000a", "b")]
+        [InlineData(1, 2, 3, "a.0c", "b")]
+        [InlineData(1, 2, 3, "a.00000c", "b")]
+        // Empty string
+        [InlineData(1, 2, 3, "a", "")]
+        [InlineData(1, 2, 3, "", "b")]
+        [InlineData(1, 2, 3, "", "")]
+        // Null handling
+        [InlineData(1, 2, 3, "a", null)]
+        [InlineData(1, 2, 3, null, "b")]
         [InlineData(1, 2, 3, null, null)]
-        // TODO these should be invalid and throw argument exceptions issue #40
+        // Negative version numbers
+        // TODO these should be invalid and throw argument exceptions (issue#41)
         [InlineData(-1, 0, 0, "", "")]
         [InlineData(0, -1, 0, "", "")]
         [InlineData(0, 0, -1, "", "")]
-        // TODO these should be invalid and throw argument exceptions issue #41
+        [InlineData(-1, -1, -1, "", "")]
+        // Illegal characters
+        // TODO Illegal characters be invalid and throw argument exceptions (issue#41)
         [InlineData(1, 2, 3, "😞", "b")]
         [InlineData(1, 2, 3, "a", "😞")]
+        // Leading Zeros in Prerelease
+        // TODO Leading zeros in prerelease be invalid and throw argument exceptions (issue#41)
         [InlineData(1, 2, 3, "01", "b")]
         [InlineData(1, 2, 3, "a.01", "b")]
-        [InlineData(1, 2, 3, "a..empty", "b")]
-        [InlineData(1, 2, 3, "a", "b..empty")]
+        [InlineData(1, 2, 3, "a.01.c", "b")]
+        [InlineData(1, 2, 3, "a.0000001.c", "b")]
+        // Leading Zeros in Build (valid)
+        [InlineData(1, 2, 3, "a", "01")]
+        [InlineData(1, 2, 3, "a", "b.01")]
+        [InlineData(1, 2, 3, "a", "b.01.c")]
+        [InlineData(1, 2, 3, "a", "b.00000001.c")]
+        [InlineData(1, 2, 3, "a", "0b")]
+        [InlineData(1, 2, 3, "a", "0000000b")]
+        [InlineData(1, 2, 3, "a", "b.0c")]
+        [InlineData(1, 2, 3, "a", "b.000000c")]
+        // Empty Identifiers
+        // TODO Empty Identifiers should be invalid and throw argument exceptions (issue#41)
+        [InlineData(1, 2, 3, ".", "b")]
+        [InlineData(1, 2, 3, "a", ".")]
+        [InlineData(1, 2, 3, "a.", "b")]
+        [InlineData(1, 2, 3, "a..", "b")]
+        [InlineData(1, 2, 3, "a", "b.")]
+        [InlineData(1, 2, 3, "a", "b..")]
+        [InlineData(1, 2, 3, ".a", "b")]
+        [InlineData(1, 2, 3, "..a", "b")]
+        [InlineData(1, 2, 3, "a", ".b")]
+        [InlineData(1, 2, 3, "a", "..b")]
+        [InlineData(1, 2, 3, "a..c", "b")]
+        [InlineData(1, 2, 3, "a", "b..c")]
         public void ConstructSemVersionTest(int major, int minor, int patch, string prerelease, string build)
         {
             var v = new SemVersion(major, minor, patch, prerelease, build);
@@ -50,6 +118,7 @@ namespace Semver.Test
 
         [Theory]
         [InlineData(0, 0, 0, 0)]
+        [InlineData(1, 1, 1, 1)]
         // TODO this is a strange conversion (issue #32)
         [InlineData(1, 2, 0, 3)]
         [InlineData(1, 2, 4, 3)]
@@ -66,6 +135,42 @@ namespace Semver.Test
             Assert.Equal(build > 0 ? build.ToString(CultureInfo.InvariantCulture) : "", v.Build);
         }
 
+        [Theory]
+        [InlineData(0, 0, 0)]
+        [InlineData(1, 1, 1)]
+        // TODO this is a strange conversion (issue #32)
+        [InlineData(1, 2, 0)]
+        [InlineData(1, 2, 4)]
+        public void ConstructSemVersionFromSystemVersionWithUndefinedRevisionTest(int major, int minor, int build)
+        {
+            var nonSemanticVersion = new Version(major, minor, build);
+
+            var v = new SemVersion(nonSemanticVersion);
+
+            Assert.Equal(major, v.Major);
+            Assert.Equal(minor, v.Minor);
+            Assert.Equal(0, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Equal(build > 0 ? build.ToString(CultureInfo.InvariantCulture) : "", v.Build);
+        }
+
+        [Theory]
+        [InlineData(0, 0)]
+        [InlineData(1, 1)]
+        [InlineData(1, 2)]
+        public void ConstructSemVersionFromSystemVersionWithUndefinedBuildRevisionTest(int major, int minor)
+        {
+            var nonSemanticVersion = new Version(major, minor);
+
+            var v = new SemVersion(nonSemanticVersion);
+
+            Assert.Equal(major, v.Major);
+            Assert.Equal(minor, v.Minor);
+            Assert.Equal(0, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Equal("", v.Build);
+        }
+
         [Fact]
         public void ConstructSemVersionFromNullSystemVersionTest()
         {
@@ -75,6 +180,7 @@ namespace Semver.Test
         }
         #endregion
 
+        // TODO better unit test on hashcode
         [Fact]
         public void GetHashCodeTest()
         {
@@ -87,23 +193,27 @@ namespace Semver.Test
             Assert.NotEqual(h1, h2);
         }
 
-
-        [Fact]
-        public void ToStringTest()
+        [Theory]
+        [InlineData(1, 2, 3, "a", "b", "1.2.3-a+b")]
+        [InlineData(1, 2, 3, "a", "", "1.2.3-a")]
+        [InlineData(1, 2, 3, "", "b", "1.2.3+b")]
+        [InlineData(1, 2, 3, "", "", "1.2.3")]
+        [InlineData(1, 2, 0, "", "", "1.2.0")]
+        [InlineData(1, 0, 0, "", "", "1.0.0")]
+        [InlineData(0, 0, 0, "", "", "0.0.0")]
+        [InlineData(6, 20, 31, "beta-x.2", "dev-mha.120", "6.20.31-beta-x.2+dev-mha.120")]
+        public void ToStringTest(int major, int minor, int patch, string prerelease, string build, string expected)
         {
-            var version = new SemVersion(1, 2, 3, "beta-x.2", "dev-mha.120");
+            var v = new SemVersion(major, minor, patch, prerelease, build);
 
-            Assert.Equal("1.2.3-beta-x.2+dev-mha.120", version.ToString());
-        }
+            var actual = v.ToString();
 
-        [Fact]
-        public void ImplicitConversionFromStringTest()
-        {
-            SemVersion v = "1.0.0";
-            Assert.Equal(1, v.Major);
+            Assert.Equal(expected, actual);
         }
 
         #region Change
+
+        // TODO add tests for validation
         [Fact]
         public void ChangeMajorTest()
         {
@@ -117,6 +227,7 @@ namespace Semver.Test
             Assert.Equal("dev", v2.Build);
         }
 
+        // TODO add tests for validation
         [Fact]
         public void ChangeMinorTest()
         {
@@ -130,6 +241,7 @@ namespace Semver.Test
             Assert.Equal("dev", v2.Build);
         }
 
+        // TODO add tests for validation
         [Fact]
         public void ChangePatchTest()
         {
@@ -143,6 +255,7 @@ namespace Semver.Test
             Assert.Equal("dev", v2.Build);
         }
 
+        // TODO add tests for validation
         [Fact]
         public void ChangePrereleaseTest()
         {
@@ -156,6 +269,7 @@ namespace Semver.Test
             Assert.Equal("dev", v2.Build);
         }
 
+        // TODO add tests for validation
         [Fact]
         public void ChangeBuildTest()
         {
