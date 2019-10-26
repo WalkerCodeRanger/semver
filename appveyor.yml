@@ -38,6 +38,7 @@ build:
   verbosity: minimal
   publish_nuget: true
   publish_nuget_symbols: true
+  use_snupkg_format: true
 
 # Test Discovery was running both xUnit and dotnet test.
 # To prevent that, use a test script to run dotnet test.
