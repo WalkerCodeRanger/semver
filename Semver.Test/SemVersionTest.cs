@@ -306,6 +306,7 @@ namespace Semver.Test
         [InlineData("1.2-nightly", "1.2.0-nightly2", false)]
         [InlineData("1.2.1", "1.2.0", false)]
         [InlineData("1.4.0", "1.2.0", false)]
+        [InlineData("1.2.3-a", "1.2.3-A", false)]
         public void EqualsTest(string s1, string s2, bool equal)
         {
             var v1 = SemVersion.Parse(s1);
@@ -552,6 +553,7 @@ namespace Semver.Test
         [InlineData("1.0.0", "2.0.0")]
         [InlineData("1.0.0-alpha", "1.0.0-rc")]
         [InlineData("1.0.0-alpha", "1.0.0-ci.1")]
+        [InlineData("1.0.0-A", "1.0.0-a")]
         public void ComparisonOperatorTest(string s1, string s2)
         {
             var v1 = SemVersion.Parse(s1);
