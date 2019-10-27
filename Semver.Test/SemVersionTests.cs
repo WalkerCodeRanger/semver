@@ -198,7 +198,9 @@ namespace Semver.Test
         {
             var nonSemanticVersion = new Version(major, minor);
 
+#pragma warning disable 618
             var v = new SemVersion(nonSemanticVersion);
+#pragma warning restore 618
 
             Assert.Equal(major, v.Major);
             Assert.Equal(minor, v.Minor);
@@ -210,9 +212,148 @@ namespace Semver.Test
         [Fact]
         public void ConstructSemVersionFromNullSystemVersionTest()
         {
+#pragma warning disable 618
             var ex = Assert.Throws<ArgumentNullException>(() => new SemVersion(null));
+#pragma warning restore 618
 
             Assert.Equal("Value cannot be null.\r\nParameter name: version", ex.Message);
+        }
+
+        [Theory]
+        [InlineData(0, 0, 0, 0)]
+        [InlineData(1, 1, 1, 0)]
+        [InlineData(1, 2, 0, 0)]
+        [InlineData(45, 2, 4, 0)]
+        public void FromVersionWithZeroRevisionTest(int major, int minor, int build, int revision)
+        {
+            var nonSemanticVersion = new Version(major, minor, build, revision);
+
+            var v = SemVersion.FromVersion(nonSemanticVersion);
+
+            Assert.Equal(major, v.Major);
+            Assert.Equal(minor, v.Minor);
+            Assert.Equal(build, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Equal("", v.Metadata);
+        }
+
+        [Theory]
+        [InlineData(1, 1, 1, 1)]
+        [InlineData(1, 2, 0, 32)]
+        [InlineData(45, 2, 4, 5414)]
+        public void FromVersionWithPositiveRevisionTest(int major, int minor, int build, int revision)
+        {
+            var nonSemanticVersion = new Version(major, minor, build, revision);
+
+            var ex = Assert.Throws<ArgumentException>(() => SemVersion.FromVersion(nonSemanticVersion));
+
+            Assert.Equal("Version with Revision number can't be converted to SemVer.\r\nParameter name: version", ex.Message);
+        }
+
+        [Theory]
+        [InlineData(0, 0, 0)]
+        [InlineData(1, 1, 1)]
+        [InlineData(1, 2, 0)]
+        [InlineData(22, 2, 4)]
+        public void FromVersionWithUndefinedRevisionTest(int major, int minor, int build)
+        {
+            var nonSemanticVersion = new Version(major, minor, build);
+
+            var v = SemVersion.FromVersion(nonSemanticVersion);
+
+            Assert.Equal(major, v.Major);
+            Assert.Equal(minor, v.Minor);
+            Assert.Equal(build, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Equal("", v.Metadata);
+        }
+
+        [Theory]
+        [InlineData(0, 0)]
+        [InlineData(1, 1)]
+        [InlineData(1, 2)]
+        [InlineData(12, 62)]
+        public void FromVersionWithUndefinedBuildRevisionTest(int major, int minor)
+        {
+            var nonSemanticVersion = new Version(major, minor);
+
+            var v = SemVersion.FromVersion(nonSemanticVersion);
+
+            Assert.Equal(major, v.Major);
+            Assert.Equal(minor, v.Minor);
+            Assert.Equal(0, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Equal("", v.Metadata);
+        }
+
+        [Fact]
+        public void FromVersionNullTest()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.FromVersion(null));
+
+            Assert.Equal("Value cannot be null.\r\nParameter name: version", ex.Message);
+        }
+
+        [Theory]
+        [InlineData(0, 0, 0)]
+        [InlineData(1, 2, 3)]
+        [InlineData(34, 62, 0)]
+        public void ToVersionFromReleaseTest(int major, int minor, int patch)
+        {
+            var v = new SemVersion(major, minor, patch);
+
+            var nonSemanticVersion = v.ToVersion();
+
+            Assert.Equal(major, nonSemanticVersion.Major);
+            Assert.Equal(minor, nonSemanticVersion.Minor);
+            Assert.Equal(patch, nonSemanticVersion.Build);
+            Assert.Equal(-1, nonSemanticVersion.Revision);
+        }
+
+        [Theory]
+        [InlineData(-1, 0, 0, "A-Z.a-z.0-9", "A-Z.a-z.0-9")]
+        [InlineData(0, -1, 0, "", "")]
+        [InlineData(0, 0, -1, "alpha", "")]
+        [InlineData(-1, -1, -1, "", "build.42")]
+        public void ToVersionFromNegativeTest(int major, int minor, int patch, string prerelease, string metadata)
+        {
+            var v = new SemVersion(major, minor, patch, prerelease, metadata);
+
+            var ex = Assert.Throws<InvalidOperationException>(() => v.ToVersion());
+
+            Assert.Equal("Negative version numbers can't be converted to System.Version.", ex.Message);
+        }
+
+        [Theory]
+        [InlineData(1, 2, 3, "A-Z.a-z.0-9", "A-Z.a-z.0-9")]
+        [InlineData(1, 2, 3, "-", "b")]
+        [InlineData(1, 2, 3, ".", "b")]
+        [InlineData(1, 2, 3, "..", "b")]
+        [InlineData(1, 2, 3, "01", "b")]
+        [InlineData(1, 2, 3, "😞", "b")]
+        public void ToVersionFromPrereleaseTest(int major, int minor, int patch, string prerelease, string metadata)
+        {
+            var v = new SemVersion(major, minor, patch, prerelease, metadata);
+
+            var ex = Assert.Throws<InvalidOperationException>(() => v.ToVersion());
+
+            Assert.Equal("Prerelease version can't be converted to System.Version.", ex.Message);
+        }
+
+        [Theory]
+        [InlineData(1, 2, 3, "", "A-Z.a-z.0-9")]
+        [InlineData(1, 2, 3, "", "😞")]
+        [InlineData(1, 2, 3, "", ".")]
+        [InlineData(1, 2, 3, "", "..b")]
+        [InlineData(1, 2, 3, "", "-")]
+        [InlineData(1, 2, 3, "", "b..c")]
+        public void ToVersionFromMetadataTest(int major, int minor, int patch, string prerelease, string metadata)
+        {
+            var v = new SemVersion(major, minor, patch, prerelease, metadata);
+
+            var ex = Assert.Throws<InvalidOperationException>(() => v.ToVersion());
+
+            Assert.Equal("Version with build metadata can't be converted to System.Version.", ex.Message);
         }
         #endregion
 

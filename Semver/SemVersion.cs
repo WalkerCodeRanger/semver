@@ -78,6 +78,7 @@ namespace Semver
         /// The Patch version will be the fourth component of the version number. The
         /// build meta data will contain the third component of the version number if
         /// it is greater than zero.</returns>
+        [Obsolete("This constructor is obsolete. Call FromVersion instead.")]
         public SemVersion(Version version)
         {
             if (version == null)
@@ -93,6 +94,55 @@ namespace Semver
 
             Metadata = version.Build > 0 ? version.Build.ToString(CultureInfo.InvariantCulture) : "";
         }
+
+        #region System.Version
+        /// <summary>
+        /// Converts a <see cref="System.Version"/> into the equivalent semantic version.
+        /// </summary>
+        /// <param name="version">The version to be converted to a semantic version.</param>
+        /// <returns>The equivalent semantic version.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="version"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="version"/> has a Revision greater than zero.</exception>
+        /// <remarks>
+        /// <see cref="System.Version"/> numbers have the form <em>major</em>.<em>minor</em>[.<em>build</em>[.<em>revision</em>]]
+        /// where square brackets ('[' and ']')  indicate optional components. The first three parts
+        /// are converted to the Major, Minor, and Patch versions of a semantic version. If the build component
+        /// is not defined (-1), the Patch number is assumed to be zero. <see cref="System.Version"/> numbers
+        /// with a revision component greater than zero cannot be converted to semantic versions. An
+        /// <see cref="ArgumentException"/> is thrown when this method is called with such a <see cref="Version"/>.
+        /// </remarks>
+        public static SemVersion FromVersion(Version version)
+        {
+            if (version == null) throw new ArgumentNullException(nameof(version));
+            if (version.Revision > 0) throw new ArgumentException("Version with Revision number can't be converted to SemVer.", nameof(version));
+            var patch = version.Build > 0 ? version.Build : 0;
+            return new SemVersion(version.Major, version.Minor, patch);
+        }
+
+        /// <summary>
+        /// Converts this semantic version to a <see cref="System.Version"/>.
+        /// </summary>
+        /// <returns>The equivalent <see cref="System.Version"/>.</returns>
+        /// <remarks>
+        /// A semantic version of the form <em>major</em>.<em>minor</em>.<em>patch</em>
+        /// is converted to a <see cref="System.Version"/> of the form
+        /// <em>major</em>.<em>minor</em>.<em>build</em> where the build number is the
+        /// patch version of the semantic version. Prerelease versions and build metadata
+        /// are not representable in a <see cref="System.Version"/>. This method throws
+        /// an <see cref="InvalidOperationException"/> if the semantic version is a
+        /// prerelease version or has build metadata.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">The semantic version is a prerelease version
+        /// or has build metadata or has a negative major, minor, or patch version.</exception>
+        public Version ToVersion()
+        {
+            if (Major < 0 || Minor < 0 || Patch < 0) throw new InvalidOperationException("Negative version numbers can't be converted to System.Version.");
+            if (IsPrerelease) throw new InvalidOperationException("Prerelease version can't be converted to System.Version.");
+            if (Metadata.Length != 0) throw new InvalidOperationException("Version with build metadata can't be converted to System.Version.");
+
+            return new Version(Major, Minor, Patch);
+        }
+        #endregion
 
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/> equivalent.
