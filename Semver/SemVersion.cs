@@ -370,7 +370,7 @@ namespace Semver
             return CompareComponent(Prerelease, other.Prerelease, true);
         }
 
-        private static int CompareComponent(string a, string b, bool lower = false)
+        private static int CompareComponent(string a, string b, bool nonemptyIsLower = false)
         {
             var aEmpty = string.IsNullOrEmpty(a);
             var bEmpty = string.IsNullOrEmpty(b);
@@ -378,9 +378,9 @@ namespace Semver
                 return 0;
 
             if (aEmpty)
-                return lower ? 1 : -1;
+                return nonemptyIsLower ? 1 : -1;
             if (bEmpty)
-                return lower ? -1 : 1;
+                return nonemptyIsLower ? -1 : 1;
 
             var aComps = a.Split('.');
             var bComps = b.Split('.');
