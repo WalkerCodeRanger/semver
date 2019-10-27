@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 #if !NETSTANDARD
 using System.Runtime.Serialization;
 using System.Security.Permissions;
@@ -148,12 +149,12 @@ namespace Semver
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/> equivalent.
         /// </summary>
         /// <param name="version">The version string.</param>
-        /// <param name="strict">If set to <see langword="true"/> minor and patch version are required.
+        /// <param name="strict">If set to <see langword="true"/> minor and patch version are required,
         /// otherwise they are optional.</param>
         /// <returns>The <see cref="SemVersion"/> object.</returns>
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
-        /// <exception cref="InvalidOperationException">The version number is missing Minor or Patch versions when they are required.</exception>
+        /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
+        /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing Minor or Patch versions and <paramref name="strict"/> is <see langword="true"/>.</exception>
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
         public static SemVersion Parse(string version, bool strict = false)
         {
@@ -191,7 +192,7 @@ namespace Semver
         /// <param name="semver">When the method returns, contains a <see cref="SemVersion"/> instance equivalent
         /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
         /// version string was not valid.</param>
-        /// <param name="strict">If set to <see langword="true"/> minor and patch version are required.
+        /// <param name="strict">If set to <see langword="true"/> minor and patch version are required,
         /// otherwise they are optional.</param>
         /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
         public static bool TryParse(string version, out SemVersion semver, bool strict = false)
@@ -235,7 +236,7 @@ namespace Semver
         /// </summary>
         /// <param name="versionA">The first version to compare.</param>
         /// <param name="versionB">The second version to compare.</param>
-        /// <returns><see langword="true"/> if the two values are equal; otherwise, <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
         public static bool Equals(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return true;
@@ -248,7 +249,7 @@ namespace Semver
         /// </summary>
         /// <param name="versionA">The first version to compare.</param>
         /// <param name="versionB">The second version to compare.</param>
-        /// <returns>A signed number indicating the relative values of <code>versionA</code> and <code>versionB</code>.</returns>
+        /// <returns>A signed number indicating the relative values of <paramref name="versionA"/> and <paramref name="versionB"/>.</returns>
         public static int Compare(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return 0;
@@ -267,9 +268,13 @@ namespace Semver
         /// <param name="build">The value to replace the build metadata or <see langword="null"/> to leave it unchanged.</param>
         /// <returns>The new version object.</returns>
         /// <remarks>
-        /// The change method is intended to be called using named argument syntax.
-        /// For example, to change the patch version, use <code>version.Change(patch: 4)</code>.
+        /// The change method is intended to be called using named argument syntax, passing only
+        /// those fields to be changed.
         /// </remarks>
+        /// <example>
+        /// To change only the patch version:
+        /// <code>version.Change(patch: 4)</code>
+        /// </example>
         public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
             string prerelease = null, string build = null)
         {
@@ -358,12 +363,26 @@ namespace Semver
         /// </returns>
         public override string ToString()
         {
-            var version = "" + Major + "." + Minor + "." + Patch;
-            if (!string.IsNullOrEmpty(Prerelease))
-                version += "-" + Prerelease;
-            if (!string.IsNullOrEmpty(Metadata))
-                version += "+" + Metadata;
-            return version;
+            // Assume all separators ("..-+"), at most 2 extra chars
+            var estimatedLength = 4 + Major.Digits() + Minor.Digits() + Patch.Digits()
+                                  + Prerelease.Length + Metadata.Length;
+            var version = new StringBuilder(estimatedLength);
+            version.Append(Major);
+            version.Append('.');
+            version.Append(Minor);
+            version.Append('.');
+            version.Append(Patch);
+            if (Prerelease.Length > 0)
+            {
+                version.Append('-');
+                version.Append(Prerelease);
+            }
+            if (Metadata.Length > 0)
+            {
+                version.Append('+');
+                version.Append(Metadata);
+            }
+            return version.ToString();
         }
 
         /// <summary>
@@ -449,7 +468,7 @@ namespace Semver
             return CompareComponent(Prerelease, other.Prerelease, true);
         }
 
-        private static int CompareComponent(string a, string b, bool lower = false)
+        private static int CompareComponent(string a, string b, bool nonemptyIsLower = false)
         {
             var aEmpty = string.IsNullOrEmpty(a);
             var bEmpty = string.IsNullOrEmpty(b);
@@ -457,9 +476,9 @@ namespace Semver
                 return 0;
 
             if (aEmpty)
-                return lower ? 1 : -1;
+                return nonemptyIsLower ? 1 : -1;
             if (bEmpty)
-                return lower ? -1 : 1;
+                return nonemptyIsLower ? -1 : 1;
 
             var aComps = a.Split('.');
             var bComps = b.Split('.');
@@ -497,7 +516,7 @@ namespace Semver
         /// </summary>
         /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
         /// <returns>
-        ///   <see langword="true"/> if the specified <see cref="object" /> is equal to this instance; otherwise, <see langword="false"/>.
+        ///   <see langword="true"/> if the specified <see cref="object" /> is equal to this instance, otherwise <see langword="false"/>.
         /// </returns>
         /// <exception cref="InvalidCastException">The <paramref name="obj"/> is not a <see cref="SemVersion"/>.</exception>
         public override bool Equals(object obj)

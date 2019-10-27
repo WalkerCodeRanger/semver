@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>A semver implementation in .Net based on the v2.0.0 of the spec found at http://semver.org/.</Description>
+    <Description>A SemVer implementation in .Net based on v2.0.0 of the spec found at http://semver.org</Description>
     <Copyright>Copyright © 2013 Max Hauser, Jeff Walker</Copyright>
     <AssemblyTitle>Semantic versioning</AssemblyTitle>
     <Authors>Max Hauser, Jeff Walker</Authors>
@@ -13,7 +13,7 @@
     <AssemblyName>Semver</AssemblyName>
     <PackageId>Semver</PackageId>
     <Title>Semantic versioning</Title>
-    <PackageTags>semver;semantic;version</PackageTags>
+    <PackageTags>semver,semantic,version</PackageTags>
     <PackageReleaseNotes>https://github.com/maxhauser/semver/releases</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/maxhauser/semver</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>

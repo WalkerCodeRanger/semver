@@ -379,6 +379,10 @@ namespace Semver.Test
         [InlineData(1, 0, 0, "", "", "1.0.0")]
         [InlineData(0, 0, 0, "", "", "0.0.0")]
         [InlineData(6, 20, 31, "beta-x.2", "dev-mha.120", "6.20.31-beta-x.2+dev-mha.120")]
+        [InlineData(-1, 0, 0, "", "", "-1.0.0")]
+        [InlineData(0, -1, 0, "", "", "0.-1.0")]
+        [InlineData(0, 0, -1, "", "", "0.0.-1")]
+        [InlineData(-1, -1, -1, "", "", "-1.-1.-1")]
         public void ToStringTest(int major, int minor, int patch, string prerelease, string metadata, string expected)
         {
             var v = new SemVersion(major, minor, patch, prerelease, metadata);
