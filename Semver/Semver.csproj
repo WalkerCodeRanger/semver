@@ -12,6 +12,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Semver</AssemblyName>
     <PackageId>Semver</PackageId>
+    <Title>Semantic versioning</Title>
     <PackageTags>semver;semantic;version</PackageTags>
     <PackageReleaseNotes>https://github.com/maxhauser/semver/releases</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/maxhauser/semver</PackageProjectUrl>
@@ -30,13 +31,6 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <DefineConstants>$(DefineConstants);NET45</DefineConstants>
   </PropertyGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <Reference Include="System.Runtime" />
-    <Reference Include="System.Threading.Tasks" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
