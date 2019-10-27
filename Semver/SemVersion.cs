@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 #if !NETSTANDARD
 using System.Runtime.Serialization;
 using System.Security.Permissions;
@@ -279,12 +280,26 @@ namespace Semver
         /// </returns>
         public override string ToString()
         {
-            var version = "" + Major + "." + Minor + "." + Patch;
-            if (!string.IsNullOrEmpty(Prerelease))
-                version += "-" + Prerelease;
-            if (!string.IsNullOrEmpty(Build))
-                version += "+" + Build;
-            return version;
+            // Assume all separators ("..-+"), at most 2 extra chars
+            var estimatedLength = 4 + Major.Digits() + Minor.Digits() + Patch.Digits()
+                                  + Prerelease.Length + Build.Length;
+            var version = new StringBuilder(estimatedLength);
+            version.Append(Major);
+            version.Append('.');
+            version.Append(Minor);
+            version.Append('.');
+            version.Append(Patch);
+            if (Prerelease.Length > 0)
+            {
+                version.Append('-');
+                version.Append(Prerelease);
+            }
+            if (Build.Length > 0)
+            {
+                version.Append('+');
+                version.Append(Build);
+            }
+            return version.ToString();
         }
 
         /// <summary>
