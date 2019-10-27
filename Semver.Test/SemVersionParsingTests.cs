@@ -251,7 +251,7 @@ namespace Semver.Test
         [MemberData(nameof(LeadingZeros))]
         [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
         [MemberData(nameof(LeadingZerosPrerelease))]
-        public void ParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
+        public void ParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
         {
             var v = SemVersion.Parse(versionString);
 
@@ -259,7 +259,7 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(patch, v.Patch);
             Assert.Equal(prerelease, v.Prerelease);
-            Assert.Equal(build, v.Build);
+            Assert.Equal(metadata, v.Metadata);
         }
 
         // TODO These exceptions should be FormatException etc.
@@ -300,7 +300,7 @@ namespace Semver.Test
         // TODO leading zero versions are accepted and shouldn't be (issue #16)
         [MemberData(nameof(LeadingZeros))]
         [MemberData(nameof(LeadingZerosPrerelease))]
-        public void ParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
+        public void ParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
         {
             var v = SemVersion.Parse(versionString, true);
 
@@ -308,7 +308,7 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(patch, v.Patch);
             Assert.Equal(prerelease, v.Prerelease);
-            Assert.Equal(build, v.Build);
+            Assert.Equal(metadata, v.Metadata);
         }
 
         [Theory(Skip = "Strict parsing still accepts invalids")]
@@ -375,7 +375,7 @@ namespace Semver.Test
         [MemberData(nameof(LeadingZeros))]
         [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
         [MemberData(nameof(LeadingZerosPrerelease))]
-        public void TryParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
+        public void TryParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
         {
             Assert.True(SemVersion.TryParse(versionString, out var v));
 
@@ -383,7 +383,7 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(patch, v.Patch);
             Assert.Equal(prerelease, v.Prerelease);
-            Assert.Equal(build, v.Build);
+            Assert.Equal(metadata, v.Metadata);
         }
 
         [Theory]
@@ -408,7 +408,7 @@ namespace Semver.Test
         // TODO leading zero versions are accepted and shouldn't be (issue #16)
         [MemberData(nameof(LeadingZeros))]
         [MemberData(nameof(LeadingZerosPrerelease))]
-        public void TryParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
+        public void TryParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
         {
             Assert.True(SemVersion.TryParse(versionString, out var v));
 
@@ -416,7 +416,7 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(patch, v.Patch);
             Assert.Equal(prerelease, v.Prerelease);
-            Assert.Equal(build, v.Build);
+            Assert.Equal(metadata, v.Metadata);
         }
 
         [Theory(Skip = "Strict parsing still accepts invalids")]
@@ -454,7 +454,7 @@ namespace Semver.Test
         [MemberData(nameof(LeadingZeros))]
         [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
         [MemberData(nameof(LeadingZerosPrerelease))]
-        public void ImplicitConversionFromValidStringTest(string versionString, int major, int minor, int patch, string prerelease, string build)
+        public void ImplicitConversionFromValidStringTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
         {
             SemVersion v = versionString;
 
@@ -462,7 +462,7 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(patch, v.Patch);
             Assert.Equal(prerelease, v.Prerelease);
-            Assert.Equal(build, v.Build);
+            Assert.Equal(metadata, v.Metadata);
         }
 
         [Theory]

@@ -26,7 +26,7 @@ namespace Semver.Test
             Assert.Equal(0, v.Minor);
             Assert.Equal(0, v.Patch);
             Assert.Equal("", v.Prerelease);
-            Assert.Equal("", v.Build);
+            Assert.Equal("", v.Metadata);
         }
 
         [Theory]
@@ -82,7 +82,7 @@ namespace Semver.Test
         [InlineData(1, 2, 3, "a.01", "b")]
         [InlineData(1, 2, 3, "a.01.c", "b")]
         [InlineData(1, 2, 3, "a.0000001.c", "b")]
-        // Leading Zeros in Build (valid)
+        // Leading Zeros in MetaData (valid)
         [InlineData(1, 2, 3, "a", "01")]
         [InlineData(1, 2, 3, "a", "b.01")]
         [InlineData(1, 2, 3, "a", "b.01.c")]
@@ -105,53 +105,89 @@ namespace Semver.Test
         [InlineData(1, 2, 3, "a", "..b")]
         [InlineData(1, 2, 3, "a..c", "b")]
         [InlineData(1, 2, 3, "a", "b..c")]
-        public void ConstructSemVersionTest(int major, int minor, int patch, string prerelease, string build)
+        public void ConstructSemVersionTest(int major, int minor, int patch, string prerelease, string metadata)
         {
-            var v = new SemVersion(major, minor, patch, prerelease, build);
+            var v = new SemVersion(major, minor, patch, prerelease, metadata);
 
             Assert.Equal(major, v.Major);
             Assert.Equal(minor, v.Minor);
             Assert.Equal(patch, v.Patch);
             Assert.Equal(prerelease ?? "", v.Prerelease);
-            Assert.Equal(build ?? "", v.Build);
+            Assert.Equal(metadata ?? "", v.Metadata);
+        }
+        #endregion
+
+        [Theory]
+        [InlineData(1, 2, 3, "a", "b")]
+        [InlineData(1, 2, 3, "A-Z.a-z.0-9", "A-Z.a-z.0-9")]
+        [InlineData(1, 2, 3, "a", "😞")]
+        [InlineData(1, 2, 3, "a", "b..c")]
+        [InlineData(1, 2, 3, "a", null)]
+        [InlineData(1, 2, 3, "a", "-")]
+        public void BuildTest(int major, int minor, int patch, string prerelease, string metadata)
+        {
+            var v = new SemVersion(major, minor, patch, prerelease, metadata);
+
+#pragma warning disable 618
+            Assert.Equal(metadata ?? "", v.Build);
+#pragma warning restore 618
         }
 
         [Theory]
+        [InlineData(1, 2, 3, "A-Z.a-z.0-9", "A-Z.a-z.0-9", true)]
+        [InlineData(1, 2, 3, "-", "b", true)]
+        [InlineData(1, 2, 3, ".", "b", true)]
+        [InlineData(1, 2, 3, "..", "b", true)]
+        [InlineData(1, 2, 3, "01", "b", true)]
+        [InlineData(1, 2, 3, "😞", "b", true)]
+        [InlineData(1, 2, 3, "", "b", false)]
+        [InlineData(1, 2, 3, null, "b", false)]
+        public void IsPrereleaseTest(int major, int minor, int patch, string prerelease, string metadata, bool expected)
+        {
+            var v = new SemVersion(major, minor, patch, prerelease, metadata);
+
+            Assert.True(expected == v.IsPrerelease, v.ToString());
+        }
+
+        #region System.Version
+        [Theory]
         [InlineData(0, 0, 0, 0)]
         [InlineData(1, 1, 1, 1)]
-        // TODO this is a strange conversion (issue #32)
         [InlineData(1, 2, 0, 3)]
         [InlineData(1, 2, 4, 3)]
         public void ConstructSemVersionFromSystemVersionTest(int major, int minor, int build, int revision)
         {
             var nonSemanticVersion = new Version(major, minor, build, revision);
 
+#pragma warning disable 618
             var v = new SemVersion(nonSemanticVersion);
+#pragma warning restore 618
 
             Assert.Equal(major, v.Major);
             Assert.Equal(minor, v.Minor);
             Assert.Equal(revision, v.Patch);
             Assert.Equal("", v.Prerelease);
-            Assert.Equal(build > 0 ? build.ToString(CultureInfo.InvariantCulture) : "", v.Build);
+            Assert.Equal(build > 0 ? build.ToString(CultureInfo.InvariantCulture) : "", v.Metadata);
         }
 
         [Theory]
         [InlineData(0, 0, 0)]
         [InlineData(1, 1, 1)]
-        // TODO this is a strange conversion (issue #32)
         [InlineData(1, 2, 0)]
         [InlineData(1, 2, 4)]
         public void ConstructSemVersionFromSystemVersionWithUndefinedRevisionTest(int major, int minor, int build)
         {
             var nonSemanticVersion = new Version(major, minor, build);
 
+#pragma warning disable 618
             var v = new SemVersion(nonSemanticVersion);
+#pragma warning restore 618
 
             Assert.Equal(major, v.Major);
             Assert.Equal(minor, v.Minor);
             Assert.Equal(0, v.Patch);
             Assert.Equal("", v.Prerelease);
-            Assert.Equal(build > 0 ? build.ToString(CultureInfo.InvariantCulture) : "", v.Build);
+            Assert.Equal(build > 0 ? build.ToString(CultureInfo.InvariantCulture) : "", v.Metadata);
         }
 
         [Theory]
@@ -168,7 +204,7 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(0, v.Patch);
             Assert.Equal("", v.Prerelease);
-            Assert.Equal("", v.Build);
+            Assert.Equal("", v.Metadata);
         }
 
         [Fact]
@@ -202,9 +238,9 @@ namespace Semver.Test
         [InlineData(1, 0, 0, "", "", "1.0.0")]
         [InlineData(0, 0, 0, "", "", "0.0.0")]
         [InlineData(6, 20, 31, "beta-x.2", "dev-mha.120", "6.20.31-beta-x.2+dev-mha.120")]
-        public void ToStringTest(int major, int minor, int patch, string prerelease, string build, string expected)
+        public void ToStringTest(int major, int minor, int patch, string prerelease, string metadata, string expected)
         {
-            var v = new SemVersion(major, minor, patch, prerelease, build);
+            var v = new SemVersion(major, minor, patch, prerelease, metadata);
 
             var actual = v.ToString();
 
@@ -224,7 +260,7 @@ namespace Semver.Test
             Assert.Equal(2, v2.Minor);
             Assert.Equal(3, v2.Patch);
             Assert.Equal("alpha", v2.Prerelease);
-            Assert.Equal("dev", v2.Build);
+            Assert.Equal("dev", v2.Metadata);
         }
 
         // TODO add tests for validation
@@ -238,7 +274,7 @@ namespace Semver.Test
             Assert.Equal(5, v2.Minor);
             Assert.Equal(3, v2.Patch);
             Assert.Equal("alpha", v2.Prerelease);
-            Assert.Equal("dev", v2.Build);
+            Assert.Equal("dev", v2.Metadata);
         }
 
         // TODO add tests for validation
@@ -252,7 +288,7 @@ namespace Semver.Test
             Assert.Equal(2, v2.Minor);
             Assert.Equal(5, v2.Patch);
             Assert.Equal("alpha", v2.Prerelease);
-            Assert.Equal("dev", v2.Build);
+            Assert.Equal("dev", v2.Metadata);
         }
 
         // TODO add tests for validation
@@ -266,7 +302,7 @@ namespace Semver.Test
             Assert.Equal(2, v2.Minor);
             Assert.Equal(3, v2.Patch);
             Assert.Equal("beta", v2.Prerelease);
-            Assert.Equal("dev", v2.Build);
+            Assert.Equal("dev", v2.Metadata);
         }
 
         // TODO add tests for validation
@@ -280,7 +316,7 @@ namespace Semver.Test
             Assert.Equal(2, v2.Minor);
             Assert.Equal(3, v2.Patch);
             Assert.Equal("alpha", v2.Prerelease);
-            Assert.Equal("gamma", v2.Build);
+            Assert.Equal("gamma", v2.Metadata);
         }
         #endregion
 

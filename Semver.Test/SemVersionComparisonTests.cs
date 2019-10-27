@@ -89,7 +89,7 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Build);
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
                 Assert.True(v.Equals(identical), v.ToString());
             }
         }
@@ -175,7 +175,7 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Build);
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
                 Assert.True(v.CompareTo(identical) == 0, v.ToString());
             }
         }
@@ -294,7 +294,7 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Build);
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
                 Assert.True(v.PrecedenceMatches(identical), v.ToString());
             }
         }
@@ -310,7 +310,7 @@ namespace Semver.Test
         public void PrecedenceMatchesDifferentTest()
         {
             foreach (var (v1, v2) in VersionPairs)
-                if (DifferByBuildOnly(v1, v2))
+                if (DifferByMetadataOnly(v1, v2))
                     Assert.True(v1.PrecedenceMatches(v2), $"({v1}).PrecedenceMatches({v2})");
                 else
                     Assert.False(v1.PrecedenceMatches(v2), $"({v1}).PrecedenceMatches({v2})");
@@ -359,7 +359,7 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Build);
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
                 Assert.True(v.CompareByPrecedence(identical) == 0, v.ToString());
             }
         }
@@ -375,7 +375,7 @@ namespace Semver.Test
         public void CompareByPrecedenceGreaterTest()
         {
             foreach (var (v1, v2) in VersionPairs)
-                if (DifferByBuildOnly(v1, v2))
+                if (DifferByMetadataOnly(v1, v2))
                     Assert.True(v1.CompareByPrecedence(v2) == 0, $"({v1}).CompareTo({v2})");
                 else
                     Assert.True(v1.CompareByPrecedence(v2) < 0, $"({v1}).CompareTo({v2})");
@@ -385,7 +385,7 @@ namespace Semver.Test
         public void CompareByPrecedenceLesserTest()
         {
             foreach (var (v1, v2) in VersionPairs)
-                if (DifferByBuildOnly(v1, v2))
+                if (DifferByMetadataOnly(v1, v2))
                     Assert.True(v2.CompareByPrecedence(v1) == 0, $"({v2}).CompareTo({v1})");
                 else
                     Assert.True(v2.CompareByPrecedence(v1) > 0, $"({v2}).CompareTo({v1})");
@@ -449,7 +449,7 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Build);
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
                 Assert.True(v == identical, v.ToString());
             }
         }
@@ -525,7 +525,7 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Build);
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
                 Assert.False(v != identical, v.ToString());
             }
         }
@@ -601,7 +601,7 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Build);
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
                 Assert.False(v < identical, $"{v} < {identical}");
                 Assert.True(v <= identical, $"{v} <= {identical}");
                 Assert.False(v > identical, $"{v} > {identical}");
@@ -723,7 +723,7 @@ namespace Semver.Test
                     yield return (versions[i], versions[j]);
         }
 
-        private static bool DifferByBuildOnly(SemVersion v1, SemVersion v2)
+        private static bool DifferByMetadataOnly(SemVersion v1, SemVersion v2)
         {
             return v1.Change(build: "").Equals(v2.Change(build: ""));
         }

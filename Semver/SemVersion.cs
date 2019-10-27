@@ -24,7 +24,7 @@ namespace Semver
                 @"(\.(?<minor>\d+))?" +
                 @"(\.(?<patch>\d+))?" +
                 @"(\-(?<pre>[0-9A-Za-z\-\.]+))?" +
-                @"(\+(?<build>[0-9A-Za-z\-\.]+))?$",
+                @"(\+(?<metadata>[0-9A-Za-z\-\.]+))?$",
 #if NETSTANDARD
                 RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 #else
@@ -46,7 +46,7 @@ namespace Semver
             Minor = semVersion.Minor;
             Patch = semVersion.Patch;
             Prerelease = semVersion.Prerelease;
-            Build = semVersion.Build;
+            Metadata = semVersion.Metadata;
         }
 #endif
 
@@ -65,7 +65,7 @@ namespace Semver
             Patch = patch;
 
             Prerelease = prerelease ?? "";
-            Build = build ?? "";
+            Metadata = build ?? "";
         }
 
         /// <summary>
@@ -73,10 +73,10 @@ namespace Semver
         /// a <see cref="System.Version"/>.
         /// </summary>
         /// <param name="version">The <see cref="Version"/> that is used to initialize
-        /// the Major, Minor, Patch and Build.</param>
+        /// the Major, Minor, and Patch versions and the build metadata.</param>
         /// <returns>A <see cref="SemVersion"/> with the same Major and Minor version.
-        /// The Patch version will be the fourth part of the version number. The
-        /// build meta data will contain the third part of the version number if
+        /// The Patch version will be the fourth component of the version number. The
+        /// build meta data will contain the third component of the version number if
         /// it is greater than zero.</returns>
         public SemVersion(Version version)
         {
@@ -91,7 +91,7 @@ namespace Semver
 
             Prerelease = "";
 
-            Build = version.Build > 0 ? version.Build.ToString(CultureInfo.InvariantCulture) : "";
+            Metadata = version.Build > 0 ? version.Build.ToString(CultureInfo.InvariantCulture) : "";
         }
 
         /// <summary>
@@ -128,9 +128,9 @@ namespace Semver
                 throw new InvalidOperationException("Invalid version (no patch version given in strict mode)");
 
             var prerelease = match.Groups["pre"].Value;
-            var build = match.Groups["build"].Value;
+            var metadata = match.Groups["metadata"].Value;
 
-            return new SemVersion(major, minor, patch, prerelease, build);
+            return new SemVersion(major, minor, patch, prerelease, metadata);
         }
 
         /// <summary>
@@ -174,9 +174,9 @@ namespace Semver
             else if (strict) return false;
 
             var prerelease = match.Groups["pre"].Value;
-            var build = match.Groups["build"].Value;
+            var metadata = match.Groups["metadata"].Value;
 
-            semver = new SemVersion(major, minor, patch, prerelease, build);
+            semver = new SemVersion(major, minor, patch, prerelease, metadata);
             return true;
         }
 
@@ -228,7 +228,7 @@ namespace Semver
                 minor ?? Minor,
                 patch ?? Patch,
                 prerelease ?? Prerelease,
-                build ?? Build);
+                build ?? Metadata);
         }
 
         /// <summary>
@@ -256,20 +256,49 @@ namespace Semver
         public int Patch { get; }
 
         /// <summary>
-        /// Gets the prerelease version.
+        /// Gets the prerelease label of this semantic version.
         /// </summary>
         /// <value>
-        /// The prerelease version. Empty string if this is a release version.
+        /// The prerelease label or empty string if this is a release version.
         /// </value>
+        /// <remarks>
+        /// A prerelease version label follows the main version number separated
+        /// by a dash ('-'). It is a series of identifiers each of which may either
+        /// be alphanumeric or numeric. Prerelease versions have lower precedence
+        /// than release versions.
+        /// </remarks>
         public string Prerelease { get; }
+
+        /// <summary>
+        /// Indicates whether this semantic version is a prerelease version.
+        /// </summary>
+        /// <value><see langword="true"/> if the <see cref="Prerelease"/> property
+        /// is non-empty; <see langword="false"/> if it is empty.</value>
+        public bool IsPrerelease => Prerelease.Length != 0;
 
         /// <summary>
         /// Gets the build metadata.
         /// </summary>
         /// <value>
-        /// The build metadata. Empty string if there is no build metadata.
+        /// The build metadata or empty string if there is no build metadata.
         /// </value>
-        public string Build { get; }
+        [Obsolete("This property is obsolete. Use Metadata instead.")]
+        public string Build => Metadata;
+
+        /// <summary>
+        /// Gets the build metadata of this semantic version.
+        /// </summary>
+        /// <value>The build metadata of this version or empty string if there
+        /// is no metadata.</value>
+        /// <remarks>
+        /// The build metadata is a series of dot separated alphanumeric identifiers separated
+        /// from the rest of the version number with a plus sign ('+').
+        ///
+        /// The metadata does not affect precedence. Two versions with different
+        /// build metadata have the same precedence. However, metadata does affect
+        /// sort order. A version without metadata sorts before one that has metadata.
+        /// </remarks>
+        public string Metadata { get; }
 
         /// <summary>
         /// Returns the <see cref="string" /> equivalent of this version.
@@ -282,8 +311,8 @@ namespace Semver
             var version = "" + Major + "." + Minor + "." + Patch;
             if (!string.IsNullOrEmpty(Prerelease))
                 version += "-" + Prerelease;
-            if (!string.IsNullOrEmpty(Build))
-                version += "+" + Build;
+            if (!string.IsNullOrEmpty(Metadata))
+                version += "+" + Metadata;
             return version;
         }
 
@@ -326,7 +355,7 @@ namespace Semver
 
 #pragma warning disable CA1062 // Validate arguments of public methods
             // If other is null, CompareByPrecedence() returns 1
-            return CompareComponent(Build, other.Build);
+            return CompareComponent(Metadata, other.Metadata);
 #pragma warning restore CA1062 // Validate arguments of public methods
         }
 
@@ -435,7 +464,7 @@ namespace Semver
                 && Minor == other.Minor
                 && Patch == other.Patch
                 && string.Equals(Prerelease, other.Prerelease, StringComparison.Ordinal)
-                && string.Equals(Build, other.Build, StringComparison.Ordinal);
+                && string.Equals(Metadata, other.Metadata, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -453,7 +482,7 @@ namespace Semver
                 result = result * 31 + Minor.GetHashCode();
                 result = result * 31 + Patch.GetHashCode();
                 result = result * 31 + Prerelease.GetHashCode();
-                result = result * 31 + Build.GetHashCode();
+                result = result * 31 + Metadata.GetHashCode();
                 return result;
             }
         }
