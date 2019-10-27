@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <Description>A semver implementation in .Net based on the v2.0.0 of the spec found at http://semver.org/.</Description>
-    <Copyright>Copyright © 2013 Max Hauser</Copyright>
+    <Copyright>Copyright © 2013 Max Hauser, Jeff Walker</Copyright>
     <AssemblyTitle>Semantic versioning</AssemblyTitle>
-    <Authors>Max Hauser</Authors>
+    <Authors>Max Hauser, Jeff Walker</Authors>
     <TargetFrameworks>netstandard1.1;net452</TargetFrameworks>
     <NoWarn>$(NoWarn);CS1591;CA1303</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
