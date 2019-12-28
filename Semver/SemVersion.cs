@@ -31,7 +31,7 @@ namespace Semver
 #else
                 RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture,
 #endif
-                TimeSpan.FromMilliseconds(100));
+                TimeSpan.FromSeconds(0.5));
 
 #if !NETSTANDARD
 #pragma warning disable CA1801 // Parameter unused
