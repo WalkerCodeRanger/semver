@@ -27,7 +27,3 @@ var version = SemVersion.Parse("1.1.0-rc.1+nightly.2345");
 if(version >= "1.0")
     Console.WriteLine("released version {0}!", version)
 ```
-
-## API Documentation
-
-API documentation is available on [NuDoq](http://nudoq.org/#!/Projects/semver).

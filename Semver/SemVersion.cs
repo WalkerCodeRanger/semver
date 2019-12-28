@@ -22,15 +22,16 @@ namespace Semver
     {
         private static readonly Regex ParseEx =
             new Regex(@"^(?<major>\d+)" +
-                @"(\.(?<minor>\d+))?" +
-                @"(\.(?<patch>\d+))?" +
-                @"(\-(?<pre>[0-9A-Za-z\-\.]+))?" +
-                @"(\+(?<metadata>[0-9A-Za-z\-\.]+))?$",
+                @"(?>\.(?<minor>\d+))?" +
+                @"(?>\.(?<patch>\d+))?" +
+                @"(?>\-(?<pre>[0-9A-Za-z\-\.]+))?" +
+                @"(?>\+(?<metadata>[0-9A-Za-z\-\.]+))?$",
 #if NETSTANDARD
-                RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
+                RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture,
 #else
-                RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+                RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture,
 #endif
+                TimeSpan.FromSeconds(0.5));
 
 #if !NETSTANDARD
 #pragma warning disable CA1801 // Parameter unused

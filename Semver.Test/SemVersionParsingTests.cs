@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Xunit;
 
 namespace Semver.Test
@@ -11,6 +12,38 @@ namespace Semver.Test
     /// </summary>
     public class SemVersionParsingTests
     {
+        /// <summary>
+        /// This a very long but valid version number to test parsing long version numbers. It is
+        /// generated using a random number generator seeded with specific value so that the same
+        /// version string will be generated each time.
+        /// </summary>
+        private static readonly string LongValidVersionString = BuildLongVersion();
+
+        private static string BuildLongVersion()
+        {
+            var s = new StringBuilder(2_000_100);
+            s.Append(int.MaxValue);
+            s.Append('.');
+            s.Append(int.MaxValue);
+            s.Append('.');
+            s.Append(int.MaxValue);
+            s.Append('-');
+            var random = new Random(1545743217);
+            AppendLabel(s, 1_000_000, random);
+            s.Append('+');
+            AppendLabel(s, 1_000_000, random);
+            return s.ToString();
+        }
+
+        private static void AppendLabel(StringBuilder s, int length, Random random1)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.";
+            var random = random1;
+
+            for (var i = 0; i < length; i++)
+                s.Append(chars[random.Next(0, chars.Length)]);
+        }
+
         /// <summary>
         /// These are version numbers given with the link in the spec to a regex for semver versions
         /// </summary>
@@ -241,6 +274,12 @@ namespace Semver.Test
             {"ui-2.1-alpha"},
         };
 
+        [Fact]
+        public void ParseLooseLongTest()
+        {
+            SemVersion.Parse(LongValidVersionString);
+        }
+
         [Theory]
         [MemberData(nameof(RegexValidExamples))]
         [MemberData(nameof(BasicValid))]
@@ -289,6 +328,12 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null));
             // TODO that is a strange error message, should be version
             Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);
+        }
+
+        [Fact]
+        public void ParseStrictLongTest()
+        {
+            SemVersion.Parse(LongValidVersionString, true);
         }
 
         [Theory]
