@@ -27,10 +27,11 @@ namespace Semver
                 @"(?>\-(?<pre>[0-9A-Za-z\-\.]+))?" +
                 @"(?>\+(?<build>[0-9A-Za-z\-\.]+))?$",
 #if NETSTANDARD
-                RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
+                RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture,
 #else
-                RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+                RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture,
 #endif
+                TimeSpan.FromMilliseconds(100));
 
 #if !NETSTANDARD
 #pragma warning disable CA1801 // Parameter unused
