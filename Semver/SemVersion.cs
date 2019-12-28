@@ -22,10 +22,10 @@ namespace Semver
     {
         private static readonly Regex ParseEx =
             new Regex(@"^(?<major>\d+)" +
-                @"(\.(?<minor>\d+))?" +
-                @"(\.(?<patch>\d+))?" +
-                @"(\-(?<pre>[0-9A-Za-z\-\.]+))?" +
-                @"(\+(?<build>[0-9A-Za-z\-\.]+))?$",
+                @"(?>\.(?<minor>\d+))?" +
+                @"(?>\.(?<patch>\d+))?" +
+                @"(?>\-(?<pre>[0-9A-Za-z\-\.]+))?" +
+                @"(?>\+(?<build>[0-9A-Za-z\-\.]+))?$",
 #if NETSTANDARD
                 RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 #else
