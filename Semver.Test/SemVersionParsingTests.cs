@@ -556,7 +556,9 @@ namespace Semver.Test
         [MemberData(nameof(LeadingZerosPrerelease))]
         public void ImplicitConversionFromValidStringTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             SemVersion v = versionString;
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(major, v.Major);
             Assert.Equal(minor, v.Minor);
@@ -575,7 +577,9 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentException>(() =>
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 SemVersion _ = versionString;
+#pragma warning restore CS0618 // Type or member is obsolete
             });
             Assert.Equal("Invalid version.\r\nParameter name: version", ex.Message);
         }
@@ -586,7 +590,9 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<OverflowException>(() =>
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 SemVersion _ = versionString;
+#pragma warning restore CS0618 // Type or member is obsolete
             });
             Assert.Equal("Value was either too large or too small for an Int32.", ex.Message);
         }
@@ -597,7 +603,9 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentNullException>(() =>
             {
                 // Must use default otherwise it thinks `null` is of type SemVersion
+#pragma warning disable CS0618 // Type or member is obsolete
                 SemVersion _ = default(string);
+#pragma warning restore CS0618 // Type or member is obsolete
             });
             // TODO that is a strange error message, should be version
             Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);

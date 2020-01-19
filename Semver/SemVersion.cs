@@ -616,6 +616,7 @@ namespace Semver
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
+        [Obsolete("Implicit conversion from string is obsolete. Use Parse or TryParse method instead.")]
         public static implicit operator SemVersion(string version)
 #pragma warning restore CA2225 // Operator overloads have named alternates
         {
