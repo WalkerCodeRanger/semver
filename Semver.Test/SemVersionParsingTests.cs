@@ -274,6 +274,43 @@ namespace Semver.Test
             {"ui-2.1-alpha"},
         };
 
+        #region Parse Forward Methods
+
+        /// <summary>
+        /// This tests the forwarding of the <see cref="SemVersion.Parse(string)"/> to
+        /// <see cref="SemVersion.Parse(string, bool)"/> passes false (i.e. loose).
+        /// </summary>
+        [Fact]
+        public void DefaultParseIsLoose()
+        {
+            var v = SemVersion.Parse("1");
+
+            Assert.Equal(1, v.Major);
+            Assert.Equal(0, v.Minor);
+            Assert.Equal(0, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Equal("", v.Metadata);
+        }
+
+        /// <summary>
+        /// This tests the forwarding of the <see cref="SemVersion.TryParse(string, out SemVersion)"/> to
+        /// <see cref="SemVersion.Parse(string, out SemVersion, bool)"/> passes false (i.e. loose).
+        /// </summary>
+        [Fact]
+        public void DefaultTryParseIsLoose()
+        {
+            var parsed = SemVersion.TryParse("1", out var v);
+
+            Assert.True(parsed);
+            Assert.Equal(1, v.Major);
+            Assert.Equal(0, v.Minor);
+            Assert.Equal(0, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Equal("", v.Metadata);
+        }
+        #endregion
+
+        #region Old Parse Methods
         [Fact]
         public void ParseLooseLongTest()
         {
@@ -333,7 +370,9 @@ namespace Semver.Test
         [Fact]
         public void ParseStrictLongTest()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             SemVersion.Parse(LongValidVersionString, true);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Theory]
@@ -347,7 +386,9 @@ namespace Semver.Test
         [MemberData(nameof(LeadingZerosPrerelease))]
         public void ParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v = SemVersion.Parse(versionString, true);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(major, v.Major);
             Assert.Equal(minor, v.Minor);
@@ -360,7 +401,9 @@ namespace Semver.Test
         [MemberData(nameof(RegexInvalidExamples))]
         public void ParseStrictInvalidExamples(string versionString)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             Assert.ThrowsAny<Exception>(() => SemVersion.Parse(versionString, true));
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         // TODO These exceptions should be FormatException etc.
@@ -372,7 +415,9 @@ namespace Semver.Test
         [MemberData(nameof(BadFormat))]
         public void ParseStrictInvalidThrowsArgumentExceptionTest(string versionString)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString, true));
+#pragma warning restore CS0618 // Type or member is obsolete
             Assert.Equal("Invalid version.\r\nParameter name: version", ex.Message);
         }
 
@@ -389,7 +434,9 @@ namespace Semver.Test
         [MemberData(nameof(MissingPatchInvalid))]
         public void ParseStrictInvalidThrowsInvalidOperationMissingPatchTest(string versionString)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
+#pragma warning restore CS0618 // Type or member is obsolete
             Assert.Equal("Invalid version (no patch version given in strict mode)", ex.Message);
         }
 
@@ -398,14 +445,18 @@ namespace Semver.Test
         [MemberData(nameof(MissingMinorPatchInvalid))]
         public void ParseStrictInvalidThrowsInvalidOperationMissingMinorPatchTest(string versionString)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
+#pragma warning restore CS0618 // Type or member is obsolete
             Assert.Equal("Invalid version (no minor version given in strict mode)", ex.Message);
         }
 
         [Fact]
         public void ParseStrictNullTest()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null, true));
+#pragma warning restore CS0618 // Type or member is obsolete
             // TODO that is a strange error message, should be version
             Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);
         }
@@ -468,7 +519,9 @@ namespace Semver.Test
         [MemberData(nameof(RegexInvalidExamples))]
         public void TryParseStrictInvalidExamples(string versionString)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             Assert.ThrowsAny<Exception>(() => SemVersion.TryParse(versionString, out _, true));
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Theory]
@@ -483,7 +536,9 @@ namespace Semver.Test
         [InlineData(null)]
         public void TryParseStrictInvalidTest(string versionString)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             Assert.False(SemVersion.TryParse(versionString, out _, true));
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         /// <summary>
@@ -547,6 +602,7 @@ namespace Semver.Test
             // TODO that is a strange error message, should be version
             Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);
         }
+        #endregion
 
         /// <summary>
         /// Construct invalid test cases for strict from valid ones for loose

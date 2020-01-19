@@ -206,8 +206,10 @@ namespace Semver.Test
         [InlineData("1.0.0-beta.11", "1.0.0-rc.1", -16)]
         public void CompareToStringOrderTest(string s1, string s2, int expected)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1, true);
             var v2 = SemVersion.Parse(s2, true);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r1 = v1.CompareTo(v2);
             var r2 = v2.CompareTo(v1);
@@ -396,8 +398,10 @@ namespace Semver.Test
         [InlineData("1.0.0-beta.11", "1.0.0-rc.1", -16)]
         public void CompareByPrecedenceStringOrderTest(string s1, string s2, int expected)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1, true);
             var v2 = SemVersion.Parse(s2, true);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r1 = v1.CompareByPrecedence(v2);
             var r2 = v2.CompareByPrecedence(v1);

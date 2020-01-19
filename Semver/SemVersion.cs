@@ -147,6 +147,22 @@ namespace Semver
         #endregion
 
         /// <summary>
+        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
+        /// equivalent. Parsing is not strict, minor and patch version numbers are optional.
+        /// </summary>
+        /// <param name="version">The version string.</param>
+        /// <returns>The <see cref="SemVersion"/> object.</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
+        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
+        public static SemVersion Parse(string version)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            return Parse(version, false);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/> equivalent.
         /// </summary>
         /// <param name="version">The version string.</param>
@@ -157,7 +173,8 @@ namespace Semver
         /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
         /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing Minor or Patch versions and <paramref name="strict"/> is <see langword="true"/>.</exception>
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
-        public static SemVersion Parse(string version, bool strict = false)
+        [Obsolete("Method is obsolete. Call Parse with SemVersionStyle instead.")]
+        public static SemVersion Parse(string version, bool strict)
         {
             var match = ParseEx.Match(version);
             if (!match.Success)
@@ -185,6 +202,24 @@ namespace Semver
             return new SemVersion(major, minor, patch, prerelease, metadata);
         }
 
+
+        /// <summary>
+        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
+        /// equivalent and returns a value that indicates whether the conversion succeeded. Parsing
+        /// is not strict, minor and patch version numbers are optional.
+        /// </summary>
+        /// <param name="version">The version string.</param>
+        /// <param name="semver">When the method returns, contains a <see cref="SemVersion"/> instance equivalent
+        /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
+        /// version string was not valid.</param>
+        /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
+        public static bool TryParse(string version, out SemVersion semver)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            return TryParse(version, out semver, false);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
         /// equivalent and returns a value that indicates whether the conversion succeeded.
@@ -196,7 +231,8 @@ namespace Semver
         /// <param name="strict">If set to <see langword="true"/> minor and patch version are required,
         /// otherwise they are optional.</param>
         /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
-        public static bool TryParse(string version, out SemVersion semver, bool strict = false)
+        [Obsolete("Method is obsolete. Call TryParse with SemVersionStyle instead.")]
+        public static bool TryParse(string version, out SemVersion semver, bool strict)
         {
             semver = null;
             if (version is null) return false;
