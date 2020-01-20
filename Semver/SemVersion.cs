@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 #if !NETSTANDARD
 using System.Runtime.Serialization;
@@ -67,7 +70,12 @@ namespace Semver
             Patch = patch;
 
             Prerelease = prerelease ?? "";
+            PrereleaseIdentifiers = new ReadOnlyCollection<PrereleaseIdentifier>(
+                Prerelease.SplitExceptEmpty('.').Select(identifier => int.TryParse(identifier, NumberStyles.None, null, out var intValue)
+                    ? new PrereleaseIdentifier(identifier, intValue)
+                    : new PrereleaseIdentifier(identifier, null)).ToList());
             Metadata = build ?? "";
+            MetadataIdentifiers = new ReadOnlyCollection<string>(Metadata.SplitExceptEmpty('.').ToList());
         }
 
         /// <summary>
@@ -95,6 +103,19 @@ namespace Semver
             Prerelease = "";
 
             Metadata = version.Build > 0 ? version.Build.ToString(CultureInfo.InvariantCulture) : "";
+        }
+
+        private SemVersion(int major, int minor, int patch,
+            IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
+            IReadOnlyList<string> metadataIdentifiers)
+        {
+            Major = major;
+            Minor = minor;
+            Patch = patch;
+            Prerelease = string.Join(".", prereleaseIdentifiers);
+            PrereleaseIdentifiers = prereleaseIdentifiers;
+            Metadata = string.Join(".", metadataIdentifiers);
+            MetadataIdentifiers = metadataIdentifiers;
         }
 
         #region System.Version
@@ -162,6 +183,17 @@ namespace Semver
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
+        public static SemVersion Parse(string version, SemVersionStyles style)
+        {
+            if (version is null) throw new ArgumentNullException(nameof(version));
+            if (!style.IsValid()) throw new ArgumentException("Invalid enum value", nameof(style));
+
+            if (!TryParseInternal(version, style, out var semver))
+                throw new FormatException("Invalid version number format");
+
+            return semver;
+        }
+
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/> equivalent.
         /// </summary>
@@ -220,6 +252,13 @@ namespace Semver
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
+        public static bool TryParse(string version, SemVersionStyles style, out SemVersion semver)
+        {
+            if (version is null) throw new ArgumentNullException(nameof(version));
+            if (!style.IsValid()) throw new ArgumentException("Invalid enum value", nameof(style));
+            return TryParseInternal(version, style, out semver);
+        }
+
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
         /// equivalent and returns a value that indicates whether the conversion succeeded.
@@ -266,6 +305,164 @@ namespace Semver
 
             semver = new SemVersion(major, minor, patch, prerelease, metadata);
             return true;
+        }
+
+        private static bool TryParseInternal(string version, SemVersionStyles style, out SemVersion semver)
+        {
+            // Assign null once so it doesn't have to be done any time parse fails
+            semver = null;
+
+            var i = 0;
+
+            // Skip leading whitespace if allowed
+            if (style.HasFlag(SemVersionStyles.AllowLeadingWhite))
+                while (i < version.Length && char.IsWhiteSpace(version, i))
+                    i += 1;
+
+            // Skip leading 'v' if allowed
+            if (i < version.Length)
+            {
+                var c = version[i];
+                if ((c == 'v' && style.HasFlag(SemVersionStyles.AllowLowerV))
+                    || (c == 'V' && style.HasFlag(SemVersionStyles.AllowUpperV)))
+                    i += 1;
+            }
+
+            // Are leading zeros allowed
+            var allowLeadingZeros = style.HasFlag(SemVersionStyles.AllowLeadingZeros);
+
+            // Parse major version
+            if (!ParseNumber(version, ref i, allowLeadingZeros, out var major)) return false;
+
+            // Parse minor version
+            var minor = 0;
+            if (i < version.Length && version[i] == '.')
+            {
+                i += 1;
+                if (!ParseNumber(version, ref i, allowLeadingZeros, out minor))
+                    return false;
+            }
+            else if (!style.HasFlag(SemVersionStyles.OptionalMinorPatch)) return false;
+
+            // Parse patch version
+            var patch = 0;
+            if (i < version.Length && version[i] == '.')
+            {
+                i += 1;
+                if (!ParseNumber(version, ref i, allowLeadingZeros, out patch)) return false;
+            }
+            else if (!style.HasFlag(SemVersionStyles.OptionalPatch)) return false;
+
+            // Parse prerelease version
+            var allowMultiplePrereleaseIdentifiers = !style.HasFlag(SemVersionStyles.DisallowMultiplePrereleaseIdentifiers);
+            List<PrereleaseIdentifier> prereleaseIdentifiers;
+            if (i < version.Length && version[i] == '-')
+            {
+                i += 1;
+                prereleaseIdentifiers = ParsePrerelease(version, ref i, allowLeadingZeros, allowMultiplePrereleaseIdentifiers);
+                if (prereleaseIdentifiers == null) return false;
+            }
+            else
+                prereleaseIdentifiers = new List<PrereleaseIdentifier>();
+
+            // Parse metadata
+            var allowMetadata = !style.HasFlag(SemVersionStyles.DisallowMetadata);
+            List<string> metadataIdentifiers;
+            if (allowMetadata && i < version.Length && version[i] == '+')
+            {
+                i += 1;
+                metadataIdentifiers = ParseMetadata(version, ref i);
+            }
+            else
+                metadataIdentifiers = new List<string>();
+
+            // Check for extra characters at the end
+            if (i != version.Length) return false;
+
+            semver = new SemVersion(major, minor, patch,
+                new ReadOnlyCollection<PrereleaseIdentifier>(prereleaseIdentifiers),
+                new ReadOnlyCollection<string>(metadataIdentifiers));
+            return true;
+        }
+
+        private static bool ParseNumber(string version, ref int i, bool allowLeadingZero, out int number)
+        {
+            var s = i;
+            if (!allowLeadingZero && i < version.Length && version[i] == '0')
+            {
+                number = 0;
+                return false;
+            }
+
+            while (i < version.Length && version[i].IsDigit())
+                i += 1;
+
+            return int.TryParse(version.Substring(s, i - s), NumberStyles.None, null, out number);
+        }
+
+        private static List<PrereleaseIdentifier> ParsePrerelease(
+            string version,
+            ref int i,
+            bool allowLeadingZero,
+            bool allowMultiplePrereleaseIdentifiers)
+        {
+            var prereleaseIdentifiers = new List<PrereleaseIdentifier>();
+            i -= 1; // Back up so we are before the start of the first identifier
+            do
+            {
+                i += 1;
+                var s = i;
+                var isNumeric = true;
+                while (i < version.Length)
+                {
+                    var c = version[i];
+                    if (c.IsAlpha() || c == '-')
+                        isNumeric = false;
+                    else if (!c.IsDigit())
+                        break;
+
+                    i += 1;
+                }
+
+                // Empty identifiers not allowed
+                if (s == i) return null;
+                var identifier = version.Substring(s, i - s);
+                if (!isNumeric)
+                    prereleaseIdentifiers.Add(new PrereleaseIdentifier(identifier, null));
+                else
+                {
+                    if (!allowLeadingZero && version[s] == '0') return null;
+                    if (!int.TryParse(identifier, NumberStyles.None, null, out var intValue)) return null;
+                    prereleaseIdentifiers.Add(new PrereleaseIdentifier(identifier.TrimStart('0'), intValue));
+                }
+
+            } while (i < version.Length && version[i] == '.' && allowMultiplePrereleaseIdentifiers);
+
+            return prereleaseIdentifiers;
+        }
+
+        private static List<string> ParseMetadata(string version, ref int i)
+        {
+            var metadataIdentifiers = new List<string>();
+            do
+            {
+                var s = i;
+                while (i < version.Length)
+                {
+                    var c = version[i];
+                    if (!c.IsAlpha() && c != '-' && !c.IsDigit())
+                        break;
+                    i += 1;
+                }
+
+                // Empty identifiers not allowed
+                if (s == i) return null;
+                var identifier = version.Substring(s, i - s);
+                metadataIdentifiers.Add(new PrereleaseIdentifier(identifier, null));
+
+            } while (i < version.Length && version[i] == '.');
+
+            return metadataIdentifiers;
         }
 
         /// <summary>
@@ -361,6 +558,8 @@ namespace Semver
         /// </remarks>
         public string Prerelease { get; }
 
+        public IReadOnlyList<PrereleaseIdentifier> PrereleaseIdentifiers { get; }
+
         /// <summary>
         /// Indicates whether this semantic version is a prerelease version.
         /// </summary>
@@ -391,6 +590,8 @@ namespace Semver
         /// sort order. A version without metadata sorts before one that has metadata.
         /// </remarks>
         public string Metadata { get; }
+
+        public IReadOnlyList<string> MetadataIdentifiers { get; }
 
         /// <summary>
         /// Returns the <see cref="string" /> equivalent of this version.
@@ -620,7 +821,7 @@ namespace Semver
         public static implicit operator SemVersion(string version)
 #pragma warning restore CA2225 // Operator overloads have named alternates
         {
-            return Parse(version);
+            return Parse(version, false);
         }
 
         /// <summary>

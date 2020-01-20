@@ -274,6 +274,16 @@ namespace Semver.Test
             {"ui-2.1-alpha"},
         };
 
+        /// <summary>
+        /// Tests that a very long valid version number can be parsed in a reasonable time.
+        /// </summary>
+        [Fact]
+        public void ParseLongVersionTest()
+        {
+            SemVersion.Parse(LongValidVersionString, SemVersionStyles.SemVer2);
+            SemVersion.TryParse(LongValidVersionString, SemVersionStyles.SemVer2, out _);
+        }
+
         #region Parse Forward Methods
 
         /// <summary>

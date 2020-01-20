@@ -40,7 +40,7 @@ namespace Semver
         /// <remarks>This is a composite semantic version style.
         ///
         /// The formats accepted by this style will change when more formats are supported.</remarks>
-        Any = AllowLeadingWhite | AllowTrailingWhite | AllowV | OptionalMinorPatch | AllowLeadingZeros,
+        Any = AllowLeadingZeros | AllowLeadingWhite | AllowTrailingWhite | AllowV | OptionalMinorPatch,
 
         /// <summary>
         /// Allow leading zeros on major, minor, and prerelease version numbers
@@ -92,5 +92,16 @@ namespace Semver
         /// Disallow a build metadata section
         /// </summary>
         DisallowMetadata = 1 << 8,
+    }
+
+    internal static class SemVersionStylesExtensions
+    {
+        private const SemVersionStyles All = SemVersionStyles.Any
+                                            | SemVersionStyles.DisallowMultiplePrereleaseIdentifiers
+                                            | SemVersionStyles.DisallowMetadata;
+        public static bool IsValid(this SemVersionStyles styles)
+        {
+            return (styles & All) == styles;
+        }
     }
 }

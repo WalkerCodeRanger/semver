@@ -27,6 +27,8 @@ namespace Semver.Test
             Assert.Equal(0, v.Patch);
             Assert.Equal("", v.Prerelease);
             Assert.Equal("", v.Metadata);
+            Assert.Empty(v.PrereleaseIdentifiers);
+            Assert.Empty(v.MetadataIdentifiers);
         }
 
         [Theory]
