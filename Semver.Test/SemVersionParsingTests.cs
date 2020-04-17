@@ -311,7 +311,7 @@ namespace Semver.Test
         public void ParseLooseInvalidThrowsArgumentExceptionTest(string versionString)
         {
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString));
-            Assert.Equal("Invalid version.\r\nParameter name: version", ex.Message);
+            Assert.Equal($"Invalid version '{versionString}'.{Environment.NewLine}Parameter name: version", ex.Message);
         }
 
         [Theory]
@@ -327,7 +327,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null));
             // TODO that is a strange error message, should be version
-            Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);
+            Assert.Equal($"Value cannot be null.{Environment.NewLine}Parameter name: input", ex.Message);
         }
 
         [Fact]
@@ -373,7 +373,7 @@ namespace Semver.Test
         public void ParseStrictInvalidThrowsArgumentExceptionTest(string versionString)
         {
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString, true));
-            Assert.Equal("Invalid version.\r\nParameter name: version", ex.Message);
+            Assert.Equal($"Invalid version '{versionString}'.{Environment.NewLine}Parameter name: version", ex.Message);
         }
 
         [Theory]
@@ -407,7 +407,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null, true));
             // TODO that is a strange error message, should be version
-            Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);
+            Assert.Equal($"Value cannot be null.{Environment.NewLine}Parameter name: input", ex.Message);
         }
 
         [Theory]
@@ -522,7 +522,7 @@ namespace Semver.Test
             {
                 SemVersion _ = versionString;
             });
-            Assert.Equal("Invalid version.\r\nParameter name: version", ex.Message);
+            Assert.Equal($"Invalid version '{versionString}'.{Environment.NewLine}Parameter name: version", ex.Message);
         }
 
         [Theory]
@@ -545,7 +545,7 @@ namespace Semver.Test
                 SemVersion _ = default(string);
             });
             // TODO that is a strange error message, should be version
-            Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);
+            Assert.Equal($"Value cannot be null.{Environment.NewLine}Parameter name: input", ex.Message);
         }
 
         /// <summary>

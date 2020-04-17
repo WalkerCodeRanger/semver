@@ -111,7 +111,7 @@ namespace Semver
         {
             var match = ParseEx.Match(version);
             if (!match.Success)
-                throw new ArgumentException("Invalid version.", nameof(version));
+                throw new ArgumentException($"Invalid version '{version}'.", nameof(version));
 
             var major = int.Parse(match.Groups["major"].Value, CultureInfo.InvariantCulture);
 
