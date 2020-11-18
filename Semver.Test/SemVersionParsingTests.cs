@@ -37,11 +37,15 @@ namespace Semver.Test
 
         private static void AppendLabel(StringBuilder s, int length, Random random1)
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.";
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789-.0";
             var random = random1;
 
             for (var i = 0; i < length; i++)
-                s.Append(chars[random.Next(0, chars.Length)]);
+            {
+                var startOfIdentifier = s[s.Length - 1] == '.';
+                var validChars = startOfIdentifier ? chars.Length - 2 : chars.Length;
+                s.Append(chars[random.Next(0, validChars)]);
+            }
         }
 
         /// <summary>
@@ -304,7 +308,7 @@ namespace Semver.Test
 
         /// <summary>
         /// This tests the forwarding of the <see cref="SemVersion.TryParse(string, out SemVersion)"/> to
-        /// <see cref="SemVersion.Parse(string, out SemVersion, bool)"/> passes false (i.e. loose).
+        /// <see cref="SemVersion.TryParse(string, out SemVersion, bool)"/> passes false (i.e. loose).
         /// </summary>
         [Fact]
         public void DefaultTryParseIsLoose()

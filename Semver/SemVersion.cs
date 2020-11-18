@@ -444,8 +444,10 @@ namespace Semver
         private static List<string> ParseMetadata(string version, ref int i)
         {
             var metadataIdentifiers = new List<string>();
+            i -= 1; // Back up so we are before the start of the first identifier
             do
             {
+                i += 1; // Advance to start of identifier
                 var s = i;
                 while (i < version.Length)
                 {
