@@ -5,6 +5,10 @@ namespace Semver
 {
     internal static class StringExtensions
     {
+        /// <summary>
+        /// Split a string on a character, but if the string is empty, return no
+        /// parts.
+        /// </summary>
         public static IEnumerable<string> SplitExceptEmpty(this string value, char c)
         {
             var parts = value.Split(c);

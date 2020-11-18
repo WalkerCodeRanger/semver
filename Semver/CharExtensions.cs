@@ -11,9 +11,9 @@ namespace Semver
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsAlpha(this char c)
+        public static bool IsAlphaOrHyphen(this char c)
         {
-            return (c >= 'A' && c <= 'Z') || (c >='a' && c <= 'z');
+            return (c >= 'A' && c <= 'Z') || (c >='a' && c <= 'z') || c == '-';
         }
     }
 }

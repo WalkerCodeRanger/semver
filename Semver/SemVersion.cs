@@ -416,7 +416,7 @@ namespace Semver
                 while (i < version.Length)
                 {
                     var c = version[i];
-                    if (c.IsAlpha() || c == '-')
+                    if (c.IsAlphaOrHyphen())
                         isNumeric = false;
                     else if (!c.IsDigit())
                         break;
@@ -452,7 +452,7 @@ namespace Semver
                 while (i < version.Length)
                 {
                     var c = version[i];
-                    if (!c.IsAlpha() && c != '-' && !c.IsDigit())
+                    if (!c.IsAlphaOrHyphen() && !c.IsDigit())
                         break;
                     i += 1;
                 }
