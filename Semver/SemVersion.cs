@@ -315,7 +315,7 @@ namespace Semver
             var i = 0;
 
             // Skip leading whitespace if allowed
-            if (style.HasFlag(SemVersionStyles.AllowLeadingWhite))
+            if (style.HasStyle(SemVersionStyles.AllowLeadingWhite))
                 while (i < version.Length && char.IsWhiteSpace(version, i))
                     i += 1;
 
@@ -323,13 +323,13 @@ namespace Semver
             if (i < version.Length)
             {
                 var c = version[i];
-                if ((c == 'v' && style.HasFlag(SemVersionStyles.AllowLowerV))
-                    || (c == 'V' && style.HasFlag(SemVersionStyles.AllowUpperV)))
+                if ((c == 'v' && style.HasStyle(SemVersionStyles.AllowLowerV))
+                    || (c == 'V' && style.HasStyle(SemVersionStyles.AllowUpperV)))
                     i += 1;
             }
 
             // Are leading zeros allowed
-            var allowLeadingZeros = style.HasFlag(SemVersionStyles.AllowLeadingZeros);
+            var allowLeadingZeros = style.HasStyle(SemVersionStyles.AllowLeadingZeros);
 
             // Parse major version
             if (!ParseNumber(version, ref i, allowLeadingZeros, out var major)) return false;
@@ -342,7 +342,7 @@ namespace Semver
                 if (!ParseNumber(version, ref i, allowLeadingZeros, out minor))
                     return false;
             }
-            else if (!style.HasFlag(SemVersionStyles.OptionalMinorPatch)) return false;
+            else if (!style.HasStyle(SemVersionStyles.OptionalMinorPatch)) return false;
 
             // Parse patch version
             var patch = 0;
@@ -351,10 +351,10 @@ namespace Semver
                 i += 1;
                 if (!ParseNumber(version, ref i, allowLeadingZeros, out patch)) return false;
             }
-            else if (!style.HasFlag(SemVersionStyles.OptionalPatch)) return false;
+            else if (!style.HasStyle(SemVersionStyles.OptionalPatch)) return false;
 
             // Parse prerelease version
-            var allowMultiplePrereleaseIdentifiers = !style.HasFlag(SemVersionStyles.DisallowMultiplePrereleaseIdentifiers);
+            var allowMultiplePrereleaseIdentifiers = !style.HasStyle(SemVersionStyles.DisallowMultiplePrereleaseIdentifiers);
             List<PrereleaseIdentifier> prereleaseIdentifiers;
             if (i < version.Length && version[i] == '-')
             {
@@ -366,7 +366,7 @@ namespace Semver
                 prereleaseIdentifiers = new List<PrereleaseIdentifier>();
 
             // Parse metadata
-            var allowMetadata = !style.HasFlag(SemVersionStyles.DisallowMetadata);
+            var allowMetadata = !style.HasStyle(SemVersionStyles.DisallowMetadata);
             List<string> metadataIdentifiers;
             if (allowMetadata && i < version.Length && version[i] == '+')
             {
