@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 
 namespace Semver
 {
@@ -41,10 +40,10 @@ namespace Semver
         /// <remarks>This is a composite semantic version style.
         ///
         /// The formats accepted by this style will change when more formats are supported.</remarks>
-        Any = AllowLeadingZeros | AllowLeadingWhite | AllowTrailingWhite | AllowV | OptionalMinorPatch,
+        Any = AllowLeadingZeros | AllowWhitespace | AllowV | OptionalMinorPatch,
 
         /// <summary>
-        /// Allow leading zeros on major, minor, and prerelease version numbers
+        /// Allow leading zeros on major, minor, patch, and prerelease version numbers
         /// </summary>
         AllowLeadingZeros = 1,
 
@@ -52,12 +51,18 @@ namespace Semver
         /// Allow leading whitespace. When combined with leading 'v', the whitespace
         /// must come before the 'v'
         /// </summary>
-        AllowLeadingWhite = 1 << 1,
+        AllowLeadingWhitespace = 1 << 1,
 
         /// <summary>
         /// Allow trailing whitespace
         /// </summary>
-        AllowTrailingWhite = 1 << 2,
+        AllowTrailingWhitespace = 1 << 2,
+
+        /// <summary>
+        /// Allow leading and/or trailing whitespace. When combined with leading 'v',
+        /// the leading whitespace must come before the 'v'
+        /// </summary>
+        AllowWhitespace = AllowLeadingWhitespace | AllowTrailingWhitespace,
 
         /// <summary>
         /// Allow a leading lowercase 'v'
@@ -93,28 +98,5 @@ namespace Semver
         /// Disallow a build metadata section
         /// </summary>
         DisallowMetadata = 1 << 8,
-    }
-
-    internal static class SemVersionStylesExtensions
-    {
-        private const SemVersionStyles All = SemVersionStyles.Any
-                                            | SemVersionStyles.DisallowMultiplePrereleaseIdentifiers
-                                            | SemVersionStyles.DisallowMetadata;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValid(this SemVersionStyles styles)
-        {
-            return (styles & All) == styles;
-        }
-
-        /// <summary>
-        /// The <see cref="Enum.HasFlag"/> method is surprisingly slow. This provides
-        /// a fast alternative for the <see cref="SemVersionStyles"/> enum.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasStyle(this SemVersionStyles styles, SemVersionStyles flag)
-        {
-            return (styles & flag) == flag;
-        }
     }
 }

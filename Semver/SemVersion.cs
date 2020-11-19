@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 #if !NETSTANDARD
 using System.Runtime.Serialization;
@@ -23,6 +24,26 @@ namespace Semver
     public sealed class SemVersion : IComparable<SemVersion>, IComparable, ISerializable
 #endif
     {
+        private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
+        private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace";
+        private const string EmptyVersionMessage = "Empty string";
+        private const string AllWhitespaceVersionMessage = "All whitespace";
+        private const string LeadingLowerVMessage = "Leading Lower V {0}";
+        private const string LeadingUpperVMessage = "Leading Upper V {0}";
+        private const string LeadingZeroMajorMinorPatchMessage = "Leading Zero in major, minor, patch {0}";
+        private const string MissingMajorMinorPatchAfterDotMessage = "Missing major, minor, patch {0}";
+        private const string NumberParseInvalid = "Number parse is invalid {0}";
+        private const string MinorVersionNotOptionalMessage = "MinorVersionNotOptional {0}";
+        private const string PatchVersionNotOptionalMessage = "PatchVersionNotOptional {0}";
+
+        /// <summary>
+        /// This exception is used with the <see cref="ParseVersion"/>
+        /// method to indicate parse failure without constructing a new exception.
+        /// This exception should never be thrown or exposed outside of this
+        /// package.
+        /// </summary>
+        private static readonly Exception ParseFailedException = new Exception("Parse Failed");
+
         private static readonly Regex ParseEx =
             new Regex(@"^(?<major>\d+)" +
                 @"(?>\.(?<minor>\d+))?" +
@@ -120,17 +141,17 @@ namespace Semver
 
         #region System.Version
         /// <summary>
-        /// Converts a <see cref="System.Version"/> into the equivalent semantic version.
+        /// Converts a <see cref="Version"/> into the equivalent semantic version.
         /// </summary>
         /// <param name="version">The version to be converted to a semantic version.</param>
         /// <returns>The equivalent semantic version.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="version"/> has a Revision greater than zero.</exception>
         /// <remarks>
-        /// <see cref="System.Version"/> numbers have the form <em>major</em>.<em>minor</em>[.<em>build</em>[.<em>revision</em>]]
+        /// <see cref="Version"/> numbers have the form <em>major</em>.<em>minor</em>[.<em>build</em>[.<em>revision</em>]]
         /// where square brackets ('[' and ']')  indicate optional components. The first three parts
         /// are converted to the Major, Minor, and Patch versions of a semantic version. If the build component
-        /// is not defined (-1), the Patch number is assumed to be zero. <see cref="System.Version"/> numbers
+        /// is not defined (-1), the Patch number is assumed to be zero. <see cref="Version"/> numbers
         /// with a revision component greater than zero cannot be converted to semantic versions. An
         /// <see cref="ArgumentException"/> is thrown when this method is called with such a <see cref="Version"/>.
         /// </remarks>
@@ -143,15 +164,15 @@ namespace Semver
         }
 
         /// <summary>
-        /// Converts this semantic version to a <see cref="System.Version"/>.
+        /// Converts this semantic version to a <see cref="Version"/>.
         /// </summary>
-        /// <returns>The equivalent <see cref="System.Version"/>.</returns>
+        /// <returns>The equivalent <see cref="Version"/>.</returns>
         /// <remarks>
         /// A semantic version of the form <em>major</em>.<em>minor</em>.<em>patch</em>
-        /// is converted to a <see cref="System.Version"/> of the form
+        /// is converted to a <see cref="Version"/> of the form
         /// <em>major</em>.<em>minor</em>.<em>build</em> where the build number is the
         /// patch version of the semantic version. Prerelease versions and build metadata
-        /// are not representable in a <see cref="System.Version"/>. This method throws
+        /// are not representable in a <see cref="Version"/>. This method throws
         /// an <see cref="InvalidOperationException"/> if the semantic version is a
         /// prerelease version or has build metadata.
         /// </remarks>
@@ -185,13 +206,11 @@ namespace Semver
 
         public static SemVersion Parse(string version, SemVersionStyles style)
         {
-            if (version is null) throw new ArgumentNullException(nameof(version));
-            if (!style.IsValid()) throw new ArgumentException("Invalid enum value", nameof(style));
+            if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
 
-            if (!TryParseInternal(version, style, out var semver))
-                throw new FormatException("Invalid version number format");
+            var ex = ParseVersion(version, style, null, out var semver);
 
-            return semver;
+            return ex is null ? semver : throw ex;
         }
 
         /// <summary>
@@ -205,7 +224,7 @@ namespace Semver
         /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
         /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing Minor or Patch versions and <paramref name="strict"/> is <see langword="true"/>.</exception>
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
-        [Obsolete("Method is obsolete. Call Parse with SemVersionStyle instead.")]
+        [Obsolete("Method is obsolete. Call Parse with SemVersionStyles instead.")]
         public static SemVersion Parse(string version, bool strict)
         {
             var match = ParseEx.Match(version);
@@ -234,7 +253,6 @@ namespace Semver
             return new SemVersion(major, minor, patch, prerelease, metadata);
         }
 
-
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
         /// equivalent and returns a value that indicates whether the conversion succeeded. Parsing
@@ -254,9 +272,8 @@ namespace Semver
 
         public static bool TryParse(string version, SemVersionStyles style, out SemVersion semver)
         {
-            if (version is null) throw new ArgumentNullException(nameof(version));
-            if (!style.IsValid()) throw new ArgumentException("Invalid enum value", nameof(style));
-            return TryParseInternal(version, style, out semver);
+            if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
+            return ParseVersion(version, style, ParseFailedException, out semver) != null;
         }
 
         /// <summary>
@@ -307,51 +324,91 @@ namespace Semver
             return true;
         }
 
-        private static bool TryParseInternal(string version, SemVersionStyles style, out SemVersion semver)
+        #region Parsing Implementation
+        /// <summary>
+        /// The internal method that all parsing is based on. Because this is called by both
+        /// <see cref="Parse(string, SemVersionStyles)"/> and <see cref="TryParse(string, SemVersionStyles, out SemVersion)"/>
+        /// it does not throw exceptions, but instead returns the exception that should be thrown
+        /// by the parse method. For performance when used from try parse, all exception construction
+        /// and message formatting can be avoided by passing in an exception which will be returned
+        /// when parsing fails.
+        /// </summary>
+        /// <remarks>This does not validate the <paramref name="style"/> parameter.
+        /// That must be done in the calling method.</remarks>
+        private static Exception ParseVersion(
+            string version,
+            SemVersionStyles style,
+            Exception ex,
+            out SemVersion semver)
         {
             // Assign null once so it doesn't have to be done any time parse fails
             semver = null;
 
+            // Note: this method relies on the fact that the null coalescing operator `??`
+            // is short circuiting to avoid constructing exceptions and exception messages
+            // when a non-null exception is passed in.
+
+            if (version is null) return ex ?? new ArgumentNullException(nameof(version));
+
+            if (version.Length == 0) return ex ?? new FormatException(EmptyVersionMessage);
+
+            // To provide good error messages, this code always parses an element
+            // first and then checks whether it should be allowed
+
             var i = 0;
 
-            // Skip leading whitespace if allowed
-            if (style.HasStyle(SemVersionStyles.AllowLeadingWhite))
-                while (i < version.Length && char.IsWhiteSpace(version, i))
-                    i += 1;
+            // Skip leading whitespace
+            while (i < version.Length && char.IsWhiteSpace(version, i)) i += 1;
 
-            // Skip leading 'v' if allowed
-            if (i < version.Length)
+            // Error if all whitespace
+            if (i == version.Length)
+                return ex ?? new FormatException(AllWhitespaceVersionMessage);
+
+            // Error if leading whitespace not allowed
+            if (i > 0 && style.HasStyle(SemVersionStyles.AllowLeadingWhitespace))
+                return ex ?? NewFormatException(LeadingWhitespaceMessage, version);
+
+            // Handle leading 'v' or 'V'
+            var leadChar = version[i]; // Safe because length checked above for all whitespace error
+            if (leadChar == 'v')
             {
-                var c = version[i];
-                if ((c == 'v' && style.HasStyle(SemVersionStyles.AllowLowerV))
-                    || (c == 'V' && style.HasStyle(SemVersionStyles.AllowUpperV)))
-                    i += 1;
+                if (style.HasStyle(SemVersionStyles.AllowLowerV)) i += 1;
+                else return ex ?? NewFormatException(LeadingLowerVMessage, version);
+            }
+            else if (leadChar == 'V')
+            {
+                if (style.HasStyle(SemVersionStyles.AllowUpperV)) i += 1;
+                else return ex ?? NewFormatException(LeadingUpperVMessage, version);
             }
 
             // Are leading zeros allowed
             var allowLeadingZeros = style.HasStyle(SemVersionStyles.AllowLeadingZeros);
 
             // Parse major version
-            if (!ParseNumber(version, ref i, allowLeadingZeros, out var major)) return false;
+            var parseEx = ParseNumber(version, ref i, allowLeadingZeros, ex, out var major);
+            if (parseEx != null) return parseEx;
 
             // Parse minor version
             var minor = 0;
             if (i < version.Length && version[i] == '.')
             {
                 i += 1;
-                if (!ParseNumber(version, ref i, allowLeadingZeros, out minor))
-                    return false;
+                parseEx = ParseNumber(version, ref i, allowLeadingZeros, ex, out minor);
+                if (parseEx != null) return parseEx;
             }
-            else if (!style.HasStyle(SemVersionStyles.OptionalMinorPatch)) return false;
+            else if (!style.HasStyle(SemVersionStyles.OptionalMinorPatch))
+                return ex ?? NewFormatException(MinorVersionNotOptionalMessage, version);
 
             // Parse patch version
             var patch = 0;
             if (i < version.Length && version[i] == '.')
             {
                 i += 1;
-                if (!ParseNumber(version, ref i, allowLeadingZeros, out patch)) return false;
+                parseEx = ParseNumber(version, ref i, allowLeadingZeros, ex, out patch);
+                if (parseEx != null) return parseEx;
             }
-            else if (!style.HasStyle(SemVersionStyles.OptionalPatch)) return false;
+            else if (!style.HasStyle(SemVersionStyles.OptionalPatch))
+                return ex ?? NewFormatException(PatchVersionNotOptionalMessage, version);
 
             // Parse prerelease version
             var allowMultiplePrereleaseIdentifiers = !style.HasStyle(SemVersionStyles.DisallowMultiplePrereleaseIdentifiers);
@@ -360,7 +417,7 @@ namespace Semver
             {
                 i += 1;
                 prereleaseIdentifiers = ParsePrerelease(version, ref i, allowLeadingZeros, allowMultiplePrereleaseIdentifiers);
-                if (prereleaseIdentifiers == null) return false;
+                if (prereleaseIdentifiers == null) return ex ?? new InvalidOperationException();
             }
             else
                 prereleaseIdentifiers = new List<PrereleaseIdentifier>();
@@ -377,27 +434,42 @@ namespace Semver
                 metadataIdentifiers = new List<string>();
 
             // Check for extra characters at the end
-            if (i != version.Length) return false;
+            if (i != version.Length) return ex ?? new InvalidOperationException();
 
             semver = new SemVersion(major, minor, patch,
                 new ReadOnlyCollection<PrereleaseIdentifier>(prereleaseIdentifiers),
                 new ReadOnlyCollection<string>(metadataIdentifiers));
-            return true;
+            return null;
         }
 
-        private static bool ParseNumber(string version, ref int i, bool allowLeadingZero, out int number)
+        private static Exception ParseNumber(
+            string version,
+            ref int i,
+            bool allowLeadingZero,
+            Exception ex,
+            out int number)
         {
-            var s = i;
+            var start = i;
             if (!allowLeadingZero && i < version.Length && version[i] == '0')
             {
                 number = 0;
-                return false;
+                return ex ?? NewFormatException(LeadingZeroMajorMinorPatchMessage, version);
             }
 
             while (i < version.Length && version[i].IsDigit())
                 i += 1;
 
-            return int.TryParse(version.Substring(s, i - s), NumberStyles.None, null, out number);
+            if (start == i)
+            {
+                number = 0;
+                return ex ?? NewFormatException(MissingMajorMinorPatchAfterDotMessage, version);
+            }
+
+            if (!int.TryParse(version.Substring(start, i - start), NumberStyles.None, CultureInfo.InvariantCulture, out number))
+                // This parse should not fail, if it does, that is a bug
+                throw new InvalidOperationException(NumberParseInvalid);
+
+            return null;
         }
 
         private static List<PrereleaseIdentifier> ParsePrerelease(
@@ -466,6 +538,13 @@ namespace Semver
 
             return metadataIdentifiers;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static FormatException NewFormatException(string messageTemplate, string version)
+        {
+            return new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, version));
+        }
+        #endregion Parsing Implementation
 
         /// <summary>
         /// Checks whether two semantic versions are equal.
