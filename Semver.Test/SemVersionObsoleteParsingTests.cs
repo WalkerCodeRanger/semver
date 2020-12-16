@@ -5,12 +5,12 @@ using Xunit;
 namespace Semver.Test
 {
     /// <summary>
-    /// Tests of any parsing related methods of <see cref="SemVersion"/>.
+    /// Tests of the obsolete parsing related methods of <see cref="SemVersion"/>.
     ///
     /// Parsing tests are structured around a number of lists of version strings
     /// which each parsing method should either parse or reject.
     /// </summary>
-    public class SemVersionParsingTests
+    public class SemVersionObsoleteParsingTests
     {
         /// <summary>
         /// This a very long but valid version number to test parsing long version numbers. It is
@@ -289,9 +289,8 @@ namespace Semver.Test
         }
 
         #region Parse Forward Methods
-
         /// <summary>
-        /// This tests the forwarding of the <see cref="SemVersion.Parse(string)"/> to
+        /// This tests that the forwarding of the <see cref="SemVersion.Parse(string)"/> to
         /// <see cref="SemVersion.Parse(string, bool)"/> passes false (i.e. loose).
         /// </summary>
         [Fact]
@@ -307,7 +306,7 @@ namespace Semver.Test
         }
 
         /// <summary>
-        /// This tests the forwarding of the <see cref="SemVersion.TryParse(string, out SemVersion)"/> to
+        /// This tests that the forwarding of the <see cref="SemVersion.TryParse(string, out SemVersion)"/> to
         /// <see cref="SemVersion.TryParse(string, out SemVersion, bool)"/> passes false (i.e. loose).
         /// </summary>
         [Fact]
