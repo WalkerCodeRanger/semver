@@ -35,7 +35,17 @@ namespace Semver.Test
             Assert.Equal(InvalidNumberStyleMessage, ex.Message);
         }
 
+        [Fact]
+        public void IntParseInvalidFormat()
+        {
+            var ex = Assert.Throws<FormatException>(
+                () => int.Parse("  42", NumberStyles.None, CultureInfo.InvariantCulture));
+
+            Assert.Equal(InvalidFormatMessage, ex.Message);
+        }
+
         private const string InvalidNumberStyleMessage = "An undefined NumberStyles value is being used.\r\nParameter name: style";
+        private const string InvalidFormatMessage = "Input string was not in a correct format.";
         private const NumberStyles InvalidNumberStyle = (NumberStyles)int.MaxValue;
     }
 }
