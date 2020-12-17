@@ -2,7 +2,7 @@
 
 namespace Semver
 {
-    public struct PrereleaseIdentifier : IEquatable<PrereleaseIdentifier>
+    public readonly struct PrereleaseIdentifier : IEquatable<PrereleaseIdentifier>
     {
         public string Value { get; }
         public int? IntValue { get; }

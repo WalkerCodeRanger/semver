@@ -1,0 +1,122 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Semver.Test.Builders;
+using Xunit;
+
+namespace Semver.Test
+{
+    public class SemVersionParsingTests
+    {
+        public static readonly TheoryData<ParsingTestCase> ParsingTestCases = ExpandTestCases(
+            // version numbers given with the link in the spec to a regex for semver versions
+            Valid("0.0.4", 0, 0, 4),
+            Valid("1.2.3", 1, 2, 3),
+            Valid("10.20.30", 10, 20, 30),
+            Valid("1.1.2-prerelease+meta", 1, 1, 2, Pre("prerelease"), "meta"),
+            Valid("1.1.2+meta", 1, 1, 2, Pre(), "meta"),
+            Valid("1.1.2+meta-valid", 1, 1, 2, Pre(), "meta-valid"),
+            Valid("1.0.0-alpha", 1, 0, 0, Pre("alpha")),
+            Valid("1.0.0-beta", 1, 0, 0, Pre("beta")),
+            Valid("1.0.0-alpha.beta", 1, 0, 0, Pre("alpha", "beta")),
+            Valid("1.0.0-alpha.beta.1", 1, 0, 0, Pre("alpha", "beta", "1")),
+            Valid("1.0.0-alpha.1", 1, 0, 0, Pre("alpha", 1)),
+            Valid("1.0.0-alpha0.valid", 1, 0, 0, Pre("alpha0", "valid")),
+            Valid("1.0.0-alpha.0valid", 1, 0, 0, Pre("alpha", "0valid")),
+            Valid("1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay", 1, 0, 0, Pre("alpha-a", "b-c-somethinglong"), "build.1-aef.1-its-okay"),
+            Valid("1.0.0-rc.1+build.1", 1, 0, 0, Pre("rc", 1), "build.1"),
+            Valid("2.0.0-rc.1+build.123", 2, 0, 0, Pre("rc", 1), "build.123"),
+            Valid("1.2.3-beta", 1, 2, 3, Pre("beta")),
+            Valid("10.2.3-DEV-SNAPSHOT", 10, 2, 3, Pre("DEV-SNAPSHOT")),
+            Valid("1.2.3-SNAPSHOT-123", 1, 2, 3, Pre("SNAPSHOT-123")),
+            Valid("1.0.0", 1),
+            Valid("2.0.0", 2),
+            Valid("1.1.7", 1, 1, 7),
+            Valid("2.0.0+build.1848", 2, 0, 0, Pre(), "build.1848"),
+            Valid("2.0.1-alpha.1227", 2, 0, 1, Pre("alpha", 1227)),
+            Valid("1.0.0-alpha+beta", 1, 0, 0, Pre("alpha"), "beta"),
+            Valid("1.2.3----RC-SNAPSHOT.12.9.1--.12+788", 1, 2, 3, Pre("---RC-SNAPSHOT", 12, 9, "1--", 12), "788"),
+            Valid("1.2.3----R-S.12.9.1--.12+meta", 1, 2, 3, Pre("---R-S", 12, 9, "1--", 12), "meta"),
+            Valid("1.2.3----RC-SNAPSHOT.12.9.1--.12", 1, 2, 3, Pre("---RC-SNAPSHOT", 12, 9, "1--", 12)),
+            Valid("1.0.0+0.build.1-rc.10000aaa-kk-0.1", 1, 0, 0, Pre(), "0.build.1-rc.10000aaa-kk-0.1"),
+            Valid("1.0.0-0A.is.legal", 1, 0, 0, Pre("0A", "is", "legal")));
+
+        [Theory]
+        [MemberData(nameof(ParsingTestCases))]
+        public void ParseWithStyleParsesCorrectly(ParsingTestCase testCase)
+        {
+            _ = testCase ?? throw new ArgumentNullException(nameof(testCase));
+
+            if (testCase.IsValid)
+            {
+                var version = SemVersion.Parse(testCase.Version, testCase.Style);
+
+                AssertVersionEqual(version, testCase);
+            }
+            else
+            {
+                var ex = Assert.Throws<Exception>(() => SemVersion.Parse(testCase.Version, testCase.Style));
+            }
+        }
+
+        private static void AssertVersionEqual(SemVersion version, ParsingTestCase testCase)
+        {
+            Assert.Equal(testCase.Major, version.Major);
+            Assert.Equal(testCase.Minor, version.Minor);
+            Assert.Equal(testCase.Patch, version.Patch);
+            Assert.Equal(testCase.PrereleaseIdentifiers, version.PrereleaseIdentifiers);
+            Assert.Equal(string.Join(".", testCase.PrereleaseIdentifiers), version.Prerelease);
+            Assert.Equal(testCase.PrereleaseIdentifiers.Any(), version.IsPrerelease);
+            Assert.Equal(testCase.MetadataIdentifiers, version.MetadataIdentifiers);
+            Assert.Equal(string.Join(".", testCase.MetadataIdentifiers), version.Metadata);
+#pragma warning disable 618 // Obsolete Warning
+            Assert.Equal(string.Join(".", testCase.MetadataIdentifiers), version.Build);
+#pragma warning restore 618
+        }
+
+        private static TheoryData<ParsingTestCase> ExpandTestCases(params ParsingTestCase[] testCases)
+        {
+            var theoryData = new TheoryData<ParsingTestCase>();
+
+            foreach (var testCase in testCases)
+            {
+                theoryData.Add(testCase);
+                // TODO construct cases for other styles
+            }
+
+            return theoryData;
+        }
+
+        private static ParsingTestCase Valid(
+            string version,
+            SemVersionStyles requiredStyles,
+            int major,
+            int minor = 0,
+            int patch = 0,
+            IEnumerable<PrereleaseIdentifier> prerelease = null,
+            string metadata = "")
+        {
+            return ParsingTestCase.Valid(version, requiredStyles, major, minor, patch,
+                prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
+                metadata.SplitExceptEmpty('.'));
+        }
+
+        private static ParsingTestCase Valid(
+            string version,
+            int major,
+            int minor = 0,
+            int patch = 0,
+            IEnumerable<PrereleaseIdentifier> prerelease = null,
+            string metadata = "")
+        {
+            return ParsingTestCase.Valid(version, SemVersionStyles.SemVer2, major, minor, patch,
+            prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
+            metadata.SplitExceptEmpty('.'));
+        }
+
+        public static IEnumerable<PrereleaseIdentifier> Pre(params TestPrereleaseIdentifier[] identifiers)
+        {
+            return identifiers.Select(i => (PrereleaseIdentifier)i);
+        }
+    }
+}

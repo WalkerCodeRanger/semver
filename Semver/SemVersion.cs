@@ -450,11 +450,11 @@ namespace Semver
             out int number)
         {
             var start = i;
-            if (!allowLeadingZero && i < version.Length && version[i] == '0')
-            {
-                number = 0;
-                return ex ?? NewFormatException(LeadingZeroMajorMinorPatchMessage, version);
-            }
+
+            // Skip leading zero
+            while (i < version.Length && version[i] == '0') i += 1;
+
+            var startOfNonZeroDigits = i;
 
             while (i < version.Length && version[i].IsDigit())
                 i += 1;
@@ -463,6 +463,18 @@ namespace Semver
             {
                 number = 0;
                 return ex ?? NewFormatException(MissingMajorMinorPatchAfterDotMessage, version);
+            }
+
+            if (!allowLeadingZero)
+            {
+                // Since it isn't missing, if there are no non-zero digits, it must be zero
+                var isZero = startOfNonZeroDigits == i;
+                var maxLeadingZeros = isZero ? 1 : 0;
+                if (startOfNonZeroDigits - start > maxLeadingZeros)
+                {
+                    number = 0;
+                    return ex ?? NewFormatException(LeadingZeroMajorMinorPatchMessage, version);
+                }
             }
 
             if (!int.TryParse(version.Substring(start, i - start), NumberStyles.None, CultureInfo.InvariantCulture, out number))
