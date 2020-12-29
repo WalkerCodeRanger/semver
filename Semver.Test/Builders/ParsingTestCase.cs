@@ -69,7 +69,10 @@ namespace Semver.Test
 
         public override string ToString()
         {
-            return $"{Version} as {Styles}";
+            if (Version is null) return $"null as {Styles}";
+            return Version.Length > 200
+                ? $"Long #{Version.GetHashCode()} as {Styles}"
+                : $"'{Version}' as {Styles}";
         }
     }
 }

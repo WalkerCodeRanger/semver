@@ -14,8 +14,8 @@ namespace Semver
     internal static class SemVersionParser
     {
         private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace";
-        private const string EmptyVersionMessage = "Empty string";
-        private const string AllWhitespaceVersionMessage = "All whitespace";
+        private const string EmptyVersionMessage = "Empty string instead of version";
+        private const string AllWhitespaceVersionMessage = "All whitespace instead of version";
         private const string LeadingLowerVMessage = "Leading 'v' in '{0}'";
         private const string LeadingUpperVMessage = "Leading 'V' in '{0}'";
         private const string LeadingZeroInMajorMinorOrPatchMessage = "Leading Zero in major, minor, or patch version in '{0}'";

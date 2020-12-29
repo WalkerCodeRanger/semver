@@ -35,10 +35,9 @@ namespace Semver.Test
             return s.ToString();
         }
 
-        private static void AppendLabel(StringBuilder s, int length, Random random1)
+        private static void AppendLabel(StringBuilder s, int length, Random random)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789-.0";
-            var random = random1;
 
             for (var i = 0; i < length; i++)
             {
