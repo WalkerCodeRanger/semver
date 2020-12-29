@@ -13,15 +13,14 @@ namespace Semver.Test
     {
         private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.\r\nParameter name: style";
 
-        //private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
-        //private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace";
+        private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace";
+        private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace";
         private const string EmptyVersionMessage = "Empty string instead of version";
         private const string AllWhitespaceVersionMessage = "All whitespace instead of version";
         private const string LeadingLowerVMessage = "Leading 'v' in '{0}'";
         private const string LeadingUpperVMessage = "Leading 'V' in '{0}'";
         private const string LeadingZeroInMajorMinorOrPatchMessage = "Leading Zero in major, minor, or patch version in '{0}'";
         private const string MissingMajorMinorOrPatchMessage = "Missing major, minor, or patch version in '{0}'";
-        //private const string NumberParseInvalid = "Number parse is invalid {0}";
         private const string MissingMinorMessage = "Missing minor version in '{0}'";
         private const string MissingPatchMessage = "Missing patch version in '{0}'";
         private const string MajorMinorOrPatchOverflowMessage = "Major, minor, or patch version '{1}' was too large for Int32 in '{0}'";
@@ -29,9 +28,11 @@ namespace Semver.Test
         private const string PrereleasePrefixedByDotMessage = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'";
         private const string MissingPrereleaseIdentifierMessage = "Missing prerelease identifier in '{0}'";
         private const string LeadingZeroInPrereleaseMessage = "Leading Zero in prerelease identifier in version '{0}'";
+        private const string PrereleaseOverflowMessage = "Prerelease identifier '{1}' was too large for Int32 in version '{0}'";
         private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'";
         private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'";
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'";
+        private const string InvalidCharacterInMajorMinorOrPatchMessage = "Invalid character '{1}' in major, minor, or patch version in '{0}'";
 
         public static readonly TheoryData<SemVersionStyles> InvalidSemVersionStyles = new TheoryData<SemVersionStyles>()
         {
@@ -171,6 +172,14 @@ namespace Semver.Test
             Invalid<OverflowException>("2147483648.2.3", MajorMinorOrPatchOverflowMessage, "2147483648"),
             Invalid<OverflowException>("1.2147483648.3", MajorMinorOrPatchOverflowMessage, "2147483648"),
             Invalid<OverflowException>("1.2.2147483648", MajorMinorOrPatchOverflowMessage, "2147483648"),
+            Invalid<OverflowException>("1.2.3-2147483648", PrereleaseOverflowMessage, "2147483648"),
+
+            // Invalid characters in major, minor, or patch
+            Invalid("1@.2.3", InvalidCharacterInMajorMinorOrPatchMessage, "@"),
+            Invalid("1.2@.3", InvalidCharacterInMajorMinorOrPatchMessage, "@"),
+            Invalid("1.0.0@", InvalidCharacterInMajorMinorOrPatchMessage, "@"),
+            Invalid("1.0.0@.alpha", InvalidCharacterInMajorMinorOrPatchMessage, "@"),
+            Invalid("1.0.0@-alpha", InvalidCharacterInMajorMinorOrPatchMessage, "@"),
 
             // Invalid characters in prerelease and metadata
             Invalid("1.2.3-😞+b", InvalidCharacterInPrereleaseMessage, "\ud83d"), // High part of surrogate pair
@@ -185,7 +194,16 @@ namespace Semver.Test
             Invalid("\t", AllWhitespaceVersionMessage),
 
             // Leading 'v', but otherwise valid
-            Valid("v1.2.3", AllowLowerV, 1, 2, 3), Valid("V1.2.3", AllowUpperV, 1, 2, 3),
+            Valid("v1.2.3", AllowLowerV, 1, 2, 3),
+            Valid("V1.2.3", AllowUpperV, 1, 2, 3),
+
+            // Leading whitespace, but otherwise valid
+            Valid(" 1.2.3", AllowLeadingWhitespace, 1, 2, 3),
+            Valid("\t1.2.3", AllowLeadingWhitespace, 1, 2, 3),
+
+            // Trailing whitespace, but otherwise valid
+            Valid("1.2.3 ", AllowTrailingWhitespace, 1, 2, 3),
+            Valid("1.2.3\t", AllowTrailingWhitespace, 1, 2, 3),
 
             // Fourth number
             Invalid("1.2.3.4", FourthVersionNumberMessage),
@@ -213,9 +231,6 @@ namespace Semver.Test
         {
             // Also checks that ToString() doesn't throw an exception
             _ = ParsingTestCases.Select(t => t.ToString()).ToList();
-
-            var x = ParsingTestCases.Where(t => t.ToString().StartsWith("Target", StringComparison.CurrentCultureIgnoreCase)).ToList();
-
         }
 
         [Theory]
@@ -327,10 +342,20 @@ namespace Semver.Test
                 theoryData.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~AllowLowerV, LeadingLowerVMessage));
 
-            // Versions needing allow leading lower v should error if that is taken away
+            // Versions needing allow leading upper v should error if that is taken away
             foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(AllowUpperV)))
                 theoryData.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~AllowUpperV, LeadingUpperVMessage));
+
+            // Versions needing allow leading whitespace should error if that is taken away
+            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(AllowLeadingWhitespace)))
+                theoryData.Add(Invalid<FormatException>(testCase.Version,
+                    testCase.Styles & ~AllowLeadingWhitespace, LeadingWhitespaceMessage));
+
+            // Versions needing allow trailing whitespace should error if that is taken away
+            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(AllowTrailingWhitespace)))
+                theoryData.Add(Invalid<FormatException>(testCase.Version,
+                    testCase.Styles & ~AllowTrailingWhitespace, TrailingWhitespaceMessage));
 
             // TODO construct cases for other styles
 

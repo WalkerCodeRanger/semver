@@ -14,6 +14,7 @@ namespace Semver
     internal static class SemVersionParser
     {
         private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace";
+        private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace";
         private const string EmptyVersionMessage = "Empty string instead of version";
         private const string AllWhitespaceVersionMessage = "All whitespace instead of version";
         private const string LeadingLowerVMessage = "Leading 'v' in '{0}'";
@@ -75,7 +76,7 @@ namespace Semver
                 return ex ?? new FormatException(AllWhitespaceVersionMessage);
 
             // Error if leading whitespace not allowed
-            if (i > 0 && style.HasStyle(SemVersionStyles.AllowLeadingWhitespace))
+            if (i > 0 && !style.HasStyle(SemVersionStyles.AllowLeadingWhitespace))
                 return ex ?? NewFormatException(LeadingWhitespaceMessage, version);
 
             // Handle leading 'v' or 'V'
@@ -158,6 +159,14 @@ namespace Semver
             else
                 metadataIdentifiers = new List<string>();
 
+            // Skip trailing whitespace
+            var startTrailingWhitespace = i;
+            while (i < version.Length && char.IsWhiteSpace(version, i)) i += 1;
+
+            // Error if leading whitespace not allowed
+            if (i != startTrailingWhitespace && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
+                return ex ?? NewFormatException(TrailingWhitespaceMessage, version);
+
             // Deal with unprocessed characters
             if (i != version.Length)
             {
@@ -195,6 +204,14 @@ namespace Semver
 
             while (i < version.Length && version[i].IsDigit())
                 i += 1;
+
+            // If the next character isn't a handled character for some part of the version, then it
+            // is an invalid character in this number
+            if (i < version.Length && !version[i].IsHandledCharacter())
+            {
+                number = 0;
+                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version, version[i]);
+            }
 
             if (start == i)
             {
@@ -265,7 +282,9 @@ namespace Semver
                         return ex ?? NewFormatException(LeadingZeroInPrereleaseMessage, version);
 
                     if (!int.TryParse(identifier, NumberStyles.None, null, out var intValue))
-                        return ex ?? NewFormatException(PrereleaseOverflowMessage, version, identifier);
+                        // Parsing validated this as a string of digits possibly proceeded by zero so the only
+                        // possible issue is a numeric overflow for `int`
+                        return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture, PrereleaseOverflowMessage, version, identifier));
 
                     prereleaseIdentifiers.Add(new PrereleaseIdentifier(identifier.TrimStart('0'), intValue));
                 }
