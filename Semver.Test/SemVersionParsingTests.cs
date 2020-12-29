@@ -21,9 +21,13 @@ namespace Semver.Test
         private const string MissingMinorMessage = "Missing minor version in '{0}'";
         private const string MissingPatchMessage = "Missing patch version in '{0}'";
         private const string MajorMinorOrPatchOverflowMessageFormat = "Major, minor, or patch version '{1}' was too large for Int32 in '{0}'";
+        private const string FourthVersionNumberMessage = "Fourth version number in '{0}'";
+        private const string PrereleasePrefixedByDotMessage = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'";
         private const string MissingPrereleaseIdentifierMessage = "Missing prerelease identifier in '{0}'";
         private const string LeadingZeroInPrereleaseMessage = "Leading Zero in prerelease identifier in version '{0}'";
         private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'";
+        private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'";
+        private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'";
 
         public static readonly TheoryData<ParsingTestCase> ParsingTestCases = ExpandTestCases(
             // version numbers given with the link in the spec to a regex for semver versions
@@ -65,7 +69,7 @@ namespace Semver.Test
             Invalid("1.2", MissingPatchMessage),
             Invalid("1.2.3-0123", LeadingZeroInPrereleaseMessage, "0123"),
             Invalid("1.2.3-0123.0123", LeadingZeroInPrereleaseMessage, "0123"),
-            Invalid("1.1.2+.123"),
+            Invalid("1.1.2+.123", MissingMetadataIdentifierMessage),
             Invalid("+invalid", MissingMajorMinorOrPatchMessage),
             Invalid("-invalid", MissingMajorMinorOrPatchMessage),
             Invalid("-invalid+invalid", MissingMajorMinorOrPatchMessage),
@@ -92,21 +96,19 @@ namespace Semver.Test
             Invalid("1.01.1", LeadingZeroInMajorMinorOrPatchMessage),
             Invalid("1.1.01", LeadingZeroInMajorMinorOrPatchMessage),
             Invalid("1.2", MissingPatchMessage),
-            Invalid("1.2.3.DEV"),
+            Invalid("1.2.3.DEV", PrereleasePrefixedByDotMessage),
             Invalid("1.2-SNAPSHOT", MissingPatchMessage),
-            Invalid("1.2.31.2.3----RC-SNAPSHOT.12.09.1--..12+788", MissingPrereleaseIdentifierMessage),
+            Invalid("1.2.31.2.3----RC-SNAPSHOT.12.09.1--..12+788", FourthVersionNumberMessage),
             Invalid("1.2-RC-SNAPSHOT", MissingPatchMessage),
             Invalid("-1.0.3-gamma+b7718", MissingMajorMinorOrPatchMessage),
             Invalid("+justmeta", MissingMajorMinorOrPatchMessage),
-            Invalid("9.8.7+meta+meta"),
-            Invalid("9.8.7-whatever+meta+meta"),
+            Invalid("9.8.7+meta+meta", InvalidCharacterInMetadataMessage, "+"),
+            Invalid("9.8.7-whatever+meta+meta", InvalidCharacterInMetadataMessage, "+"),
             Invalid<OverflowException>("99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12",
                 MajorMinorOrPatchOverflowMessageFormat, "99999999999999999999999"),
 
 
             Invalid<ArgumentNullException>(null, "Value cannot be null.\r\nParameter name: version"));
-
-
 
         [Fact]
         public void CanConstructParsingTestCases()
