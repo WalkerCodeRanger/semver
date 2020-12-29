@@ -34,8 +34,12 @@ namespace Semver.Test
 
         public static readonly TheoryData<SemVersionStyles> InvalidSemVersionStyles = new TheoryData<SemVersionStyles>()
         {
+            // Optional minor flag without optional patch flag
             OptionalMinorPatch & ~OptionalPatch,
-            (SemVersionStyles)int.MaxValue,
+            // Next unused bit flag
+            (Any | SemVer1) + 1,
+            // All bits set
+            unchecked((SemVersionStyles)uint.MaxValue),
         };
 
         public static readonly TheoryData<ParsingTestCase> ParsingTestCases = ExpandTestCases(
