@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace Semver.Test
@@ -17,11 +19,19 @@ namespace Semver.Test
         {
             return new ParsingTestCase(version, requiredStyles, major, minor, patch, prereleaseIdentifiers, metadataIdentifiers);
         }
+        public static ParsingTestCase Invalid(
+            string version,
+            SemVersionStyles styles,
+            Type exceptionType,
+            string exceptionMessage)
+        {
+            return new ParsingTestCase(version, styles, exceptionType, exceptionMessage);
+        }
 
         private ParsingTestCase(string version, SemVersionStyles requiredStyles, int major, int minor, int patch, IEnumerable<PrereleaseIdentifier> prereleaseIdentifiers, IEnumerable<string> metadataIdentifiers)
         {
             Version = version;
-            Style = requiredStyles;
+            Styles = requiredStyles;
             IsValid = true;
             Major = major;
             Minor = minor;
@@ -30,8 +40,17 @@ namespace Semver.Test
             MetadataIdentifiers = metadataIdentifiers.ToList().AsReadOnly();
         }
 
+        private ParsingTestCase(string version, SemVersionStyles styles, Type exceptionType, string exceptionMessage)
+        {
+            Version = version;
+            Styles = styles;
+            IsValid = false;
+            ExceptionType = exceptionType;
+            ExceptionMessage = string.Format(CultureInfo.InvariantCulture, exceptionMessage, version);
+        }
+
         public string Version { get; }
-        public SemVersionStyles Style { get; }
+        public SemVersionStyles Styles { get; }
         public bool IsValid { get; }
 
         #region Valid Values
@@ -43,9 +62,14 @@ namespace Semver.Test
         public IReadOnlyList<string> MetadataIdentifiers { get; }
         #endregion
 
+        #region Invalid Values
+        public Type ExceptionType { get; }
+        public string ExceptionMessage { get; }
+        #endregion
+
         public override string ToString()
         {
-            return $"{Version} as {Style}";
+            return $"{Version} as {Styles}";
         }
     }
 }

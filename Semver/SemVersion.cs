@@ -28,13 +28,17 @@ namespace Semver
         private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace";
         private const string EmptyVersionMessage = "Empty string";
         private const string AllWhitespaceVersionMessage = "All whitespace";
-        private const string LeadingLowerVMessage = "Leading Lower V {0}";
-        private const string LeadingUpperVMessage = "Leading Upper V {0}";
-        private const string LeadingZeroMajorMinorPatchMessage = "Leading Zero in major, minor, patch {0}";
-        private const string MissingMajorMinorPatchAfterDotMessage = "Missing major, minor, patch {0}";
-        private const string NumberParseInvalid = "Number parse is invalid {0}";
-        private const string MinorVersionNotOptionalMessage = "MinorVersionNotOptional {0}";
-        private const string PatchVersionNotOptionalMessage = "PatchVersionNotOptional {0}";
+        private const string LeadingLowerVMessage = "Leading 'v' in '{0}'";
+        private const string LeadingUpperVMessage = "Leading 'V' in '{0}'";
+        private const string LeadingZeroInMajorMinorOrPatchMessage = "Leading Zero in major, minor, or patch version in '{0}'";
+        private const string MissingMajorMinorOrPatchMessage = "Missing major, minor, or patch version in '{0}'";
+        private const string MissingMinorMessage = "Missing minor version in '{0}'";
+        private const string MissingPatchMessage = "Missing patch version in '{0}'";
+        private const string MajorMinorOrPatchOverflowMessage = "Major, minor, or patch version '{1}' was too large for Int32 in '{0}'";
+        private const string MissingPrereleaseIdentifierMessage = "Missing prerelease identifier in '{0}'";
+        private const string LeadingZeroInPrereleaseMessage = "Leading Zero in prerelease identifier in version '{0}'";
+        private const string PrereleaseOverflowMessage = "Prerelease identifier '{1}' was too large for Int32 in version '{0}'";
+        private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'";
 
         /// <summary>
         /// This exception is used with the <see cref="ParseVersion"/>
@@ -273,7 +277,13 @@ namespace Semver
         public static bool TryParse(string version, SemVersionStyles style, out SemVersion semver)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
-            return ParseVersion(version, style, ParseFailedException, out semver) != null;
+            var exception = ParseVersion(version, style, ParseFailedException, out semver);
+
+            // This check ensures that ParseVersion doesn't construct an exception, but always returns ParseFailedException
+            if (exception != null && exception != ParseFailedException)
+                throw new InvalidOperationException($"{nameof(ParseVersion)} returned exception other than {nameof(ParseFailedException)}", exception);
+
+            return exception is null;
         }
 
         /// <summary>
@@ -385,7 +395,7 @@ namespace Semver
             var allowLeadingZeros = style.HasStyle(SemVersionStyles.AllowLeadingZeros);
 
             // Parse major version
-            var parseEx = ParseNumber(version, ref i, allowLeadingZeros, ex, out var major);
+            var parseEx = ParseMajorMinorOrPatch(version, ref i, allowLeadingZeros, ex, out var major);
             if (parseEx != null) return parseEx;
 
             // Parse minor version
@@ -393,22 +403,22 @@ namespace Semver
             if (i < version.Length && version[i] == '.')
             {
                 i += 1;
-                parseEx = ParseNumber(version, ref i, allowLeadingZeros, ex, out minor);
+                parseEx = ParseMajorMinorOrPatch(version, ref i, allowLeadingZeros, ex, out minor);
                 if (parseEx != null) return parseEx;
             }
             else if (!style.HasStyle(SemVersionStyles.OptionalMinorPatch))
-                return ex ?? NewFormatException(MinorVersionNotOptionalMessage, version);
+                return ex ?? NewFormatException(MissingMinorMessage, version);
 
             // Parse patch version
             var patch = 0;
             if (i < version.Length && version[i] == '.')
             {
                 i += 1;
-                parseEx = ParseNumber(version, ref i, allowLeadingZeros, ex, out patch);
+                parseEx = ParseMajorMinorOrPatch(version, ref i, allowLeadingZeros, ex, out patch);
                 if (parseEx != null) return parseEx;
             }
             else if (!style.HasStyle(SemVersionStyles.OptionalPatch))
-                return ex ?? NewFormatException(PatchVersionNotOptionalMessage, version);
+                return ex ?? NewFormatException(MissingPatchMessage, version);
 
             // Parse prerelease version
             var allowMultiplePrereleaseIdentifiers = !style.HasStyle(SemVersionStyles.DisallowMultiplePrereleaseIdentifiers);
@@ -416,8 +426,8 @@ namespace Semver
             if (i < version.Length && version[i] == '-')
             {
                 i += 1;
-                prereleaseIdentifiers = ParsePrerelease(version, ref i, allowLeadingZeros, allowMultiplePrereleaseIdentifiers);
-                if (prereleaseIdentifiers == null) return ex ?? new InvalidOperationException();
+                parseEx = ParsePrerelease(version, ref i, allowLeadingZeros, allowMultiplePrereleaseIdentifiers, ex, out prereleaseIdentifiers);
+                if (parseEx != null) return parseEx;
             }
             else
                 prereleaseIdentifiers = new List<PrereleaseIdentifier>();
@@ -434,7 +444,8 @@ namespace Semver
                 metadataIdentifiers = new List<string>();
 
             // Check for extra characters at the end
-            if (i != version.Length) return ex ?? new InvalidOperationException();
+            if (i != version.Length)
+                return ex ?? new InvalidOperationException("Parsing failed due to unhandled extra characters at the end");
 
             semver = new SemVersion(major, minor, patch,
                 new ReadOnlyCollection<PrereleaseIdentifier>(prereleaseIdentifiers),
@@ -442,7 +453,7 @@ namespace Semver
             return null;
         }
 
-        private static Exception ParseNumber(
+        private static Exception ParseMajorMinorOrPatch(
             string version,
             ref int i,
             bool allowLeadingZero,
@@ -462,7 +473,7 @@ namespace Semver
             if (start == i)
             {
                 number = 0;
-                return ex ?? NewFormatException(MissingMajorMinorPatchAfterDotMessage, version);
+                return ex ?? NewFormatException(MissingMajorMinorOrPatchMessage, version);
             }
 
             if (!allowLeadingZero)
@@ -473,24 +484,29 @@ namespace Semver
                 if (startOfNonZeroDigits - start > maxLeadingZeros)
                 {
                     number = 0;
-                    return ex ?? NewFormatException(LeadingZeroMajorMinorPatchMessage, version);
+                    return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage, version);
                 }
             }
 
-            if (!int.TryParse(version.Substring(start, i - start), NumberStyles.None, CultureInfo.InvariantCulture, out number))
-                // This parse should not fail, if it does, that is a bug
-                throw new InvalidOperationException(NumberParseInvalid);
+            var numberString = version.Substring(start, i - start);
+            if (!int.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
+                // Parsing validated this as a string of digits possibly proceeded by zero so the only
+                // possible issue is a numeric overflow for `int`
+                return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
+                    MajorMinorOrPatchOverflowMessage, version, numberString));
 
             return null;
         }
 
-        private static List<PrereleaseIdentifier> ParsePrerelease(
+        private static Exception ParsePrerelease(
             string version,
             ref int i,
             bool allowLeadingZero,
-            bool allowMultiplePrereleaseIdentifiers)
+            bool allowMultiplePrereleaseIdentifiers,
+            Exception ex,
+            out List<PrereleaseIdentifier> prereleaseIdentifiers)
         {
-            var prereleaseIdentifiers = new List<PrereleaseIdentifier>();
+            prereleaseIdentifiers = new List<PrereleaseIdentifier>();
             i -= 1; // Back up so we are before the start of the first identifier
             do
             {
@@ -502,27 +518,35 @@ namespace Semver
                     var c = version[i];
                     if (c.IsAlphaOrHyphen())
                         isNumeric = false;
-                    else if (!c.IsDigit())
+                    else if (c=='.' || c =='+')
                         break;
+                    else if (!c.IsDigit())
+                        return ex ?? NewFormatException(InvalidCharacterInPrereleaseMessage, version, Convert.ToString(c, CultureInfo.InvariantCulture));
 
                     i += 1;
                 }
 
                 // Empty identifiers not allowed
-                if (s == i) return null;
+                if (s == i)
+                    return ex ?? NewFormatException(MissingPrereleaseIdentifierMessage, version);
+
                 var identifier = version.Substring(s, i - s);
                 if (!isNumeric)
                     prereleaseIdentifiers.Add(new PrereleaseIdentifier(identifier, null));
                 else
                 {
-                    if (!allowLeadingZero && version[s] == '0') return null;
-                    if (!int.TryParse(identifier, NumberStyles.None, null, out var intValue)) return null;
+                    if (!allowLeadingZero && version[s] == '0')
+                        return ex ?? NewFormatException(LeadingZeroInPrereleaseMessage, version);
+
+                    if (!int.TryParse(identifier, NumberStyles.None, null, out var intValue))
+                        return ex ?? NewFormatException(PrereleaseOverflowMessage, version, identifier);
+
                     prereleaseIdentifiers.Add(new PrereleaseIdentifier(identifier.TrimStart('0'), intValue));
                 }
 
             } while (i < version.Length && version[i] == '.' && allowMultiplePrereleaseIdentifiers);
 
-            return prereleaseIdentifiers;
+            return null;
         }
 
         private static List<string> ParseMetadata(string version, ref int i)
@@ -555,6 +579,12 @@ namespace Semver
         private static FormatException NewFormatException(string messageTemplate, string version)
         {
             return new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, version));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static FormatException NewFormatException(string messageTemplate, string version, string value)
+        {
+            return new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, version, value));
         }
         #endregion Parsing Implementation
 
