@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using static Semver.SemVersionStyles;
 
 namespace Semver
 {
     internal static class SemVersionStylesExtensions
     {
-        private const SemVersionStyles All = SemVersionStyles.Any
-                                             | SemVersionStyles.DisallowMultiplePrereleaseIdentifiers
-                                             | SemVersionStyles.DisallowMetadata;
+        private const SemVersionStyles All = Any
+                                             | DisallowMultiplePrereleaseIdentifiers
+                                             | DisallowMetadata;
+        private const SemVersionStyles OptionalMinorWithoutPatch = OptionalMinorPatch & ~OptionalPatch;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsValid(this SemVersionStyles styles)
         {
-            return (styles & All) == styles;
+            return (styles & All) == styles
+                // Check for a flag for optional minor without optional patch
+                && (styles & OptionalMinorPatch) != OptionalMinorWithoutPatch;
         }
 
         /// <summary>

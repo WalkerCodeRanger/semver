@@ -4,11 +4,14 @@ using System.Globalization;
 using System.Linq;
 using Semver.Test.Builders;
 using Xunit;
+using static Semver.SemVersionStyles;
 
 namespace Semver.Test
 {
     public class SemVersionParsingTests
     {
+        private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.\r\nParameter name: style";
+
         //private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
         //private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace";
         //private const string EmptyVersionMessage = "Empty string";
@@ -28,6 +31,12 @@ namespace Semver.Test
         private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'";
         private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'";
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'";
+
+        public static readonly TheoryData<SemVersionStyles> InvalidSemVersionStyles = new TheoryData<SemVersionStyles>()
+        {
+            OptionalMinorPatch & ~OptionalPatch,
+            (SemVersionStyles)int.MaxValue,
+        };
 
         public static readonly TheoryData<ParsingTestCase> ParsingTestCases = ExpandTestCases(
             // version numbers given with the link in the spec to a regex for semver versions
@@ -64,6 +73,7 @@ namespace Semver.Test
             // This was given as a valid example, but isn't supported by the semver package because of overflow
             Invalid<OverflowException>("99999999999999999999999.999999999999999999.99999999999999999",
                 MajorMinorOrPatchOverflowMessageFormat, "99999999999999999999999"),
+
             // These are invalid version numbers given with the link in the spec to a regex for semver versions
             Invalid("1", MissingMinorMessage),
             Invalid("1.2", MissingPatchMessage),
@@ -107,6 +117,66 @@ namespace Semver.Test
             Invalid<OverflowException>("99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12",
                 MajorMinorOrPatchOverflowMessageFormat, "99999999999999999999999"),
 
+            // Basic valid versions
+            Valid("1.2.3-a+b", 1, 2, 3, Pre("a"), "b"),
+            Valid("1.2.3-a", 1, 2, 3, Pre("a")),
+            Valid("1.2.3+b", 1, 2, 3, Pre(), "b"),
+            Valid("1.2.3", 1, 2, 3),
+
+            // Valid letter Limits
+            Valid("1.2.3-A-Z.a-z.0-9+A-Z.a-z.0-9", 1, 2, 3, Pre("A-Z", "a-z", "0-9"), "A-Z.a-z.0-9"),
+
+            // Misc valid
+            Valid("1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, Pre("alpha-beta"), "nightly.23.43-bla"),
+            Valid("1.2.45-alpha+nightly.23", 1, 2, 45, Pre("alpha"), "nightly.23"),
+            Valid("3.2.1-beta", 3, 2, 1, Pre("beta")),
+            Valid("2.0.0+nightly.23.43-bla", 2, 0, 0, Pre(), "nightly.23.43-bla"),
+            Valid("5.6.7", 5, 6, 7),
+
+            // Valid unusual versions
+            Valid("1.0.0--ci.1", 1, 0, 0, Pre("-ci", 1)),
+            Valid("1.0.0-0A", 1, 0, 0, Pre("0A")),
+
+            // Dash in strange place
+            Valid("1.2.3--+b", 1, 2, 3, Pre("-"), "b"),
+            Valid("1.2.3---+b", 1, 2, 3, Pre("--"), "b"),
+            Valid("1.2.3---", 1, 2, 3, Pre("--")),
+            Valid("1.2.3-a+-", 1, 2, 3, Pre("a"), "-"),
+            Valid("1.2.3-a+--", 1, 2, 3, Pre("a"), "--"),
+            Valid("1.2.3--a+b", 1, 2, 3, Pre("-a"), "b"),
+            Valid("1.2.3--1+b", 1, 2, 3, Pre("-1"), "b"),
+            Valid("1.2.3---a+b", 1, 2, 3, Pre("--a"), "b"),
+            Valid("1.2.3---1+b", 1, 2, 3, Pre("--1"), "b"),
+            Valid("1.2.3-a+-b", 1, 2, 3, Pre("a"), "-b"),
+            Valid("1.2.3-a+--b", 1, 2, 3, Pre("a"), "--b"),
+            Valid("1.2.3-a-+b", 1, 2, 3, Pre("a-"), "b"),
+            Valid("1.2.3-1-+b", 1, 2, 3, Pre("1-"), "b"),
+            Valid("1.2.3-a--+b", 1, 2, 3, Pre("a--"), "b"),
+            Valid("1.2.3-1--+b", 1, 2, 3, Pre("1--"), "b"),
+            Valid("1.2.3-a+b-", 1, 2, 3, Pre("a"), "b-"),
+            Valid("1.2.3-a+b--", 1, 2, 3, Pre("a"), "b--"),
+            Valid("1.2.3--.a+b", 1, 2, 3, Pre("-", "a"), "b"),
+            Valid("1.2.3-a+-.b", 1, 2, 3, Pre("a"), "-.b"),
+            Valid("1.2.3-a.-+b", 1, 2, 3, Pre("a", "-"), "b"),
+            Valid("1.2.3-a.-.c+b", 1, 2, 3, Pre("a", "-", "c"), "b"),
+            Valid("1.2.3-a+b.-", 1, 2, 3, Pre("a"), "b.-"),
+            Valid("1.2.3-a+b.-.c", 1, 2, 3, Pre("a"), "b.-.c"),
+
+            // Missing patch number, but otherwise valid
+            Valid("1.6-zeta.5+nightly.23.43-bla", OptionalPatch, 1, 6, 0, Pre("zeta", "5"), "nightly.23.43-bla"),
+            Valid("2.0+nightly.23.43-bla", OptionalPatch, 2, 0, 0, Pre(), "nightly.23.43-bla"),
+            Valid("2.1-alpha", OptionalPatch, 2, 1, 0, Pre("alpha")),
+            Valid("5.6+nightly.23.43-bla", OptionalPatch, 5, 6, 0, Pre(), "nightly.23.43-bla"),
+            Valid("3.2", OptionalPatch, 3, 2),
+            Valid("1.3", OptionalPatch, 1, 3),
+            Valid("1.3-alpha", OptionalPatch, 1, 3, 0, Pre("alpha")),
+            Valid("1.3+build", OptionalPatch, 1, 3, 0, Pre(), "build"),
+
+            // Missing minor and patch number, but otherwise valid
+            Valid("1-beta+dev.123", OptionalMinorPatch, 1, 0, 0, Pre("beta"), "dev.123"),
+            Valid("7-rc.1", OptionalMinorPatch, 7, 0, 0, Pre("rc", 1)),
+            Valid("6+sha.a3456b", OptionalMinorPatch, 6, 0, 0, Pre(), "sha.a3456b"),
+            Valid("64", OptionalMinorPatch, 64),
 
             Invalid<ArgumentNullException>(null, "Value cannot be null.\r\nParameter name: version"));
 
@@ -114,6 +184,15 @@ namespace Semver.Test
         public void CanConstructParsingTestCases()
         {
             _ = ParsingTestCases;
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidSemVersionStyles))]
+        public void ParseWithInvalidStyle(SemVersionStyles styles)
+        {
+            var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse("ignored", styles));
+
+            Assert.Equal(InvalidSemVersionStylesMessage, ex.Message);
         }
 
         [Theory]
@@ -135,6 +214,15 @@ namespace Semver.Test
 
                 Assert.Equal(testCase.ExceptionMessage, ex.Message);
             }
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidSemVersionStyles))]
+        public void TryParseWithInvalidStyle(SemVersionStyles styles)
+        {
+            var ex = Assert.Throws<ArgumentException>(() => SemVersion.TryParse("ignored", styles, out _));
+
+            Assert.Equal(InvalidSemVersionStylesMessage, ex.Message);
         }
 
         [Theory]
@@ -177,10 +265,19 @@ namespace Semver.Test
             var theoryData = new TheoryData<ParsingTestCase>();
 
             foreach (var testCase in testCases)
-            {
                 theoryData.Add(testCase);
-                // TODO construct cases for other styles
-            }
+
+            // Versions needing optional patch should error if that is taken away
+            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(OptionalPatch) && !c.Styles.HasStyle(OptionalMinorPatch)))
+                theoryData.Add(Invalid<FormatException>(testCase.Version,
+                    testCase.Styles & ~OptionalPatch, MissingPatchMessage));
+
+            // Versions needing optional minor should error if that is taken away
+            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(OptionalMinorPatch)))
+                theoryData.Add(Invalid<FormatException>(testCase.Version,
+                    testCase.Styles & ~OptionalMinorPatch, MissingMinorMessage));
+
+            // TODO construct cases for other styles
 
             return theoryData;
         }
@@ -207,7 +304,7 @@ namespace Semver.Test
             IEnumerable<PrereleaseIdentifier> prerelease = null,
             string metadata = "")
         {
-            return ParsingTestCase.Valid(version, SemVersionStyles.SemVer2, major, minor, patch,
+            return ParsingTestCase.Valid(version, SemVer2, major, minor, patch,
             prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
             metadata.SplitExceptEmpty('.'));
         }
@@ -230,14 +327,16 @@ namespace Semver.Test
             where T : Exception
         {
             exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
-            return ParsingTestCase.Invalid(version, SemVersionStyles.SemVer2, typeof(T), exceptionMessage);
+            return ParsingTestCase.Invalid(version, SemVer2, typeof(T), exceptionMessage);
         }
 
-        private static ParsingTestCase Invalid(string version, string exceptionMessage = "",
+        private static ParsingTestCase Invalid(
+            string version,
+            string exceptionMessage = "",
             string exceptionValue = null)
         {
             exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
-            return ParsingTestCase.Invalid(version, SemVersionStyles.SemVer2, typeof(FormatException), exceptionMessage);
+            return ParsingTestCase.Invalid(version, SemVer2, typeof(FormatException), exceptionMessage);
         }
 
         public static IEnumerable<PrereleaseIdentifier> Pre(params TestPrereleaseIdentifier[] identifiers)
