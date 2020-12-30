@@ -212,6 +212,11 @@ namespace Semver.Test
             Invalid("1.2.3.0+build", FourthVersionNumberMessage),
             Invalid("1.2.3.0-beta+b23", FourthVersionNumberMessage),
 
+            // Ends in dot after number
+            Invalid("1.2.3.", InvalidCharacterInMajorMinorOrPatchMessage, "."),
+            Invalid("1.2.", OptionalPatch, MissingMajorMinorOrPatchMessage),
+            Invalid("1.", OptionalMinorPatch, MissingMajorMinorOrPatchMessage),
+
             // Missing major version
             Invalid("ui-2.1-alpha", MissingMajorMinorOrPatchMessage),
 
@@ -456,6 +461,16 @@ namespace Semver.Test
         {
             exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
             return ParsingTestCase.Invalid(version, requiredStyles, typeof(T), exceptionMessage);
+        }
+
+        private static ParsingTestCase Invalid(
+            string version,
+            SemVersionStyles requiredStyles,
+            string exceptionMessage = "",
+            string exceptionValue = null)
+        {
+            exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
+            return ParsingTestCase.Invalid(version, requiredStyles, typeof(FormatException), exceptionMessage);
         }
 
         private static ParsingTestCase Invalid<T>(

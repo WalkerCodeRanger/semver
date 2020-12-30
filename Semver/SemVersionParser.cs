@@ -159,16 +159,13 @@ namespace Semver
             else
                 metadataIdentifiers = new List<string>();
 
-            // Skip trailing whitespace
-            var startTrailingWhitespace = i;
-            while (i < version.Length && char.IsWhiteSpace(version, i)) i += 1;
+            // Find length without trailing whitespace (needed in case there is whitespace in the middle)
+            var length = version.Length - 1;
+            while (length > 0 && char.IsWhiteSpace(version, length)) length -= 1;
+            length += 1; // add back length for non-whitespace
 
-            // Error if leading whitespace not allowed
-            if (i != startTrailingWhitespace && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
-                return ex ?? NewFormatException(TrailingWhitespaceMessage, version);
-
-            // Deal with unprocessed characters
-            if (i != version.Length)
+            // There are invalid characters before the trailing whitespace
+            if (i < length)
             {
                 if (ex != null) return ex;
                 var invalidChar = version[i];
@@ -181,6 +178,14 @@ namespace Semver
 
                 return NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version, invalidChar);
             }
+
+            // Error if trailing whitespace not allowed
+            if (length != version.Length && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
+                return ex ?? NewFormatException(TrailingWhitespaceMessage, version);
+
+            // There shouldn't be any unprocessed characters
+            if (i != length)
+                throw new InvalidOperationException($"Error parsing '{version}'");
 
             semver = new SemVersion(major, minor, patch,
                 new ReadOnlyCollection<PrereleaseIdentifier>(prereleaseIdentifiers),
@@ -332,12 +337,6 @@ namespace Semver
         private static FormatException NewFormatException(string messageTemplate, string version)
         {
             return new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, version));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static FormatException NewFormatException(string messageTemplate, string version, string value)
-        {
-            return new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, version, value));
         }
 
         /// <remarks>This overload avoids issues with culture when trying to convert the char to a
