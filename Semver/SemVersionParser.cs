@@ -33,6 +33,8 @@ namespace Semver
         private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'";
         private const string InvalidCharacterInMajorMinorOrPatchMessage = "{1} version contains invalid character '{2}' in '{0}'";
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'";
+        private const string MultiplePrereleaseIdentifiersMessage = "Multiple prerelease identifiers are not allow in '{0}'";
+        private const string BuildMetadataMessage = "Build metadata is not allowed in '{0}'";
 
         /// <summary>
         /// The internal method that all parsing is based on. Because this is called by both
@@ -139,9 +141,8 @@ namespace Semver
                 prereleaseIdentifiers = new List<PrereleaseIdentifier>();
 
             // Parse metadata
-            var allowMetadata = !style.HasStyle(SemVersionStyles.DisallowMetadata);
             List<string> metadataIdentifiers;
-            if (allowMetadata && i < version.Length && version[i] == '+')
+            if (i < version.Length && version[i] == '+')
             {
                 i += 1;
                 parseEx = ParseMetadata(version, ref i, startOfTrailingWhitespace, ex, out metadataIdentifiers);
@@ -149,6 +150,9 @@ namespace Semver
             }
             else
                 metadataIdentifiers = new List<string>();
+
+            if (style.HasStyle(SemVersionStyles.DisallowMetadata) && metadataIdentifiers.Count > 0)
+                return ex ?? NewFormatException(BuildMetadataMessage, version);
 
             // There are invalid characters before the trailing whitespace
             if (i < startOfTrailingWhitespace)
@@ -305,7 +309,7 @@ namespace Semver
                     var c = version[i];
                     if (c.IsAlphaOrHyphen())
                         isNumeric = false;
-                    else if (c=='.' || c =='+')
+                    else if (c == '.' || c == '+')
                         break;
                     else if (!c.IsDigit())
                         return ex ?? NewFormatException(InvalidCharacterInPrereleaseMessage, version, c);
@@ -334,6 +338,9 @@ namespace Semver
                 }
 
             } while (i < startOfNext && version[i] == '.' && allowMultiplePrereleaseIdentifiers);
+
+            if (!allowMultiplePrereleaseIdentifiers && i < startOfNext && version[i] == '.')
+                return ex ?? NewFormatException(MultiplePrereleaseIdentifiersMessage, version);
 
             return null;
         }

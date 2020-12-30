@@ -41,6 +41,8 @@ namespace Semver.Test
         private const string InvalidCharacterInMinorMessage = "Minor version contains invalid character '{1}' in '{0}'";
         private const string InvalidCharacterInPatchMessage = "Patch version contains invalid character '{1}' in '{0}'";
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'";
+        private const string MultiplePrereleaseIdentifiersMessage = "Multiple prerelease identifiers are not allow in '{0}'";
+        private const string BuildMetadataMessage = "Build metadata is not allowed in '{0}'";
 
         public static readonly TheoryData<SemVersionStyles> InvalidSemVersionStyles = new TheoryData<SemVersionStyles>()
         {
@@ -120,7 +122,6 @@ namespace Semver.Test
             Invalid("01.1.1", LeadingZeroInMajorMessage),
             Invalid("1.01.1", LeadingZeroInMinorMessage),
             Invalid("1.1.01", LeadingZeroInPatchMessage),
-            Invalid("1.2", MissingPatchMessage),
             Invalid("1.2.3.DEV", PrereleasePrefixedByDotMessage),
             Invalid("1.2-SNAPSHOT", MissingPatchMessage),
             Invalid("1.2.31.2.3----RC-SNAPSHOT.12.09.1--..12+788", FourthVersionNumberMessage),
@@ -137,7 +138,7 @@ namespace Semver.Test
             Valid("1.2.3-a+b", 1, 2, 3, Pre("a"), "b"),
             Valid("1.2.3-a", 1, 2, 3, Pre("a")),
             Valid("1.2.3+b", 1, 2, 3, Pre(), "b"),
-            Valid("1.2.3", 1, 2, 3),
+            Valid("4.5.6", 4, 5, 6),
 
             // Valid letter Limits
             Valid("1.2.3-A-Z.a-z.0-9+A-Z.a-z.0-9", 1, 2, 3, Pre("A-Z", "a-z", "0-9"), "A-Z.a-z.0-9"),
@@ -242,20 +243,20 @@ namespace Semver.Test
             Invalid("\t", AllWhitespaceVersionMessage),
 
             // Leading 'v', but otherwise valid
-            Valid("v1.2.3", AllowLowerV, 1, 2, 3),
-            Valid("V1.2.3", AllowUpperV, 1, 2, 3),
+            Valid("v14.5.6", AllowLowerV, 14, 5, 6),
+            Valid("V14.5.6", AllowUpperV, 14, 5, 6),
 
             // Leading whitespace, but otherwise valid
-            Valid(" 1.2.3", AllowLeadingWhitespace, 1, 2, 3),
-            Valid("\t1.2.3", AllowLeadingWhitespace, 1, 2, 3),
+            Valid(" 12.2.3", AllowLeadingWhitespace, 12, 2, 3),
+            Valid("\t12.2.3", AllowLeadingWhitespace, 12, 2, 3),
 
             // Trailing whitespace, but otherwise valid
-            Valid("1.2.3 ", AllowTrailingWhitespace, 1, 2, 3),
-            Valid("1.2.3\t", AllowTrailingWhitespace, 1, 2, 3),
-            Valid("1.2.3-a ", AllowTrailingWhitespace, 1, 2, 3, Pre("a")),
-            Valid("1.2.3-a\t", AllowTrailingWhitespace, 1, 2, 3, Pre("a")),
-            Valid("1.2.3+b ", AllowTrailingWhitespace, 1, 2, 3, Pre(), "b"),
-            Valid("1.2.3+b\t", AllowTrailingWhitespace, 1, 2, 3, Pre(), "b"),
+            Valid("11.2.3 ", AllowTrailingWhitespace, 11, 2, 3),
+            Valid("11.2.3\t", AllowTrailingWhitespace, 11, 2, 3),
+            Valid("11.2.3-a ", AllowTrailingWhitespace, 11, 2, 3, Pre("a")),
+            Valid("11.2.3-a\t", AllowTrailingWhitespace, 11, 2, 3, Pre("a")),
+            Valid("11.2.3+b ", AllowTrailingWhitespace, 11, 2, 3, Pre(), "b"),
+            Valid("11.2.3+b\t", AllowTrailingWhitespace, 11, 2, 3, Pre(), "b"),
 
             // Whitespace in middle
             Invalid("1 .2.3-alpha+build", InvalidCharacterInMajorMessage, " "),
@@ -306,6 +307,9 @@ namespace Semver.Test
             Invalid("1.2.3+b.", MissingMetadataIdentifierMessage),
             Invalid("1.2.3+b..b", MissingMetadataIdentifierMessage),
 
+            // Multiple prerelease identifiers (important for constructing disallow prerelease identifiers)
+            Valid("1.2.3-alpha.beta.gamma", 1, 2, 3, Pre("alpha", "beta", "gamma")),
+
             // Some long versions to test parsing big version number (parameter is random seed)
             ValidLongVersion(21575113),
             ValidLongVersion(23),
@@ -321,7 +325,18 @@ namespace Semver.Test
         public void CanConstructParsingTestCases()
         {
             // Also checks that ToString() doesn't throw an exception
-            _ = ParsingTestCases.Select(t => t.ToString()).ToList();
+            _ = ParsingTestCases.Select(t => t[0].ToString()).ToList();
+        }
+
+        [Fact]
+        public void NoDuplicateParsingTestCases()
+        {
+            var duplicates = ParsingTestCases
+                             .Select(data => data[0]).Cast<ParsingTestCase>()
+                             .GroupBy(c => (c.Version, c.Styles), (k, g) => g.ToList())
+                             .Where(g => g.Count > 1)
+                             .Select(g => g.First()).ToList();
+            Assert.Empty(duplicates);
         }
 
         [Theory]
@@ -419,7 +434,10 @@ namespace Semver.Test
             foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowLeadingZeros)))
             {
                 // Determine whether the error should be about leading zeros in major, minor, or patch
-                var expectedVersion = SemVersion.Parse(testCase.Version, testCase.Styles).ToString();
+                if (!SemVersion.TryParse(testCase.Version, testCase.Styles, out var expectedSemVersion))
+                    continue;
+
+                var expectedVersion = expectedSemVersion.ToString();
                 var expectedMajorMinorPatch = expectedVersion.Split('-')[0];
                 var actualMajorMinorPatch = testCase.Version.Split('-')[0];
                 var leadingZeroInMajorMinorPatch = expectedMajorMinorPatch != actualMajorMinorPatch;
@@ -462,6 +480,35 @@ namespace Semver.Test
                 testCases.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~AllowTrailingWhitespace, TrailingWhitespaceMessage));
 
+            // Construct cases for disallow multiple prerelease identifiers
+            foreach (var testCase in validTestCases)
+            {
+                if (!SemVersion.TryParse(testCase.Version, out var version))
+                    continue;
+
+                if (version.PrereleaseIdentifiers.Count <= 1)
+                    testCases.Add(testCase.Change(styles: testCase.Styles | DisallowMultiplePrereleaseIdentifiers));
+                else
+                    testCases.Add(Invalid(testCase.Version,
+                        testCase.Styles | DisallowMultiplePrereleaseIdentifiers, MultiplePrereleaseIdentifiersMessage));
+            }
+
+            // The validTestCases list is now out of date
+            validTestCases = testCases.Where(c => c.IsValid).ToList();
+
+            // Construct cases for disallow metadata
+            foreach (var testCase in validTestCases)
+            {
+                if (!SemVersion.TryParse(testCase.Version, out var version))
+                    continue;
+
+                if (version.MetadataIdentifiers.Count == 0)
+                    testCases.Add(testCase.Change(styles: testCase.Styles | DisallowMetadata));
+                else
+                    testCases.Add(Invalid(testCase.Version,
+                        testCase.Styles | DisallowMetadata, BuildMetadataMessage));
+            }
+
             // Construct cases with leading 'v' and 'V' added
             foreach (var testCase in testCases.Where(CanBePrefixedWithV).ToList())
             {
@@ -478,11 +525,9 @@ namespace Semver.Test
             // Construct cases with trailing whitespace added
             foreach (var testCase in testCases.Where(c => !c.Styles.HasStyle(AllowTrailingWhitespace)
                                                           && !string.IsNullOrWhiteSpace(c.Version)
-                                                          && !c.Version.EndsWith(".", StringComparison.Ordinal)
+                                                          && !c.Version.EndsWith(".", StringComparison.Ordinal) // TODO remove this
                                                           && c.ExceptionMessageFormat != TrailingWhitespaceMessage).ToList())
                 testCases.Add(testCase.Change(testCase.Version + " ", testCase.Styles | AllowTrailingWhitespace));
-
-            // TODO construct cases for other styles
 
             var theoryData = new TheoryData<ParsingTestCase>();
             foreach (var testCase in testCases)
@@ -492,9 +537,6 @@ namespace Semver.Test
 
         private static bool CanBePrefixedWithV(ParsingTestCase c)
         {
-            //if (c.Styles.HasStyle(AllowLowerV) ||c.Styles.HasStyle(AllowUpperV))
-            //    return false;
-
             if (string.IsNullOrWhiteSpace(c.Version)) return false;
 
             if (c.Version.StartsWith("v", StringComparison.Ordinal)
