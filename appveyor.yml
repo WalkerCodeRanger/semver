@@ -10,6 +10,7 @@ init:
 - ps: |
     git config --global core.autocrlf true
     Write-Host "Appveyor build version: $env:APPVEYOR_BUILD_VERSION"
+    $version = $env:APPVEYOR_BUILD_VERSION
     $env:GIT_HASH=$env:APPVEYOR_REPO_COMMIT.Substring(0, 10)
     Write-Host "Git commit hash: $env:GIT_HASH"
     If ($env:APPVEYOR_REPO_TAG -and ($env:APPVEYOR_REPO_TAG_NAME -match "^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"))
