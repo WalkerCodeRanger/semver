@@ -9,6 +9,9 @@ using static Semver.SemVersionStyles;
 
 namespace Semver.Test
 {
+    /// <summary>
+    /// Tests of the parsing related methods of <see cref="SemVersion"/>.
+    /// </summary>
     public class SemVersionParsingTests
     {
         private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.\r\nParameter name: style";

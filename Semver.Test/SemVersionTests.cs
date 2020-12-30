@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 #if !NETSTANDARD
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -26,8 +27,8 @@ namespace Semver.Test
             Assert.Equal(0, v.Minor);
             Assert.Equal(0, v.Patch);
             Assert.Equal("", v.Prerelease);
-            Assert.Equal("", v.Metadata);
             Assert.Empty(v.PrereleaseIdentifiers);
+            Assert.Equal("", v.Metadata);
             Assert.Empty(v.MetadataIdentifiers);
         }
 
@@ -69,17 +70,17 @@ namespace Semver.Test
         [InlineData(1, 2, 3, null, "b")]
         [InlineData(1, 2, 3, null, null)]
         // Negative version numbers
-        // TODO these should be invalid and throw argument exceptions (issue#41)
+        // TODO Negative versions should be invalid and throw argument exceptions (issue#41)
         [InlineData(-1, 0, 0, "", "")]
         [InlineData(0, -1, 0, "", "")]
         [InlineData(0, 0, -1, "", "")]
         [InlineData(-1, -1, -1, "", "")]
         // Illegal characters
-        // TODO Illegal characters be invalid and throw argument exceptions (issue#41)
+        // TODO Illegal characters should be invalid and throw argument exceptions (issue#41)
         [InlineData(1, 2, 3, "😞", "b")]
         [InlineData(1, 2, 3, "a", "😞")]
         // Leading Zeros in Prerelease
-        // TODO Leading zeros in prerelease be invalid and throw argument exceptions (issue#41)
+        // TODO Leading zeros in prerelease should be invalid and throw argument exceptions (issue#41)
         [InlineData(1, 2, 3, "01", "b")]
         [InlineData(1, 2, 3, "a.01", "b")]
         [InlineData(1, 2, 3, "a.01.c", "b")]
@@ -115,7 +116,15 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(patch, v.Patch);
             Assert.Equal(prerelease ?? "", v.Prerelease);
+#pragma warning disable CS0612 // Type or member is obsolete
+            var expectedPrereleaseIdentifiers =
+                (prerelease?.SplitExceptEmpty('.') ?? Enumerable.Empty<string>())
+                            .Select(PrereleaseIdentifier.CreateLoose);
+#pragma warning restore CS0612 // Type or member is obsolete
+            Assert.Equal(expectedPrereleaseIdentifiers, v.PrereleaseIdentifiers);
             Assert.Equal(metadata ?? "", v.Metadata);
+            var expectedMetadataIdentifiers = metadata?.SplitExceptEmpty('.') ?? Enumerable.Empty<string>();
+            Assert.Equal(expectedMetadataIdentifiers, v.MetadataIdentifiers);
         }
         #endregion
 
@@ -169,7 +178,18 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(revision, v.Patch);
             Assert.Equal("", v.Prerelease);
-            Assert.Equal(build > 0 ? build.ToString(CultureInfo.InvariantCulture) : "", v.Metadata);
+            Assert.Empty(v.PrereleaseIdentifiers);
+            if (build > 0)
+            {
+                var metadata = build.ToString(CultureInfo.InvariantCulture);
+                Assert.Equal(metadata, v.Metadata);
+                Assert.Equal(new[] { metadata }, v.MetadataIdentifiers);
+            }
+            else
+            {
+                Assert.Equal("", v.Metadata);
+                Assert.Empty(v.MetadataIdentifiers);
+            }
         }
 
         [Theory]
@@ -189,7 +209,18 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(0, v.Patch);
             Assert.Equal("", v.Prerelease);
-            Assert.Equal(build > 0 ? build.ToString(CultureInfo.InvariantCulture) : "", v.Metadata);
+            Assert.Empty(v.PrereleaseIdentifiers);
+            if (build > 0)
+            {
+                var metadata = build.ToString(CultureInfo.InvariantCulture);
+                Assert.Equal(metadata, v.Metadata);
+                Assert.Equal(new[] { metadata }, v.MetadataIdentifiers);
+            }
+            else
+            {
+                Assert.Equal("", v.Metadata);
+                Assert.Empty(v.MetadataIdentifiers);
+            }
         }
 
         [Theory]
@@ -208,7 +239,9 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(0, v.Patch);
             Assert.Equal("", v.Prerelease);
+            Assert.Empty(v.PrereleaseIdentifiers);
             Assert.Equal("", v.Metadata);
+            Assert.Empty(v.MetadataIdentifiers);
         }
 
         [Fact]
@@ -236,7 +269,9 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(build, v.Patch);
             Assert.Equal("", v.Prerelease);
+            Assert.Empty(v.PrereleaseIdentifiers);
             Assert.Equal("", v.Metadata);
+            Assert.Empty(v.MetadataIdentifiers);
         }
 
         [Theory]
@@ -267,7 +302,9 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(build, v.Patch);
             Assert.Equal("", v.Prerelease);
+            Assert.Empty(v.PrereleaseIdentifiers);
             Assert.Equal("", v.Metadata);
+            Assert.Empty(v.MetadataIdentifiers);
         }
 
         [Theory]
@@ -285,7 +322,9 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(0, v.Patch);
             Assert.Equal("", v.Prerelease);
+            Assert.Empty(v.PrereleaseIdentifiers);
             Assert.Equal("", v.Metadata);
+            Assert.Empty(v.MetadataIdentifiers);
         }
 
         [Fact]

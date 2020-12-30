@@ -112,8 +112,18 @@ namespace Semver
                 Patch = version.Revision;
 
             Prerelease = "";
+            PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
 
-            Metadata = version.Build > 0 ? version.Build.ToString(CultureInfo.InvariantCulture) : "";
+            if (version.Build > 0)
+            {
+                Metadata = version.Build.ToString(CultureInfo.InvariantCulture);
+                MetadataIdentifiers = new ReadOnlyCollection<string>(new List<string>(1) { Metadata });
+            }
+            else
+            {
+                Metadata = "";
+                MetadataIdentifiers = ReadOnlyList<string>.Empty;
+            }
         }
 
         /// <summary>
