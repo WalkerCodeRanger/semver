@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace Semver.Test
@@ -40,13 +39,45 @@ namespace Semver.Test
             MetadataIdentifiers = metadataIdentifiers.ToList().AsReadOnly();
         }
 
-        private ParsingTestCase(string version, SemVersionStyles styles, Type exceptionType, string exceptionMessage)
+        private ParsingTestCase(string version, SemVersionStyles styles, Type exceptionType, string exceptionMessageFormat)
         {
             Version = version;
             Styles = styles;
             IsValid = false;
             ExceptionType = exceptionType;
-            ExceptionMessage = string.Format(CultureInfo.InvariantCulture, exceptionMessage, version);
+            ExceptionMessageFormat = exceptionMessageFormat;
+        }
+
+        private ParsingTestCase(
+            bool isValid,
+            string version,
+            SemVersionStyles requiredStyles,
+            int major,
+            int minor,
+            int patch,
+            IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
+            IReadOnlyList<string> metadataIdentifiers,
+            Type exceptionType,
+            string exceptionMessageFormat)
+        {
+            IsValid = isValid;
+            Version = version;
+            Styles = requiredStyles;
+            Major = major;
+            Minor = minor;
+            Patch = patch;
+            PrereleaseIdentifiers = prereleaseIdentifiers;
+            MetadataIdentifiers = metadataIdentifiers;
+            ExceptionType = exceptionType;
+            ExceptionMessageFormat = exceptionMessageFormat;
+        }
+
+        public ParsingTestCase Change(string version = null, SemVersionStyles? styles = null)
+        {
+            return new ParsingTestCase(this.IsValid, version  ?? this.Version, styles ?? this.Styles,
+                this.Major, this.Minor, this.Patch,
+                this.PrereleaseIdentifiers, this.MetadataIdentifiers,
+                this.ExceptionType, this.ExceptionMessageFormat);
         }
 
         public string Version { get; }
@@ -64,7 +95,7 @@ namespace Semver.Test
 
         #region Invalid Values
         public Type ExceptionType { get; }
-        public string ExceptionMessage { get; }
+        public string ExceptionMessageFormat { get; }
         #endregion
 
         public override string ToString()

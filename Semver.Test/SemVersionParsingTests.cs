@@ -350,7 +350,8 @@ namespace Semver.Test
                 var ex = Assert.Throws(testCase.ExceptionType,
                     () => SemVersion.Parse(testCase.Version, testCase.Styles));
 
-                Assert.Equal(testCase.ExceptionMessage, ex.Message);
+                Assert.Equal(string.Format(CultureInfo.InvariantCulture, testCase.ExceptionMessageFormat, testCase.Version),
+                    ex.Message);
             }
         }
 
@@ -398,25 +399,24 @@ namespace Semver.Test
 #pragma warning restore 618
         }
 
-        private static TheoryData<ParsingTestCase> ExpandTestCases(params ParsingTestCase[] testCases)
+        private static TheoryData<ParsingTestCase> ExpandTestCases(params ParsingTestCase[] testCaseParams)
         {
-            var theoryData = new TheoryData<ParsingTestCase>();
-
-            foreach (var testCase in testCases)
-                theoryData.Add(testCase);
+            var testCases = testCaseParams.ToList();
+            var validTestCases = testCases.Where(c => c.IsValid).ToList();
 
             // Versions needing optional patch should error if that is taken away
-            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(OptionalPatch) && !c.Styles.HasStyle(OptionalMinorPatch)))
-                theoryData.Add(Invalid<FormatException>(testCase.Version,
+            foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(OptionalPatch)
+                                                               && !c.Styles.HasStyle(OptionalMinorPatch)))
+                testCases.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~OptionalPatch, MissingPatchMessage));
 
             // Versions needing optional minor should error if that is taken away
-            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(OptionalMinorPatch)))
-                theoryData.Add(Invalid<FormatException>(testCase.Version,
+            foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(OptionalMinorPatch)))
+                testCases.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~OptionalMinorPatch, MissingMinorMessage));
 
             // Versions needing leading zeros should error if that is taken away
-            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(AllowLeadingZeros)))
+            foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowLeadingZeros)))
             {
                 // Determine whether the error should be about leading zeros in major, minor, or patch
                 var expectedVersion = SemVersion.Parse(testCase.Version, testCase.Styles).ToString();
@@ -437,33 +437,73 @@ namespace Semver.Test
                 }
                 else
                     message = LeadingZeroInPrereleaseMessage;
-                theoryData.Add(Invalid<FormatException>(testCase.Version,
+
+                testCases.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~AllowLeadingZeros, message));
             }
 
             // Versions needing allow leading lower v should error if that is taken away
-            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(AllowLowerV)))
-                theoryData.Add(Invalid<FormatException>(testCase.Version,
+            foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowLowerV)))
+                testCases.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~AllowLowerV, LeadingLowerVMessage));
 
             // Versions needing allow leading upper v should error if that is taken away
-            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(AllowUpperV)))
-                theoryData.Add(Invalid<FormatException>(testCase.Version,
+            foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowUpperV)))
+                testCases.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~AllowUpperV, LeadingUpperVMessage));
 
             // Versions needing allow leading whitespace should error if that is taken away
-            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(AllowLeadingWhitespace)))
-                theoryData.Add(Invalid<FormatException>(testCase.Version,
+            foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowLeadingWhitespace)))
+                testCases.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~AllowLeadingWhitespace, LeadingWhitespaceMessage));
 
             // Versions needing allow trailing whitespace should error if that is taken away
-            foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(AllowTrailingWhitespace)))
-                theoryData.Add(Invalid<FormatException>(testCase.Version,
+            foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowTrailingWhitespace)))
+                testCases.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~AllowTrailingWhitespace, TrailingWhitespaceMessage));
+
+            // Construct cases with leading 'v' and 'V' added
+            foreach (var testCase in testCases.Where(CanBePrefixedWithV).ToList())
+            {
+                testCases.Add(testCase.Change("v" + testCase.Version, testCase.Styles | AllowLowerV));
+                testCases.Add(testCase.Change("V" + testCase.Version, testCase.Styles | AllowUpperV));
+            }
+
+            // Construct cases with leading whitespace added
+            foreach (var testCase in testCases.Where(c => !c.Styles.HasStyle(AllowLeadingWhitespace)
+                                                          && !string.IsNullOrWhiteSpace(c.Version)
+                                                          && c.ExceptionMessageFormat != LeadingWhitespaceMessage).ToList())
+                testCases.Add(testCase.Change(" " + testCase.Version, testCase.Styles | AllowLeadingWhitespace));
+
+            // Construct cases with trailing whitespace added
+            foreach (var testCase in testCases.Where(c => !c.Styles.HasStyle(AllowTrailingWhitespace)
+                                                          && !string.IsNullOrWhiteSpace(c.Version)
+                                                          && !c.Version.EndsWith(".", StringComparison.Ordinal)
+                                                          && c.ExceptionMessageFormat != TrailingWhitespaceMessage).ToList())
+                testCases.Add(testCase.Change(testCase.Version + " ", testCase.Styles | AllowTrailingWhitespace));
 
             // TODO construct cases for other styles
 
+            var theoryData = new TheoryData<ParsingTestCase>();
+            foreach (var testCase in testCases)
+                theoryData.Add(testCase);
             return theoryData;
+        }
+
+        private static bool CanBePrefixedWithV(ParsingTestCase c)
+        {
+            //if (c.Styles.HasStyle(AllowLowerV) ||c.Styles.HasStyle(AllowUpperV))
+            //    return false;
+
+            if (string.IsNullOrWhiteSpace(c.Version)) return false;
+
+            if (c.Version.StartsWith("v", StringComparison.Ordinal)
+                || c.Version.StartsWith("V", StringComparison.Ordinal)
+                || c.Version.StartsWith(" ", StringComparison.Ordinal)
+                || c.Version.StartsWith("\t", StringComparison.Ordinal))
+                return false;
+
+            return true;
         }
 
         private static ParsingTestCase Valid(
