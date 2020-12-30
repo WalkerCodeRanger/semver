@@ -81,9 +81,10 @@ namespace Semver
 
             Prerelease = prerelease ?? "";
             PrereleaseIdentifiers = new ReadOnlyCollection<PrereleaseIdentifier>(
-                Prerelease.SplitExceptEmpty('.').Select(identifier => int.TryParse(identifier, NumberStyles.None, null, out var intValue)
-                    ? new PrereleaseIdentifier(identifier, intValue)
-                    : new PrereleaseIdentifier(identifier, null)).ToList());
+                Prerelease.SplitExceptEmpty('.')
+#pragma warning disable CS0612 // Type or member is obsolete
+                          .Select(PrereleaseIdentifier.CreateLoose).ToList());
+#pragma warning restore CS0612 // Type or member is obsolete
             Metadata = build ?? "";
             MetadataIdentifiers = new ReadOnlyCollection<string>(Metadata.SplitExceptEmpty('.').ToList());
         }

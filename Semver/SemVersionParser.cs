@@ -308,7 +308,7 @@ namespace Semver
 
                 var identifier = version.Substring(s, i - s);
                 if (!isNumeric)
-                    prereleaseIdentifiers.Add(new PrereleaseIdentifier(identifier, null));
+                    prereleaseIdentifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, null));
                 else
                 {
                     if (!allowLeadingZero && version[s] == '0')
@@ -319,7 +319,7 @@ namespace Semver
                         // possible issue is a numeric overflow for `int`
                         return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture, PrereleaseOverflowMessage, version, identifier));
 
-                    prereleaseIdentifiers.Add(new PrereleaseIdentifier(identifier.TrimStart('0'), intValue));
+                    prereleaseIdentifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier.TrimStart('0'), intValue));
                 }
 
             } while (i < startOfNext && version[i] == '.' && allowMultiplePrereleaseIdentifiers);
@@ -358,7 +358,7 @@ namespace Semver
                     return ex ?? NewFormatException(MissingMetadataIdentifierMessage, version);
 
                 var identifier = version.Substring(s, i - s);
-                metadataIdentifiers.Add(new PrereleaseIdentifier(identifier, null));
+                metadataIdentifiers.Add(identifier);
 
             } while (i < startOfNext && version[i] == '.');
 

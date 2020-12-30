@@ -611,7 +611,7 @@ namespace Semver.Test
             if (random.NextBoolean())
             {
                 var value = random.Next();
-                return new PrereleaseIdentifier(value.ToString(CultureInfo.InvariantCulture), value);
+                return new PrereleaseIdentifier(value);
             }
 
             var charCount = random.Next(1, 1_000);
@@ -619,7 +619,7 @@ namespace Semver.Test
             for (int i = 0; i < charCount; i++)
                 identifier.Append(ValidIdentifierChars[random.Next(ValidIdentifierChars.Length)]);
 
-            return new PrereleaseIdentifier(identifier.ToString(), null);
+            return new PrereleaseIdentifier(identifier.ToString());
         }
 
         private static string ValidMetadataIdentifier(Random random)
@@ -629,7 +629,7 @@ namespace Semver.Test
             for (int i = 0; i < charCount; i++)
                 identifier.Append(ValidIdentifierChars[random.Next(ValidIdentifierChars.Length)]);
 
-            return new PrereleaseIdentifier(identifier.ToString(), null);
+            return identifier.ToString();
         }
 
         private static ParsingTestCase Invalid<T>(

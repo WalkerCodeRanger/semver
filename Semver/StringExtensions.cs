@@ -16,5 +16,29 @@ namespace Semver
                 return Enumerable.Empty<string>();
             return parts;
         }
+
+        /// <summary>
+        /// Is this string composed entirely of digits 0 to 9?
+        /// </summary>
+        public static bool IsDigits(this string value)
+        {
+            foreach (var c in value)
+                if (!c.IsDigit())
+                    return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Is this string composed entirely of alphanumeric characters and hyphens?
+        /// </summary>
+        public static bool IsAlphanumericOrHyphens(this string value)
+        {
+            foreach (var c in value)
+                if (!c.IsAlphaOrHyphen() && !c.IsDigit())
+                    return false;
+
+            return true;
+        }
     }
 }

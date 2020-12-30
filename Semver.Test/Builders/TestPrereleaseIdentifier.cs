@@ -30,7 +30,9 @@ namespace Semver.Test.Builders
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Test Builder")]
         public static implicit operator PrereleaseIdentifier(TestPrereleaseIdentifier identifier)
         {
-            return new PrereleaseIdentifier(identifier.Value, identifier.IntValue);
+            if (identifier.IntValue is int intValue) return new PrereleaseIdentifier(intValue);
+
+            return new PrereleaseIdentifier(identifier.Value);
         }
     }
 }
