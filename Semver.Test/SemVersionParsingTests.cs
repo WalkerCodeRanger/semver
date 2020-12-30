@@ -226,6 +226,7 @@ namespace Semver.Test
             Invalid("1.0.0@", InvalidCharacterInPatchMessage, "@"),
             Invalid("1.0.0@.alpha", InvalidCharacterInPatchMessage, "@"),
             Invalid("1.0.0@-alpha", InvalidCharacterInPatchMessage, "@"),
+            Invalid("1.0.0@+build", InvalidCharacterInPatchMessage, "@"),
 
             // Invalid characters in prerelease and metadata
             Invalid("1.2.3-😞+b", InvalidCharacterInPrereleaseMessage, "\ud83d"), // High part of surrogate pair
@@ -251,13 +252,23 @@ namespace Semver.Test
             // Trailing whitespace, but otherwise valid
             Valid("1.2.3 ", AllowTrailingWhitespace, 1, 2, 3),
             Valid("1.2.3\t", AllowTrailingWhitespace, 1, 2, 3),
+            Valid("1.2.3-a ", AllowTrailingWhitespace, 1, 2, 3, Pre("a")),
+            Valid("1.2.3-a\t", AllowTrailingWhitespace, 1, 2, 3, Pre("a")),
+            Valid("1.2.3+b ", AllowTrailingWhitespace, 1, 2, 3, Pre(), "b"),
+            Valid("1.2.3+b\t", AllowTrailingWhitespace, 1, 2, 3, Pre(), "b"),
 
             // Whitespace in middle
-            Invalid("1 .2.3-alpha", InvalidCharacterInMajorMessage, " "),
-            Invalid("1. 2.3-alpha", InvalidCharacterInMinorMessage, " "),
-            Invalid("1.2 .3-alpha", InvalidCharacterInMinorMessage, " "),
-            Invalid("1.2. 3-alpha", InvalidCharacterInPatchMessage, " "),
-            Invalid("1.2.3 -alpha", InvalidCharacterInPatchMessage, " "),
+            Invalid("1 .2.3-alpha+build", InvalidCharacterInMajorMessage, " "),
+            Invalid("1. 2.3-alpha+build", InvalidCharacterInMinorMessage, " "),
+            Invalid("1.2 .3-alpha+build", InvalidCharacterInMinorMessage, " "),
+            Invalid("1.2. 3-alpha+build", InvalidCharacterInPatchMessage, " "),
+            Invalid("1.2.3 -alpha+build", InvalidCharacterInPatchMessage, " "),
+            Invalid("1.2.3- alpha+build", InvalidCharacterInPrereleaseMessage, " "),
+            Invalid("1.2.3-al pha+build", InvalidCharacterInPrereleaseMessage, " "),
+            Invalid("1.2.3-alpha +build", InvalidCharacterInPrereleaseMessage, " "),
+            Invalid("1.2.3-alpha+ build", InvalidCharacterInMetadataMessage, " "),
+            Invalid("1.2.3-alpha+bu ild", InvalidCharacterInMetadataMessage, " "),
+            Invalid("1.2.3-alpha+build .2", InvalidCharacterInMetadataMessage, " "),
 
             // Fourth number
             Invalid("1.2.3.4", FourthVersionNumberMessage),
@@ -271,8 +282,29 @@ namespace Semver.Test
             Invalid("1.2.", OptionalPatch, EmptyPatchMessage),
             Invalid("1.", OptionalMinorPatch, EmptyMinorMessage),
 
+            // No or improper separator for prerelease version
+            Invalid("1.2.3.alpha", PrereleasePrefixedByDotMessage),
+            Invalid("1.2.3alpha", InvalidCharacterInPatchMessage, "a"),
+            Invalid("1.2.3.12alpha", FourthVersionNumberMessage),
+
             // Missing major version
             Invalid("ui-2.1-alpha", InvalidCharacterInMajorMessage, "u"),
+
+            // Missing prerelease identifier
+            Invalid("1.2.3-.a", MissingPrereleaseIdentifierMessage),
+            Invalid("1.2.3-a.", MissingPrereleaseIdentifierMessage),
+            Invalid("1.2.3-a..a", MissingPrereleaseIdentifierMessage),
+            Invalid("1.2.3-", MissingPrereleaseIdentifierMessage),
+            Invalid("1.2.3-  ", MissingPrereleaseIdentifierMessage),
+            Invalid("1.2.3-a.+b", MissingPrereleaseIdentifierMessage),
+            Invalid("1.2.3-+b", MissingPrereleaseIdentifierMessage),
+
+            // Missing metadata identifier
+            Invalid("1.2.3+", MissingMetadataIdentifierMessage),
+            Invalid("1.2.3+  ", MissingMetadataIdentifierMessage),
+            Invalid("1.2.3+.b", MissingMetadataIdentifierMessage),
+            Invalid("1.2.3+b.", MissingMetadataIdentifierMessage),
+            Invalid("1.2.3+b..b", MissingMetadataIdentifierMessage),
 
             // Some long versions to test parsing big version number (parameter is random seed)
             ValidLongVersion(21575113),

@@ -132,7 +132,7 @@ namespace Semver
             if (i < version.Length && version[i] == '-')
             {
                 i += 1;
-                parseEx = ParsePrerelease(version, ref i, allowLeadingZeros, allowMultiplePrereleaseIdentifiers, ex, out prereleaseIdentifiers);
+                parseEx = ParsePrerelease(version, ref i, startOfMetadata, allowLeadingZeros, allowMultiplePrereleaseIdentifiers, ex, out prereleaseIdentifiers);
                 if (parseEx != null) return parseEx;
             }
             else
@@ -144,19 +144,14 @@ namespace Semver
             if (allowMetadata && i < version.Length && version[i] == '+')
             {
                 i += 1;
-                parseEx = ParseMetadata(version, ref i, ex, out metadataIdentifiers);
+                parseEx = ParseMetadata(version, ref i, startOfTrailingWhitespace, ex, out metadataIdentifiers);
                 if (parseEx != null) return parseEx;
             }
             else
                 metadataIdentifiers = new List<string>();
 
-            // Find length without trailing whitespace (needed in case there is whitespace in the middle)
-            var length = version.Length - 1;
-            while (length > 0 && char.IsWhiteSpace(version, length)) length -= 1;
-            length += 1; // add back length for non-whitespace
-
             // There are invalid characters before the trailing whitespace
-            if (i < length)
+            if (i < startOfTrailingWhitespace)
             {
                 if (ex != null) return ex;
                 var invalidChar = version[i];
@@ -171,11 +166,11 @@ namespace Semver
             }
 
             // Error if trailing whitespace not allowed
-            if (length != version.Length && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
+            if (startOfTrailingWhitespace != version.Length && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
                 return ex ?? NewFormatException(TrailingWhitespaceMessage, version);
 
             // There shouldn't be any unprocessed characters
-            if (i != length)
+            if (i != startOfTrailingWhitespace)
                 throw new InvalidOperationException($"Error parsing '{version}'");
 
             semver = new SemVersion(major, minor, patch,
@@ -292,6 +287,7 @@ namespace Semver
         private static Exception ParsePrerelease(
             string version,
             ref int i,
+            int startOfNext,
             bool allowLeadingZero,
             bool allowMultiplePrereleaseIdentifiers,
             Exception ex,
@@ -304,7 +300,7 @@ namespace Semver
                 i += 1;
                 var s = i;
                 var isNumeric = true;
-                while (i < version.Length)
+                while (i < startOfNext)
                 {
                     var c = version[i];
                     if (c.IsAlphaOrHyphen())
@@ -337,7 +333,7 @@ namespace Semver
                     prereleaseIdentifiers.Add(new PrereleaseIdentifier(identifier.TrimStart('0'), intValue));
                 }
 
-            } while (i < version.Length && version[i] == '.' && allowMultiplePrereleaseIdentifiers);
+            } while (i < startOfNext && version[i] == '.' && allowMultiplePrereleaseIdentifiers);
 
             return null;
         }
@@ -345,6 +341,7 @@ namespace Semver
         private static Exception ParseMetadata(
             string version,
             ref int i,
+            int startOfNext,
             Exception ex,
             out List<string> metadataIdentifiers)
         {
@@ -354,7 +351,7 @@ namespace Semver
             {
                 i += 1; // Advance to start of identifier
                 var s = i;
-                while (i < version.Length)
+                while (i < startOfNext)
                 {
                     var c = version[i];
                     if (c == '.')
@@ -371,7 +368,7 @@ namespace Semver
                 var identifier = version.Substring(s, i - s);
                 metadataIdentifiers.Add(new PrereleaseIdentifier(identifier, null));
 
-            } while (i < version.Length && version[i] == '.');
+            } while (i < startOfNext && version[i] == '.');
 
             return null;
         }
