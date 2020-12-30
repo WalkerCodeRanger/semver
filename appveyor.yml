@@ -21,7 +21,7 @@ init:
     $version_split_at_hyphen = $version -split '-'
     $major_minor_patch = $version_split_at_hyphen[0]
     $major_minor_patch_split = $major_minor_patch -split '.'
-    $major = $major_minor_patch_split[0]
+    $major = "$($major_minor_patch_split[0])"
     $minor = "0"
     # Because 2.0.6 was released, all future 2.X versions must be 2.1.0.0 assembly version
     # but future versions should be X.0.0.0
