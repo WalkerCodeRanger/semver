@@ -7,7 +7,8 @@ namespace Semver.Test
 {
     /// <summary>
     /// Tests of any comparison or equality related functionality of <see cref="SemVersion"/>.
-    /// This includes both standard comparison and precedence comparison.
+    /// This includes both standard comparison and precedence comparison. It also includes
+    /// <see cref="SemVersion.GetHashCode()"/> because this is connected to equality.
     ///
     /// Because it is possible to construct invalid semver versions, the comparison
     /// tests must be based of constructing <see cref="SemVersion"/> rather than just
@@ -147,8 +148,8 @@ namespace Semver.Test
         public void EqualsNonSemVersionTest()
         {
             var v = new SemVersion(1);
-            // TODO should throw argument exception
-            var ex = Assert.Throws<InvalidCastException>(() => v.CompareTo(new object()));
+            // TODO should return false
+            var ex = Assert.Throws<InvalidCastException>(() => v.Equals(new object()));
 
             Assert.Equal("Unable to cast object of type 'System.Object' to type 'Semver.SemVersion'.", ex.Message);
         }
@@ -165,6 +166,26 @@ namespace Semver.Test
             var r = SemVersion.Equals(v1, v2);
 
             Assert.Equal(expected, r);
+        }
+        #endregion
+
+        #region GetHashCode
+        [Fact]
+        public void GetHashCodeOfEqualTest()
+        {
+            foreach (var v in VersionsInOrder)
+            {
+                // Construct an identical version, but different instance
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+                Assert.True(v.GetHashCode() == identical.GetHashCode(), v.ToString());
+            }
+        }
+
+        [Fact]
+        public void GetHashCodeOfDifferentTest()
+        {
+            foreach (var (v1, v2) in VersionPairs)
+                Assert.False(v1.GetHashCode() == v2.GetHashCode(), $"({v1}).GetHashCode() == ({v2}).GetHashCode()");
         }
         #endregion
 

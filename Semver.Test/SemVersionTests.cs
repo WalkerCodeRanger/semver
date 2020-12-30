@@ -398,19 +398,6 @@ namespace Semver.Test
         }
         #endregion
 
-        // TODO better unit test on hashcode
-        [Fact]
-        public void GetHashCodeTest()
-        {
-            var v1 = SemVersion.Parse("1.0.0-1+b");
-            var v2 = SemVersion.Parse("1.0.0-1+c");
-
-            var h1 = v1.GetHashCode();
-            var h2 = v2.GetHashCode();
-
-            Assert.NotEqual(h1, h2);
-        }
-
         [Theory]
         [InlineData(1, 2, 3, "a", "b", "1.2.3-a+b")]
         [InlineData(1, 2, 3, "a", "", "1.2.3-a")]
