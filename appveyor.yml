@@ -12,24 +12,35 @@ init:
     Write-Host "Appveyor build version: $env:APPVEYOR_BUILD_VERSION"
     $env:GIT_HASH=$env:APPVEYOR_REPO_COMMIT.Substring(0, 10)
     Write-Host "Git commit hash: $env:GIT_HASH"
-    $version_parts = $env:APPVEYOR_BUILD_VERSION -split '-'
-    $version = $version_parts[0]
-    $pr_part = ""
-    If ($version_parts.Length -ge 3) { $pr_part=".$($version_parts[2])" }
-    $version = "$($version)-pre.$($env:APPVEYOR_BUILD_NUMBER)$pr_part"
-    Write-Host "Computed version: $version"
     If ($env:APPVEYOR_REPO_TAG -and ($env:APPVEYOR_REPO_TAG_NAME -match "^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"))
     {
         $version=$env:APPVEYOR_REPO_TAG_NAME.Substring(1)
         Write-Host "Tagged version: $version"
     }
+    $version_split_at_hyphen = $version -split '-'
+    $major_minor_patch = $version_split_at_hyphen[0]
+    $major_minor_patch_split = $major_minor_patch -split '.'
+    $major = $major_minor_patch_split[0]
+    $minor = "0"
+    # Because 2.0.6 was released, all future 2.X versions must be 2.1.0.0 assembly version
+    # but future versions should be X.0.0.0
+    If ($major -eq "2") { $minor = "1" }
+    $assembly_version = "$major.$minor.0.0"
+    $file_version = "$major_minor_patch.0"
+    $informational_version = "$version+$env:GIT_HASH"
+    Write-Host "Computed package version: $version"
+    Write-Host "Computed assembly version: $assembly_version"
+    Write-Host "Computed file version: $file_version"
+    Write-Host "Computed info version: $informational_version"
     Update-AppveyorBuild -Version "$version"
 
 dotnet_csproj:
   patch: true
   file: '**\Semver.csproj'
   package_version: '{version}'
-  informational_version: "{version}+$(GIT_HASH)"
+  assembly_version: '{assembly_version}'
+  file_version: '{file_version}'
+  informational_version: "{informational_version}"
 
 before_build:
   - dotnet restore
