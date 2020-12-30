@@ -190,6 +190,19 @@ namespace Semver.Test
         }
 
         [Theory]
+        [MemberData(nameof(EqualityCases))]
+        public void GetHashCodeTest(PrereleaseIdentifier left, PrereleaseIdentifier right, bool expectEqual)
+        {
+            var leftHashcode = left.GetHashCode();
+            var rightHashcode = right.GetHashCode();
+
+            if (expectEqual)
+                Assert.Equal(leftHashcode, rightHashcode);
+            else
+                Assert.NotEqual(leftHashcode, rightHashcode);
+        }
+
+        [Theory]
         [InlineData("042")]
         [InlineData("0A")]
         [InlineData("123")]
@@ -210,7 +223,7 @@ namespace Semver.Test
         [InlineData("123")]
         [InlineData("1-2")]
         [InlineData(null)]
-        public void CallToString(string value)
+        public void ToStringTest(string value)
         {
             var identifier = PrereleaseIdentifier.CreateUnsafe(value, null);
 

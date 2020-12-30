@@ -496,6 +496,7 @@ namespace Semver.Test
         public void ChangeBuildTest()
         {
             var v1 = new SemVersion(1, 2, 3, "alpha", "dev");
+            // TODO this parameter should be named 'metadata', but that is a breaking change
             var v2 = v1.Change(build: "gamma");
 
             Assert.Equal(1, v2.Major);
