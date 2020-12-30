@@ -118,14 +118,12 @@ namespace Semver
             if (i < startOfPrerelease && version[i] == '.')
             {
                 i += 1;
-                if (i < version.Length)
-                {
-                    if (version[i].IsDigit())
-                        return ex ?? NewFormatException(FourthVersionNumberMessage, version);
-                    return ex ?? NewFormatException(PrereleasePrefixedByDotMessage, version);
-                }
-                // There is just an extra dot at the end
-                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version, "Patch", '.');
+                // If it is ".\d" then we'll assume they were trying to have a fourth version number
+                if (i < version.Length && version[i].IsDigit())
+                    return ex ?? NewFormatException(FourthVersionNumberMessage, version);
+
+                // Otherwise, assume they used "." instead of "-" to start the prerelease
+                return ex ?? NewFormatException(PrereleasePrefixedByDotMessage, version);
             }
 
             // Parse prerelease version
@@ -154,28 +152,15 @@ namespace Semver
             if (style.HasStyle(SemVersionStyles.DisallowMetadata) && metadataIdentifiers.Count > 0)
                 return ex ?? NewFormatException(BuildMetadataMessage, version);
 
-            // There are invalid characters before the trailing whitespace
-            if (i < startOfTrailingWhitespace)
-            {
-                if (ex != null) return ex;
-                var invalidChar = version[i];
-                // Determine where to report the invalid character
-                if (metadataIdentifiers.Count > 0)
-                    return NewFormatException(InvalidCharacterInMetadataMessage, version, invalidChar);
-
-                if (prereleaseIdentifiers.Count > 0)
-                    return NewFormatException(InvalidCharacterInPrereleaseMessage, version, invalidChar);
-
-                return NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version, invalidChar);
-            }
+            // There shouldn't be any unprocessed characters before the trailing whitespace.
+            // If there is, it is a programmer mistake, so immediately throw an exception rather
+            // than returning an exception which try parse wouldn't throw.
+            if (i != startOfTrailingWhitespace)
+                throw new InvalidOperationException($"Error parsing '{version}'");
 
             // Error if trailing whitespace not allowed
             if (startOfTrailingWhitespace != version.Length && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
                 return ex ?? NewFormatException(TrailingWhitespaceMessage, version);
-
-            // There shouldn't be any unprocessed characters
-            if (i != startOfTrailingWhitespace)
-                throw new InvalidOperationException($"Error parsing '{version}'");
 
             semver = new SemVersion(major, minor, patch,
                 new ReadOnlyCollection<PrereleaseIdentifier>(prereleaseIdentifiers),

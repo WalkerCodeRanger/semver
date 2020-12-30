@@ -201,7 +201,7 @@ namespace Semver.Test
             Valid("1.02.3", AllowLeadingZeros, 1, 2, 3),
             Valid("1.00.3", AllowLeadingZeros, 1, 0, 3),
             Valid("1.2.03", AllowLeadingZeros, 1, 2, 3),
-            Valid("1.2.00", AllowLeadingZeros, 1, 2, 0),
+            Valid("1.2.00", AllowLeadingZeros, 1, 2),
 
             // Leading zeros in alphanumeric prerelease identifiers
             Valid("1.2.3-0a", 1, 2, 3, Pre("0a")),
@@ -279,7 +279,7 @@ namespace Semver.Test
             Invalid("1.2.3.0-beta+b23", FourthVersionNumberMessage),
 
             // Ends in dot after number
-            Invalid("1.2.3.", InvalidCharacterInPatchMessage, "."),
+            Invalid("1.2.3.", PrereleasePrefixedByDotMessage),
             Invalid("1.2.", OptionalPatch, EmptyPatchMessage),
             Invalid("1.", OptionalMinorPatch, EmptyMinorMessage),
 
@@ -525,7 +525,6 @@ namespace Semver.Test
             // Construct cases with trailing whitespace added
             foreach (var testCase in testCases.Where(c => !c.Styles.HasStyle(AllowTrailingWhitespace)
                                                           && !string.IsNullOrWhiteSpace(c.Version)
-                                                          && !c.Version.EndsWith(".", StringComparison.Ordinal) // TODO remove this
                                                           && c.ExceptionMessageFormat != TrailingWhitespaceMessage).ToList())
                 testCases.Add(testCase.Change(testCase.Version + " ", testCase.Styles | AllowTrailingWhitespace));
 
