@@ -26,22 +26,22 @@ init:
     # Because 2.0.6 was released, all future 2.X versions must be 2.1.0.0 assembly version
     # but future versions should be X.0.0.0
     If ($major -eq "2") { $minor = "1" }
-    $assembly_version = "$major.$minor.0.0"
-    $file_version = "$major_minor_patch.0"
-    $informational_version = "$version+$env:GIT_HASH"
+    $env:ASSEMBLY_VERSION = "$major.$minor.0.0"
+    $env:FILE_VERSION = "$major_minor_patch.0"
+    $env:INFORMATIONAL_Version = "$version+$env:GIT_HASH"
     Write-Host "Computed package version: $version"
-    Write-Host "Computed assembly version: $assembly_version"
-    Write-Host "Computed file version: $file_version"
-    Write-Host "Computed info version: $informational_version"
+    Write-Host "Computed assembly version: $env:ASSEMBLY_VERSION"
+    Write-Host "Computed file version: $env:FILE_VERSION"
+    Write-Host "Computed info version: $env:INFORMATIONAL_Version"
     Update-AppveyorBuild -Version "$version"
 
 dotnet_csproj:
   patch: true
   file: '**\Semver.csproj'
   package_version: '{version}'
-  assembly_version: '{assembly_version}'
-  file_version: '{file_version}'
-  informational_version: "{informational_version}"
+  assembly_version: '$(ASSEMBLY_VERSION)'
+  file_version: '$(FILE_VERSION)'
+  informational_version: "$(INFORMATIONAL_Version)"
 
 before_build:
   - dotnet restore
