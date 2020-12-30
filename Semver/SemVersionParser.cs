@@ -19,11 +19,11 @@ namespace Semver
         private const string AllWhitespaceVersionMessage = "All whitespace instead of version";
         private const string LeadingLowerVMessage = "Leading 'v' in '{0}'";
         private const string LeadingUpperVMessage = "Leading 'V' in '{0}'";
-        private const string LeadingZeroInMajorMinorOrPatchMessage = "Leading Zero in major, minor, or patch version in '{0}'";
-        private const string MissingMajorMinorOrPatchMessage = "Missing major, minor, or patch version in '{0}'";
+        private const string LeadingZeroInMajorMinorOrPatchMessage = "{1} version has leading zero in '{0}'";
+        private const string EmptyMajorMinorOrPatchMessage = "{1} version missing in '{0}'";
         private const string MissingMinorMessage = "Missing minor version in '{0}'";
         private const string MissingPatchMessage = "Missing patch version in '{0}'";
-        private const string MajorMinorOrPatchOverflowMessage = "Major, minor, or patch version '{1}' was too large for Int32 in '{0}'";
+        private const string MajorMinorOrPatchOverflowMessage = "{1} version '{2}' was too large for Int32 in '{0}'";
         private const string FourthVersionNumberMessage = "Fourth version number in '{0}'";
         private const string PrereleasePrefixedByDotMessage = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'";
         private const string MissingPrereleaseIdentifierMessage = "Missing prerelease identifier in '{0}'";
@@ -31,9 +31,8 @@ namespace Semver
         private const string PrereleaseOverflowMessage = "Prerelease identifier '{1}' was too large for Int32 in version '{0}'";
         private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'";
         private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'";
+        private const string InvalidCharacterInMajorMinorOrPatchMessage = "{1} version contains invalid character '{2}' in '{0}'";
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'";
-        private const string InvalidCharacterInMajorMinorOrPatchMessage = "Invalid character '{1}' in major, minor, or patch version in '{0}'";
-
 
         /// <summary>
         /// The internal method that all parsing is based on. Because this is called by both
@@ -63,40 +62,32 @@ namespace Semver
 
             if (version.Length == 0) return ex ?? new FormatException(EmptyVersionMessage);
 
-            // To provide good error messages, this code always parses an element
-            // first and then checks whether it should be allowed
+            // This code does two things to help provide good error messages:
+            // 1. It breaks the version number into segments and then parses those segments
+            // 2. It parses and element first, then checks the flags for whether it should be allowed
 
             var i = 0;
 
-            // Skip leading whitespace
-            while (i < version.Length && char.IsWhiteSpace(version, i)) i += 1;
+            var parseEx = ParseLeadingWhitespace(version, style, ex, ref i);
+            if (parseEx != null) return parseEx;
 
-            // Error if all whitespace
-            if (i == version.Length)
-                return ex ?? new FormatException(AllWhitespaceVersionMessage);
+            parseEx = ParseLeadingV(version, style, ex, ref i);
+            if (parseEx != null) return parseEx;
 
-            // Error if leading whitespace not allowed
-            if (i > 0 && !style.HasStyle(SemVersionStyles.AllowLeadingWhitespace))
-                return ex ?? NewFormatException(LeadingWhitespaceMessage, version);
+            // Now break the version number down into segments. Two segments have already been handled
+            // namely leading whitespace and 'v' or 'V'.
 
-            // Handle leading 'v' or 'V'
-            var leadChar = version[i]; // Safe because length checked above for all whitespace error
-            if (leadChar == 'v')
-            {
-                if (style.HasStyle(SemVersionStyles.AllowLowerV)) i += 1;
-                else return ex ?? NewFormatException(LeadingLowerVMessage, version);
-            }
-            else if (leadChar == 'V')
-            {
-                if (style.HasStyle(SemVersionStyles.AllowUpperV)) i += 1;
-                else return ex ?? NewFormatException(LeadingUpperVMessage, version);
-            }
+            var startOfTrailingWhitespace = StartOfTrailingWhitespace(version);
+            var startOfMetadata = version.IndexOf('+', i, startOfTrailingWhitespace - i);
+            if (startOfMetadata < 0) startOfMetadata = startOfTrailingWhitespace;
+            var startOfPrerelease = version.IndexOf('-', i, startOfMetadata - i);
+            if (startOfPrerelease < 0) startOfPrerelease = startOfMetadata;
 
             // Are leading zeros allowed
             var allowLeadingZeros = style.HasStyle(SemVersionStyles.AllowLeadingZeros);
 
             // Parse major version
-            var parseEx = ParseMajorMinorOrPatch(version, ref i, allowLeadingZeros, ex, out var major);
+            parseEx = ParseVersionNumber("Major", version, ref i, startOfPrerelease, allowLeadingZeros, ex, out var major);
             if (parseEx != null) return parseEx;
 
             // Parse minor version
@@ -104,7 +95,7 @@ namespace Semver
             if (i < version.Length && version[i] == '.')
             {
                 i += 1;
-                parseEx = ParseMajorMinorOrPatch(version, ref i, allowLeadingZeros, ex, out minor);
+                parseEx = ParseVersionNumber("Minor", version, ref i, startOfPrerelease, allowLeadingZeros, ex, out minor);
                 if (parseEx != null) return parseEx;
             }
             else if (!style.HasStyle(SemVersionStyles.OptionalMinorPatch))
@@ -115,14 +106,14 @@ namespace Semver
             if (i < version.Length && version[i] == '.')
             {
                 i += 1;
-                parseEx = ParseMajorMinorOrPatch(version, ref i, allowLeadingZeros, ex, out patch);
+                parseEx = ParseVersionNumber("Patch", version, ref i, startOfPrerelease, allowLeadingZeros, ex, out patch);
                 if (parseEx != null) return parseEx;
             }
             else if (!style.HasStyle(SemVersionStyles.OptionalPatch))
                 return ex ?? NewFormatException(MissingPatchMessage, version);
 
             // Handle fourth version number
-            if (i < version.Length && version[i] == '.')
+            if (i < startOfPrerelease && version[i] == '.')
             {
                 i += 1;
                 if (i < version.Length)
@@ -132,7 +123,7 @@ namespace Semver
                     return ex ?? NewFormatException(PrereleasePrefixedByDotMessage, version);
                 }
                 // There is just an extra dot at the end
-                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version, '.');
+                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version, "Patch", '.');
             }
 
             // Parse prerelease version
@@ -193,35 +184,87 @@ namespace Semver
             return null;
         }
 
-        private static Exception ParseMajorMinorOrPatch(
+        private static Exception ParseLeadingWhitespace(
+            string version,
+            SemVersionStyles style,
+            Exception ex,
+            ref int i)
+        {
+            // Skip leading whitespace
+            while (i < version.Length && char.IsWhiteSpace(version, i)) i += 1;
+
+            // Error if all whitespace
+            if (i == version.Length)
+                return ex ?? new FormatException(AllWhitespaceVersionMessage);
+
+            // Error if leading whitespace not allowed
+            if (i > 0 && !style.HasStyle(SemVersionStyles.AllowLeadingWhitespace))
+                return ex ?? NewFormatException(LeadingWhitespaceMessage, version);
+
+            return null;
+        }
+
+        private static Exception ParseLeadingV(string version, SemVersionStyles style, Exception ex, ref int i)
+        {
+            // This is safe because the check for all whitespace ensures there is at least one more char
+            var leadChar = version[i];
+            switch (leadChar)
+            {
+                case 'v' when style.HasStyle(SemVersionStyles.AllowLowerV):
+                    i += 1;
+                    break;
+                case 'v':
+                    return ex ?? NewFormatException(LeadingLowerVMessage, version);
+                case 'V' when style.HasStyle(SemVersionStyles.AllowUpperV):
+                    i += 1;
+                    break;
+                case 'V':
+                    return ex ?? NewFormatException(LeadingUpperVMessage, version);
+            }
+
+            return null;
+        }
+
+        private static int StartOfTrailingWhitespace(string version)
+        {
+            var i = version.Length - 1;
+            while (i > 0 && char.IsWhiteSpace(version, i)) i -= 1;
+            return i + 1; // add one for the non-whitespace char that was found
+        }
+
+        private static Exception ParseVersionNumber(
+            string kind,
             string version,
             ref int i,
+            int startOfNext,
             bool allowLeadingZero,
             Exception ex,
             out int number)
         {
+            var end = version.IndexOf('.', i, startOfNext - i);
+            if (end < 0) end = startOfNext;
+
             var start = i;
 
-            // Skip leading zero
-            while (i < version.Length && version[i] == '0') i += 1;
+            // Skip leading zeros
+            while (i < end && version[i] == '0') i += 1;
 
             var startOfNonZeroDigits = i;
 
-            while (i < version.Length && version[i].IsDigit())
+            while (i < end && version[i].IsDigit())
                 i += 1;
 
-            // If the next character isn't a handled character for some part of the version, then it
-            // is an invalid character in this number
-            if (i < version.Length && !version[i].IsHandledCharacter())
+            // If there are unprocessed characters, then it is an invalid char for this segment
+            if (i < end)
             {
                 number = 0;
-                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version, version[i]);
+                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version, kind, version[i]);
             }
 
             if (start == i)
             {
                 number = 0;
-                return ex ?? NewFormatException(MissingMajorMinorOrPatchMessage, version);
+                return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, version, kind);
             }
 
             if (!allowLeadingZero)
@@ -232,7 +275,7 @@ namespace Semver
                 if (startOfNonZeroDigits - start > maxLeadingZeros)
                 {
                     number = 0;
-                    return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage, version);
+                    return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage, version, kind);
                 }
             }
 
@@ -241,7 +284,7 @@ namespace Semver
                 // Parsing validated this as a string of digits possibly proceeded by zero so the only
                 // possible issue is a numeric overflow for `int`
                 return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
-                    MajorMinorOrPatchOverflowMessage, version, numberString));
+                    MajorMinorOrPatchOverflowMessage, version, kind, numberString));
 
             return null;
         }
@@ -334,17 +377,9 @@ namespace Semver
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static FormatException NewFormatException(string messageTemplate, string version)
+        private static FormatException NewFormatException(string messageTemplate, params object[] args)
         {
-            return new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, version));
-        }
-
-        /// <remarks>This overload avoids issues with culture when trying to convert the char to a
-        /// string at the call site.</remarks>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static FormatException NewFormatException(string messageTemplate, string version, char value)
-        {
-            return new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, version, value));
+            return new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, args));
         }
     }
 }

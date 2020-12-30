@@ -19,11 +19,17 @@ namespace Semver.Test
         private const string AllWhitespaceVersionMessage = "All whitespace instead of version";
         private const string LeadingLowerVMessage = "Leading 'v' in '{0}'";
         private const string LeadingUpperVMessage = "Leading 'V' in '{0}'";
-        private const string LeadingZeroInMajorMinorOrPatchMessage = "Leading Zero in major, minor, or patch version in '{0}'";
-        private const string MissingMajorMinorOrPatchMessage = "Missing major, minor, or patch version in '{0}'";
+        private const string LeadingZeroInMajorMessage = "Major version has leading zero in '{0}'";
+        private const string LeadingZeroInMinorMessage = "Minor version has leading zero in '{0}'";
+        private const string LeadingZeroInPatchMessage = "Patch version has leading zero in '{0}'";
+        private const string EmptyMajorMessage = "Major version missing in '{0}'";
+        private const string EmptyMinorMessage = "Minor version missing in '{0}'";
+        private const string EmptyPatchMessage = "Patch version missing in '{0}'";
         private const string MissingMinorMessage = "Missing minor version in '{0}'";
         private const string MissingPatchMessage = "Missing patch version in '{0}'";
-        private const string MajorMinorOrPatchOverflowMessage = "Major, minor, or patch version '{1}' was too large for Int32 in '{0}'";
+        private const string MajorOverflowMessage = "Major version '{1}' was too large for Int32 in '{0}'";
+        private const string MinorOverflowMessage = "Minor version '{1}' was too large for Int32 in '{0}'";
+        private const string PatchOverflowMessage = "Patch version '{1}' was too large for Int32 in '{0}'";
         private const string FourthVersionNumberMessage = "Fourth version number in '{0}'";
         private const string PrereleasePrefixedByDotMessage = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'";
         private const string MissingPrereleaseIdentifierMessage = "Missing prerelease identifier in '{0}'";
@@ -31,8 +37,10 @@ namespace Semver.Test
         private const string PrereleaseOverflowMessage = "Prerelease identifier '{1}' was too large for Int32 in version '{0}'";
         private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'";
         private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'";
+        private const string InvalidCharacterInMajorMessage = "Major version contains invalid character '{1}' in '{0}'";
+        private const string InvalidCharacterInMinorMessage = "Minor version contains invalid character '{1}' in '{0}'";
+        private const string InvalidCharacterInPatchMessage = "Patch version contains invalid character '{1}' in '{0}'";
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'";
-        private const string InvalidCharacterInMajorMinorOrPatchMessage = "Invalid character '{1}' in major, minor, or patch version in '{0}'";
 
         public static readonly TheoryData<SemVersionStyles> InvalidSemVersionStyles = new TheoryData<SemVersionStyles>()
         {
@@ -46,10 +54,14 @@ namespace Semver.Test
 
         public static readonly TheoryData<ParsingTestCase> ParsingTestCases = ExpandTestCases(
             // version numbers given with the link in the spec to a regex for semver versions
-            Valid("0.0.4", 0, 0, 4), Valid("1.2.3", 1, 2, 3), Valid("10.20.30", 10, 20, 30),
+            Valid("0.0.4", 0, 0, 4),
+            Valid("1.2.3", 1, 2, 3),
+            Valid("10.20.30", 10, 20, 30),
             Valid("1.1.2-prerelease+meta", 1, 1, 2, Pre("prerelease"), "meta"),
-            Valid("1.1.2+meta", 1, 1, 2, Pre(), "meta"), Valid("1.1.2+meta-valid", 1, 1, 2, Pre(), "meta-valid"),
-            Valid("1.0.0-alpha", 1, 0, 0, Pre("alpha")), Valid("1.0.0-beta", 1, 0, 0, Pre("beta")),
+            Valid("1.1.2+meta", 1, 1, 2, Pre(), "meta"),
+            Valid("1.1.2+meta-valid", 1, 1, 2, Pre(), "meta-valid"),
+            Valid("1.0.0-alpha", 1, 0, 0, Pre("alpha")),
+            Valid("1.0.0-beta", 1, 0, 0, Pre("beta")),
             Valid("1.0.0-alpha.beta", 1, 0, 0, Pre("alpha", "beta")),
             Valid("1.0.0-alpha.beta.1", 1, 0, 0, Pre("alpha", "beta", "1")),
             Valid("1.0.0-alpha.1", 1, 0, 0, Pre("alpha", 1)),
@@ -59,9 +71,13 @@ namespace Semver.Test
                 Pre("alpha-a", "b-c-somethinglong"), "build.1-aef.1-its-okay"),
             Valid("1.0.0-rc.1+build.1", 1, 0, 0, Pre("rc", 1), "build.1"),
             Valid("2.0.0-rc.1+build.123", 2, 0, 0, Pre("rc", 1), "build.123"),
-            Valid("1.2.3-beta", 1, 2, 3, Pre("beta")), Valid("10.2.3-DEV-SNAPSHOT", 10, 2, 3, Pre("DEV-SNAPSHOT")),
-            Valid("1.2.3-SNAPSHOT-123", 1, 2, 3, Pre("SNAPSHOT-123")), Valid("1.0.0", 1), Valid("2.0.0", 2),
-            Valid("1.1.7", 1, 1, 7), Valid("2.0.0+build.1848", 2, 0, 0, Pre(), "build.1848"),
+            Valid("1.2.3-beta", 1, 2, 3, Pre("beta")),
+            Valid("10.2.3-DEV-SNAPSHOT", 10, 2, 3, Pre("DEV-SNAPSHOT")),
+            Valid("1.2.3-SNAPSHOT-123", 1, 2, 3, Pre("SNAPSHOT-123")),
+            Valid("1.0.0", 1),
+            Valid("2.0.0", 2),
+            Valid("1.1.7", 1, 1, 7),
+            Valid("2.0.0+build.1848", 2, 0, 0, Pre(), "build.1848"),
             Valid("2.0.1-alpha.1227", 2, 0, 1, Pre("alpha", 1227)),
             Valid("1.0.0-alpha+beta", 1, 0, 0, Pre("alpha"), "beta"),
             Valid("1.2.3----RC-SNAPSHOT.12.9.1--.12+788", 1, 2, 3, Pre("---RC-SNAPSHOT", 12, 9, "1--", 12), "788"),
@@ -71,23 +87,29 @@ namespace Semver.Test
             Valid("1.0.0-0A.is.legal", 1, 0, 0, Pre("0A", "is", "legal")),
             // This was given as a valid example, but isn't supported by the semver package because of overflow
             Invalid<OverflowException>("99999999999999999999999.999999999999999999.99999999999999999",
-                MajorMinorOrPatchOverflowMessage, "99999999999999999999999"),
+                MajorOverflowMessage, "99999999999999999999999"),
 
             // These are invalid version numbers given with the link in the spec to a regex for semver versions
-            Invalid("1", MissingMinorMessage), Invalid("1.2", MissingPatchMessage),
+            Invalid("1", MissingMinorMessage),
+            Invalid("1.2", MissingPatchMessage),
             Invalid("1.2.3-0123", LeadingZeroInPrereleaseMessage, "0123"),
             Invalid("1.2.3-0123.0123", LeadingZeroInPrereleaseMessage, "0123"),
             Invalid("1.1.2+.123", MissingMetadataIdentifierMessage),
-            Invalid("+invalid", MissingMajorMinorOrPatchMessage), Invalid("-invalid", MissingMajorMinorOrPatchMessage),
-            Invalid("-invalid+invalid", MissingMajorMinorOrPatchMessage),
-            Invalid("-invalid.01", MissingMajorMinorOrPatchMessage), Invalid("alpha", MissingMajorMinorOrPatchMessage),
-            Invalid("alpha.beta", MissingMajorMinorOrPatchMessage),
-            Invalid("alpha.beta.1", MissingMajorMinorOrPatchMessage),
-            Invalid("alpha.1", MissingMajorMinorOrPatchMessage), Invalid("alpha+beta", MissingMajorMinorOrPatchMessage),
-            Invalid("alpha_beta", MissingMajorMinorOrPatchMessage), Invalid("alpha.", MissingMajorMinorOrPatchMessage),
-            Invalid("alpha..", MissingMajorMinorOrPatchMessage), Invalid("beta", MissingMajorMinorOrPatchMessage),
+            Invalid("+invalid", EmptyMajorMessage),
+            Invalid("-invalid", EmptyMajorMessage),
+            Invalid("-invalid+invalid", EmptyMajorMessage),
+            Invalid("-invalid.01", EmptyMajorMessage),
+            Invalid("alpha", InvalidCharacterInMajorMessage, "a"),
+            Invalid("alpha.beta", InvalidCharacterInMajorMessage, "a"),
+            Invalid("alpha.beta.1", InvalidCharacterInMajorMessage, "a"),
+            Invalid("alpha.1", InvalidCharacterInMajorMessage, "a"),
+            Invalid("alpha+beta", InvalidCharacterInMajorMessage, "a"),
+            Invalid("alpha_beta", InvalidCharacterInMajorMessage, "a"),
+            Invalid("alpha.", InvalidCharacterInMajorMessage, "a"),
+            Invalid("alpha..", InvalidCharacterInMajorMessage, "a"),
+            Invalid("beta", InvalidCharacterInMajorMessage, "b"),
             Invalid("1.0.0-alpha_beta", InvalidCharacterInPrereleaseMessage, "_"),
-            Invalid("-alpha.", MissingMajorMinorOrPatchMessage),
+            Invalid("-alpha.", EmptyMajorMessage),
             Invalid("1.0.0-alpha..", MissingPrereleaseIdentifierMessage),
             Invalid("1.0.0-alpha..1", MissingPrereleaseIdentifierMessage),
             Invalid("1.0.0-alpha...1", MissingPrereleaseIdentifierMessage),
@@ -95,23 +117,27 @@ namespace Semver.Test
             Invalid("1.0.0-alpha.....1", MissingPrereleaseIdentifierMessage),
             Invalid("1.0.0-alpha......1", MissingPrereleaseIdentifierMessage),
             Invalid("1.0.0-alpha.......1", MissingPrereleaseIdentifierMessage),
-            Invalid("01.1.1", LeadingZeroInMajorMinorOrPatchMessage),
-            Invalid("1.01.1", LeadingZeroInMajorMinorOrPatchMessage),
-            Invalid("1.1.01", LeadingZeroInMajorMinorOrPatchMessage), Invalid("1.2", MissingPatchMessage),
-            Invalid("1.2.3.DEV", PrereleasePrefixedByDotMessage), Invalid("1.2-SNAPSHOT", MissingPatchMessage),
+            Invalid("01.1.1", LeadingZeroInMajorMessage),
+            Invalid("1.01.1", LeadingZeroInMinorMessage),
+            Invalid("1.1.01", LeadingZeroInPatchMessage),
+            Invalid("1.2", MissingPatchMessage),
+            Invalid("1.2.3.DEV", PrereleasePrefixedByDotMessage),
+            Invalid("1.2-SNAPSHOT", MissingPatchMessage),
             Invalid("1.2.31.2.3----RC-SNAPSHOT.12.09.1--..12+788", FourthVersionNumberMessage),
             Invalid("1.2-RC-SNAPSHOT", MissingPatchMessage),
-            Invalid("-1.0.3-gamma+b7718", MissingMajorMinorOrPatchMessage),
-            Invalid("+justmeta", MissingMajorMinorOrPatchMessage),
+            Invalid("-1.0.3-gamma+b7718", EmptyMajorMessage),
+            Invalid("+justmeta", EmptyMajorMessage),
             Invalid("9.8.7+meta+meta", InvalidCharacterInMetadataMessage, "+"),
             Invalid("9.8.7-whatever+meta+meta", InvalidCharacterInMetadataMessage, "+"),
             Invalid<OverflowException>(
                 "99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12",
-                MajorMinorOrPatchOverflowMessage, "99999999999999999999999"),
+                MajorOverflowMessage, "99999999999999999999999"),
 
             // Basic valid versions
-            Valid("1.2.3-a+b", 1, 2, 3, Pre("a"), "b"), Valid("1.2.3-a", 1, 2, 3, Pre("a")),
-            Valid("1.2.3+b", 1, 2, 3, Pre(), "b"), Valid("1.2.3", 1, 2, 3),
+            Valid("1.2.3-a+b", 1, 2, 3, Pre("a"), "b"),
+            Valid("1.2.3-a", 1, 2, 3, Pre("a")),
+            Valid("1.2.3+b", 1, 2, 3, Pre(), "b"),
+            Valid("1.2.3", 1, 2, 3),
 
             // Valid letter Limits
             Valid("1.2.3-A-Z.a-z.0-9+A-Z.a-z.0-9", 1, 2, 3, Pre("A-Z", "a-z", "0-9"), "A-Z.a-z.0-9"),
@@ -120,23 +146,36 @@ namespace Semver.Test
             Valid("1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, Pre("alpha-beta"), "nightly.23.43-bla"),
             Valid("1.2.45-alpha+nightly.23", 1, 2, 45, Pre("alpha"), "nightly.23"),
             Valid("3.2.1-beta", 3, 2, 1, Pre("beta")),
-            Valid("2.0.0+nightly.23.43-bla", 2, 0, 0, Pre(), "nightly.23.43-bla"), Valid("5.6.7", 5, 6, 7),
+            Valid("2.0.0+nightly.23.43-bla", 2, 0, 0, Pre(), "nightly.23.43-bla"),
+            Valid("5.6.7", 5, 6, 7),
 
             // Valid unusual versions
-            Valid("1.0.0--ci.1", 1, 0, 0, Pre("-ci", 1)), Valid("1.0.0-0A", 1, 0, 0, Pre("0A")),
+            Valid("1.0.0--ci.1", 1, 0, 0, Pre("-ci", 1)),
+            Valid("1.0.0-0A", 1, 0, 0, Pre("0A")),
 
             // Dash in strange place
-            Valid("1.2.3--+b", 1, 2, 3, Pre("-"), "b"), Valid("1.2.3---+b", 1, 2, 3, Pre("--"), "b"),
-            Valid("1.2.3---", 1, 2, 3, Pre("--")), Valid("1.2.3-a+-", 1, 2, 3, Pre("a"), "-"),
-            Valid("1.2.3-a+--", 1, 2, 3, Pre("a"), "--"), Valid("1.2.3--a+b", 1, 2, 3, Pre("-a"), "b"),
-            Valid("1.2.3--1+b", 1, 2, 3, Pre("-1"), "b"), Valid("1.2.3---a+b", 1, 2, 3, Pre("--a"), "b"),
-            Valid("1.2.3---1+b", 1, 2, 3, Pre("--1"), "b"), Valid("1.2.3-a+-b", 1, 2, 3, Pre("a"), "-b"),
-            Valid("1.2.3-a+--b", 1, 2, 3, Pre("a"), "--b"), Valid("1.2.3-a-+b", 1, 2, 3, Pre("a-"), "b"),
-            Valid("1.2.3-1-+b", 1, 2, 3, Pre("1-"), "b"), Valid("1.2.3-a--+b", 1, 2, 3, Pre("a--"), "b"),
-            Valid("1.2.3-1--+b", 1, 2, 3, Pre("1--"), "b"), Valid("1.2.3-a+b-", 1, 2, 3, Pre("a"), "b-"),
-            Valid("1.2.3-a+b--", 1, 2, 3, Pre("a"), "b--"), Valid("1.2.3--.a+b", 1, 2, 3, Pre("-", "a"), "b"),
-            Valid("1.2.3-a+-.b", 1, 2, 3, Pre("a"), "-.b"), Valid("1.2.3-a.-+b", 1, 2, 3, Pre("a", "-"), "b"),
-            Valid("1.2.3-a.-.c+b", 1, 2, 3, Pre("a", "-", "c"), "b"), Valid("1.2.3-a+b.-", 1, 2, 3, Pre("a"), "b.-"),
+            Valid("1.2.3--+b", 1, 2, 3, Pre("-"), "b"),
+            Valid("1.2.3---+b", 1, 2, 3, Pre("--"), "b"),
+            Valid("1.2.3---", 1, 2, 3, Pre("--")),
+            Valid("1.2.3-a+-", 1, 2, 3, Pre("a"), "-"),
+            Valid("1.2.3-a+--", 1, 2, 3, Pre("a"), "--"),
+            Valid("1.2.3--a+b", 1, 2, 3, Pre("-a"), "b"),
+            Valid("1.2.3--1+b", 1, 2, 3, Pre("-1"), "b"),
+            Valid("1.2.3---a+b", 1, 2, 3, Pre("--a"), "b"),
+            Valid("1.2.3---1+b", 1, 2, 3, Pre("--1"), "b"),
+            Valid("1.2.3-a+-b", 1, 2, 3, Pre("a"), "-b"),
+            Valid("1.2.3-a+--b", 1, 2, 3, Pre("a"), "--b"),
+            Valid("1.2.3-a-+b", 1, 2, 3, Pre("a-"), "b"),
+            Valid("1.2.3-1-+b", 1, 2, 3, Pre("1-"), "b"),
+            Valid("1.2.3-a--+b", 1, 2, 3, Pre("a--"), "b"),
+            Valid("1.2.3-1--+b", 1, 2, 3, Pre("1--"), "b"),
+            Valid("1.2.3-a+b-", 1, 2, 3, Pre("a"), "b-"),
+            Valid("1.2.3-a+b--", 1, 2, 3, Pre("a"), "b--"),
+            Valid("1.2.3--.a+b", 1, 2, 3, Pre("-", "a"), "b"),
+            Valid("1.2.3-a+-.b", 1, 2, 3, Pre("a"), "-.b"),
+            Valid("1.2.3-a.-+b", 1, 2, 3, Pre("a", "-"), "b"),
+            Valid("1.2.3-a.-.c+b", 1, 2, 3, Pre("a", "-", "c"), "b"),
+            Valid("1.2.3-a+b.-", 1, 2, 3, Pre("a"), "b.-"),
             Valid("1.2.3-a+b.-.c", 1, 2, 3, Pre("a"), "b.-.c"),
 
             // Missing patch number, but otherwise valid
@@ -144,7 +183,8 @@ namespace Semver.Test
             Valid("2.0+nightly.23.43-bla", OptionalPatch, 2, 0, 0, Pre(), "nightly.23.43-bla"),
             Valid("2.1-alpha", OptionalPatch, 2, 1, 0, Pre("alpha")),
             Valid("5.6+nightly.23.43-bla", OptionalPatch, 5, 6, 0, Pre(), "nightly.23.43-bla"),
-            Valid("3.2", OptionalPatch, 3, 2), Valid("1.3", OptionalPatch, 1, 3),
+            Valid("3.2", OptionalPatch, 3, 2),
+            Valid("1.3", OptionalPatch, 1, 3),
             Valid("1.3-alpha", OptionalPatch, 1, 3, 0, Pre("alpha")),
             Valid("1.3+build", OptionalPatch, 1, 3, 0, Pre(), "build"),
 
@@ -155,12 +195,18 @@ namespace Semver.Test
             Valid("64", OptionalMinorPatch, 64),
 
             // Leading zeros in major, minor, or patch, but otherwise valid
-            Valid("01.2.3", AllowLeadingZeros, 1, 2, 3), Valid("1.02.3", AllowLeadingZeros, 1, 2, 3),
+            Valid("01.2.3", AllowLeadingZeros, 1, 2, 3),
+            Valid("00.2.3", AllowLeadingZeros, 0, 2, 3),
+            Valid("1.02.3", AllowLeadingZeros, 1, 2, 3),
+            Valid("1.00.3", AllowLeadingZeros, 1, 0, 3),
             Valid("1.2.03", AllowLeadingZeros, 1, 2, 3),
+            Valid("1.2.00", AllowLeadingZeros, 1, 2, 0),
 
             // Leading zeros in alphanumeric prerelease identifiers
-            Valid("1.2.3-0a", 1, 2, 3, Pre("0a")), Valid("1.2.3-00000a", 1, 2, 3, Pre("00000a")),
-            Valid("1.2.3-a.0c", 1, 2, 3, Pre("a", "0c")), Valid("1.2.3-a.00000c", 1, 2, 3, Pre("a", "00000c")),
+            Valid("1.2.3-0a", 1, 2, 3, Pre("0a")),
+            Valid("1.2.3-00000a", 1, 2, 3, Pre("00000a")),
+            Valid("1.2.3-a.0c", 1, 2, 3, Pre("a", "0c")),
+            Valid("1.2.3-a.00000c", 1, 2, 3, Pre("a", "00000c")),
 
             // Leading zeros in numeric prerelease identifiers, but otherwise valid
             Valid("1.2.3-01", AllowLeadingZeros, 1, 2, 3, Pre(1)),
@@ -169,17 +215,17 @@ namespace Semver.Test
             Valid("1.2.3-a.00001.c", AllowLeadingZeros, 1, 2, 3, Pre("a", 1, "c")),
 
             // Overflow at int.Max+1
-            Invalid<OverflowException>("2147483648.2.3", MajorMinorOrPatchOverflowMessage, "2147483648"),
-            Invalid<OverflowException>("1.2147483648.3", MajorMinorOrPatchOverflowMessage, "2147483648"),
-            Invalid<OverflowException>("1.2.2147483648", MajorMinorOrPatchOverflowMessage, "2147483648"),
+            Invalid<OverflowException>("2147483648.2.3", MajorOverflowMessage, "2147483648"),
+            Invalid<OverflowException>("1.2147483648.3", MinorOverflowMessage, "2147483648"),
+            Invalid<OverflowException>("1.2.2147483648", PatchOverflowMessage, "2147483648"),
             Invalid<OverflowException>("1.2.3-2147483648", PrereleaseOverflowMessage, "2147483648"),
 
             // Invalid characters in major, minor, or patch
-            Invalid("1@.2.3", InvalidCharacterInMajorMinorOrPatchMessage, "@"),
-            Invalid("1.2@.3", InvalidCharacterInMajorMinorOrPatchMessage, "@"),
-            Invalid("1.0.0@", InvalidCharacterInMajorMinorOrPatchMessage, "@"),
-            Invalid("1.0.0@.alpha", InvalidCharacterInMajorMinorOrPatchMessage, "@"),
-            Invalid("1.0.0@-alpha", InvalidCharacterInMajorMinorOrPatchMessage, "@"),
+            Invalid("1@.2.3", InvalidCharacterInMajorMessage, "@"),
+            Invalid("1.2@.3", InvalidCharacterInMinorMessage, "@"),
+            Invalid("1.0.0@", InvalidCharacterInPatchMessage, "@"),
+            Invalid("1.0.0@.alpha", InvalidCharacterInPatchMessage, "@"),
+            Invalid("1.0.0@-alpha", InvalidCharacterInPatchMessage, "@"),
 
             // Invalid characters in prerelease and metadata
             Invalid("1.2.3-😞+b", InvalidCharacterInPrereleaseMessage, "\ud83d"), // High part of surrogate pair
@@ -190,7 +236,8 @@ namespace Semver.Test
             Invalid("1.0.0+á", InvalidCharacterInMetadataMessage, "á"),
 
             // Empty or whitespace
-            Invalid("", EmptyVersionMessage), Invalid(" ", AllWhitespaceVersionMessage),
+            Invalid("", EmptyVersionMessage),
+            Invalid(" ", AllWhitespaceVersionMessage),
             Invalid("\t", AllWhitespaceVersionMessage),
 
             // Leading 'v', but otherwise valid
@@ -205,6 +252,13 @@ namespace Semver.Test
             Valid("1.2.3 ", AllowTrailingWhitespace, 1, 2, 3),
             Valid("1.2.3\t", AllowTrailingWhitespace, 1, 2, 3),
 
+            // Whitespace in middle
+            Invalid("1 .2.3-alpha", InvalidCharacterInMajorMessage, " "),
+            Invalid("1. 2.3-alpha", InvalidCharacterInMinorMessage, " "),
+            Invalid("1.2 .3-alpha", InvalidCharacterInMinorMessage, " "),
+            Invalid("1.2. 3-alpha", InvalidCharacterInPatchMessage, " "),
+            Invalid("1.2.3 -alpha", InvalidCharacterInPatchMessage, " "),
+
             // Fourth number
             Invalid("1.2.3.4", FourthVersionNumberMessage),
             Invalid("1.2.3.0", FourthVersionNumberMessage),
@@ -213,12 +267,12 @@ namespace Semver.Test
             Invalid("1.2.3.0-beta+b23", FourthVersionNumberMessage),
 
             // Ends in dot after number
-            Invalid("1.2.3.", InvalidCharacterInMajorMinorOrPatchMessage, "."),
-            Invalid("1.2.", OptionalPatch, MissingMajorMinorOrPatchMessage),
-            Invalid("1.", OptionalMinorPatch, MissingMajorMinorOrPatchMessage),
+            Invalid("1.2.3.", InvalidCharacterInPatchMessage, "."),
+            Invalid("1.2.", OptionalPatch, EmptyPatchMessage),
+            Invalid("1.", OptionalMinorPatch, EmptyMinorMessage),
 
             // Missing major version
-            Invalid("ui-2.1-alpha", MissingMajorMinorOrPatchMessage),
+            Invalid("ui-2.1-alpha", InvalidCharacterInMajorMessage, "u"),
 
             // Some long versions to test parsing big version number (parameter is random seed)
             ValidLongVersion(21575113),
@@ -333,11 +387,24 @@ namespace Semver.Test
             foreach (var testCase in testCases.Where(c => c.IsValid && c.Styles.HasStyle(AllowLeadingZeros)))
             {
                 // Determine whether the error should be about leading zeros in major, minor, or patch
-                var version = SemVersion.Parse(testCase.Version, testCase.Styles).ToString();
-                var leadingZeroInMajorMinorPatch = version.Split('-')[0] != testCase.Version.Split('-')[0];
-                var message = leadingZeroInMajorMinorPatch
-                    ? LeadingZeroInMajorMinorOrPatchMessage
-                    : LeadingZeroInPrereleaseMessage;
+                var expectedVersion = SemVersion.Parse(testCase.Version, testCase.Styles).ToString();
+                var expectedMajorMinorPatch = expectedVersion.Split('-')[0];
+                var actualMajorMinorPatch = testCase.Version.Split('-')[0];
+                var leadingZeroInMajorMinorPatch = expectedMajorMinorPatch != actualMajorMinorPatch;
+                string message;
+                if (leadingZeroInMajorMinorPatch)
+                {
+                    var expectedParts = expectedMajorMinorPatch.Split('.');
+                    var actualParts = actualMajorMinorPatch.Split('.');
+                    if (actualParts[0] != expectedParts[0])
+                        message = LeadingZeroInMajorMessage;
+                    else if (actualParts[1] != expectedParts[1])
+                        message = LeadingZeroInMinorMessage;
+                    else
+                        message = LeadingZeroInPatchMessage;
+                }
+                else
+                    message = LeadingZeroInPrereleaseMessage;
                 theoryData.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~AllowLeadingZeros, message));
             }
@@ -499,7 +566,14 @@ namespace Semver.Test
 
         private static string InjectValue(string format, string value)
         {
-            return string.Format(CultureInfo.InvariantCulture, format, "{0}", value);
+            try
+            {
+                return string.Format(CultureInfo.InvariantCulture, format, "{0}", value);
+            }
+            catch (FormatException ex)
+            {
+                throw new FormatException($"Could not inject '{value}' into '{format}'", ex);
+            }
         }
     }
 }
