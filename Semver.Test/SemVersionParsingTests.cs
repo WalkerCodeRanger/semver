@@ -14,7 +14,7 @@ namespace Semver.Test
     /// </summary>
     public class SemVersionParsingTests
     {
-        private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.\r\nParameter name: style";
+        private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used\r\nParameter name: style";
 
         private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace";
         private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace";
