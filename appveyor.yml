@@ -19,7 +19,7 @@ init:
         Write-Host "Tagged version: $version"
     }
     $version_split_at_hyphen = $version -split '-'
-    $major_minor_patch = $version_split_at_hyphen[0]
+    $major_minor_patch = "$($version_split_at_hyphen[0])"
     $major_minor_patch_split = $major_minor_patch -split '.'
     $major = "$($major_minor_patch_split[0])"
     $minor = "0"
