@@ -21,9 +21,32 @@ Install-Package semver
 var version = SemVersion.Parse("1.1.0-rc.1+nightly.2345");
 ```
 
+## Constructing
+
+```csharp
+var v1 = new SemVersion(1, 0);
+```
+
 ## Comparing
 
 ```csharp
-if(version >= "1.0")
-    Console.WriteLine("released version {0}!", version)
+if (version < v1)
+    Console.WriteLine($"Initial development version {version}!");
+```
+
+## Manipulating
+
+```csharp
+if (version.IsPrerelease)
+{
+    Console.WriteLine($"Prerelease: {version.Prerelease}");
+    Console.WriteLine($"Next release version is: {version.Change(prerelease: "", build: "")}");
+}
+```
+
+Outputs:
+
+```console
+Prerelease: rc.1
+Next release version is: 1.1.0
 ```
