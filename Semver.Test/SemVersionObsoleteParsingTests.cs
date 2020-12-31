@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Xunit;
+using static System.Environment;
 
 namespace Semver.Test
 {
@@ -360,7 +361,7 @@ namespace Semver.Test
         public void ParseLooseInvalidThrowsArgumentExceptionTest(string versionString)
         {
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString));
-            Assert.Equal("Invalid version.\r\nParameter name: version", ex.Message);
+            Assert.Equal($"Invalid version '{versionString}'.{NewLine}Parameter name: version", ex.Message);
         }
 
         [Theory]
@@ -376,7 +377,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null));
             // TODO that is a strange error message, should be version
-            Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);
+            Assert.Equal($"Value cannot be null.{NewLine}Parameter name: input", ex.Message);
         }
 
         [Fact]
@@ -430,7 +431,7 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString, true));
 #pragma warning restore CS0618 // Type or member is obsolete
-            Assert.Equal("Invalid version.\r\nParameter name: version", ex.Message);
+            Assert.Equal($"Invalid version '{versionString}'.{NewLine}Parameter name: version", ex.Message);
         }
 
         [Theory]
@@ -470,7 +471,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null, true));
 #pragma warning restore CS0618 // Type or member is obsolete
             // TODO that is a strange error message, should be version
-            Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);
+            Assert.Equal($"Value cannot be null.{NewLine}Parameter name: input", ex.Message);
         }
 
         [Theory]
@@ -593,7 +594,7 @@ namespace Semver.Test
                 SemVersion _ = versionString;
 #pragma warning restore CS0618 // Type or member is obsolete
             });
-            Assert.Equal("Invalid version.\r\nParameter name: version", ex.Message);
+            Assert.Equal($"Invalid version '{versionString}'.{NewLine}Parameter name: version", ex.Message);
         }
 
         [Theory]
@@ -620,7 +621,7 @@ namespace Semver.Test
 #pragma warning restore CS0618 // Type or member is obsolete
             });
             // TODO that is a strange error message, should be version
-            Assert.Equal("Value cannot be null.\r\nParameter name: input", ex.Message);
+            Assert.Equal($"Value cannot be null.{NewLine}Parameter name: input", ex.Message);
         }
         #endregion
 
