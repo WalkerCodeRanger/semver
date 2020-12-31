@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
 using Xunit;
+using static System.Environment;
 
 namespace Semver.Test
 {
@@ -251,7 +252,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentNullException>(() => new SemVersion(null));
 #pragma warning restore 618
 
-            Assert.Equal("Value cannot be null.\r\nParameter name: version", ex.Message);
+            Assert.Equal($"Value cannot be null.{NewLine}Parameter name: version", ex.Message);
         }
 
         [Theory]
@@ -284,7 +285,7 @@ namespace Semver.Test
 
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.FromVersion(nonSemanticVersion));
 
-            Assert.Equal("Version with Revision number can't be converted to SemVer.\r\nParameter name: version", ex.Message);
+            Assert.Equal($"Version with Revision number can't be converted to SemVer.{NewLine}Parameter name: version", ex.Message);
         }
 
         [Theory]
@@ -332,7 +333,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.FromVersion(null));
 
-            Assert.Equal("Value cannot be null.\r\nParameter name: version", ex.Message);
+            Assert.Equal($"Value cannot be null.{NewLine}Parameter name: version", ex.Message);
         }
 
         [Theory]

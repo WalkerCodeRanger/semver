@@ -13,28 +13,28 @@ namespace Semver
     /// own class.</remarks>
     internal static class SemVersionParser
     {
-        private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace";
-        private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace";
-        private const string EmptyVersionMessage = "Empty string instead of version";
-        private const string AllWhitespaceVersionMessage = "All whitespace instead of version";
-        private const string LeadingLowerVMessage = "Leading 'v' in '{0}'";
-        private const string LeadingUpperVMessage = "Leading 'V' in '{0}'";
-        private const string LeadingZeroInMajorMinorOrPatchMessage = "{1} version has leading zero in '{0}'";
-        private const string EmptyMajorMinorOrPatchMessage = "{1} version missing in '{0}'";
-        private const string MissingMinorMessage = "Missing minor version in '{0}'";
-        private const string MissingPatchMessage = "Missing patch version in '{0}'";
-        private const string MajorMinorOrPatchOverflowMessage = "{1} version '{2}' was too large for Int32 in '{0}'";
-        private const string FourthVersionNumberMessage = "Fourth version number in '{0}'";
-        private const string PrereleasePrefixedByDotMessage = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'";
-        private const string MissingPrereleaseIdentifierMessage = "Missing prerelease identifier in '{0}'";
-        private const string LeadingZeroInPrereleaseMessage = "Leading Zero in prerelease identifier in version '{0}'";
-        private const string PrereleaseOverflowMessage = "Prerelease identifier '{1}' was too large for Int32 in version '{0}'";
-        private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'";
-        private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'";
-        private const string InvalidCharacterInMajorMinorOrPatchMessage = "{1} version contains invalid character '{2}' in '{0}'";
-        private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'";
-        private const string MultiplePrereleaseIdentifiersMessage = "Multiple prerelease identifiers are not allow in '{0}'";
-        private const string BuildMetadataMessage = "Build metadata is not allowed in '{0}'";
+        private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace.";
+        private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace.";
+        private const string EmptyVersionMessage = "Empty string is not a valid version.";
+        private const string AllWhitespaceVersionMessage = "Whitespace is not a valid version.";
+        private const string LeadingLowerVMessage = "Leading 'v' in '{0}'.";
+        private const string LeadingUpperVMessage = "Leading 'V' in '{0}'.";
+        private const string LeadingZeroInMajorMinorOrPatchMessage = "{1} version has leading zero in '{0}'.";
+        private const string EmptyMajorMinorOrPatchMessage = "{1} version missing in '{0}'.";
+        private const string MissingMinorMessage = "Missing minor version in '{0}'.";
+        private const string MissingPatchMessage = "Missing patch version in '{0}'.";
+        private const string MajorMinorOrPatchOverflowMessage = "{1} version '{2}' was too large for Int32 in '{0}'.";
+        private const string FourthVersionNumberMessage = "Fourth version number in '{0}'.";
+        private const string PrereleasePrefixedByDotMessage = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'.";
+        private const string MissingPrereleaseIdentifierMessage = "Missing prerelease identifier in '{0}'.";
+        private const string LeadingZeroInPrereleaseMessage = "Leading zero in prerelease identifier in version '{0}'.";
+        private const string PrereleaseOverflowMessage = "Prerelease identifier '{1}' was too large for Int32 in version '{0}'.";
+        private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'.";
+        private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'.";
+        private const string InvalidCharacterInMajorMinorOrPatchMessage = "{1} version contains invalid character '{2}' in '{0}'.";
+        private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'.";
+        private const string MultiplePrereleaseIdentifiersMessage = "Multiple prerelease identifiers are not allowed in '{0}'.";
+        private const string BuildMetadataMessage = "Build metadata is not allowed in '{0}'.";
 
         /// <summary>
         /// The internal method that all parsing is based on. Because this is called by both

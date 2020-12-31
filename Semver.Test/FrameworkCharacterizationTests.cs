@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Xunit;
+using static System.Environment;
 
 namespace Semver.Test
 {
@@ -53,7 +54,7 @@ namespace Semver.Test
             Assert.Equal(IntOverflowMessage, ex.Message);
         }
 
-        private const string InvalidNumberStyleMessage = "An undefined NumberStyles value is being used.\r\nParameter name: style";
+        private static readonly string InvalidNumberStyleMessage = $"An undefined NumberStyles value is being used.{NewLine}Parameter name: style";
         private const string InvalidFormatMessage = "Input string was not in a correct format.";
         private const string IntOverflowMessage = "Value was either too large or too small for an Int32.";
         private const NumberStyles InvalidNumberStyle = (NumberStyles)int.MaxValue;

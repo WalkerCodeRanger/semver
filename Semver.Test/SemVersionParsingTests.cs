@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Semver.Test.Builders;
 using Xunit;
+using static System.Environment;
 using static Semver.SemVersionStyles;
 
 namespace Semver.Test
@@ -14,38 +15,38 @@ namespace Semver.Test
     /// </summary>
     public class SemVersionParsingTests
     {
-        private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used\r\nParameter name: style";
+        private static readonly string InvalidSemVersionStylesMessage = $"An invalid SemVersionStyles value was used.{NewLine}Parameter name: style";
 
-        private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace";
-        private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace";
-        private const string EmptyVersionMessage = "Empty string instead of version";
-        private const string AllWhitespaceVersionMessage = "All whitespace instead of version";
-        private const string LeadingLowerVMessage = "Leading 'v' in '{0}'";
-        private const string LeadingUpperVMessage = "Leading 'V' in '{0}'";
-        private const string LeadingZeroInMajorMessage = "Major version has leading zero in '{0}'";
-        private const string LeadingZeroInMinorMessage = "Minor version has leading zero in '{0}'";
-        private const string LeadingZeroInPatchMessage = "Patch version has leading zero in '{0}'";
-        private const string EmptyMajorMessage = "Major version missing in '{0}'";
-        private const string EmptyMinorMessage = "Minor version missing in '{0}'";
-        private const string EmptyPatchMessage = "Patch version missing in '{0}'";
-        private const string MissingMinorMessage = "Missing minor version in '{0}'";
-        private const string MissingPatchMessage = "Missing patch version in '{0}'";
-        private const string MajorOverflowMessage = "Major version '{1}' was too large for Int32 in '{0}'";
-        private const string MinorOverflowMessage = "Minor version '{1}' was too large for Int32 in '{0}'";
-        private const string PatchOverflowMessage = "Patch version '{1}' was too large for Int32 in '{0}'";
-        private const string FourthVersionNumberMessage = "Fourth version number in '{0}'";
-        private const string PrereleasePrefixedByDotMessage = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'";
-        private const string MissingPrereleaseIdentifierMessage = "Missing prerelease identifier in '{0}'";
-        private const string LeadingZeroInPrereleaseMessage = "Leading Zero in prerelease identifier in version '{0}'";
-        private const string PrereleaseOverflowMessage = "Prerelease identifier '{1}' was too large for Int32 in version '{0}'";
-        private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'";
-        private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'";
-        private const string InvalidCharacterInMajorMessage = "Major version contains invalid character '{1}' in '{0}'";
-        private const string InvalidCharacterInMinorMessage = "Minor version contains invalid character '{1}' in '{0}'";
-        private const string InvalidCharacterInPatchMessage = "Patch version contains invalid character '{1}' in '{0}'";
-        private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'";
-        private const string MultiplePrereleaseIdentifiersMessage = "Multiple prerelease identifiers are not allow in '{0}'";
-        private const string BuildMetadataMessage = "Build metadata is not allowed in '{0}'";
+        private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace.";
+        private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace.";
+        private const string EmptyVersionMessage = "Empty string is not a valid version.";
+        private const string AllWhitespaceVersionMessage = "Whitespace is not a valid version.";
+        private const string LeadingLowerVMessage = "Leading 'v' in '{0}'.";
+        private const string LeadingUpperVMessage = "Leading 'V' in '{0}'.";
+        private const string LeadingZeroInMajorMessage = "Major version has leading zero in '{0}'.";
+        private const string LeadingZeroInMinorMessage = "Minor version has leading zero in '{0}'.";
+        private const string LeadingZeroInPatchMessage = "Patch version has leading zero in '{0}'.";
+        private const string EmptyMajorMessage = "Major version missing in '{0}'.";
+        private const string EmptyMinorMessage = "Minor version missing in '{0}'.";
+        private const string EmptyPatchMessage = "Patch version missing in '{0}'.";
+        private const string MissingMinorMessage = "Missing minor version in '{0}'.";
+        private const string MissingPatchMessage = "Missing patch version in '{0}'.";
+        private const string MajorOverflowMessage = "Major version '{1}' was too large for Int32 in '{0}'.";
+        private const string MinorOverflowMessage = "Minor version '{1}' was too large for Int32 in '{0}'.";
+        private const string PatchOverflowMessage = "Patch version '{1}' was too large for Int32 in '{0}'.";
+        private const string FourthVersionNumberMessage = "Fourth version number in '{0}'.";
+        private const string PrereleasePrefixedByDotMessage = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'.";
+        private const string MissingPrereleaseIdentifierMessage = "Missing prerelease identifier in '{0}'.";
+        private const string LeadingZeroInPrereleaseMessage = "Leading zero in prerelease identifier in version '{0}'.";
+        private const string PrereleaseOverflowMessage = "Prerelease identifier '{1}' was too large for Int32 in version '{0}'.";
+        private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'.";
+        private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'.";
+        private const string InvalidCharacterInMajorMessage = "Major version contains invalid character '{1}' in '{0}'.";
+        private const string InvalidCharacterInMinorMessage = "Minor version contains invalid character '{1}' in '{0}'.";
+        private const string InvalidCharacterInPatchMessage = "Patch version contains invalid character '{1}' in '{0}'.";
+        private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'.";
+        private const string MultiplePrereleaseIdentifiersMessage = "Multiple prerelease identifiers are not allowed in '{0}'.";
+        private const string BuildMetadataMessage = "Build metadata is not allowed in '{0}'.";
 
         public static readonly TheoryData<SemVersionStyles> InvalidSemVersionStyles = new TheoryData<SemVersionStyles>()
         {
@@ -322,7 +323,7 @@ namespace Semver.Test
             ValidLongVersion(1445670),
             ValidLongVersion(5646),
 
-            Invalid<ArgumentNullException>(null, "Value cannot be null.\r\nParameter name: version"));
+            Invalid<ArgumentNullException>(null, $"Value cannot be null.{NewLine}Parameter name: version"));
 
         [Fact]
         public void CanConstructParsingTestCases()

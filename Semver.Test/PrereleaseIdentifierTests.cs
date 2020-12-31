@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Xunit;
+using static System.Environment;
 
 namespace Semver.Test
 {
@@ -53,7 +54,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier("", allowLeadingZeros));
 
             Assert.Equal("value", ex.ParamName);
-            Assert.Equal("Cannot be empty string\r\nParameter name: value", ex.Message);
+            Assert.Equal($"Cannot be empty string.{NewLine}Parameter name: value", ex.Message);
         }
 
         [Theory]
@@ -80,7 +81,7 @@ namespace Semver.Test
             // int.MaxValue + 1
             var ex = Assert.Throws<OverflowException>(() => new PrereleaseIdentifier("2147483648"));
 
-            Assert.Equal("Prerelease identifier '2147483648' was too large for Int32", ex.Message);
+            Assert.Equal("Prerelease identifier '2147483648' was too large for Int32.", ex.Message);
         }
 
         [Theory]
@@ -91,7 +92,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier(value));
 
             Assert.Equal("value", ex.ParamName);
-            Assert.Equal($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'\r\nParameter name: value",
+            Assert.Equal($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'.{NewLine}Parameter name: value",
                 ex.Message);
         }
 
@@ -107,7 +108,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier(value));
 
             Assert.Equal("value", ex.ParamName);
-            Assert.Equal($"A prerelease identifier can contain only ASCII alphanumeric characters and hyphens '{value}'\r\nParameter name: value",
+            Assert.Equal($"A prerelease identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.{NewLine}Parameter name: value",
                 ex.Message);
         }
 
@@ -131,7 +132,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier(value));
 
             Assert.Equal("value", ex.ParamName);
-            Assert.Equal($"Numeric prerelease identifiers can't be negative: {value}\r\nParameter name: value",
+            Assert.Equal($"Numeric prerelease identifiers can't be negative: {value}.{NewLine}Parameter name: value",
                 ex.Message);
         }
 

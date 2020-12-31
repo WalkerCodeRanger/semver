@@ -23,7 +23,7 @@ namespace Semver
     public sealed class SemVersion : IComparable<SemVersion>, IComparable, ISerializable
 #endif
     {
-        private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used";
+        private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
 
         /// <summary>
         /// This exception is used with the <see cref="SemVersionParser.Parse"/>

@@ -43,7 +43,7 @@ namespace Semver
         {
             _ = value ?? throw new ArgumentNullException(nameof(value));
             if (value.Length == 0)
-                throw new ArgumentException("Cannot be empty string", nameof(value));
+                throw new ArgumentException("Cannot be empty string.", nameof(value));
             if (value.IsDigits())
             {
                 if (value.Length > 1 && value[0] == '0')
@@ -54,7 +54,7 @@ namespace Semver
                         if (value.Length == 0) value = "0";
                     }
                     else
-                        throw new ArgumentException($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'", nameof(value));
+                        throw new ArgumentException($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'.", nameof(value));
                 }
 
                 try
@@ -64,13 +64,13 @@ namespace Semver
                 catch (OverflowException)
                 {
                     // Remake the overflow exception to give better message
-                    throw new OverflowException($"Prerelease identifier '{value}' was too large for Int32");
+                    throw new OverflowException($"Prerelease identifier '{value}' was too large for Int32.");
                 }
             }
             else
             {
                 if (!value.IsAlphanumericOrHyphens())
-                    throw new ArgumentException($"A prerelease identifier can contain only ASCII alphanumeric characters and hyphens '{value}'", nameof(value));
+                    throw new ArgumentException($"A prerelease identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.", nameof(value));
                 IntValue = null;
             }
 
@@ -80,7 +80,7 @@ namespace Semver
         public PrereleaseIdentifier(int value)
         {
             if (value < 0)
-                throw new ArgumentException($"Numeric prerelease identifiers can't be negative: {value}", nameof(value));
+                throw new ArgumentException($"Numeric prerelease identifiers can't be negative: {value}.", nameof(value));
             Value = value.ToString(CultureInfo.InvariantCulture);
             IntValue = value;
         }
