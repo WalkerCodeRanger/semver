@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 #if !NETSTANDARD
 using System.Runtime.Serialization;
@@ -33,6 +34,8 @@ namespace Semver
 #endif
                 TimeSpan.FromSeconds(0.5));
 
+        private static readonly Regex LeadingZeroNumberEx = new Regex(@"^0\d+$");
+        
 #if !NETSTANDARD
 #pragma warning disable CA1801 // Parameter unused
         /// <summary>
@@ -129,12 +132,100 @@ namespace Semver
             else if (strict)
                 throw new InvalidOperationException("Invalid version (no patch version given in strict mode)");
 
-            var prerelease = match.Groups["pre"].Value;
-            var build = match.Groups["build"].Value;
+            try
+            {
+                var prerelease = ParsePreRelease(match.Groups["pre"].Value, strict);
+                var build = ParseBuildMetadata(match.Groups["build"].Value, strict);
 
-            return new SemVersion(major, minor, patch, prerelease, build);
+                return new SemVersion(major, minor, patch, prerelease, build);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new InvalidOperationException($"Invalid version ({ex.Message})");
+            }
         }
 
+        /// <summary>
+        /// Parses the pre-release version for compliance with the SemVer 2 spec. 
+        /// </summary>
+        /// <remarks>
+        /// <para>In loose mode, any string is accepted.</para>
+        /// <para>
+        /// In strict mode, the specification is followed.
+        /// A pre-release version MAY be denoted by appending a hyphen and a series of dot separated identifiers
+        /// immediately following the patch version. Identifiers MUST comprise only ASCII alphanumerics and hyphens
+        /// [0-9A-Za-z-]. Identifiers MUST NOT be empty. Numeric identifiers MUST NOT include leading zeroes.
+        /// Pre-release versions have a lower precedence than the associated normal version. A pre-release version
+        /// indicates that the version is unstable and might not satisfy the intended compatibility requirements
+        /// as denoted by its associated normal version.</para>
+        /// <example>
+        /// 1.0.0-alpha, 1.0.0-alpha.1, 1.0.0-0.3.7, 1.0.0-x.7.z.92, 1.0.0-x-y-z.–
+        /// </example>
+        /// </remarks>
+        /// <param name="pre">The value supplied for the pre-release version.</param>
+        /// <param name="strict">If set to <see langword="false"/>, any string is allowed.</param>
+        /// <returns>The pre-release version, or an empty string if none was supplied.</returns>
+        private static string ParsePreRelease(string pre, bool strict)
+        {
+            return ParseIdentifiers("pre-release version", pre, strict, ValidatePreReleaseIdentifier);
+        }
+
+        private static bool ValidatePreReleaseIdentifier(string identifier)
+        {
+            return !(
+                string.IsNullOrWhiteSpace(identifier) ||
+                LeadingZeroNumberEx.IsMatch(identifier)
+            );
+        }
+
+        /// <summary>
+        /// Parses the build metadata for compliance with the SemVer 2 spec. 
+        /// </summary>
+        /// <remarks>
+        /// <para>In loose mode, any string is accepted.</para>
+        /// <para>
+        /// In strict mode, the specification is followed.
+        /// Build metadata MAY be denoted by appending a plus sign and a series of dot separated identifiers
+        /// immediately following the patch or pre-release version. Identifiers MUST comprise only ASCII alphanumerics
+        /// and hyphens [0-9A-Za-z-]. Identifiers MUST NOT be empty. Build metadata MUST be ignored when determining
+        /// version precedence. Thus two versions that differ only in the build metadata, have the same precedence.
+        /// </para>
+        /// <example>
+        /// 1.0.0-alpha+001, 1.0.0+20130313144700, 1.0.0-beta+exp.sha.5114f85, 1.0.0+21AF26D3—-117B344092BD
+        /// </example>
+        /// </remarks>
+        /// <param name="build">The value supplied for the build metadata.</param>
+        /// <param name="strict">If set to <see langword="false"/>, any string is allowed.</param>
+        /// <returns>The build metadata, or an empty string if none was supplied.</returns>
+        private static string ParseBuildMetadata(string build, bool strict)
+        {
+            return ParseIdentifiers("build metadata", build, strict, ValidateBuildMetadataIdentifier);
+        }
+        
+        private static bool ValidateBuildMetadataIdentifier(string identifier)
+        {
+            return !string.IsNullOrWhiteSpace(identifier);
+        }
+
+        private static string ParseIdentifiers(string identifiersType, string identifiers, bool strict, 
+            Func<string, bool> validateIdentifier)
+        {
+            if (string.IsNullOrWhiteSpace(identifiers)) return string.Empty;
+            if (!strict) return identifiers;
+
+            var firstInvalidIdentifier = identifiers
+                .Split('.')
+                .FirstOrDefault(identifier => !validateIdentifier(identifier));
+
+            if (firstInvalidIdentifier != null)
+            {
+                throw new ArgumentException(
+                    $"The {identifiersType} does not comply with the specification. " +
+                    $"Invalid identifier: '{firstInvalidIdentifier}'");
+            }
+
+            return identifiers;
+        }
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
         /// equivalent and returns a value that indicates whether the conversion succeeded.

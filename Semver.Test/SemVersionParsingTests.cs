@@ -27,10 +27,10 @@ namespace Semver.Test
             s.Append(int.MaxValue);
             s.Append('.');
             s.Append(int.MaxValue);
-            s.Append('-');
+            s.Append("-pre");
             var random = new Random(1545743217);
             AppendLabel(s, 1_000_000, random);
-            s.Append('+');
+            s.Append("+build");
             AppendLabel(s, 1_000_000, random);
             return s.ToString();
         }
@@ -40,8 +40,26 @@ namespace Semver.Test
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.";
             var random = random1;
 
+            var identifierBuilder = new StringBuilder(".");
+            
             for (var i = 0; i < length; i++)
-                s.Append(chars[random.Next(0, chars.Length)]);
+            {
+                var nextChar = chars[random.Next(0, chars.Length)];
+
+                if (identifierBuilder.Length == 1 && (nextChar == '.' || nextChar == '0'))
+                {
+                    // Don't start with a leading zero, and don't insert an empty group.
+                    continue;
+                }
+                
+                if (nextChar == '.')
+                {
+                    s.Append(identifierBuilder);
+                    identifierBuilder.Clear();
+                }
+                
+                identifierBuilder.Append(nextChar);
+            }
         }
 
         /// <summary>
@@ -80,6 +98,7 @@ namespace Semver.Test
                 {"1.2.3----RC-SNAPSHOT.12.9.1--.12", 1, 2, 3, "---RC-SNAPSHOT.12.9.1--.12", ""},
                 {"1.0.0+0.build.1-rc.10000aaa-kk-0.1", 1, 0, 0, "", "0.build.1-rc.10000aaa-kk-0.1"},
                 {"1.0.0-0A.is.legal", 1, 0, 0, "0A.is.legal", ""},
+                {"1.0.0-pre.0.1", 1, 0, 0, "pre.0.1", ""},
             };
 
         /// <summary>
@@ -236,6 +255,24 @@ namespace Semver.Test
                 {"1.2.3-a.00001.c", 1, 2, 3, "a.00001.c", ""},
             };
 
+        public static readonly TheoryData<string, int, int, int, string, string> EmptyPrereleaseIdentities = 
+            new TheoryData<string, int, int, int, string, string>()
+            {
+                {"1.0.0-pre..1", 1, 0, 0, "pre..1", ""},
+                {"1.0.0-pre.2..1", 1, 0, 0, "pre.2..1", ""},
+                {"1.0.0-pre.1..2+alpha", 1, 0, 0, "pre.1..2", "alpha"},
+                {"1.0.0-pre.1..2+alpha.3..1", 1, 0, 0, "pre.1..2", "alpha.3..1"},
+            };
+
+        public static readonly TheoryData<string, int, int, int, string, string> EmptyBuildIdentities = 
+            new TheoryData<string, int, int, int, string, string>()
+            {
+                {"1.0.0-pre.1+alpha..1", 1, 0, 0, "pre.1", "alpha..1"},
+                {"1.0.0-pre.1.2+alpha.1..3", 1, 0, 0, "pre.1.2", "alpha.1..3"},
+                {"1.0.0+alpha.1..3", 1, 0, 0, "", "alpha.1..3"},
+                {"1.0.0+1..3", 1, 0, 0, "", "1..3"},
+            };
+
         public static readonly TheoryData<string> Overflow = new TheoryData<string>()
             {
                 // int.Max+1
@@ -290,6 +327,8 @@ namespace Semver.Test
         [MemberData(nameof(LeadingZeros))]
         [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
         [MemberData(nameof(LeadingZerosPrerelease))]
+        [MemberData(nameof(EmptyPrereleaseIdentities))]
+        [MemberData(nameof(EmptyBuildIdentities))]
         public void ParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             var v = SemVersion.Parse(versionString);
@@ -341,10 +380,6 @@ namespace Semver.Test
         [MemberData(nameof(BasicValid))]
         [MemberData(nameof(MiscValid))]
         [MemberData(nameof(DashInStrangePlace))]
-        [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
-        // TODO leading zero versions are accepted and shouldn't be (issue #16)
-        [MemberData(nameof(LeadingZeros))]
-        [MemberData(nameof(LeadingZerosPrerelease))]
         public void ParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             var v = SemVersion.Parse(versionString, true);
@@ -363,6 +398,35 @@ namespace Semver.Test
             Assert.ThrowsAny<Exception>(() => SemVersion.Parse(versionString, true));
         }
 
+        [Theory]
+        [MemberData(nameof(LeadingZerosPrerelease))]
+        [MemberData(nameof(EmptyPrereleaseIdentities))]
+// Ignoring extra parameters which are only used for the "Loose" tests
+#pragma warning disable
+        public void ParseStrictInvalidPreReleaseExamples(string versionString, int major, int minor, int patch, string prerelease, string build)
+#pragma warning restore
+        {
+            var ex = Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
+            Assert.StartsWith(
+                "Invalid version (The pre-release version does not comply with the specification. Invalid identifier:", 
+                ex.Message,
+                StringComparison.OrdinalIgnoreCase);
+        }
+        
+        [Theory]
+        [MemberData(nameof(EmptyBuildIdentities))]
+// Ignoring extra parameters which are only used for the "Loose" tests
+#pragma warning disable
+        public void ParseStrictInvalidBuildExamples(string versionString, int major, int minor, int patch, string prerelease, string build)
+#pragma warning restore
+        {
+            var ex = Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
+            Assert.StartsWith(
+                "Invalid version (The build metadata does not comply with the specification. Invalid identifier:", 
+                ex.Message,
+                StringComparison.OrdinalIgnoreCase);
+        }
+        
         // TODO These exceptions should be FormatException etc.
         [Theory]
         [MemberData(nameof(IllegalCharacters))]
@@ -420,6 +484,8 @@ namespace Semver.Test
         [MemberData(nameof(LeadingZeros))]
         [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
         [MemberData(nameof(LeadingZerosPrerelease))]
+        [MemberData(nameof(EmptyPrereleaseIdentities))]
+        [MemberData(nameof(EmptyBuildIdentities))]
         public void TryParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             Assert.True(SemVersion.TryParse(versionString, out var v));
@@ -449,10 +515,8 @@ namespace Semver.Test
         [MemberData(nameof(BasicValid))]
         [MemberData(nameof(MiscValid))]
         [MemberData(nameof(DashInStrangePlace))]
-        [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
         // TODO leading zero versions are accepted and shouldn't be (issue #16)
         [MemberData(nameof(LeadingZeros))]
-        [MemberData(nameof(LeadingZerosPrerelease))]
         public void TryParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             Assert.True(SemVersion.TryParse(versionString, out var v));
@@ -497,8 +561,6 @@ namespace Semver.Test
         [MemberData(nameof(MissingPatchValid))]
         [MemberData(nameof(MissingMinorPatchValid))]
         [MemberData(nameof(LeadingZeros))]
-        [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
-        [MemberData(nameof(LeadingZerosPrerelease))]
         public void ImplicitConversionFromValidStringTest(string versionString, int major, int minor, int patch, string prerelease, string build)
         {
             SemVersion v = versionString;
