@@ -61,7 +61,9 @@ namespace Semver
             Minor = semVersion.Minor;
             Patch = semVersion.Patch;
             Prerelease = semVersion.Prerelease;
+            PrereleaseIdentifiers = semVersion.PrereleaseIdentifiers;
             Metadata = semVersion.Metadata;
+            MetadataIdentifiers = semVersion.MetadataIdentifiers;
         }
 #endif
 

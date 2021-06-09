@@ -509,6 +509,8 @@ namespace Semver.Test
                 semVerSerializedDeserialized = (SemVersion)bf.Deserialize(ms);
             }
             Assert.Equal(semVer, semVerSerializedDeserialized);
+            Assert.Equal(semVer.PrereleaseIdentifiers, semVerSerializedDeserialized.PrereleaseIdentifiers);
+            Assert.Equal(semVer.MetadataIdentifiers, semVerSerializedDeserialized.MetadataIdentifiers);
         }
 #endif
     }
