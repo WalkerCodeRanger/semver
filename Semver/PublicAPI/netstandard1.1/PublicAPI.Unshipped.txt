@@ -1,1 +1,44 @@
-﻿
+﻿override Semver.PrereleaseIdentifier.Equals(object obj) -> bool
+override Semver.PrereleaseIdentifier.GetHashCode() -> int
+override Semver.PrereleaseIdentifier.ToString() -> string
+Semver.PrereleaseIdentifier
+Semver.PrereleaseIdentifier.Equals(Semver.PrereleaseIdentifier other) -> bool
+Semver.PrereleaseIdentifier.IntValue.get -> int?
+Semver.PrereleaseIdentifier.PrereleaseIdentifier() -> void
+Semver.PrereleaseIdentifier.PrereleaseIdentifier(int value) -> void
+Semver.PrereleaseIdentifier.PrereleaseIdentifier(string value, bool allowLeadingZeros = false) -> void
+Semver.PrereleaseIdentifier.Value.get -> string
+Semver.SemVersion.Equals(Semver.SemVersion other) -> bool
+Semver.SemVersion.IsPrerelease.get -> bool
+Semver.SemVersion.Metadata.get -> string
+Semver.SemVersion.MetadataIdentifiers.get -> System.Collections.Generic.IReadOnlyList<string>
+Semver.SemVersion.PrereleaseIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.PrereleaseIdentifier>
+Semver.SemVersion.ToVersion() -> System.Version
+Semver.SemVersionStyles
+Semver.SemVersionStyles.AllowLeadingWhitespace = 2 -> Semver.SemVersionStyles
+Semver.SemVersionStyles.AllowLeadingZeros = 1 -> Semver.SemVersionStyles
+Semver.SemVersionStyles.AllowLowerV = 8 -> Semver.SemVersionStyles
+Semver.SemVersionStyles.AllowTrailingWhitespace = 4 -> Semver.SemVersionStyles
+Semver.SemVersionStyles.AllowUpperV = 16 -> Semver.SemVersionStyles
+Semver.SemVersionStyles.AllowV = Semver.SemVersionStyles.AllowLowerV | Semver.SemVersionStyles.AllowUpperV -> Semver.SemVersionStyles
+Semver.SemVersionStyles.AllowWhitespace = Semver.SemVersionStyles.AllowLeadingWhitespace | Semver.SemVersionStyles.AllowTrailingWhitespace -> Semver.SemVersionStyles
+Semver.SemVersionStyles.Any = Semver.SemVersionStyles.AllowLeadingZeros | Semver.SemVersionStyles.AllowWhitespace | Semver.SemVersionStyles.AllowV | Semver.SemVersionStyles.OptionalMinorPatch -> Semver.SemVersionStyles
+Semver.SemVersionStyles.DisallowMetadata = 256 -> Semver.SemVersionStyles
+Semver.SemVersionStyles.DisallowMultiplePrereleaseIdentifiers = 128 -> Semver.SemVersionStyles
+Semver.SemVersionStyles.OptionalMinorPatch = 96 -> Semver.SemVersionStyles
+Semver.SemVersionStyles.OptionalPatch = 32 -> Semver.SemVersionStyles
+Semver.SemVersionStyles.SemVer1 = Semver.SemVersionStyles.AllowLeadingZeros | Semver.SemVersionStyles.DisallowMultiplePrereleaseIdentifiers | Semver.SemVersionStyles.DisallowMetadata -> Semver.SemVersionStyles
+Semver.SemVersionStyles.SemVer2 = 0 -> Semver.SemVersionStyles
+Semver.SemVersionStyles.Strict = 0 -> Semver.SemVersionStyles
+static Semver.PrereleaseIdentifier.implicit operator string(Semver.PrereleaseIdentifier prereleaseIdentifier) -> string
+static Semver.PrereleaseIdentifier.operator !=(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
+static Semver.PrereleaseIdentifier.operator ==(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
+static Semver.SemVersion.FromVersion(System.Version version) -> Semver.SemVersion
+static Semver.SemVersion.Parse(string version) -> Semver.SemVersion
+static Semver.SemVersion.Parse(string version, bool strict) -> Semver.SemVersion
+static Semver.SemVersion.Parse(string version, Semver.SemVersionStyles style) -> Semver.SemVersion
+static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver) -> bool
+static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, bool strict) -> bool
+static Semver.SemVersion.TryParse(string version, Semver.SemVersionStyles style, out Semver.SemVersion semver) -> bool
+*REMOVED*static Semver.SemVersion.Parse(string version, bool strict = false) -> Semver.SemVersion
+*REMOVED*static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, bool strict = false) -> bool
