@@ -20,7 +20,7 @@ namespace Semver
     public sealed class SemVersion : IComparable<SemVersion>, IComparable, IEquatable<SemVersion>
 #else
     [Serializable]
-    public sealed class SemVersion : IComparable<SemVersion>, IComparable, ISerializable
+    public sealed class SemVersion : IComparable<SemVersion>, IComparable, IEquatable<SemVersion>, ISerializable
 #endif
     {
         private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
@@ -428,6 +428,7 @@ namespace Semver
         /// </remarks>
         public string Prerelease { get; }
 
+        // TODO write doc comments for PrereleaseIdentifiers
         public IReadOnlyList<PrereleaseIdentifier> PrereleaseIdentifiers { get; }
 
         /// <summary>
@@ -461,6 +462,7 @@ namespace Semver
         /// </remarks>
         public string Metadata { get; }
 
+        // TODO write doc comments for MetadataIdentifiers
         public IReadOnlyList<string> MetadataIdentifiers { get; }
 
         /// <summary>

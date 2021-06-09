@@ -53,6 +53,8 @@ namespace Semver
             Exception ex,
             out SemVersion semver)
         {
+            // TODO limit the length of the string parsed to prevent timeout attacks
+
             // Assign null once so it doesn't have to be done any time parse fails
             semver = null;
 
