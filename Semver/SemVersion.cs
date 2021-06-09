@@ -34,13 +34,11 @@ namespace Semver
                 TimeSpan.FromSeconds(0.5));
 
 #if !NETSTANDARD
-#pragma warning disable CA1801 // Parameter unused
         /// <summary>
         /// Deserialize a <see cref="SemVersion"/>.
         /// </summary>
         /// <exception cref="ArgumentNullException">The <paramref name="info"/> parameter is null.</exception>
         private SemVersion(SerializationInfo info, StreamingContext context)
-#pragma warning restore CA1801 // Parameter unused
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
             var semVersion = Parse(info.GetString("SemVersion"));
@@ -344,10 +342,8 @@ namespace Semver
             var r = CompareByPrecedence(other);
             if (r != 0) return r;
 
-#pragma warning disable CA1062 // Validate arguments of public methods
             // If other is null, CompareByPrecedence() returns 1
             return CompareComponent(Build, other.Build);
-#pragma warning restore CA1062 // Validate arguments of public methods
         }
 
         /// <summary>
@@ -492,7 +488,6 @@ namespace Semver
         }
 #endif
 
-#pragma warning disable CA2225 // Operator overloads have named alternates
         /// <summary>
         /// Implicit conversion from <see cref="string"/> to <see cref="SemVersion"/>.
         /// </summary>
@@ -502,7 +497,6 @@ namespace Semver
         /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
         public static implicit operator SemVersion(string version)
-#pragma warning restore CA2225 // Operator overloads have named alternates
         {
             return Parse(version);
         }
