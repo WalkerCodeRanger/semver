@@ -46,7 +46,7 @@ if (version.IsPrerelease)
 
 Outputs:
 
-```console
+```text
 Prerelease: rc.1
 Next release version is: 1.1.0
 ```

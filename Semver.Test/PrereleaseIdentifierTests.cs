@@ -25,8 +25,8 @@ namespace Semver.Test
 
         [Theory]
         [InlineData("ident", null)]
-        [InlineData("42", 42)]
-        [InlineData("042", 42)]
+        [InlineData("42", 12)]
+        [InlineData("042", 13)]
         [InlineData("hello", -1)]
         public void CreateUnsafe(string value, int? intValue)
         {
