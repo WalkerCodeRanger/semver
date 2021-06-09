@@ -418,6 +418,10 @@ namespace Semver.Test
 #pragma warning restore 618
         }
 
+        /// <summary>
+        /// Expands out parsing test cases by creating variations of each test case
+        /// with different issues.
+        /// </summary>
         private static TheoryData<ParsingTestCase> ExpandTestCases(params ParsingTestCase[] testCaseParams)
         {
             var testCases = testCaseParams.ToList();
