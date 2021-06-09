@@ -18,7 +18,7 @@ Install-Package semver
 ## Parsing
 
 ```csharp
-var version = SemVersion.Parse("1.1.0-rc.1+nightly.2345");
+var version = SemVersion.Parse("1.1.0-rc.1+nightly.2345", SemVersionStyles.Strict);
 ```
 
 ## Constructing
