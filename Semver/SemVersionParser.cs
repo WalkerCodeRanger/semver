@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
@@ -53,6 +54,7 @@ namespace Semver
             Exception ex,
             out SemVersion semver)
         {
+            Debug.Assert(style.IsValid(), $"Invalid {nameof(style)}");
             // TODO limit the length of the string parsed to prevent timeout attacks
 
             // Assign null once so it doesn't have to be done any time parse fails
@@ -68,7 +70,7 @@ namespace Semver
 
             // This code does two things to help provide good error messages:
             // 1. It breaks the version number into segments and then parses those segments
-            // 2. It parses and element first, then checks the flags for whether it should be allowed
+            // 2. It parses an element first, then checks the flags for whether it should be allowed
 
             var i = 0;
 
