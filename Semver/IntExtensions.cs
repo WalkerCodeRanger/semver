@@ -16,7 +16,7 @@ namespace Semver
         /// where the poster offers performance benchmarks showing this is the
         /// fastest way to get a number of digits.
         /// </remarks>
-        public static int Digits(this int n)
+        public static int DecimalDigits(this int n)
         {
             if (n < 10) return 1;
             if (n < 100) return 2;

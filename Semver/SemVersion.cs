@@ -474,8 +474,10 @@ namespace Semver
         public override string ToString()
         {
             // Assume all separators ("..-+"), at most 2 extra chars
-            var estimatedLength = 4 + Major.Digits() + Minor.Digits() + Patch.Digits()
-                                  + Prerelease.Length + Metadata.Length;
+            var estimatedLength = 4 + Major.DecimalDigits()
+                                    + Minor.DecimalDigits()
+                                    + Patch.DecimalDigits()
+                                    + Prerelease.Length + Metadata.Length;
             var version = new StringBuilder(estimatedLength);
             version.Append(Major);
             version.Append('.');

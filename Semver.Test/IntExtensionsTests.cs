@@ -20,7 +20,7 @@ namespace Semver.Test
         [InlineData(int.MaxValue)]
         public void DigitsTest(int n)
         {
-            Assert.Equal(n.ToString(CultureInfo.InvariantCulture).Length, n.Digits());
+            Assert.Equal(n.ToString(CultureInfo.InvariantCulture).Length, n.DecimalDigits());
         }
     }
 }

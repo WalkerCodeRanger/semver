@@ -5,3 +5,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("e208ca67-5b59-45d9-a29a-7f30137d3beb")]
 
 [assembly: InternalsVisibleTo("Semver.Test")]
+[assembly: InternalsVisibleTo("Semver.Benchmarks")]

@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semver", "Semver\Semver.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semver.Test", "Semver.Test\Semver.Test.csproj", "{49C6E934-5657-41CF-8BBB-01047629ABD9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semver.Benchmarks", "Semver.Benchmarks\Semver.Benchmarks.csproj", "{A68E9D98-600A-4170-AB82-AE93CC25D491}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{49C6E934-5657-41CF-8BBB-01047629ABD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49C6E934-5657-41CF-8BBB-01047629ABD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49C6E934-5657-41CF-8BBB-01047629ABD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A68E9D98-600A-4170-AB82-AE93CC25D491}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A68E9D98-600A-4170-AB82-AE93CC25D491}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A68E9D98-600A-4170-AB82-AE93CC25D491}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A68E9D98-600A-4170-AB82-AE93CC25D491}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -616,7 +616,7 @@ namespace Semver.Test
 
         private static PrereleaseIdentifier ValidPrereleaseIdentifier(Random random)
         {
-            if (random.NextBoolean())
+            if (random.NextBool())
             {
                 var value = random.Next();
                 return new PrereleaseIdentifier(value);
