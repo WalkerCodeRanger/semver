@@ -1,5 +1,7 @@
-﻿using System;
+﻿extern alias current;
+using System;
 using System.Text;
+using current::Semver;
 using Semver.Test.Builders;
 
 namespace Semver.Benchmarks

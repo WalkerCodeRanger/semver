@@ -1,6 +1,8 @@
-﻿using System;
+﻿extern alias current;
+using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using current::Semver;
 
 namespace Semver.Benchmarks
 {
