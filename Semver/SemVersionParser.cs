@@ -131,7 +131,7 @@ namespace Semver
             }
 
             // Parse prerelease version
-            var allowMultiplePrereleaseIdentifiers = !style.HasStyle(SemVersionStyles.DisallowMultiplePrereleaseIdentifiers);
+            var allowMultiplePrereleaseIdentifiers = style.HasStyle(SemVersionStyles.AllowMultiplePrereleaseIdentifiers);
             List<PrereleaseIdentifier> prereleaseIdentifiers;
             if (i < version.Length && version[i] == '-')
             {
@@ -153,7 +153,7 @@ namespace Semver
             else
                 metadataIdentifiers = new List<string>();
 
-            if (style.HasStyle(SemVersionStyles.DisallowMetadata) && metadataIdentifiers.Count > 0)
+            if (!style.HasStyle(SemVersionStyles.AllowMetadata) && metadataIdentifiers.Count > 0)
                 return ex ?? NewFormatException(BuildMetadataMessage, version);
 
             // There shouldn't be any unprocessed characters before the trailing whitespace.

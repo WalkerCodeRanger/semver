@@ -1,4 +1,5 @@
 ﻿using Xunit;
+using static Semver.SemVersionStyles;
 
 namespace Semver.Test
 {
@@ -7,7 +8,20 @@ namespace Semver.Test
         [Fact]
         public void StrictIsTheSameAsSemVer2()
         {
-            Assert.Equal(SemVersionStyles.SemVer2, SemVersionStyles.Strict);
+            Assert.Equal(SemVer2, Strict);
+        }
+
+        [Fact]
+        public void AnyIsValid()
+        {
+            Assert.True(Any.IsValid());
+        }
+
+        [Fact]
+        public void OptionalMinorWithoutOptionalPatchIsInvalid()
+        {
+            var optionalMinorWithoutOptionalPatch = OptionalMinorPatch & ~OptionalPatch;
+            Assert.False(optionalMinorWithoutOptionalPatch.IsValid());
         }
     }
 }

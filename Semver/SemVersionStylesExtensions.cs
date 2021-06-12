@@ -6,16 +6,28 @@ namespace Semver
 {
     internal static class SemVersionStylesExtensions
     {
-        private const SemVersionStyles All = Any
-                                             | DisallowMultiplePrereleaseIdentifiers
-                                             | DisallowMetadata;
+        internal const SemVersionStyles AllowAll = AllowLeadingZeros
+                                                 | AllowLeadingWhitespace
+                                                 | AllowTrailingWhitespace
+                                                 | AllowWhitespace
+                                                 | AllowLowerV
+                                                 | AllowUpperV
+                                                 | AllowV
+                                                 | OptionalPatch
+                                                 | OptionalMinorPatch
+                                                 | AllowMultiplePrereleaseIdentifiers
+                                                 | AllowMetadata;
         private const SemVersionStyles OptionalMinorWithoutPatch = OptionalMinorPatch & ~OptionalPatch;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsValid(this SemVersionStyles styles)
         {
-            return (styles & All) == styles
-                // Check for a flag for optional minor without optional patch
+            // Either it is the Any style
+            if (styles == Any) return true;
+
+            // Or it is some combination of the flags
+            return (styles & AllowAll) == styles
+                // Except for a flag for optional minor without optional patch
                 && (styles & OptionalMinorPatch) != OptionalMinorWithoutPatch;
         }
 

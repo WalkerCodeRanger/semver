@@ -17,30 +17,23 @@ namespace Semver
         ///
         /// Note: Version numbers with a trailing dash but no prerelease version (e.g. "1.2.3-")
         /// are not accepted event though they are supported by the spec.</remarks>
-        SemVer1 = AllowLeadingZeros | DisallowMetadata | DisallowMultiplePrereleaseIdentifiers,
+        // TODO add an allow empty prerelease for `1.2.3-`?
+        SemVer1 = AllowLeadingZeros,
 
         /// <summary>
         /// Accept version strings as defined by the SemVer 2.0 spec
         /// </summary>
         /// <remarks>This is a composite semantic version style.</remarks>
-        SemVer2 = 0,
+        SemVer2 = AllowMultiplePrereleaseIdentifiers | AllowMetadata,
 
         /// <summary>
         /// Accept version strings strictly conforming to the latest supported SemVer spec
         /// </summary>
         /// <remarks>This is a composite semantic version style.
         ///
-        /// The formats accepted by this style will change when new SemVer specs are
+        /// The enum value and formats accepted by this style will change when new SemVer specs are
         /// supported.</remarks>
         Strict = SemVer2,
-
-        /// <summary>
-        /// Accept any version string format supported.
-        /// </summary>
-        /// <remarks>This is a composite semantic version style.
-        ///
-        /// The formats accepted by this style will change when more formats are supported.</remarks>
-        Any = AllowLeadingZeros | AllowWhitespace | AllowV | OptionalMinorPatch,
 
         /// <summary>
         /// Allow leading zeros on major, minor, patch, and prerelease version numbers
@@ -90,13 +83,21 @@ namespace Semver
         OptionalMinorPatch = 1 << 6 | OptionalPatch,
 
         /// <summary>
-        /// Disallow multiple prerelease identifiers
+        /// Allow multiple prerelease identifiers
         /// </summary>
-        DisallowMultiplePrereleaseIdentifiers = 1 << 7,
+        AllowMultiplePrereleaseIdentifiers = 1 << 7,
 
         /// <summary>
-        /// Disallow a build metadata section
+        /// Allow a build metadata section
         /// </summary>
-        DisallowMetadata = 1 << 8,
+        AllowMetadata = 1 << 8,
+
+        /// <summary>
+        /// Accept any version string format supported.
+        /// </summary>
+        /// <remarks>This is a composite semantic version style.
+        ///
+        /// The formats accepted by this style will change when more formats are supported.</remarks>
+        Any = unchecked((int)0xFFFF_FFFF),
     }
 }
