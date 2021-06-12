@@ -7,8 +7,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-        <DefineConstants>$(DefineConstants);NETSTANDARD;NETSTANDARD1_1</DefineConstants>
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
+        <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
