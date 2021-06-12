@@ -1,8 +1,6 @@
-﻿extern alias current;
-using System;
+﻿using System;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using current::Semver;
 
 namespace Semver.Benchmarks
 {
@@ -10,7 +8,7 @@ namespace Semver.Benchmarks
     [SimpleJob(RuntimeMoniker.NetCoreApp21)]
     public class DecimalDigits
     {
-        [Params(99, 999, 999_999)]
+        [Params(99, 999, 999_999, int.MaxValue)]
         public int Number { get; set; }
 
         [Benchmark]

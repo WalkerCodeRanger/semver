@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Semver.Benchmarks
+namespace Semver.Benchmarks.Builders
 {
     public static class Enumerables
     {

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Semver.Benchmarks": {
+      "commandName": "Project",
+      "workingDirectory": "..\\"
+    }
+  }
+}

@@ -1,10 +1,7 @@
-﻿extern alias current;
-using System;
+﻿using System;
 using System.Text;
-using current::Semver;
-using Semver.Test.Builders;
 
-namespace Semver.Benchmarks
+namespace Semver.Benchmarks.Builders
 {
     public static class RandomExtensions
     {
@@ -81,6 +78,12 @@ namespace Semver.Benchmarks
         public static char Alpha(this Random random)
         {
             return Alphanumerics[random.Next(10, Alphanumerics.Length)];
+        }
+
+        public static bool NextBool(this Random random)
+        {
+            // Next() returns an int in the range 0 to Int32.MaxValue
+            return random.Next() > (int.MaxValue / 2);
         }
     }
 }

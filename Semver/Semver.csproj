@@ -11,9 +11,7 @@
     <DebugType>portable</DebugType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Semver</AssemblyName>
-    <AssemblyName Condition="'$(CI)'!='True'">local.Semver</AssemblyName>
     <PackageId>Semver</PackageId>
-    <PackageId Condition="'$(CI)'!='True'">local.Semver</PackageId>
     <Title>Semantic versioning</Title>
     <PackageTags>semver,semantic,version</PackageTags>
     <PackageReleaseNotes>https://github.com/maxhauser/semver/releases</PackageReleaseNotes>

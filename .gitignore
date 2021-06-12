@@ -2,6 +2,7 @@
 bin/
 obj/
 TestResults/
+BenchmarkDotNet.Artifacts/
 *.user
 *.suo
 *.nupkg
