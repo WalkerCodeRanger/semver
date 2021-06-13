@@ -662,10 +662,10 @@ namespace Semver
                 return true;
 
             return Major == other.Major
-                   && Minor == other.Minor
-                   && Patch == other.Patch
-                   && string.Equals(Prerelease, other.Prerelease, StringComparison.Ordinal)
-                   && string.Equals(Metadata, other.Metadata, StringComparison.Ordinal);
+                && Minor == other.Minor
+                && Patch == other.Patch
+                && string.Equals(Prerelease, other.Prerelease, StringComparison.Ordinal)
+                && string.Equals(Metadata, other.Metadata, StringComparison.Ordinal);
         }
 
         /// <summary>

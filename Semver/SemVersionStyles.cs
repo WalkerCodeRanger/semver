@@ -10,7 +10,8 @@ namespace Semver
     public enum SemVersionStyles
     {
         /// <summary>
-        /// Accept version strings strictly conforming to the SemVer 2.0 spec
+        /// Accept version strings strictly conforming to the latest supported SemVer spec.
+        /// Currently, that is SemVer 2.0
         /// </summary>
         Strict = 0,
 
