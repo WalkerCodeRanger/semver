@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -81,13 +82,20 @@ namespace Semver
             Patch = patch;
 
             Prerelease = prerelease ?? "";
-            PrereleaseIdentifiers = new ReadOnlyCollection<PrereleaseIdentifier>(
-                Prerelease.SplitExceptEmpty('.')
+            if (Prerelease.Length == 0)
+                PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
+            else
+                PrereleaseIdentifiers = new ReadOnlyCollection<PrereleaseIdentifier>(
+                    Prerelease.SplitExceptEmpty('.')
 #pragma warning disable CS0612 // Type or member is obsolete
                           .Select(PrereleaseIdentifier.CreateLoose).ToList());
 #pragma warning restore CS0612 // Type or member is obsolete
+
             Metadata = build ?? "";
-            MetadataIdentifiers = new ReadOnlyCollection<string>(Metadata.SplitExceptEmpty('.').ToList());
+            if (Metadata.Length == 0)
+                MetadataIdentifiers = ReadOnlyList<string>.Empty;
+            else
+                MetadataIdentifiers = new ReadOnlyCollection<string>(Metadata.SplitExceptEmpty('.').ToList());
         }
 
         /// <summary>
@@ -139,8 +147,10 @@ namespace Semver
             Major = major;
             Minor = minor;
             Patch = patch;
+            Debug.Assert(prereleaseIdentifiers != null);
             Prerelease = string.Join(".", prereleaseIdentifiers);
             PrereleaseIdentifiers = prereleaseIdentifiers;
+            Debug.Assert(metadataIdentifiers != null);
             Metadata = string.Join(".", metadataIdentifiers);
             MetadataIdentifiers = metadataIdentifiers;
         }
@@ -300,7 +310,7 @@ namespace Semver
         /// <param name="strict">If set to <see langword="true"/> minor and patch version are required,
         /// otherwise they are optional.</param>
         /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
-        [Obsolete("Method is obsolete. Call TryParse with SemVersionStyle instead.")]
+        [Obsolete("Method is obsolete. Call TryParse with SemVersionStyles instead.")]
         public static bool TryParse(string version, out SemVersion semver, bool strict)
         {
             semver = null;
@@ -446,6 +456,7 @@ namespace Semver
         /// <value>
         /// The build metadata or empty string if there is no build metadata.
         /// </value>
+        // TODO consider again whether to make this obsolete, name the new property BuildMetadata
         [Obsolete("This property is obsolete. Use Metadata instead.")]
         public string Build => Metadata;
 
