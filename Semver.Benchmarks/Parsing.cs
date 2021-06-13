@@ -101,7 +101,7 @@ namespace Semver.Benchmarks
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
-                var version = SemVersion.Parse(versions[i], style);
+                var version = SemVersion.Parse(versions[i], style, maxLength: int.MaxValue);
                 accumulator += version.Major;
             }
 
@@ -117,7 +117,7 @@ namespace Semver.Benchmarks
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
-                SemVersion.TryParse(versions[i], style, out var version);
+                SemVersion.TryParse(versions[i], style, out var version, maxLength: int.MaxValue);
                 accumulator += version.Major;
             }
 
