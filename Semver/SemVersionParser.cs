@@ -132,7 +132,7 @@ namespace Semver
             }
 
             // Parse prerelease version
-            List<PrereleaseIdentifier> prereleaseIdentifiers;
+            IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers;
             if (i < version.Length && version[i] == '-')
             {
                 i += 1;
@@ -140,10 +140,10 @@ namespace Semver
                 if (parseEx != null) return parseEx;
             }
             else
-                prereleaseIdentifiers = new List<PrereleaseIdentifier>();
+                prereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
 
             // Parse metadata
-            List<string> metadataIdentifiers;
+            IReadOnlyList<string> metadataIdentifiers;
             if (i < version.Length && version[i] == '+')
             {
                 i += 1;
@@ -151,7 +151,7 @@ namespace Semver
                 if (parseEx != null) return parseEx;
             }
             else
-                metadataIdentifiers = new List<string>();
+                metadataIdentifiers = ReadOnlyList<string>.Empty;
 
             // There shouldn't be any unprocessed characters before the trailing whitespace.
             // If there is, it is a programmer mistake, so immediately throw an exception rather
@@ -163,9 +163,7 @@ namespace Semver
             if (startOfTrailingWhitespace != version.Length && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
                 return ex ?? NewFormatException(TrailingWhitespaceMessage, LimitLength(version));
 
-            semver = new SemVersion(major, minor, patch,
-                new ReadOnlyCollection<PrereleaseIdentifier>(prereleaseIdentifiers),
-                new ReadOnlyCollection<string>(metadataIdentifiers));
+            semver = new SemVersion(major, minor, patch, prereleaseIdentifiers, metadataIdentifiers);
             return null;
         }
 
@@ -280,9 +278,10 @@ namespace Semver
             int startOfNext,
             bool allowLeadingZero,
             Exception ex,
-            out List<PrereleaseIdentifier> prereleaseIdentifiers)
+            out IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers)
         {
-            prereleaseIdentifiers = new List<PrereleaseIdentifier>();
+            var identifiers = new List<PrereleaseIdentifier>();
+            prereleaseIdentifiers = new ReadOnlyCollection<PrereleaseIdentifier>(identifiers);
             i -= 1; // Back up so we are before the start of the first identifier
             do
             {
@@ -308,7 +307,7 @@ namespace Semver
 
                 var identifier = version.Substring(s, i - s);
                 if (!isNumeric)
-                    prereleaseIdentifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, null));
+                    identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, null));
                 else
                 {
                     if (!allowLeadingZero && version[s] == '0')
@@ -320,7 +319,7 @@ namespace Semver
                         return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
                             PrereleaseOverflowMessage, LimitLength(version), identifier));
 
-                    prereleaseIdentifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier.TrimStart('0'), intValue));
+                    identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier.TrimStart('0'), intValue));
                 }
 
             } while (i < startOfNext && version[i] == '.');
@@ -333,9 +332,10 @@ namespace Semver
             ref int i,
             int startOfNext,
             Exception ex,
-            out List<string> metadataIdentifiers)
+            out IReadOnlyList<string> metadataIdentifiers)
         {
-            metadataIdentifiers = new List<string>();
+            var identifiers = new List<string>();
+            metadataIdentifiers = new ReadOnlyCollection<string>(identifiers);
             i -= 1; // Back up so we are before the start of the first identifier
             do
             {
@@ -356,7 +356,7 @@ namespace Semver
                     return ex ?? NewFormatException(MissingMetadataIdentifierMessage, LimitLength(version));
 
                 var identifier = version.Substring(s, i - s);
-                metadataIdentifiers.Add(identifier);
+                identifiers.Add(identifier);
 
             } while (i < startOfNext && version[i] == '.');
 
