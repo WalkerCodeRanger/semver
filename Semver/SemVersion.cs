@@ -24,6 +24,7 @@ namespace Semver
 #endif
     {
         private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
+        internal const int MaxVersionLength = 1024;
 
         /// <summary>
         /// This exception is used with the <see cref="SemVersionParser.Parse"/>
@@ -209,11 +210,11 @@ namespace Semver
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
-        public static SemVersion Parse(string version, SemVersionStyles style)
+        public static SemVersion Parse(string version, SemVersionStyles style, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
 
-            var ex = SemVersionParser.Parse(version, style, null, out var semver);
+            var ex = SemVersionParser.Parse(version, style, null, maxLength, out var semver);
 
             return ex is null ? semver : throw ex;
         }
@@ -275,10 +276,11 @@ namespace Semver
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
-        public static bool TryParse(string version, SemVersionStyles style, out SemVersion semver)
+        public static bool TryParse(string version, SemVersionStyles style,
+            out SemVersion semver, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
-            var exception = SemVersionParser.Parse(version, style, ParseFailedException, out semver);
+            var exception = SemVersionParser.Parse(version, style, ParseFailedException, maxLength, out semver);
 
             // This check ensures that ParseVersion doesn't construct an exception, but always returns ParseFailedException
             if (exception != null && exception != ParseFailedException)

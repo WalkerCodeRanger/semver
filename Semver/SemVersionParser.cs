@@ -17,6 +17,7 @@ namespace Semver
         private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace.";
         private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace.";
         private const string EmptyVersionMessage = "Empty string is not a valid version.";
+        private const string TooLongVersionMessage = "Exceeded maximum length of {1} in '{0}'.";
         private const string AllWhitespaceVersionMessage = "Whitespace is not a valid version.";
         private const string LeadingLowerVMessage = "Leading 'v' in '{0}'.";
         private const string LeadingUpperVMessage = "Leading 'V' in '{0}'.";
@@ -39,23 +40,23 @@ namespace Semver
 
         /// <summary>
         /// The internal method that all parsing is based on. Because this is called by both
-        /// <see cref="SemVersion.Parse(string, SemVersionStyles)"/> and
-        /// <see cref="SemVersion.TryParse(string, SemVersionStyles, out SemVersion)"/>
+        /// <see cref="SemVersion.Parse(string, SemVersionStyles, int)"/> and
+        /// <see cref="SemVersion.TryParse(string, SemVersionStyles, out SemVersion, int)"/>
         /// it does not throw exceptions, but instead returns the exception that should be thrown
         /// by the parse method. For performance when used from try parse, all exception construction
         /// and message formatting can be avoided by passing in an exception which will be returned
         /// when parsing fails.
         /// </summary>
-        /// <remarks>This does not validate the <paramref name="style"/> parameter.
-        /// That must be done in the calling method.</remarks>
+        /// <remarks>This does not validate the <paramref name="style"/> or <paramref name="maxLength"/>
+        /// parameter values. That must be done in the calling method.</remarks>
         public static Exception Parse(
             string version,
             SemVersionStyles style,
             Exception ex,
+            int maxLength,
             out SemVersion semver)
         {
             Debug.Assert(style.IsValid(), $"Invalid {nameof(style)}");
-            // TODO limit the length of the string parsed to prevent timeout attacks
 
             // Assign null once so it doesn't have to be done any time parse fails
             semver = null;
@@ -67,6 +68,8 @@ namespace Semver
             if (version is null) return ex ?? new ArgumentNullException(nameof(version));
 
             if (version.Length == 0) return ex ?? new FormatException(EmptyVersionMessage);
+
+            if (version.Length > maxLength) return ex ?? NewFormatException(TooLongVersionMessage, LimitLength(version), maxLength);
 
             // This code does two things to help provide good error messages:
             // 1. It breaks the version number into segments and then parses those segments
@@ -105,7 +108,7 @@ namespace Semver
                 if (parseEx != null) return parseEx;
             }
             else if (!style.HasStyle(SemVersionStyles.OptionalMinorPatch))
-                return ex ?? NewFormatException(MissingMinorMessage, version);
+                return ex ?? NewFormatException(MissingMinorMessage, LimitLength(version));
 
             // Parse patch version
             var patch = 0;
@@ -116,7 +119,7 @@ namespace Semver
                 if (parseEx != null) return parseEx;
             }
             else if (!style.HasStyle(SemVersionStyles.OptionalPatch))
-                return ex ?? NewFormatException(MissingPatchMessage, version);
+                return ex ?? NewFormatException(MissingPatchMessage, LimitLength(version));
 
             // Handle fourth version number
             if (i < startOfPrerelease && version[i] == '.')
@@ -124,10 +127,10 @@ namespace Semver
                 i += 1;
                 // If it is ".\d" then we'll assume they were trying to have a fourth version number
                 if (i < version.Length && version[i].IsDigit())
-                    return ex ?? NewFormatException(FourthVersionNumberMessage, version);
+                    return ex ?? NewFormatException(FourthVersionNumberMessage, LimitLength(version));
 
                 // Otherwise, assume they used "." instead of "-" to start the prerelease
-                return ex ?? NewFormatException(PrereleasePrefixedByDotMessage, version);
+                return ex ?? NewFormatException(PrereleasePrefixedByDotMessage, LimitLength(version));
             }
 
             // Parse prerelease version
@@ -154,7 +157,7 @@ namespace Semver
                 metadataIdentifiers = new List<string>();
 
             if (!style.HasStyle(SemVersionStyles.AllowMetadata) && metadataIdentifiers.Count > 0)
-                return ex ?? NewFormatException(BuildMetadataMessage, version);
+                return ex ?? NewFormatException(BuildMetadataMessage, LimitLength(version));
 
             // There shouldn't be any unprocessed characters before the trailing whitespace.
             // If there is, it is a programmer mistake, so immediately throw an exception rather
@@ -164,7 +167,7 @@ namespace Semver
 
             // Error if trailing whitespace not allowed
             if (startOfTrailingWhitespace != version.Length && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
-                return ex ?? NewFormatException(TrailingWhitespaceMessage, version);
+                return ex ?? NewFormatException(TrailingWhitespaceMessage, LimitLength(version));
 
             semver = new SemVersion(major, minor, patch,
                 new ReadOnlyCollection<PrereleaseIdentifier>(prereleaseIdentifiers),
@@ -187,7 +190,7 @@ namespace Semver
 
             // Error if leading whitespace not allowed
             if (i > 0 && !style.HasStyle(SemVersionStyles.AllowLeadingWhitespace))
-                return ex ?? NewFormatException(LeadingWhitespaceMessage, version);
+                return ex ?? NewFormatException(LeadingWhitespaceMessage, LimitLength(version));
 
             return null;
         }
@@ -202,12 +205,12 @@ namespace Semver
                     i += 1;
                     break;
                 case 'v':
-                    return ex ?? NewFormatException(LeadingLowerVMessage, version);
+                    return ex ?? NewFormatException(LeadingLowerVMessage, LimitLength(version));
                 case 'V' when style.HasStyle(SemVersionStyles.AllowUpperV):
                     i += 1;
                     break;
                 case 'V':
-                    return ex ?? NewFormatException(LeadingUpperVMessage, version);
+                    return ex ?? NewFormatException(LeadingUpperVMessage, LimitLength(version));
             }
 
             return null;
@@ -246,13 +249,13 @@ namespace Semver
             if (i < end)
             {
                 number = 0;
-                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version, kind, version[i]);
+                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, LimitLength(version), kind, version[i]);
             }
 
             if (start == i)
             {
                 number = 0;
-                return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, version, kind);
+                return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, LimitLength(version), kind);
             }
 
             if (!allowLeadingZero)
@@ -263,7 +266,7 @@ namespace Semver
                 if (startOfNonZeroDigits - start > maxLeadingZeros)
                 {
                     number = 0;
-                    return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage, version, kind);
+                    return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage, LimitLength(version), kind);
                 }
             }
 
@@ -272,7 +275,7 @@ namespace Semver
                 // Parsing validated this as a string of digits possibly proceeded by zero so the only
                 // possible issue is a numeric overflow for `int`
                 return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
-                    MajorMinorOrPatchOverflowMessage, version, kind, numberString));
+                    MajorMinorOrPatchOverflowMessage, LimitLength(version), kind, numberString));
 
             return null;
         }
@@ -301,14 +304,14 @@ namespace Semver
                     else if (c == '.' || c == '+')
                         break;
                     else if (!c.IsDigit())
-                        return ex ?? NewFormatException(InvalidCharacterInPrereleaseMessage, version, c);
+                        return ex ?? NewFormatException(InvalidCharacterInPrereleaseMessage, LimitLength(version), c);
 
                     i += 1;
                 }
 
                 // Empty identifiers not allowed
                 if (s == i)
-                    return ex ?? NewFormatException(MissingPrereleaseIdentifierMessage, version);
+                    return ex ?? NewFormatException(MissingPrereleaseIdentifierMessage, LimitLength(version));
 
                 var identifier = version.Substring(s, i - s);
                 if (!isNumeric)
@@ -316,12 +319,13 @@ namespace Semver
                 else
                 {
                     if (!allowLeadingZero && version[s] == '0')
-                        return ex ?? NewFormatException(LeadingZeroInPrereleaseMessage, version);
+                        return ex ?? NewFormatException(LeadingZeroInPrereleaseMessage, LimitLength(version));
 
                     if (!int.TryParse(identifier, NumberStyles.None, null, out var intValue))
                         // Parsing validated this as a string of digits possibly proceeded by zero so the only
                         // possible issue is a numeric overflow for `int`
-                        return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture, PrereleaseOverflowMessage, version, identifier));
+                        return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
+                            PrereleaseOverflowMessage, LimitLength(version), identifier));
 
                     prereleaseIdentifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier.TrimStart('0'), intValue));
                 }
@@ -329,7 +333,7 @@ namespace Semver
             } while (i < startOfNext && version[i] == '.' && allowMultiplePrereleaseIdentifiers);
 
             if (!allowMultiplePrereleaseIdentifiers && i < startOfNext && version[i] == '.')
-                return ex ?? NewFormatException(MultiplePrereleaseIdentifiersMessage, version);
+                return ex ?? NewFormatException(MultiplePrereleaseIdentifiersMessage, LimitLength(version));
 
             return null;
         }
@@ -353,13 +357,13 @@ namespace Semver
                     if (c == '.')
                         break;
                     if (!c.IsAlphaOrHyphen() && !c.IsDigit())
-                        return ex ?? NewFormatException(InvalidCharacterInMetadataMessage, version, c);
+                        return ex ?? NewFormatException(InvalidCharacterInMetadataMessage, LimitLength(version), c);
                     i += 1;
                 }
 
                 // Empty identifiers not allowed
                 if (s == i)
-                    return ex ?? NewFormatException(MissingMetadataIdentifierMessage, version);
+                    return ex ?? NewFormatException(MissingMetadataIdentifierMessage, LimitLength(version));
 
                 var identifier = version.Substring(s, i - s);
                 metadataIdentifiers.Add(identifier);
@@ -373,6 +377,16 @@ namespace Semver
         private static FormatException NewFormatException(string messageTemplate, params object[] args)
         {
             return new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, args));
+        }
+
+        private const int VersionDisplayLimit = 100 - 3;
+
+        private static string LimitLength(string version)
+        {
+            if (version.Length > VersionDisplayLimit)
+                version = version.Substring(0, VersionDisplayLimit) + "...";
+
+            return version;
         }
     }
 }

@@ -36,9 +36,9 @@ static Semver.PrereleaseIdentifier.operator ==(Semver.PrereleaseIdentifier left,
 static Semver.SemVersion.FromVersion(System.Version version) -> Semver.SemVersion
 static Semver.SemVersion.Parse(string version) -> Semver.SemVersion
 static Semver.SemVersion.Parse(string version, bool strict) -> Semver.SemVersion
-static Semver.SemVersion.Parse(string version, Semver.SemVersionStyles style) -> Semver.SemVersion
+static Semver.SemVersion.Parse(string version, Semver.SemVersionStyles style, int maxLength = 1024) -> Semver.SemVersion
 static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver) -> bool
 static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, bool strict) -> bool
-static Semver.SemVersion.TryParse(string version, Semver.SemVersionStyles style, out Semver.SemVersion semver) -> bool
+static Semver.SemVersion.TryParse(string version, Semver.SemVersionStyles style, out Semver.SemVersion semver, int maxLength = 1024) -> bool
 *REMOVED*static Semver.SemVersion.Parse(string version, bool strict = false) -> Semver.SemVersion
 *REMOVED*static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, bool strict = false) -> bool

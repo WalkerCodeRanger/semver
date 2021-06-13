@@ -18,7 +18,7 @@ namespace Semver.Test
         /// generated using a random number generator seeded with specific value so that the same
         /// version string will be generated each time.
         /// </summary>
-        private static readonly string LongValidVersionString = BuildLongVersion();
+        public static readonly string LongValidVersionString = BuildLongVersion();
 
         private static string BuildLongVersion()
         {
@@ -277,16 +277,6 @@ namespace Semver.Test
         {
             {"ui-2.1-alpha"},
         };
-
-        /// <summary>
-        /// Tests that a very long valid version number can be parsed in a reasonable time.
-        /// </summary>
-        [Fact]
-        public void ParseLongVersionTest()
-        {
-            SemVersion.Parse(LongValidVersionString, SemVersionStyles.SemVer2);
-            SemVersion.TryParse(LongValidVersionString, SemVersionStyles.SemVer2, out _);
-        }
 
         #region Parse Forward Methods
         /// <summary>

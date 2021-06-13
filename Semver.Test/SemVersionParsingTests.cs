@@ -20,6 +20,7 @@ namespace Semver.Test
         private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace.";
         private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace.";
         private const string EmptyVersionMessage = "Empty string is not a valid version.";
+        private const string TooLongVersionMessage = "Exceeded maximum length of {1} in '{0}'.";
         private const string AllWhitespaceVersionMessage = "Whitespace is not a valid version.";
         private const string LeadingLowerVMessage = "Leading 'v' in '{0}'.";
         private const string LeadingUpperVMessage = "Leading 'V' in '{0}'.";
@@ -217,6 +218,9 @@ namespace Semver.Test
             Valid("1.2.3-a.01.c", SemVer2 | AllowLeadingZeros, 1, 2, 3, Pre("a", 1, "c")),
             Valid("1.2.3-a.00001.c", SemVer2 | AllowLeadingZeros, 1, 2, 3, Pre("a", 1, "c")),
 
+            // Longer than max length
+            Invalid("1.0.0-length", TooLongVersionMessage, "2", maxLength: 2),
+
             // Overflow at int.Max+1
             Invalid<OverflowException>("2147483648.2.3", MajorOverflowMessage, "2147483648"),
             Invalid<OverflowException>("1.2147483648.3", MinorOverflowMessage, "2147483648"),
@@ -366,16 +370,17 @@ namespace Semver.Test
 
             if (testCase.IsValid)
             {
-                var version = SemVersion.Parse(testCase.Version, testCase.Styles);
+                var version = SemVersion.Parse(testCase.Version, testCase.Styles, testCase.MaxLength);
 
                 AssertVersionEqual(version, testCase);
             }
             else
             {
                 var ex = Assert.Throws(testCase.ExceptionType,
-                    () => SemVersion.Parse(testCase.Version, testCase.Styles));
+                    () => SemVersion.Parse(testCase.Version, testCase.Styles, testCase.MaxLength));
 
-                Assert.Equal(string.Format(CultureInfo.InvariantCulture, testCase.ExceptionMessageFormat, testCase.Version),
+                Assert.Equal(string.Format(CultureInfo.InvariantCulture,
+                        testCase.ExceptionMessageFormat, LimitLength(testCase.Version)),
                     ex.Message);
             }
         }
@@ -395,7 +400,7 @@ namespace Semver.Test
         {
             _ = testCase ?? throw new ArgumentNullException(nameof(testCase));
 
-            var result = SemVersion.TryParse(testCase.Version, testCase.Styles, out var version);
+            var result = SemVersion.TryParse(testCase.Version, testCase.Styles, out var version, testCase.MaxLength);
 
             if (testCase.IsValid)
             {
@@ -407,6 +412,16 @@ namespace Semver.Test
                 Assert.False(result);
                 Assert.Null(version);
             }
+        }
+
+        /// <summary>
+        /// Tests that a very long valid version number can be parsed in a reasonable time.
+        /// </summary>
+        [Fact]
+        public void ParseLongVersionTest()
+        {
+            SemVersion.Parse(SemVersionObsoleteParsingTests.LongValidVersionString, SemVersionStyles.SemVer2, maxLength: int.MaxValue);
+            SemVersion.TryParse(SemVersionObsoleteParsingTests.LongValidVersionString, SemVersionStyles.SemVer2, out _, maxLength: int.MaxValue);
         }
 
         private static void AssertVersionEqual(SemVersion version, ParsingTestCase testCase)
@@ -437,12 +452,12 @@ namespace Semver.Test
             foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(OptionalPatch)
                                                                && !c.Styles.HasStyle(OptionalMinorPatch)))
                 testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~OptionalPatch, MissingPatchMessage));
+                    testCase.Styles & ~OptionalPatch, MissingPatchMessage, maxLength: testCase.MaxLength));
 
             // Versions needing optional minor should error if that is taken away
             foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(OptionalMinorPatch)))
                 testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~OptionalMinorPatch, MissingMinorMessage));
+                    testCase.Styles & ~OptionalMinorPatch, MissingMinorMessage, maxLength: testCase.MaxLength));
 
             // Versions needing leading zeros should error if that is taken away
             foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowLeadingZeros)))
@@ -471,40 +486,41 @@ namespace Semver.Test
                     message = LeadingZeroInPrereleaseMessage;
 
                 testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~AllowLeadingZeros, message));
+                    testCase.Styles & ~AllowLeadingZeros, message, maxLength: testCase.MaxLength));
             }
 
             // Versions needing allow leading lower v should error if that is taken away
             foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowLowerV)))
                 testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~AllowLowerV, LeadingLowerVMessage));
+                    testCase.Styles & ~AllowLowerV, LeadingLowerVMessage, maxLength: testCase.MaxLength));
 
             // Versions needing allow leading upper v should error if that is taken away
             foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowUpperV)))
                 testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~AllowUpperV, LeadingUpperVMessage));
+                    testCase.Styles & ~AllowUpperV, LeadingUpperVMessage, maxLength: testCase.MaxLength));
 
             // Versions needing allow leading whitespace should error if that is taken away
             foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowLeadingWhitespace)))
                 testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~AllowLeadingWhitespace, LeadingWhitespaceMessage));
+                    testCase.Styles & ~AllowLeadingWhitespace, LeadingWhitespaceMessage, maxLength: testCase.MaxLength));
 
             // Versions needing allow trailing whitespace should error if that is taken away
             foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowTrailingWhitespace)))
                 testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~AllowTrailingWhitespace, TrailingWhitespaceMessage));
+                    testCase.Styles & ~AllowTrailingWhitespace, TrailingWhitespaceMessage, maxLength: testCase.MaxLength));
 
             // Versions needing allow multiple prerelease identifiers should error if that is taken away
             foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowMultiplePrereleaseIdentifiers)
                                                             && c.PrereleaseIdentifiers.Count > 1))
                 testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~AllowMultiplePrereleaseIdentifiers, MultiplePrereleaseIdentifiersMessage));
+                    testCase.Styles & ~AllowMultiplePrereleaseIdentifiers, MultiplePrereleaseIdentifiersMessage,
+                    maxLength: testCase.MaxLength));
 
             // Versions needing allow metadata should error if that is taken away
             foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowMetadata)
                                                             && c.MetadataIdentifiers.Any()))
                 testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~AllowMetadata, BuildMetadataMessage));
+                    testCase.Styles & ~AllowMetadata, BuildMetadataMessage, maxLength: testCase.MaxLength));
 
             // Construct cases with leading 'v' and 'V' added
             foreach (var testCase in testCases.Where(CanBePrefixedWithV).ToList())
@@ -598,7 +614,7 @@ namespace Semver.Test
             v.Append(string.Join(".", metadataIdentifiers));
 
             return ParsingTestCase.Valid(v.ToString(), SemVer2, major, minor, patch,
-                prereleaseIdentifiers, metadataIdentifiers);
+                prereleaseIdentifiers, metadataIdentifiers, maxLength: int.MaxValue);
         }
 
         private const string ValidIdentifierChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-";
@@ -633,40 +649,46 @@ namespace Semver.Test
             string version,
             SemVersionStyles requiredStyles,
             string exceptionMessage = "",
-            string exceptionValue = null)
+            string exceptionValue = null,
+            int maxLength = SemVersion.MaxVersionLength)
             where T : Exception
         {
             exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
-            return ParsingTestCase.Invalid(version, requiredStyles, typeof(T), exceptionMessage);
+            return ParsingTestCase.Invalid(version, requiredStyles, typeof(T), exceptionMessage, maxLength);
         }
 
         private static ParsingTestCase Invalid(
             string version,
             SemVersionStyles requiredStyles,
             string exceptionMessage = "",
-            string exceptionValue = null)
+            string exceptionValue = null,
+            int maxLength = SemVersion.MaxVersionLength)
         {
             exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
-            return ParsingTestCase.Invalid(version, requiredStyles, typeof(FormatException), exceptionMessage);
+            return ParsingTestCase.Invalid(version, requiredStyles, typeof(FormatException),
+                exceptionMessage, maxLength);
         }
 
         private static ParsingTestCase Invalid<T>(
             string version,
             string exceptionMessage = "",
-            string exceptionValue = null)
+            string exceptionValue = null,
+            int maxLength = SemVersion.MaxVersionLength)
             where T : Exception
         {
             exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
-            return ParsingTestCase.Invalid(version, SemVer2, typeof(T), exceptionMessage);
+            return ParsingTestCase.Invalid(version, SemVer2, typeof(T), exceptionMessage, maxLength);
         }
 
         private static ParsingTestCase Invalid(
             string version,
             string exceptionMessage = "",
-            string exceptionValue = null)
+            string exceptionValue = null,
+            int maxLength = SemVersion.MaxVersionLength)
         {
             exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
-            return ParsingTestCase.Invalid(version, SemVer2, typeof(FormatException), exceptionMessage);
+            return ParsingTestCase.Invalid(version, SemVer2, typeof(FormatException),
+                exceptionMessage, maxLength);
         }
 
         public static IEnumerable<PrereleaseIdentifier> Pre(params TestPrereleaseIdentifier[] identifiers)
@@ -684,6 +706,16 @@ namespace Semver.Test
             {
                 throw new FormatException($"Could not inject '{value}' into '{format}'", ex);
             }
+        }
+
+        private const int VersionDisplayLimit = 100 - 3;
+
+        private static string LimitLength(string version)
+        {
+            if (version?.Length > VersionDisplayLimit)
+                version = version.Substring(0, VersionDisplayLimit) + "...";
+
+            return version;
         }
     }
 }
