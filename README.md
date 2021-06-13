@@ -37,6 +37,7 @@ if (version < v1)
 ## Manipulating
 
 ```csharp
+Console.WriteLine($"Current: {version}");
 if (version.IsPrerelease)
 {
     Console.WriteLine($"Prerelease: {version.Prerelease}");
@@ -47,6 +48,7 @@ if (version.IsPrerelease)
 Outputs:
 
 ```text
+Current: 1.1.0-rc.1+nightly.2345
 Prerelease: rc.1
 Next release version is: 1.1.0
 ```

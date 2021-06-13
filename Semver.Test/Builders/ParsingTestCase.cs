@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Semver.Test
+namespace Semver.Test.Builders
 {
     /// <summary>
     /// Represents an individual parsing test case.
