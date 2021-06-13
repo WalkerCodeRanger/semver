@@ -18,8 +18,6 @@ Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLeadingWhitespace = 2 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLeadingZeros = 1 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLowerV = 8 -> Semver.SemVersionStyles
-Semver.SemVersionStyles.AllowMetadata = 256 -> Semver.SemVersionStyles
-Semver.SemVersionStyles.AllowMultiplePrereleaseIdentifiers = 128 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowTrailingWhitespace = 4 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowUpperV = 16 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowV = Semver.SemVersionStyles.AllowLowerV | Semver.SemVersionStyles.AllowUpperV -> Semver.SemVersionStyles
@@ -27,9 +25,7 @@ Semver.SemVersionStyles.AllowWhitespace = Semver.SemVersionStyles.AllowLeadingWh
 Semver.SemVersionStyles.Any = -1 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.OptionalMinorPatch = 96 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.OptionalPatch = 32 -> Semver.SemVersionStyles
-Semver.SemVersionStyles.SemVer1 = 1 -> Semver.SemVersionStyles
-Semver.SemVersionStyles.SemVer2 = Semver.SemVersionStyles.AllowMultiplePrereleaseIdentifiers | Semver.SemVersionStyles.AllowMetadata -> Semver.SemVersionStyles
-Semver.SemVersionStyles.Strict = Semver.SemVersionStyles.AllowMultiplePrereleaseIdentifiers | Semver.SemVersionStyles.AllowMetadata -> Semver.SemVersionStyles
+Semver.SemVersionStyles.Strict = 0 -> Semver.SemVersionStyles
 static Semver.PrereleaseIdentifier.implicit operator string(Semver.PrereleaseIdentifier prereleaseIdentifier) -> string
 static Semver.PrereleaseIdentifier.operator !=(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
 static Semver.PrereleaseIdentifier.operator ==(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool

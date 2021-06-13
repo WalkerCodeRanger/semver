@@ -14,9 +14,7 @@ namespace Semver
                                                  | AllowUpperV
                                                  | AllowV
                                                  | OptionalPatch
-                                                 | OptionalMinorPatch
-                                                 | AllowMultiplePrereleaseIdentifiers
-                                                 | AllowMetadata;
+                                                 | OptionalMinorPatch;
         private const SemVersionStyles OptionalMinorWithoutPatch = OptionalMinorPatch & ~OptionalPatch;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

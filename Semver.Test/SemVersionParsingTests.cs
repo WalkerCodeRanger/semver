@@ -46,8 +46,6 @@ namespace Semver.Test
         private const string InvalidCharacterInMinorMessage = "Minor version contains invalid character '{1}' in '{0}'.";
         private const string InvalidCharacterInPatchMessage = "Patch version contains invalid character '{1}' in '{0}'.";
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'.";
-        private const string MultiplePrereleaseIdentifiersMessage = "Multiple prerelease identifiers are not allowed in '{0}'.";
-        private const string BuildMetadataMessage = "Build metadata is not allowed in '{0}'.";
 
         public static readonly TheoryData<SemVersionStyles> InvalidSemVersionStyles = new TheoryData<SemVersionStyles>()
         {
@@ -183,20 +181,20 @@ namespace Semver.Test
             Valid("1.2.3-a+b.-.c", 1, 2, 3, Pre("a"), "b.-.c"),
 
             // Missing patch number, but otherwise valid
-            Valid("1.6-zeta.5+nightly.23.43-bla", SemVer2 | OptionalPatch, 1, 6, 0, Pre("zeta", "5"), "nightly.23.43-bla"),
-            Valid("2.0+nightly.23.43-bla", SemVer2 | OptionalPatch, 2, 0, 0, Pre(), "nightly.23.43-bla"),
-            Valid("2.1-alpha", SemVer2 | OptionalPatch, 2, 1, 0, Pre("alpha")),
-            Valid("5.6+nightly.23.43-bla", SemVer2 | OptionalPatch, 5, 6, 0, Pre(), "nightly.23.43-bla"),
-            Valid("3.2", SemVer2 | OptionalPatch, 3, 2),
-            Valid("1.3", SemVer2 | OptionalPatch, 1, 3),
-            Valid("1.3-alpha", SemVer2 | OptionalPatch, 1, 3, 0, Pre("alpha")),
-            Valid("1.3+build", SemVer2 | OptionalPatch, 1, 3, 0, Pre(), "build"),
+            Valid("1.6-zeta.5+nightly.23.43-bla", OptionalPatch, 1, 6, 0, Pre("zeta", "5"), "nightly.23.43-bla"),
+            Valid("2.0+nightly.23.43-bla", OptionalPatch, 2, 0, 0, Pre(), "nightly.23.43-bla"),
+            Valid("2.1-alpha", OptionalPatch, 2, 1, 0, Pre("alpha")),
+            Valid("5.6+nightly.23.43-bla", OptionalPatch, 5, 6, 0, Pre(), "nightly.23.43-bla"),
+            Valid("3.2", OptionalPatch, 3, 2),
+            Valid("1.3", OptionalPatch, 1, 3),
+            Valid("1.3-alpha", OptionalPatch, 1, 3, 0, Pre("alpha")),
+            Valid("1.3+build", OptionalPatch, 1, 3, 0, Pre(), "build"),
 
             // Missing minor and patch number, but otherwise valid
-            Valid("1-beta+dev.123", SemVer2 | OptionalMinorPatch, 1, 0, 0, Pre("beta"), "dev.123"),
-            Valid("7-rc.1", SemVer2 | OptionalMinorPatch, 7, 0, 0, Pre("rc", 1)),
-            Valid("6+sha.a3456b", SemVer2 | OptionalMinorPatch, 6, 0, 0, Pre(), "sha.a3456b"),
-            Valid("64", SemVer2 | OptionalMinorPatch, 64),
+            Valid("1-beta+dev.123", OptionalMinorPatch, 1, 0, 0, Pre("beta"), "dev.123"),
+            Valid("7-rc.1", OptionalMinorPatch, 7, 0, 0, Pre("rc", 1)),
+            Valid("6+sha.a3456b", OptionalMinorPatch, 6, 0, 0, Pre(), "sha.a3456b"),
+            Valid("64", OptionalMinorPatch, 64),
 
             // Leading zeros in major, minor, or patch, but otherwise valid
             Valid("01.2.3", AllowLeadingZeros, 1, 2, 3),
@@ -213,10 +211,10 @@ namespace Semver.Test
             Valid("1.2.3-a.00000c", 1, 2, 3, Pre("a", "00000c")),
 
             // Leading zeros in numeric prerelease identifiers, but otherwise valid
-            Valid("1.2.3-01", SemVer2 | AllowLeadingZeros, 1, 2, 3, Pre(1)),
-            Valid("1.2.3-a.01", SemVer2 | AllowLeadingZeros, 1, 2, 3, Pre("a", 1)),
-            Valid("1.2.3-a.01.c", SemVer2 | AllowLeadingZeros, 1, 2, 3, Pre("a", 1, "c")),
-            Valid("1.2.3-a.00001.c", SemVer2 | AllowLeadingZeros, 1, 2, 3, Pre("a", 1, "c")),
+            Valid("1.2.3-01", AllowLeadingZeros, 1, 2, 3, Pre(1)),
+            Valid("1.2.3-a.01", AllowLeadingZeros, 1, 2, 3, Pre("a", 1)),
+            Valid("1.2.3-a.01.c", AllowLeadingZeros, 1, 2, 3, Pre("a", 1, "c")),
+            Valid("1.2.3-a.00001.c", AllowLeadingZeros, 1, 2, 3, Pre("a", 1, "c")),
 
             // Longer than max length
             Invalid("1.0.0-length", TooLongVersionMessage, "2", maxLength: 2),
@@ -257,12 +255,12 @@ namespace Semver.Test
             Valid("\t12.2.3", AllowLeadingWhitespace, 12, 2, 3),
 
             // Trailing whitespace, but otherwise valid
-            Valid("11.2.3 ", SemVer2 | AllowTrailingWhitespace, 11, 2, 3),
-            Valid("11.2.3\t", SemVer2 | AllowTrailingWhitespace, 11, 2, 3),
-            Valid("11.2.3-a ", SemVer2 | AllowTrailingWhitespace, 11, 2, 3, Pre("a")),
-            Valid("11.2.3-a\t", SemVer2 | AllowTrailingWhitespace, 11, 2, 3, Pre("a")),
-            Valid("11.2.3+b ", SemVer2 | AllowTrailingWhitespace, 11, 2, 3, Pre(), "b"),
-            Valid("11.2.3+b\t", SemVer2 | AllowTrailingWhitespace, 11, 2, 3, Pre(), "b"),
+            Valid("11.2.3 ", AllowTrailingWhitespace, 11, 2, 3),
+            Valid("11.2.3\t", AllowTrailingWhitespace, 11, 2, 3),
+            Valid("11.2.3-a ", AllowTrailingWhitespace, 11, 2, 3, Pre("a")),
+            Valid("11.2.3-a\t", AllowTrailingWhitespace, 11, 2, 3, Pre("a")),
+            Valid("11.2.3+b ", AllowTrailingWhitespace, 11, 2, 3, Pre(), "b"),
+            Valid("11.2.3+b\t", AllowTrailingWhitespace, 11, 2, 3, Pre(), "b"),
 
             // Whitespace in middle
             Invalid("1 .2.3-alpha+build", InvalidCharacterInMajorMessage, " "),
@@ -306,10 +304,6 @@ namespace Semver.Test
             Invalid("1.2.3-a.+b", MissingPrereleaseIdentifierMessage),
             Invalid("1.2.3-+b", MissingPrereleaseIdentifierMessage),
 
-            // Multiple prerelease identifiers
-            Invalid("1.2.3-a.b", SemVer1, MultiplePrereleaseIdentifiersMessage),
-            Invalid("1.2.3-0.12.b", SemVer1, MultiplePrereleaseIdentifiersMessage),
-
             // Missing metadata identifier
             Invalid("1.2.3+", MissingMetadataIdentifierMessage),
             Invalid("1.2.3+  ", MissingMetadataIdentifierMessage),
@@ -317,11 +311,7 @@ namespace Semver.Test
             Invalid("1.2.3+b.", MissingMetadataIdentifierMessage),
             Invalid("1.2.3+b..b", MissingMetadataIdentifierMessage),
 
-            // Metadata not allowed
-            Invalid("1.2.3+M", SemVer1, BuildMetadataMessage),
-            Invalid("1.2.3-P+M", SemVer1, BuildMetadataMessage),
-
-            // Multiple prerelease identifiers (important for constructing disallow prerelease identifiers)
+            // Multiple prerelease identifiers
             Valid("1.2.3-alpha.beta.gamma", 1, 2, 3, Pre("alpha", "beta", "gamma")),
 
             // Some long versions to test parsing big version number (parameter is random seed)
@@ -420,8 +410,8 @@ namespace Semver.Test
         [Fact]
         public void ParseLongVersionTest()
         {
-            SemVersion.Parse(SemVersionObsoleteParsingTests.LongValidVersionString, SemVersionStyles.SemVer2, maxLength: int.MaxValue);
-            SemVersion.TryParse(SemVersionObsoleteParsingTests.LongValidVersionString, SemVersionStyles.SemVer2, out _, maxLength: int.MaxValue);
+            SemVersion.Parse(SemVersionObsoleteParsingTests.LongValidVersionString, Strict, maxLength: int.MaxValue);
+            SemVersion.TryParse(SemVersionObsoleteParsingTests.LongValidVersionString, Strict, out _, maxLength: int.MaxValue);
         }
 
         private static void AssertVersionEqual(SemVersion version, ParsingTestCase testCase)
@@ -509,19 +499,6 @@ namespace Semver.Test
                 testCases.Add(Invalid<FormatException>(testCase.Version,
                     testCase.Styles & ~AllowTrailingWhitespace, TrailingWhitespaceMessage, maxLength: testCase.MaxLength));
 
-            // Versions needing allow multiple prerelease identifiers should error if that is taken away
-            foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowMultiplePrereleaseIdentifiers)
-                                                            && c.PrereleaseIdentifiers.Count > 1))
-                testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~AllowMultiplePrereleaseIdentifiers, MultiplePrereleaseIdentifiersMessage,
-                    maxLength: testCase.MaxLength));
-
-            // Versions needing allow metadata should error if that is taken away
-            foreach (var testCase in validTestCases.Where(c => c.Styles.HasStyle(AllowMetadata)
-                                                            && c.MetadataIdentifiers.Any()))
-                testCases.Add(Invalid<FormatException>(testCase.Version,
-                    testCase.Styles & ~AllowMetadata, BuildMetadataMessage, maxLength: testCase.MaxLength));
-
             // Construct cases with leading 'v' and 'V' added
             foreach (var testCase in testCases.Where(CanBePrefixedWithV).ToList())
             {
@@ -582,7 +559,7 @@ namespace Semver.Test
             IEnumerable<PrereleaseIdentifier> prerelease = null,
             string metadata = "")
         {
-            return ParsingTestCase.Valid(version, SemVer2, major, minor, patch,
+            return ParsingTestCase.Valid(version, Strict, major, minor, patch,
             prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
             metadata.SplitExceptEmpty('.'));
         }
@@ -613,7 +590,7 @@ namespace Semver.Test
                 metadataIdentifiers.Add(ValidMetadataIdentifier(random));
             v.Append(string.Join(".", metadataIdentifiers));
 
-            return ParsingTestCase.Valid(v.ToString(), SemVer2, major, minor, patch,
+            return ParsingTestCase.Valid(v.ToString(), Strict, major, minor, patch,
                 prereleaseIdentifiers, metadataIdentifiers, maxLength: int.MaxValue);
         }
 
@@ -677,7 +654,7 @@ namespace Semver.Test
             where T : Exception
         {
             exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
-            return ParsingTestCase.Invalid(version, SemVer2, typeof(T), exceptionMessage, maxLength);
+            return ParsingTestCase.Invalid(version, Strict, typeof(T), exceptionMessage, maxLength);
         }
 
         private static ParsingTestCase Invalid(
@@ -687,7 +664,7 @@ namespace Semver.Test
             int maxLength = SemVersion.MaxVersionLength)
         {
             exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
-            return ParsingTestCase.Invalid(version, SemVer2, typeof(FormatException),
+            return ParsingTestCase.Invalid(version, Strict, typeof(FormatException),
                 exceptionMessage, maxLength);
         }
 

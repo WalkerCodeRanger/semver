@@ -6,12 +6,6 @@ namespace Semver.Test
     public class SemVersionStylesTests
     {
         [Fact]
-        public void StrictIsTheSameAsSemVer2()
-        {
-            Assert.Equal(SemVer2, Strict);
-        }
-
-        [Fact]
         public void AnyIsValid()
         {
             Assert.True(Any.IsValid());

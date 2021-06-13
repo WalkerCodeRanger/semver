@@ -35,8 +35,6 @@ namespace Semver
         private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'.";
         private const string InvalidCharacterInMajorMinorOrPatchMessage = "{1} version contains invalid character '{2}' in '{0}'.";
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'.";
-        private const string MultiplePrereleaseIdentifiersMessage = "Multiple prerelease identifiers are not allowed in '{0}'.";
-        private const string BuildMetadataMessage = "Build metadata is not allowed in '{0}'.";
 
         /// <summary>
         /// The internal method that all parsing is based on. Because this is called by both
@@ -134,12 +132,11 @@ namespace Semver
             }
 
             // Parse prerelease version
-            var allowMultiplePrereleaseIdentifiers = style.HasStyle(SemVersionStyles.AllowMultiplePrereleaseIdentifiers);
             List<PrereleaseIdentifier> prereleaseIdentifiers;
             if (i < version.Length && version[i] == '-')
             {
                 i += 1;
-                parseEx = ParsePrerelease(version, ref i, startOfMetadata, allowLeadingZeros, allowMultiplePrereleaseIdentifiers, ex, out prereleaseIdentifiers);
+                parseEx = ParsePrerelease(version, ref i, startOfMetadata, allowLeadingZeros, ex, out prereleaseIdentifiers);
                 if (parseEx != null) return parseEx;
             }
             else
@@ -155,9 +152,6 @@ namespace Semver
             }
             else
                 metadataIdentifiers = new List<string>();
-
-            if (!style.HasStyle(SemVersionStyles.AllowMetadata) && metadataIdentifiers.Count > 0)
-                return ex ?? NewFormatException(BuildMetadataMessage, LimitLength(version));
 
             // There shouldn't be any unprocessed characters before the trailing whitespace.
             // If there is, it is a programmer mistake, so immediately throw an exception rather
@@ -285,7 +279,6 @@ namespace Semver
             ref int i,
             int startOfNext,
             bool allowLeadingZero,
-            bool allowMultiplePrereleaseIdentifiers,
             Exception ex,
             out List<PrereleaseIdentifier> prereleaseIdentifiers)
         {
@@ -330,10 +323,7 @@ namespace Semver
                     prereleaseIdentifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier.TrimStart('0'), intValue));
                 }
 
-            } while (i < startOfNext && version[i] == '.' && allowMultiplePrereleaseIdentifiers);
-
-            if (!allowMultiplePrereleaseIdentifiers && i < startOfNext && version[i] == '.')
-                return ex ?? NewFormatException(MultiplePrereleaseIdentifiersMessage, LimitLength(version));
+            } while (i < startOfNext && version[i] == '.');
 
             return null;
         }
