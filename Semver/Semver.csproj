@@ -13,7 +13,7 @@
     <AssemblyName>Semver</AssemblyName>
     <PackageId>Semver</PackageId>
     <Title>Semantic versioning</Title>
-    <PackageTags>semver,semantic,version</PackageTags>
+    <PackageTags>semver,semantic,version,versioning</PackageTags>
     <PackageReleaseNotes>https://github.com/maxhauser/semver/releases</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/maxhauser/semver</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
