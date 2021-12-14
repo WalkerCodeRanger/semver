@@ -7,6 +7,7 @@ Semver.SemVersion.Change(int? major = null, int? minor = null, int? patch = null
 Semver.SemVersion.CompareByPrecedence(Semver.SemVersion other) -> int
 Semver.SemVersion.CompareTo(object obj) -> int
 Semver.SemVersion.CompareTo(Semver.SemVersion other) -> int
+Semver.SemVersion.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
 Semver.SemVersion.Major.get -> int
 Semver.SemVersion.Minor.get -> int
 Semver.SemVersion.Patch.get -> int

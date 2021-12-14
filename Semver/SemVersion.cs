@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Text;
-#if !NETSTANDARD
+#if SERIALIZABLE
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 #endif
@@ -13,11 +13,11 @@ namespace Semver
     /// A semantic version implementation.
     /// Conforms with v2.0.0 of http://semver.org
     /// </summary>
-#if NETSTANDARD
-    public sealed class SemVersion : IComparable<SemVersion>, IComparable
-#else
+#if SERIALIZABLE
     [Serializable]
     public sealed class SemVersion : IComparable<SemVersion>, IComparable, ISerializable
+#else
+    public sealed class SemVersion : IComparable<SemVersion>, IComparable
 #endif
     {
         private static readonly Regex ParseEx =
@@ -26,14 +26,14 @@ namespace Semver
                 @"(?>\.(?<patch>\d+))?" +
                 @"(?>\-(?<pre>[0-9A-Za-z\-\.]+))?" +
                 @"(?>\+(?<build>[0-9A-Za-z\-\.]+))?$",
-#if NETSTANDARD
-                RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture,
-#else
+#if COMPILED_REGEX
                 RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture,
+#else
+                RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture,
 #endif
                 TimeSpan.FromSeconds(0.5));
 
-#if !NETSTANDARD
+#if SERIALIZABLE
         /// <summary>
         /// Deserialize a <see cref="SemVersion"/>.
         /// </summary>
@@ -477,7 +477,7 @@ namespace Semver
             }
         }
 
-#if !NETSTANDARD
+#if SERIALIZABLE
         /// <summary>
         /// Populates a <see cref="SerializationInfo"/> with the data needed to serialize the target object.
         /// </summary>

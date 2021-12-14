@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Globalization;
-#if !NETSTANDARD
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-#endif
 using Xunit;
 
 namespace Semver.Test
@@ -289,7 +287,6 @@ namespace Semver.Test
         }
         #endregion
 
-#if !NETSTANDARD
         [Fact]
         public void SerializationTest()
         {
@@ -304,6 +301,5 @@ namespace Semver.Test
             }
             Assert.Equal(semVer, semVerSerializedDeserialized);
         }
-#endif
     }
 }
