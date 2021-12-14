@@ -107,6 +107,9 @@ namespace Semver
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
         public static SemVersion Parse(string version, bool strict = false)
         {
+            if (version == null)
+                throw new ArgumentNullException(nameof(version));
+
             var match = ParseEx.Match(version);
             if (!match.Success)
                 throw new ArgumentException($"Invalid version '{version}'.", nameof(version));

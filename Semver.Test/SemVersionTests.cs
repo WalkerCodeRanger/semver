@@ -176,7 +176,8 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => new SemVersion(null));
 
-            Assert.Equal("Value cannot be null.\r\nParameter name: version", ex.Message);
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("version", ex.ParamName);
         }
         #endregion
 
