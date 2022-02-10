@@ -14,8 +14,8 @@ using System.Text.RegularExpressions;
 namespace Semver
 {
     /// <summary>
-    /// A semantic version implementation.
-    /// Conforms with v2.0.0 of http://semver.org
+    /// A semantic version number.
+    /// Conforms with v2.0.0 of semantic versioning (http://semver.org).
     /// </summary>
 #if NETSTANDARD
     public sealed class SemVersion : IComparable<SemVersion>, IComparable, IEquatable<SemVersion>
@@ -27,12 +27,12 @@ namespace Semver
         private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
         internal const int MaxVersionLength = 1024;
 
-        /// <summary>
+        /// <remarks>
         /// This exception is used with the <see cref="SemVersionParser.Parse"/>
         /// method to indicate parse failure without constructing a new exception.
         /// This exception should never be thrown or exposed outside of this
         /// package.
-        /// </summary>
+        /// </remarks>
         private static readonly Exception ParseFailedException = new Exception("Parse Failed");
 
         private static readonly Regex ParseEx =
@@ -100,7 +100,7 @@ namespace Semver
 
         /// <summary>
         /// Constructs a new instance of the <see cref="SemVersion"/> class from
-        /// a <see cref="System.Version"/>.
+        /// a <see cref="Version"/>.
         /// </summary>
         /// <param name="version">The <see cref="Version"/> that is used to initialize
         /// the Major, Minor, and Patch versions and the build metadata.</param>
@@ -136,10 +136,10 @@ namespace Semver
         }
 
         /// <summary>
-        /// Construct a <see cref="SemVersion"/> from its proper parts
+        /// Construct a <see cref="SemVersion"/> from its proper parts.
         /// </summary>
         /// <remarks>The <paramref name="prereleaseIdentifiers"/> and <paramref name="metadataIdentifiers"/>
-        /// must not be null and must be properly read only.</remarks>
+        /// must not be null and must be immutable.</remarks>
         internal SemVersion(int major, int minor, int patch,
             IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
             IReadOnlyList<string> metadataIdentifiers)
@@ -168,7 +168,7 @@ namespace Semver
         /// where square brackets ('[' and ']')  indicate optional components. The first three parts
         /// are converted to the Major, Minor, and Patch versions of a semantic version. If the build component
         /// is not defined (-1), the Patch number is assumed to be zero. <see cref="Version"/> numbers
-        /// with a revision component greater than zero cannot be converted to semantic versions. An
+        /// with a revision greater than zero cannot be converted to semantic versions. An
         /// <see cref="ArgumentException"/> is thrown when this method is called with such a <see cref="Version"/>.
         /// </remarks>
         public static SemVersion FromVersion(Version version)
@@ -183,6 +183,8 @@ namespace Semver
         /// Converts this semantic version to a <see cref="Version"/>.
         /// </summary>
         /// <returns>The equivalent <see cref="Version"/>.</returns>
+        /// <exception cref="InvalidOperationException">The semantic version is a prerelease version
+        /// or has build metadata or has a negative major, minor, or patch version.</exception>
         /// <remarks>
         /// A semantic version of the form <em>major</em>.<em>minor</em>.<em>patch</em>
         /// is converted to a <see cref="Version"/> of the form
@@ -192,8 +194,6 @@ namespace Semver
         /// an <see cref="InvalidOperationException"/> if the semantic version is a
         /// prerelease version or has build metadata.
         /// </remarks>
-        /// <exception cref="InvalidOperationException">The semantic version is a prerelease version
-        /// or has build metadata or has a negative major, minor, or patch version.</exception>
         public Version ToVersion()
         {
             if (Major < 0 || Minor < 0 || Patch < 0) throw new InvalidOperationException("Negative version numbers can't be converted to System.Version.");
@@ -212,7 +212,7 @@ namespace Semver
         /// <returns>The <see cref="SemVersion"/> object.</returns>
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
-        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
+        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <c>int.MaxValue</c>.</exception>
         public static SemVersion Parse(string version)
         {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -220,6 +220,7 @@ namespace Semver
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
+        // TODO Doc Comment
         public static SemVersion Parse(string version, SemVersionStyles style, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
@@ -239,7 +240,7 @@ namespace Semver
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
         /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing Minor or Patch versions and <paramref name="strict"/> is <see langword="true"/>.</exception>
-        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
+        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <c>int.MaxValue</c>.</exception>
         [Obsolete("Method is obsolete. Call Parse with SemVersionStyles instead.")]
         public static SemVersion Parse(string version, bool strict)
         {
@@ -286,6 +287,7 @@ namespace Semver
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
+        // TODO Doc Comment
         public static bool TryParse(string version, SemVersionStyles style,
             out SemVersion semver, int maxLength = MaxVersionLength)
         {
@@ -402,35 +404,23 @@ namespace Semver
                 build ?? Metadata);
         }
 
-        /// <summary>
-        /// Gets the major version.
-        /// </summary>
         /// <value>
         /// The major version.
         /// </value>
         public int Major { get; }
 
-        /// <summary>
-        /// Gets the minor version.
-        /// </summary>
         /// <value>
         /// The minor version.
         /// </value>
         public int Minor { get; }
 
-        /// <summary>
-        /// Gets the patch version.
-        /// </summary>
         /// <value>
         /// The patch version.
         /// </value>
         public int Patch { get; }
 
-        /// <summary>
-        /// Gets the prerelease label of this semantic version.
-        /// </summary>
         /// <value>
-        /// The prerelease label or empty string if this is a release version.
+        /// The prerelease identifiers or empty string if this is a release version.
         /// </value>
         /// <remarks>
         /// A prerelease version label follows the main version number separated
@@ -443,16 +433,11 @@ namespace Semver
         // TODO write doc comments for PrereleaseIdentifiers
         public IReadOnlyList<PrereleaseIdentifier> PrereleaseIdentifiers { get; }
 
-        /// <summary>
-        /// Indicates whether this semantic version is a prerelease version.
-        /// </summary>
-        /// <value><see langword="true"/> if the <see cref="Prerelease"/> property
-        /// is non-empty; <see langword="false"/> if it is empty.</value>
+        /// <value>Whether this is a prerelease version. <see langword="true"/>
+        /// if the <see cref="Prerelease"/> property is non-empty; <see langword="false"/>
+        /// if it is empty.</value>
         public bool IsPrerelease => Prerelease.Length != 0;
 
-        /// <summary>
-        /// Gets the build metadata.
-        /// </summary>
         /// <value>
         /// The build metadata or empty string if there is no build metadata.
         /// </value>
@@ -460,9 +445,6 @@ namespace Semver
         [Obsolete("This property is obsolete. Use Metadata instead.")]
         public string Build => Metadata;
 
-        /// <summary>
-        /// Gets the build metadata of this semantic version.
-        /// </summary>
         /// <value>The build metadata of this version or empty string if there
         /// is no metadata.</value>
         /// <remarks>
@@ -479,7 +461,7 @@ namespace Semver
         public IReadOnlyList<string> MetadataIdentifiers { get; }
 
         /// <summary>
-        /// Returns the <see cref="string" /> equivalent of this version.
+        /// Converts this version to a <see cref="string" />.
         /// </summary>
         /// <returns>
         /// The <see cref="string" /> equivalent of this version.
@@ -707,7 +689,7 @@ namespace Semver
         /// <returns>The <see cref="SemVersion"/> object.</returns>
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
-        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <code>int.MaxValue</code>.</exception>
+        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <c>int.MaxValue</c>.</exception>
         [Obsolete("Implicit conversion from string is obsolete. Use Parse or TryParse method instead.")]
         public static implicit operator SemVersion(string version)
         {

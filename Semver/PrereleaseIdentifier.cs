@@ -4,13 +4,17 @@ using System.Runtime.CompilerServices;
 
 namespace Semver
 {
+    // TODO Doc Comment
     public readonly struct PrereleaseIdentifier : IEquatable<PrereleaseIdentifier>
     {
+        // TODO Doc Comment
         public string Value { get; }
+
+        // TODO Doc Comment
         public int? IntValue { get; }
 
         /// <summary>
-        /// Construct a prerelease identifier and be loose in what is accepted
+        /// Construct a prerelease identifier and be loose in what is accepted.
         /// </summary>
         /// <remarks>This should be used only by the <see cref="SemVersion"/> constructor which
         /// still accepts illegal values.</remarks>
@@ -39,6 +43,7 @@ namespace Semver
             IntValue = intValue;
         }
 
+        // TODO Doc Comment
         public PrereleaseIdentifier(string value, bool allowLeadingZeros = false)
         {
             _ = value ?? throw new ArgumentNullException(nameof(value));
@@ -77,6 +82,7 @@ namespace Semver
             Value = value;
         }
 
+        // TODO Doc Comment
         public PrereleaseIdentifier(int value)
         {
             if (value < 0)
