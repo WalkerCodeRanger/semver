@@ -5,7 +5,7 @@
     <Copyright>Copyright © 2013 Max Hauser, Jeff Walker</Copyright>
     <AssemblyTitle>Semantic versioning</AssemblyTitle>
     <Authors>Max Hauser, Jeff Walker</Authors>
-    <TargetFrameworks>netstandard1.1;net452</TargetFrameworks>
+    <TargetFrameworks>netstandard1.1;netstandard2.0;net452</TargetFrameworks>
     <NoWarn>$(NoWarn);CS1591;CA1303</NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <DebugType>portable</DebugType>
@@ -26,12 +26,8 @@
     <FileVersion>0.0.0.0</FileVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD;NETSTANDARD1_1</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+  <PropertyGroup Condition=" '$(TargetFramework)' != 'netstandard1.1' ">
+    <DefineConstants>$(DefineConstants);SERIALIZABLE;COMPILED_REGEX</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
