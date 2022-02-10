@@ -2,18 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net461</TargetFrameworks>
     <StartupObject>Semver.Benchmarks.Program</StartupObject>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">
-        <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'net461' ">
-        <DefineConstants>$(DefineConstants);NET461</DefineConstants>
-    </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet">

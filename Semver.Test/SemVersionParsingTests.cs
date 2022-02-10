@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using Semver.Test.Builders;
 using Xunit;
-using static System.Environment;
 using static Semver.SemVersionStyles;
 
 namespace Semver.Test
@@ -15,7 +14,7 @@ namespace Semver.Test
     /// </summary>
     public class SemVersionParsingTests
     {
-        private static readonly string InvalidSemVersionStylesMessage = $"An invalid SemVersionStyles value was used.{NewLine}Parameter name: style";
+        private static readonly string InvalidSemVersionStylesMessageStart = $"An invalid SemVersionStyles value was used.";
 
         private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace.";
         private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace.";
@@ -323,7 +322,7 @@ namespace Semver.Test
             ValidLongVersion(1445670),
             ValidLongVersion(5646),
 
-            Invalid<ArgumentNullException>(null, $"Value cannot be null.{NewLine}Parameter name: version"));
+            Invalid<ArgumentNullException>(null, "Value cannot be null."));
 
         [Fact]
         public void CanConstructParsingTestCases()
@@ -349,7 +348,8 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse("ignored", styles));
 
-            Assert.Equal(InvalidSemVersionStylesMessage, ex.Message);
+            Assert.StartsWith(InvalidSemVersionStylesMessageStart, ex.Message);
+            Assert.Equal("style", ex.ParamName);
         }
 
         [Theory]
@@ -369,9 +369,16 @@ namespace Semver.Test
                 var ex = Assert.Throws(testCase.ExceptionType,
                     () => SemVersion.Parse(testCase.Version, testCase.Styles, testCase.MaxLength));
 
-                Assert.Equal(string.Format(CultureInfo.InvariantCulture,
-                        testCase.ExceptionMessageFormat, LimitLength(testCase.Version)),
-                    ex.Message);
+                var expected = string.Format(CultureInfo.InvariantCulture,
+                    testCase.ExceptionMessageFormat, LimitLength(testCase.Version));
+
+                if (ex is ArgumentException argumentException)
+                {
+                    Assert.StartsWith(expected, argumentException.Message);
+                    Assert.Equal("version", argumentException.ParamName);
+                }
+                else
+                    Assert.Equal(expected, ex.Message);
             }
         }
 
@@ -381,7 +388,8 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.TryParse("ignored", styles, out _));
 
-            Assert.Equal(InvalidSemVersionStylesMessage, ex.Message);
+            Assert.StartsWith(InvalidSemVersionStylesMessageStart, ex.Message);
+            Assert.Equal("style", ex.ParamName);
         }
 
         [Theory]

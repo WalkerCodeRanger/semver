@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using Xunit;
-using static System.Environment;
 
 namespace Semver.Test
 {
@@ -54,7 +53,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier("", allowLeadingZeros));
 
             Assert.Equal("value", ex.ParamName);
-            Assert.Equal($"Cannot be empty string.{NewLine}Parameter name: value", ex.Message);
+            Assert.StartsWith($"Cannot be empty string.", ex.Message);
         }
 
         [Theory]
@@ -92,7 +91,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier(value));
 
             Assert.Equal("value", ex.ParamName);
-            Assert.Equal($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'.{NewLine}Parameter name: value",
+            Assert.StartsWith($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'.",
                 ex.Message);
         }
 
@@ -108,7 +107,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier(value));
 
             Assert.Equal("value", ex.ParamName);
-            Assert.Equal($"A prerelease identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.{NewLine}Parameter name: value",
+            Assert.StartsWith($"A prerelease identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.",
                 ex.Message);
         }
 
@@ -132,7 +131,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier(value));
 
             Assert.Equal("value", ex.ParamName);
-            Assert.Equal($"Numeric prerelease identifiers can't be negative: {value}.{NewLine}Parameter name: value",
+            Assert.StartsWith($"Numeric prerelease identifiers can't be negative: {value}.",
                 ex.Message);
         }
 

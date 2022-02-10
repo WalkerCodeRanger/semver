@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using Xunit;
-using static System.Environment;
 
 namespace Semver.Test
 {
@@ -24,7 +23,8 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(
                 () => int.TryParse("45", InvalidNumberStyle, CultureInfo.InvariantCulture, out _));
 
-            Assert.Equal(InvalidNumberStyleMessage, ex.Message);
+            Assert.StartsWith(InvalidNumberStyleMessageStart, ex.Message);
+            Assert.Equal("style", ex.ParamName);
         }
 
         [Fact]
@@ -33,7 +33,8 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(
                 () => int.Parse(null, InvalidNumberStyle, CultureInfo.InvariantCulture));
 
-            Assert.Equal(InvalidNumberStyleMessage, ex.Message);
+            Assert.StartsWith(InvalidNumberStyleMessageStart, ex.Message);
+            Assert.Equal("style", ex.ParamName);
         }
 
         [Fact]
@@ -54,7 +55,7 @@ namespace Semver.Test
             Assert.Equal(IntOverflowMessage, ex.Message);
         }
 
-        private static readonly string InvalidNumberStyleMessage = $"An undefined NumberStyles value is being used.{NewLine}Parameter name: style";
+        private const string InvalidNumberStyleMessageStart = "An undefined NumberStyles value is being used.";
         private const string InvalidFormatMessage = "Input string was not in a correct format.";
         private const string IntOverflowMessage = "Value was either too large or too small for an Int32.";
         private const NumberStyles InvalidNumberStyle = (NumberStyles)int.MaxValue;
