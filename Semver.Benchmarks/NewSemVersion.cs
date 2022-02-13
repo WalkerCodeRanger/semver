@@ -7,6 +7,7 @@ namespace Semver.Benchmarks
 {
     [SimpleJob(RuntimeMoniker.Net461)]
     [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     public class NewSemVersion
     {
         private const string Prerelease = "asdf.24534634.sdfdg.02343sd";

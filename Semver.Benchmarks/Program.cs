@@ -10,7 +10,7 @@ namespace Semver.Benchmarks
             //var random = new Random();
             //var version = BasicPrereleaseParsing.RandomVersion(random);
             //var seed = random.Next(int.MinValue, int.MaxValue);
-            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args).ToList();
+            _ = BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args).ToList();
         }
     }
 }

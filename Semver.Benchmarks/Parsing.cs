@@ -12,6 +12,7 @@ namespace Semver.Benchmarks
     /// </summary>
     [SimpleJob(RuntimeMoniker.Net461)]
     [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     public abstract class Parsing
     {
         protected const int VersionCount = 1_000;
