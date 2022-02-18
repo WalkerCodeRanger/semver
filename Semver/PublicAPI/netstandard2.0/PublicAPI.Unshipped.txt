@@ -15,6 +15,9 @@ Semver.SemVersion.PrecedenceMatches(Semver.SemVersion other) -> bool
 Semver.SemVersion.Prerelease.get -> string
 Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "") -> void
 Semver.SemVersion.SemVersion(System.Version version) -> void
+Semver.SemVersion.WithMajorVersion(int majorVersion) -> Semver.SemVersion
+Semver.SemVersion.WithMinorVersion(int minorVersion) -> Semver.SemVersion
+Semver.SemVersion.WithPatchVersion(int patchVersion) -> Semver.SemVersion
 static Semver.SemVersion.Compare(Semver.SemVersion versionA, Semver.SemVersion versionB) -> int
 static Semver.SemVersion.Equals(Semver.SemVersion versionA, Semver.SemVersion versionB) -> bool
 static Semver.SemVersion.implicit operator Semver.SemVersion(string version) -> Semver.SemVersion
@@ -24,8 +27,6 @@ static Semver.SemVersion.operator <=(Semver.SemVersion left, Semver.SemVersion r
 static Semver.SemVersion.operator ==(Semver.SemVersion left, Semver.SemVersion right) -> bool
 static Semver.SemVersion.operator >(Semver.SemVersion left, Semver.SemVersion right) -> bool
 static Semver.SemVersion.operator >=(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.Parse(string version, bool strict = false) -> Semver.SemVersion
-static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, bool strict = false) -> bool
 override Semver.PrereleaseIdentifier.Equals(object obj) -> bool
 override Semver.PrereleaseIdentifier.GetHashCode() -> int
 override Semver.PrereleaseIdentifier.ToString() -> string

@@ -25,6 +25,9 @@ namespace Semver
 #endif
     {
         private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
+        private const string InvalidMajorVersionMessage = "Major version must be greater than or equal to zero.";
+        private const string InvalidMinorVersionMessage = "Minor version must be greater than or equal to zero.";
+        private const string InvalidPatchVersionMessage = "Patch version must be greater than or equal to zero.";
         internal const int MaxVersionLength = 1024;
 
         /// <remarks>
@@ -403,6 +406,36 @@ namespace Semver
                 prerelease ?? Prerelease,
                 build ?? Metadata);
         }
+
+        #region With... Methods
+
+        // TODO Doc Comment
+        public SemVersion WithMajorVersion(int majorVersion)
+        {
+            if (majorVersion < 0)
+                throw new ArgumentOutOfRangeException(nameof(majorVersion), InvalidMajorVersionMessage);
+
+            return new SemVersion(majorVersion, Minor, Patch, PrereleaseIdentifiers, MetadataIdentifiers);
+        }
+
+        // TODO Doc Comment
+        public SemVersion WithMinorVersion(int minorVersion)
+        {
+            if (minorVersion < 0)
+                throw new ArgumentOutOfRangeException(nameof(minorVersion), InvalidMinorVersionMessage);
+
+            return new SemVersion(Major, minorVersion, Patch, PrereleaseIdentifiers, MetadataIdentifiers);
+        }
+
+        // TODO Doc Comment
+        public SemVersion WithPatchVersion(int patchVersion)
+        {
+            if (patchVersion < 0)
+                throw new ArgumentOutOfRangeException(nameof(patchVersion), InvalidPatchVersionMessage);
+
+            return new SemVersion(Major, Minor, patchVersion, PrereleaseIdentifiers, MetadataIdentifiers);
+        }
+        #endregion
 
         /// <value>
         /// The major version.

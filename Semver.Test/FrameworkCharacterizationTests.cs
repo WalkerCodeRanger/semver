@@ -55,6 +55,13 @@ namespace Semver.Test
             Assert.Equal(IntOverflowMessage, ex.Message);
         }
 
+        [Fact]
+        public void ConstructNegativeVersionThrowsArgumentOutOfRangeException()
+        {
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new Version(-1, 0));
+            Assert.StartsWith("Version's parameters must be greater than or equal to zero.", ex.Message);
+        }
+
         private const string InvalidNumberStyleMessageStart = "An undefined NumberStyles value is being used.";
         private const string InvalidFormatMessage = "Input string was not in a correct format.";
         private const string IntOverflowMessage = "Value was either too large or too small for an Int32.";
