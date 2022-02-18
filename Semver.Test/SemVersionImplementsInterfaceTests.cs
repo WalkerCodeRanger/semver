@@ -1,7 +1,5 @@
 ﻿using System;
-#if !NETSTANDARD
 using System.Runtime.Serialization;
-#endif
 using Xunit;
 
 namespace Semver.Test
@@ -30,11 +28,17 @@ namespace Semver.Test
             Assert.IsAssignableFrom<IEquatable<SemVersion>>(new SemVersion(1));
         }
 
-#if !NETSTANDARD
+#if SERIALIZABLE
         [Fact]
         public void SemVersionImplementsISerializable()
         {
             Assert.IsAssignableFrom<ISerializable>(new SemVersion(1));
+        }
+#else
+        [Fact]
+        public void SemVersionDoesNotImplementsISerializable()
+        {
+            Assert.False(typeof(ISerializable).IsAssignableFrom(typeof(SemVersion)));
         }
 #endif
     }

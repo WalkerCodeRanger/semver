@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
-#if !NETSTANDARD
 using System.IO;
+using System.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-#endif
 using Xunit;
 
 namespace Semver.Test
@@ -497,7 +496,7 @@ namespace Semver.Test
         }
         #endregion
 
-#if !NETSTANDARD
+#if SERIALIZABLE
         [Fact]
         public void SerializationTest()
         {
@@ -513,6 +512,19 @@ namespace Semver.Test
             Assert.Equal(semVer, semVerSerializedDeserialized);
             Assert.Equal(semVer.PrereleaseIdentifiers, semVerSerializedDeserialized.PrereleaseIdentifiers);
             Assert.Equal(semVer.MetadataIdentifiers, semVerSerializedDeserialized.MetadataIdentifiers);
+        }
+#else
+        [Fact]
+        public void SerializationTest()
+        {
+            var semVer = new SemVersion(1, 2, 3, "alpha", "dev");
+            using (var ms = new MemoryStream())
+            {
+                var bf = new BinaryFormatter();
+                var ex = Assert.Throws<SerializationException>(() => bf.Serialize(ms, semVer));
+                const string expectedMessage = "Type 'Semver.SemVersion' in Assembly 'Semver, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null' is not marked as serializable.";
+                Assert.Equal(expectedMessage, ex.Message);
+            }
         }
 #endif
     }

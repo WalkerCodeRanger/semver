@@ -17,14 +17,25 @@
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)'!='netcoreapp2.1'">
+      <DefineConstants>$(DefineConstants);SERIALIZABLE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Semver\Semver.csproj" />
+  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp2.1'">
+    <ProjectReference Include="..\Semver\Semver.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">
+      <!-- Force the use of the netstandard1.1 library to test it, otherwise netstandard2.0 is used -->
+      <ProjectReference Include="..\Semver\Semver.csproj">
+          <SetTargetFramework>TargetFramework=netstandard1.1</SetTargetFramework>
+      </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
