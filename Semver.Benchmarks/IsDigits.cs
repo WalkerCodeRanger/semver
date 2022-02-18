@@ -5,6 +5,7 @@ namespace Semver.Benchmarks
 {
     [SimpleJob(RuntimeMoniker.Net461)]
     [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     public class IsDigits
     {
         private const string Value = "245413548946516575165756156751323245451984";
