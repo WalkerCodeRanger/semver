@@ -8,7 +8,7 @@ namespace Semver.Test
     /// <summary>
     /// Tests of the "With..." methods of <see cref="SemVersion"/>.
     /// </summary>
-    public class SemVersionWithTests
+    public class SemVersionWithFieldTests
     {
         public static readonly SemVersion Version = new SemVersion(1, 2, 3, "pre", "metadata");
 
