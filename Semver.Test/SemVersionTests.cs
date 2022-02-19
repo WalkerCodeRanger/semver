@@ -435,7 +435,9 @@ namespace Semver.Test
         public void ChangeMajorTest()
         {
             var v1 = new SemVersion(1, 2, 3, "alpha", "dev");
+#pragma warning disable CS0618 // Type or member is obsolete
             var v2 = v1.Change(major: 5);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(5, v2.Major);
             Assert.Equal(2, v2.Minor);
@@ -449,7 +451,9 @@ namespace Semver.Test
         public void ChangeMinorTest()
         {
             var v1 = new SemVersion(1, 2, 3, "alpha", "dev");
+#pragma warning disable CS0618 // Type or member is obsolete
             var v2 = v1.Change(minor: 5);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(1, v2.Major);
             Assert.Equal(5, v2.Minor);
@@ -463,7 +467,9 @@ namespace Semver.Test
         public void ChangePatchTest()
         {
             var v1 = new SemVersion(1, 2, 3, "alpha", "dev");
+#pragma warning disable CS0618 // Type or member is obsolete
             var v2 = v1.Change(patch: 5);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(1, v2.Major);
             Assert.Equal(2, v2.Minor);
@@ -477,7 +483,9 @@ namespace Semver.Test
         public void ChangePrereleaseTest()
         {
             var v1 = new SemVersion(1, 2, 3, "alpha", "dev");
+#pragma warning disable CS0618 // Type or member is obsolete
             var v2 = v1.Change(prerelease: "beta");
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(1, v2.Major);
             Assert.Equal(2, v2.Minor);
@@ -492,7 +500,9 @@ namespace Semver.Test
         {
             var v1 = new SemVersion(1, 2, 3, "alpha", "dev");
             // TODO this parameter should be named 'metadata', but that is a breaking change
+#pragma warning disable CS0618 // Type or member is obsolete
             var v2 = v1.Change(build: "gamma");
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(1, v2.Major);
             Assert.Equal(2, v2.Minor);

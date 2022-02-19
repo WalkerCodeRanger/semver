@@ -117,7 +117,7 @@ namespace Semver
         /// The Patch version will be the fourth component of the version number. The
         /// build meta data will contain the third component of the version number if
         /// it is greater than zero.</returns>
-        [Obsolete("This constructor is obsolete. Call FromVersion instead.")]
+        [Obsolete("This constructor is obsolete. Use SemVersion.FromVersion() instead.")]
         public SemVersion(Version version)
         {
             if (version == null)
@@ -256,7 +256,7 @@ namespace Semver
         /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
         /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing Minor or Patch versions and <paramref name="strict"/> is <see langword="true"/>.</exception>
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <c>int.MaxValue</c>.</exception>
-        [Obsolete("Method is obsolete. Call Parse with SemVersionStyles instead.")]
+        [Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
         public static SemVersion Parse(string version, bool strict)
         {
             var match = ParseEx.Match(version);
@@ -327,7 +327,7 @@ namespace Semver
         /// <param name="strict">If set to <see langword="true"/> minor and patch version are required,
         /// otherwise they are optional.</param>
         /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
-        [Obsolete("Method is obsolete. Call TryParse with SemVersionStyles instead.")]
+        [Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
         public static bool TryParse(string version, out SemVersion semver, bool strict)
         {
             semver = null;
@@ -408,6 +408,7 @@ namespace Semver
         /// To change only the patch version:
         /// <code>version.Change(patch: 4)</code>
         /// </example>
+        [Obsolete("Method is obsolete. Use With() or With...() method instead.")]
         public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
             string prerelease = null, string build = null)
         {
@@ -417,6 +418,60 @@ namespace Semver
                 patch ?? Patch,
                 prerelease ?? Prerelease,
                 build ?? Metadata);
+        }
+
+        /// <summary>
+        /// Make a copy of the current instance with changed properties.
+        /// </summary>
+        /// <param name="major">The value to replace the major version or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="minor">The value to replace the minor version or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="patch">The value to replace the patch version or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="prerelease">The value to replace the prerelease identifiers or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="metadata">The value to replace the build metadata identifiers or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading zeros will be trimmed.</param>
+        /// <returns>The new version object.</returns>
+        /// <remarks>
+        /// The <see cref="With"/> method is intended to be called using named argument syntax, passing only
+        /// those fields to be changed.
+        /// </remarks>
+        /// <example>
+        /// To change only the patch version:
+        /// <code>version.With(patch: 4)</code>
+        /// </example>
+        public SemVersion With(
+            int? major = null,
+            int? minor = null,
+            int? patch = null,
+            string prerelease = null,
+            string metadata = null,
+            bool allowLeadingZeros = false)
+        {
+            // Note: It is tempting to null coalesce first, but then this method would report invalid
+            // arguments on invalid SemVersion instances.
+            if (major is int majorInt && majorInt < 0)
+                throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (minor is int minorInt && minorInt < 0)
+                throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
+            if (patch is int patchInt && patchInt < 0)
+                throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
+
+            var prereleaseIdentifiers = prerelease?.Length == 0
+                ? ReadOnlyList<PrereleaseIdentifier>.Empty
+                : prerelease?.Split('.')
+                             .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prerelease)))
+                             .ToReadOnlyList();
+            var metadataIdentifiers = metadata?.Length == 0
+                ? ReadOnlyList<MetadataIdentifier>.Empty
+                : metadata?.Split('.')
+                           .Select(i => new MetadataIdentifier(i, nameof(metadata)))
+                           .ToReadOnlyList();
+
+            return new SemVersion(
+                major ?? Major,
+                minor ?? Minor,
+                patch ?? Patch,
+                prereleaseIdentifiers ?? PrereleaseIdentifiers,
+                metadataIdentifiers ?? MetadataIdentifiers);
         }
 
         #region With... Methods
@@ -832,7 +887,7 @@ namespace Semver
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <c>int.MaxValue</c>.</exception>
-        [Obsolete("Implicit conversion from string is obsolete. Use Parse or TryParse method instead.")]
+        [Obsolete("Implicit conversion from string is obsolete. Use Parse() or TryParse() method instead.")]
         public static implicit operator SemVersion(string version)
         {
             return Parse(version, false);

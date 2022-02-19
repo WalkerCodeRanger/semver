@@ -24,6 +24,7 @@ Semver.SemVersion.PrecedenceMatches(Semver.SemVersion other) -> bool
 Semver.SemVersion.Prerelease.get -> string
 Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "") -> void
 Semver.SemVersion.SemVersion(System.Version version) -> void
+Semver.SemVersion.With(int? major = null, int? minor = null, int? patch = null, string prerelease = null, string metadata = null, bool allowLeadingZeros = false) -> Semver.SemVersion
 Semver.SemVersion.WithMajor(int major) -> Semver.SemVersion
 Semver.SemVersion.WithMetadata(params string[] metadataIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithMetadata(string metadata) -> Semver.SemVersion

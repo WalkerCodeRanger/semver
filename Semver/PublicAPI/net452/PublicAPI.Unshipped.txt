@@ -22,6 +22,7 @@ Semver.SemVersion.Metadata.get -> string
 Semver.SemVersion.MetadataIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.MetadataIdentifier>
 Semver.SemVersion.PrereleaseIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.PrereleaseIdentifier>
 Semver.SemVersion.ToVersion() -> System.Version
+Semver.SemVersion.With(int? major = null, int? minor = null, int? patch = null, string prerelease = null, string metadata = null, bool allowLeadingZeros = false) -> Semver.SemVersion
 Semver.SemVersion.WithMajor(int major) -> Semver.SemVersion
 Semver.SemVersion.WithMetadata(params string[] metadataIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithMetadata(string metadata) -> Semver.SemVersion

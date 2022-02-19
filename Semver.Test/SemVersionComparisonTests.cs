@@ -749,7 +749,10 @@ namespace Semver.Test
 
         private static bool DifferByMetadataOnly(SemVersion v1, SemVersion v2)
         {
+            // Note: can't use WithoutMetadata because this comparision is performed on invalid SemVersion instances
+#pragma warning disable CS0618 // Type or member is obsolete
             return v1.Change(build: "").Equals(v2.Change(build: ""));
+#pragma warning restore CS0618 // Type or member is obsolete
         }
     }
 }

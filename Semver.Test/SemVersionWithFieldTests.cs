@@ -137,7 +137,7 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithPrereleaseParsingToLarge()
+        public void WithPrereleaseParsingTooLarge()
         {
             var ex = Assert.Throws<OverflowException>(()
                => Version.WithPrerelease("bar.99999999999999999", allowLeadingZeros: false));
@@ -205,7 +205,7 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithPrereleaseParamsToLarge()
+        public void WithPrereleaseParamsTooLarge()
         {
             var ex = Assert.Throws<OverflowException>(()
                 => Version.WithPrerelease("bar", "99999999999999999"));
@@ -284,7 +284,7 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithPrereleaseEnumerableToLarge()
+        public void WithPrereleaseEnumerableTooLarge()
         {
             var ex = Assert.Throws<OverflowException>(()
                 => Version.WithPrerelease(new[] { "bar", "99999999999999999" }, allowLeadingZeros: false));
@@ -413,7 +413,7 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithMetadataParsingToLarge()
+        public void WithMetadataParsingTooLarge()
         {
             var v = Version.WithMetadata("bar.99999999999999999");
 
@@ -481,7 +481,7 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithMetadataParamsToLarge()
+        public void WithMetadataParamsTooLarge()
         {
             var v = Version.WithMetadata("bar", "99999999999999999");
 
@@ -550,7 +550,7 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithMetadataEnumerableToLarge()
+        public void WithMetadataEnumerableTooLarge()
         {
             var v = Version.WithMetadata(new List<string> { "bar", "99999999999999999" });
 
