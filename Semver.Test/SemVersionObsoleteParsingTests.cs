@@ -229,7 +229,7 @@ namespace Semver.Test
                 {"1.2.3-a.00000c", 1, 2, 3, "a.00000c", ""},
             };
 
-        // TODO these should have leading zeros removed if they are accepted
+        // These should have leading zeros removed if they are accepted
         public static readonly TheoryData<string, int, int, int, string, string> LeadingZerosPrerelease =
             new TheoryData<string, int, int, int, string, string>()
             {
@@ -340,7 +340,6 @@ namespace Semver.Test
             Assert.Equal(metadata, v.Metadata);
         }
 
-        // TODO These exceptions should be FormatException etc.
         [Theory]
         [MemberData(nameof(IllegalCharacters))]
         [MemberData(nameof(EmptyOrWhitespace))]
@@ -349,6 +348,7 @@ namespace Semver.Test
         [MemberData(nameof(BadFormat))]
         public void ParseLooseInvalidThrowsArgumentExceptionTest(string versionString)
         {
+            // These exceptions should be FormatException etc.
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString));
             Assert.StartsWith($"Invalid version '{versionString}'.", ex.Message);
             Assert.Equal("version", ex.ParamName);
@@ -367,7 +367,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
-            // TODO that is a strange error message, should be version
+            // This is an incorrect param name, should be "version"
             Assert.Equal("input", ex.ParamName);
         }
 
@@ -385,7 +385,7 @@ namespace Semver.Test
         [MemberData(nameof(MiscValid))]
         [MemberData(nameof(DashInStrangePlace))]
         [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
-        // TODO leading zero versions are accepted and shouldn't be (issue #16)
+        // Leading zero versions are accepted and shouldn't be (issue #16)
         [MemberData(nameof(LeadingZeros))]
         [MemberData(nameof(LeadingZerosPrerelease))]
         public void ParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
@@ -410,7 +410,6 @@ namespace Semver.Test
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
-        // TODO These exceptions should be FormatException etc.
         [Theory]
         [MemberData(nameof(IllegalCharacters))]
         [MemberData(nameof(EmptyOrWhitespace))]
@@ -419,6 +418,7 @@ namespace Semver.Test
         [MemberData(nameof(BadFormat))]
         public void ParseStrictInvalidThrowsArgumentExceptionTest(string versionString)
         {
+            // These exceptions should be FormatException etc.
 #pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString, true));
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -434,22 +434,22 @@ namespace Semver.Test
             Assert.Equal("Value was either too large or too small for an Int32.", ex.Message);
         }
 
-        // TODO These exceptions should be FormatException etc.
         [Theory]
         [MemberData(nameof(MissingPatchInvalid))]
         public void ParseStrictInvalidThrowsInvalidOperationMissingPatchTest(string versionString)
         {
+            // These exceptions should be FormatException etc.
 #pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
 #pragma warning restore CS0618 // Type or member is obsolete
             Assert.Equal("Invalid version (no patch version given in strict mode)", ex.Message);
         }
 
-        // TODO These exceptions should be FormatException etc.
         [Theory]
         [MemberData(nameof(MissingMinorPatchInvalid))]
         public void ParseStrictInvalidThrowsInvalidOperationMissingMinorPatchTest(string versionString)
         {
+            // These exceptions should be FormatException etc.
 #pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<InvalidOperationException>(() => SemVersion.Parse(versionString, true));
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -463,7 +463,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null, true));
 #pragma warning restore CS0618 // Type or member is obsolete
             Assert.StartsWith("Value cannot be null.", ex.Message);
-            // TODO that is a strange error message, should be version
+            // This is an incorrect param name, should be "version"
             Assert.Equal("input", ex.ParamName);
         }
 
@@ -507,7 +507,7 @@ namespace Semver.Test
         [MemberData(nameof(MiscValid))]
         [MemberData(nameof(DashInStrangePlace))]
         [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
-        // TODO leading zero versions are accepted and shouldn't be (issue #16)
+        // Leading zero versions are accepted and shouldn't be (issue #16)
         [MemberData(nameof(LeadingZeros))]
         [MemberData(nameof(LeadingZerosPrerelease))]
         public void TryParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
@@ -615,7 +615,7 @@ namespace Semver.Test
 #pragma warning restore CS0618 // Type or member is obsolete
             });
             Assert.StartsWith("Value cannot be null.", ex.Message);
-            // TODO that is a strange error message, should be version
+            // This is an incorrect param name, should be "version"
             Assert.Equal("input", ex.ParamName);
         }
         #endregion

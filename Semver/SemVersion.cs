@@ -228,6 +228,7 @@ namespace Semver
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <c>int.MaxValue</c>.</exception>
+        // TODO reconsider adding this overload that allows non-obsolete access to the old parsing
         public static SemVersion Parse(string version)
         {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -295,6 +296,7 @@ namespace Semver
         /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
         /// version string was not valid.</param>
         /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
+        // TODO reconsider adding this overload that allows non-obsolete access to the old parsing
         public static bool TryParse(string version, out SemVersion semver)
         {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -303,6 +305,7 @@ namespace Semver
         }
 
         // TODO Doc Comment
+        // TODO MS guidelines say to always put out params last, perhaps the default maxLength should be an overload so it can come before the out param?
         public static bool TryParse(string version, SemVersionStyles style,
             out SemVersion semver, int maxLength = MaxVersionLength)
         {
@@ -627,7 +630,7 @@ namespace Semver
         /// </remarks>
         public string Prerelease { get; }
 
-        // TODO write doc comments for PrereleaseIdentifiers
+        // TODO Doc Comment
         public IReadOnlyList<PrereleaseIdentifier> PrereleaseIdentifiers { get; }
 
         /// <value>Whether this is a prerelease version. <see langword="true"/>
@@ -638,7 +641,6 @@ namespace Semver
         /// <value>
         /// The build metadata or empty string if there is no build metadata.
         /// </value>
-        // TODO consider again whether to make this obsolete, name the new property BuildMetadata
         [Obsolete("This property is obsolete. Use Metadata instead.")]
         public string Build => Metadata;
 
@@ -654,7 +656,7 @@ namespace Semver
         /// </remarks>
         public string Metadata { get; }
 
-        // TODO write doc comments for MetadataIdentifiers
+        // TODO Doc Comment
         public IReadOnlyList<MetadataIdentifier> MetadataIdentifiers { get; }
 
         /// <summary>
