@@ -20,5 +20,8 @@
         <Compile Include="..\Semver\*.cs">
             <Link>LocalVersion\%(RecursiveDir)%(FileName)%(Extension)</Link>
         </Compile>
+        <Compile Include="..\Semver\Utility\*.cs">
+            <Link>LocalVersion\%(RecursiveDir)\Utility\%(FileName)%(Extension)</Link>
+        </Compile>
     </ItemGroup>
 </Project>

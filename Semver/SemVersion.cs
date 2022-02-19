@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -10,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Security.Permissions;
 #endif
 using System.Text.RegularExpressions;
+using Semver.Utility;
 
 namespace Semver
 {
@@ -28,6 +28,7 @@ namespace Semver
         private const string InvalidMajorVersionMessage = "Major version must be greater than or equal to zero.";
         private const string InvalidMinorVersionMessage = "Minor version must be greater than or equal to zero.";
         private const string InvalidPatchVersionMessage = "Patch version must be greater than or equal to zero.";
+        private const string PrereleaseIdentifierIsDefaultMessage = "Prerelease identifier cannot be default/null.";
         internal const int MaxVersionLength = 1024;
 
         /// <remarks>
@@ -88,17 +89,17 @@ namespace Semver
             if (Prerelease.Length == 0)
                 PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
             else
-                PrereleaseIdentifiers = new ReadOnlyCollection<PrereleaseIdentifier>(
-                    Prerelease.Split('.')
+                PrereleaseIdentifiers = Prerelease.Split('.')
 #pragma warning disable CS0612 // Type or member is obsolete
-                          .Select(PrereleaseIdentifier.CreateLoose).ToList());
+                                                  .Select(PrereleaseIdentifier.CreateLoose)
 #pragma warning restore CS0612 // Type or member is obsolete
+                                                  .ToReadOnlyList();
 
             Metadata = build ?? "";
             if (Metadata.Length == 0)
                 MetadataIdentifiers = ReadOnlyList<string>.Empty;
             else
-                MetadataIdentifiers = new ReadOnlyCollection<string>(Metadata.Split('.').ToList());
+                MetadataIdentifiers = Metadata.Split('.').ToReadOnlyList();
         }
 
         /// <summary>
@@ -129,7 +130,7 @@ namespace Semver
             if (version.Build > 0)
             {
                 Metadata = version.Build.ToString(CultureInfo.InvariantCulture);
-                MetadataIdentifiers = new ReadOnlyCollection<string>(new List<string>(1) { Metadata });
+                MetadataIdentifiers = new List<string>(1) { Metadata }.AsReadOnly();
             }
             else
             {
@@ -408,33 +409,76 @@ namespace Semver
         }
 
         #region With... Methods
-
         // TODO Doc Comment
-        public SemVersion WithMajorVersion(int majorVersion)
+        public SemVersion WithMajor(int major)
         {
-            if (majorVersion < 0)
-                throw new ArgumentOutOfRangeException(nameof(majorVersion), InvalidMajorVersionMessage);
-
-            return new SemVersion(majorVersion, Minor, Patch, PrereleaseIdentifiers, MetadataIdentifiers);
+            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            return new SemVersion(major, Minor, Patch, PrereleaseIdentifiers, MetadataIdentifiers);
         }
 
         // TODO Doc Comment
-        public SemVersion WithMinorVersion(int minorVersion)
+        public SemVersion WithMinor(int minor)
         {
-            if (minorVersion < 0)
-                throw new ArgumentOutOfRangeException(nameof(minorVersion), InvalidMinorVersionMessage);
-
-            return new SemVersion(Major, minorVersion, Patch, PrereleaseIdentifiers, MetadataIdentifiers);
+            if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
+            return new SemVersion(Major, minor, Patch, PrereleaseIdentifiers, MetadataIdentifiers);
         }
 
         // TODO Doc Comment
-        public SemVersion WithPatchVersion(int patchVersion)
+        public SemVersion WithPatch(int patch)
         {
-            if (patchVersion < 0)
-                throw new ArgumentOutOfRangeException(nameof(patchVersion), InvalidPatchVersionMessage);
-
-            return new SemVersion(Major, Minor, patchVersion, PrereleaseIdentifiers, MetadataIdentifiers);
+            if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
+            return new SemVersion(Major, Minor, patch, PrereleaseIdentifiers, MetadataIdentifiers);
         }
+
+        // TODO Doc Comment
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public SemVersion WithPrerelease(string prerelease, bool allowLeadingZeros = false)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+        {
+            if (prerelease is null) throw new ArgumentNullException(nameof(prerelease));
+            if (prerelease.Length == 0) return new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, MetadataIdentifiers);
+            var identifiers = prerelease.Split('.')
+                              .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prerelease)))
+                              .ToReadOnlyList();
+            return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
+        }
+
+        // TODO Doc Comment
+        public SemVersion WithPrerelease(params string[] prereleaseIdentifiers)
+        {
+            if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
+            if (prereleaseIdentifiers.Length == 0) return new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, MetadataIdentifiers);
+            var identifiers = prereleaseIdentifiers
+                              .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros: false, nameof(prereleaseIdentifiers)))
+                              .ToReadOnlyList();
+
+            return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
+        }
+
+        // TODO Doc Comment
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public SemVersion WithPrerelease(IEnumerable<string> prereleaseIdentifiers, bool allowLeadingZeros = false)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+        {
+            if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
+            var identifiers = prereleaseIdentifiers
+                              .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prereleaseIdentifiers)))
+                              .ToReadOnlyList();
+            return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
+        }
+
+        // TODO Doc Comment
+        public SemVersion WithPrerelease(IEnumerable<PrereleaseIdentifier> prereleaseIdentifiers)
+        {
+            if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
+            var identifiers = prereleaseIdentifiers.ToReadOnlyList();
+            if (identifiers.Any(i => i == default)) throw new ArgumentException(PrereleaseIdentifierIsDefaultMessage, nameof(prereleaseIdentifiers));
+            return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
+        }
+
+        // TODO Doc Comment
+        public SemVersion WithoutPrerelease()
+            => new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, MetadataIdentifiers);
         #endregion
 
         /// <value>

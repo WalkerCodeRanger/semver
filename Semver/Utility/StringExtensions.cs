@@ -1,4 +1,4 @@
-﻿namespace Semver
+﻿namespace Semver.Utility
 {
     internal static class StringExtensions
     {

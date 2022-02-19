@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Semver
+namespace Semver.Utility
 {
     internal static class IntExtensions
     {

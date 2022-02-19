@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Semver.Utility;
 
 namespace Semver
 {
@@ -52,10 +53,20 @@ namespace Semver
 
         // TODO Doc Comment
         public PrereleaseIdentifier(string value, bool allowLeadingZeros = false)
+            : this(value, allowLeadingZeros, nameof(value))
         {
-            _ = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Internal constructor allows changing the parameter name to enable methods using this
+        /// as part of their prerelease identifier validation to match the parameter name to their
+        /// parameter name.
+        /// </summary>
+        internal PrereleaseIdentifier(string value, bool allowLeadingZeros, string paramName)
+        {
+            _ = value ?? throw new ArgumentNullException(paramName);
             if (value.Length == 0)
-                throw new ArgumentException("Prerelease identifier cannot be empty.", nameof(value));
+                throw new ArgumentException("Prerelease identifier cannot be empty.", paramName);
             if (value.IsDigits())
             {
                 if (value.Length > 1 && value[0] == '0')
@@ -66,7 +77,7 @@ namespace Semver
                         if (value.Length == 0) value = "0";
                     }
                     else
-                        throw new ArgumentException($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'.", nameof(value));
+                        throw new ArgumentException($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'.", paramName);
                 }
 
                 try
@@ -82,7 +93,7 @@ namespace Semver
             else
             {
                 if (!value.IsAlphanumericOrHyphens())
-                    throw new ArgumentException($"A prerelease identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.", nameof(value));
+                    throw new ArgumentException($"A prerelease identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.", paramName);
                 IntValue = null;
             }
 

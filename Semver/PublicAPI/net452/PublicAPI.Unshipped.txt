@@ -14,9 +14,14 @@ Semver.SemVersion.Metadata.get -> string
 Semver.SemVersion.MetadataIdentifiers.get -> System.Collections.Generic.IReadOnlyList<string>
 Semver.SemVersion.PrereleaseIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.PrereleaseIdentifier>
 Semver.SemVersion.ToVersion() -> System.Version
-Semver.SemVersion.WithMajorVersion(int majorVersion) -> Semver.SemVersion
-Semver.SemVersion.WithMinorVersion(int minorVersion) -> Semver.SemVersion
-Semver.SemVersion.WithPatchVersion(int patchVersion) -> Semver.SemVersion
+Semver.SemVersion.WithMajor(int major) -> Semver.SemVersion
+Semver.SemVersion.WithMinor(int minor) -> Semver.SemVersion
+Semver.SemVersion.WithoutPrerelease() -> Semver.SemVersion
+Semver.SemVersion.WithPatch(int patch) -> Semver.SemVersion
+Semver.SemVersion.WithPrerelease(params string[] prereleaseIdentifiers) -> Semver.SemVersion
+Semver.SemVersion.WithPrerelease(string prerelease, bool allowLeadingZeros = false) -> Semver.SemVersion
+Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier> prereleaseIdentifiers) -> Semver.SemVersion
+Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<string> prereleaseIdentifiers, bool allowLeadingZeros = false) -> Semver.SemVersion
 Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLeadingWhitespace = 2 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLeadingZeros = 1 -> Semver.SemVersionStyles

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Semver.Utility;
 
 namespace Semver.Benchmarks.Builders
 {

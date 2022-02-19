@@ -1,7 +1,8 @@
 ﻿using System.Globalization;
+using Semver.Utility;
 using Xunit;
 
-namespace Semver.Test
+namespace Semver.Test.Utility
 {
     public class IntExtensionsTests
     {

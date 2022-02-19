@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using Semver.Utility;
 
 namespace Semver.Benchmarks
 {

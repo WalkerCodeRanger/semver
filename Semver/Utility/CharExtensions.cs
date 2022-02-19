@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Semver
+namespace Semver.Utility
 {
     internal static class CharExtensions
     {

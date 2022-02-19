@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp2.1'">
-    <ProjectReference Include="..\Semver\Semver.csproj"/>
+    <ProjectReference Include="..\Semver\Semver.csproj" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.1'">

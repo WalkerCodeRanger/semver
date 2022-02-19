@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Semver.Utility;
 
 namespace Semver
 {
@@ -281,7 +281,7 @@ namespace Semver
             out IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers)
         {
             var identifiers = new List<PrereleaseIdentifier>();
-            prereleaseIdentifiers = new ReadOnlyCollection<PrereleaseIdentifier>(identifiers);
+            prereleaseIdentifiers = identifiers.AsReadOnly();
             i -= 1; // Back up so we are before the start of the first identifier
             do
             {
@@ -335,7 +335,7 @@ namespace Semver
             out IReadOnlyList<string> metadataIdentifiers)
         {
             var identifiers = new List<string>();
-            metadataIdentifiers = new ReadOnlyCollection<string>(identifiers);
+            metadataIdentifiers = identifiers.AsReadOnly();
             i -= 1; // Back up so we are before the start of the first identifier
             do
             {
