@@ -1,6 +1,14 @@
-﻿override Semver.PrereleaseIdentifier.Equals(object obj) -> bool
+﻿override Semver.MetadataIdentifier.Equals(object obj) -> bool
+override Semver.MetadataIdentifier.GetHashCode() -> int
+override Semver.MetadataIdentifier.ToString() -> string
+override Semver.PrereleaseIdentifier.Equals(object obj) -> bool
 override Semver.PrereleaseIdentifier.GetHashCode() -> int
 override Semver.PrereleaseIdentifier.ToString() -> string
+Semver.MetadataIdentifier
+Semver.MetadataIdentifier.Equals(Semver.MetadataIdentifier other) -> bool
+Semver.MetadataIdentifier.MetadataIdentifier() -> void
+Semver.MetadataIdentifier.MetadataIdentifier(string value) -> void
+Semver.MetadataIdentifier.Value.get -> string
 Semver.PrereleaseIdentifier
 Semver.PrereleaseIdentifier.Equals(Semver.PrereleaseIdentifier other) -> bool
 Semver.PrereleaseIdentifier.IntValue.get -> int?
@@ -34,6 +42,9 @@ Semver.SemVersionStyles.Any = -1 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.OptionalMinorPatch = 96 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.OptionalPatch = 32 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.Strict = 0 -> Semver.SemVersionStyles
+static Semver.MetadataIdentifier.implicit operator string(Semver.MetadataIdentifier metadataIdentifier) -> string
+static Semver.MetadataIdentifier.operator !=(Semver.MetadataIdentifier left, Semver.MetadataIdentifier right) -> bool
+static Semver.MetadataIdentifier.operator ==(Semver.MetadataIdentifier left, Semver.MetadataIdentifier right) -> bool
 static Semver.PrereleaseIdentifier.implicit operator string(Semver.PrereleaseIdentifier prereleaseIdentifier) -> string
 static Semver.PrereleaseIdentifier.operator !=(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
 static Semver.PrereleaseIdentifier.operator ==(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool

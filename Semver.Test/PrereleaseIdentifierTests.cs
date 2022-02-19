@@ -12,6 +12,7 @@ namespace Semver.Test
         [InlineData("042", 42)]
         [InlineData("hello", null)]
         [InlineData("2147483648", null)] // int.MaxValue + 1
+        [InlineData("hello@", null)]
         public void CreateLoose(string value, int? intValue)
         {
 #pragma warning disable CS0612 // Type or member is obsolete
@@ -27,6 +28,8 @@ namespace Semver.Test
         [InlineData("42", 12)]
         [InlineData("042", 13)]
         [InlineData("hello", -1)]
+        [InlineData("2147483648", 42)] // int.MaxValue + 1
+        [InlineData("hello@", null)]
         public void CreateUnsafe(string value, int? intValue)
         {
             var identifier = PrereleaseIdentifier.CreateUnsafe(value, intValue);
@@ -42,6 +45,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => new PrereleaseIdentifier(null, allowLeadingZeros));
 
+            Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("value", ex.ParamName);
         }
 
@@ -52,8 +56,8 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier("", allowLeadingZeros));
 
-            Assert.Equal("value", ex.ParamName);
             Assert.StartsWith("Prerelease identifier cannot be empty.", ex.Message);
+            Assert.Equal("value", ex.ParamName);
         }
 
         [Theory]
@@ -90,9 +94,9 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier(value));
 
-            Assert.Equal("value", ex.ParamName);
             Assert.StartsWith($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'.",
                 ex.Message);
+            Assert.Equal("value", ex.ParamName);
         }
 
         [Theory]
@@ -106,9 +110,9 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier(value));
 
-            Assert.Equal("value", ex.ParamName);
             Assert.StartsWith($"A prerelease identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.",
                 ex.Message);
+            Assert.Equal("value", ex.ParamName);
         }
 
         [Theory]
@@ -130,9 +134,8 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier(value));
 
+            Assert.StartsWith($"Numeric prerelease identifiers can't be negative: {value}.", ex.Message);
             Assert.Equal("value", ex.ParamName);
-            Assert.StartsWith($"Numeric prerelease identifiers can't be negative: {value}.",
-                ex.Message);
         }
 
         public static readonly TheoryData<PrereleaseIdentifier, PrereleaseIdentifier, bool> EqualityCases
@@ -143,6 +146,8 @@ namespace Semver.Test
                 {new PrereleaseIdentifier(42), new PrereleaseIdentifier(42), true},
                 {new PrereleaseIdentifier(42), new PrereleaseIdentifier(0), false},
                 {new PrereleaseIdentifier("hello"), new PrereleaseIdentifier(42), false},
+                {PrereleaseIdentifier.CreateUnsafe("", null), PrereleaseIdentifier.CreateUnsafe("", null), true},
+                {default, default, true},
                 // Equality is based only on the string value
                 {PrereleaseIdentifier.CreateUnsafe("896", null), PrereleaseIdentifier.CreateUnsafe("896", 896), true},
 #pragma warning disable CS0612 // Type or member is obsolete
@@ -207,6 +212,7 @@ namespace Semver.Test
         [InlineData("0A")]
         [InlineData("123")]
         [InlineData("1-2")]
+        [InlineData("@")]
         [InlineData(null)]
         public void ImplicitConversionToString(string value)
         {
@@ -222,6 +228,7 @@ namespace Semver.Test
         [InlineData("0A")]
         [InlineData("123")]
         [InlineData("1-2")]
+        [InlineData("@")]
         [InlineData(null)]
         public void ToStringTest(string value)
         {
