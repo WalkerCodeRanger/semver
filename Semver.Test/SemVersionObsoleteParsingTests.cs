@@ -285,30 +285,14 @@ namespace Semver.Test
         [Fact]
         public void DefaultParseIsLoose()
         {
-            var v = SemVersion.Parse("1");
+            // Loose allows optional minor and patch
+            var v = SemVersion.Parse("1-0123..a+build..metadata");
 
             Assert.Equal(1, v.Major);
             Assert.Equal(0, v.Minor);
             Assert.Equal(0, v.Patch);
-            Assert.Equal("", v.Prerelease);
-            Assert.Equal("", v.Metadata);
-        }
-
-        /// <summary>
-        /// This tests that the forwarding of the <see cref="SemVersion.TryParse(string, out SemVersion)"/> to
-        /// <see cref="SemVersion.TryParse(string, out SemVersion, bool)"/> passes false (i.e. loose).
-        /// </summary>
-        [Fact]
-        public void DefaultTryParseIsLoose()
-        {
-            var parsed = SemVersion.TryParse("1", out var v);
-
-            Assert.True(parsed);
-            Assert.Equal(1, v.Major);
-            Assert.Equal(0, v.Minor);
-            Assert.Equal(0, v.Patch);
-            Assert.Equal("", v.Prerelease);
-            Assert.Equal("", v.Metadata);
+            Assert.Equal("0123..a", v.Prerelease);
+            Assert.Equal("build..metadata", v.Metadata);
         }
         #endregion
 
@@ -479,7 +463,9 @@ namespace Semver.Test
         [MemberData(nameof(LeadingZerosPrerelease))]
         public void TryParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             Assert.True(SemVersion.TryParse(versionString, out var v));
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(major, v.Major);
             Assert.Equal(minor, v.Minor);
@@ -498,7 +484,9 @@ namespace Semver.Test
         [InlineData(null)]
         public void TryParseLooseInvalidTest(string versionString)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             Assert.False(SemVersion.TryParse(versionString, out _));
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Theory]
@@ -512,7 +500,9 @@ namespace Semver.Test
         [MemberData(nameof(LeadingZerosPrerelease))]
         public void TryParseStrictValidTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             Assert.True(SemVersion.TryParse(versionString, out var v));
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(major, v.Major);
             Assert.Equal(minor, v.Minor);

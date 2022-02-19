@@ -1,29 +1,27 @@
 ﻿override Semver.MetadataIdentifier.Equals(object obj) -> bool
 override Semver.MetadataIdentifier.GetHashCode() -> int
 override Semver.MetadataIdentifier.ToString() -> string
-override Semver.SemVersion.Equals(object obj) -> bool
-override Semver.SemVersion.GetHashCode() -> int
-override Semver.SemVersion.ToString() -> string
+override Semver.PrereleaseIdentifier.Equals(object obj) -> bool
+override Semver.PrereleaseIdentifier.GetHashCode() -> int
+override Semver.PrereleaseIdentifier.ToString() -> string
 Semver.MetadataIdentifier
 Semver.MetadataIdentifier.Equals(Semver.MetadataIdentifier other) -> bool
 Semver.MetadataIdentifier.MetadataIdentifier() -> void
 Semver.MetadataIdentifier.MetadataIdentifier(string value) -> void
 Semver.MetadataIdentifier.Value.get -> string
-Semver.SemVersion
-Semver.SemVersion.Build.get -> string
-Semver.SemVersion.Change(int? major = null, int? minor = null, int? patch = null, string prerelease = null, string build = null) -> Semver.SemVersion
-Semver.SemVersion.CompareByPrecedence(Semver.SemVersion other) -> int
-Semver.SemVersion.CompareTo(object obj) -> int
-Semver.SemVersion.CompareTo(Semver.SemVersion other) -> int
-Semver.SemVersion.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
-Semver.SemVersion.Major.get -> int
+Semver.PrereleaseIdentifier
+Semver.PrereleaseIdentifier.Equals(Semver.PrereleaseIdentifier other) -> bool
+Semver.PrereleaseIdentifier.IntValue.get -> int?
+Semver.PrereleaseIdentifier.PrereleaseIdentifier() -> void
+Semver.PrereleaseIdentifier.PrereleaseIdentifier(int value) -> void
+Semver.PrereleaseIdentifier.PrereleaseIdentifier(string value, bool allowLeadingZeros = false) -> void
+Semver.PrereleaseIdentifier.Value.get -> string
+Semver.SemVersion.Equals(Semver.SemVersion other) -> bool
+Semver.SemVersion.IsPrerelease.get -> bool
+Semver.SemVersion.Metadata.get -> string
 Semver.SemVersion.MetadataIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.MetadataIdentifier>
-Semver.SemVersion.Minor.get -> int
-Semver.SemVersion.Patch.get -> int
-Semver.SemVersion.PrecedenceMatches(Semver.SemVersion other) -> bool
-Semver.SemVersion.Prerelease.get -> string
-Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "") -> void
-Semver.SemVersion.SemVersion(System.Version version) -> void
+Semver.SemVersion.PrereleaseIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.PrereleaseIdentifier>
+Semver.SemVersion.ToVersion() -> System.Version
 Semver.SemVersion.With(int? major = null, int? minor = null, int? patch = null, string prerelease = null, string metadata = null, bool allowLeadingZeros = false) -> Semver.SemVersion
 Semver.SemVersion.WithMajor(int major) -> Semver.SemVersion
 Semver.SemVersion.WithMetadata(params string[] metadataIdentifiers) -> Semver.SemVersion
@@ -39,33 +37,6 @@ Semver.SemVersion.WithPrerelease(params string[] prereleaseIdentifiers) -> Semve
 Semver.SemVersion.WithPrerelease(string prerelease, bool allowLeadingZeros = false) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier> prereleaseIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<string> prereleaseIdentifiers, bool allowLeadingZeros = false) -> Semver.SemVersion
-static Semver.MetadataIdentifier.implicit operator string(Semver.MetadataIdentifier metadataIdentifier) -> string
-static Semver.MetadataIdentifier.operator !=(Semver.MetadataIdentifier left, Semver.MetadataIdentifier right) -> bool
-static Semver.MetadataIdentifier.operator ==(Semver.MetadataIdentifier left, Semver.MetadataIdentifier right) -> bool
-static Semver.SemVersion.Compare(Semver.SemVersion versionA, Semver.SemVersion versionB) -> int
-static Semver.SemVersion.Equals(Semver.SemVersion versionA, Semver.SemVersion versionB) -> bool
-static Semver.SemVersion.implicit operator Semver.SemVersion(string version) -> Semver.SemVersion
-static Semver.SemVersion.operator !=(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.operator <(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.operator <=(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.operator ==(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.operator >(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.operator >=(Semver.SemVersion left, Semver.SemVersion right) -> bool
-override Semver.PrereleaseIdentifier.Equals(object obj) -> bool
-override Semver.PrereleaseIdentifier.GetHashCode() -> int
-override Semver.PrereleaseIdentifier.ToString() -> string
-Semver.PrereleaseIdentifier
-Semver.PrereleaseIdentifier.Equals(Semver.PrereleaseIdentifier other) -> bool
-Semver.PrereleaseIdentifier.IntValue.get -> int?
-Semver.PrereleaseIdentifier.PrereleaseIdentifier() -> void
-Semver.PrereleaseIdentifier.PrereleaseIdentifier(int value) -> void
-Semver.PrereleaseIdentifier.PrereleaseIdentifier(string value, bool allowLeadingZeros = false) -> void
-Semver.PrereleaseIdentifier.Value.get -> string
-Semver.SemVersion.Equals(Semver.SemVersion other) -> bool
-Semver.SemVersion.IsPrerelease.get -> bool
-Semver.SemVersion.Metadata.get -> string
-Semver.SemVersion.PrereleaseIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.PrereleaseIdentifier>
-Semver.SemVersion.ToVersion() -> System.Version
 Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLeadingWhitespace = 2 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLeadingZeros = 1 -> Semver.SemVersionStyles
@@ -78,6 +49,9 @@ Semver.SemVersionStyles.Any = -1 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.OptionalMinorPatch = 96 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.OptionalPatch = 32 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.Strict = 0 -> Semver.SemVersionStyles
+static Semver.MetadataIdentifier.implicit operator string(Semver.MetadataIdentifier metadataIdentifier) -> string
+static Semver.MetadataIdentifier.operator !=(Semver.MetadataIdentifier left, Semver.MetadataIdentifier right) -> bool
+static Semver.MetadataIdentifier.operator ==(Semver.MetadataIdentifier left, Semver.MetadataIdentifier right) -> bool
 static Semver.PrereleaseIdentifier.implicit operator string(Semver.PrereleaseIdentifier prereleaseIdentifier) -> string
 static Semver.PrereleaseIdentifier.operator !=(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
 static Semver.PrereleaseIdentifier.operator ==(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
@@ -85,8 +59,5 @@ static Semver.SemVersion.FromVersion(System.Version version) -> Semver.SemVersio
 static Semver.SemVersion.Parse(string version) -> Semver.SemVersion
 static Semver.SemVersion.Parse(string version, bool strict) -> Semver.SemVersion
 static Semver.SemVersion.Parse(string version, Semver.SemVersionStyles style, int maxLength = 1024) -> Semver.SemVersion
-static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver) -> bool
-static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, bool strict) -> bool
 static Semver.SemVersion.TryParse(string version, Semver.SemVersionStyles style, out Semver.SemVersion semver, int maxLength = 1024) -> bool
 *REMOVED*static Semver.SemVersion.Parse(string version, bool strict = false) -> Semver.SemVersion
-*REMOVED*static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, bool strict = false) -> bool

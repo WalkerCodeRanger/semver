@@ -286,24 +286,6 @@ namespace Semver
             return new SemVersion(major, minor, patch, prerelease, metadata);
         }
 
-        /// <summary>
-        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
-        /// equivalent and returns a value that indicates whether the conversion succeeded. Parsing
-        /// is not strict, minor and patch version numbers are optional.
-        /// </summary>
-        /// <param name="version">The version string.</param>
-        /// <param name="semver">When the method returns, contains a <see cref="SemVersion"/> instance equivalent
-        /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
-        /// version string was not valid.</param>
-        /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
-        // TODO reconsider adding this overload that allows non-obsolete access to the old parsing
-        public static bool TryParse(string version, out SemVersion semver)
-        {
-#pragma warning disable CS0618 // Type or member is obsolete
-            return TryParse(version, out semver, false);
-#pragma warning restore CS0618 // Type or member is obsolete
-        }
-
         // TODO Doc Comment
         // TODO MS guidelines say to always put out params last, perhaps the default maxLength should be an overload so it can come before the out param?
         public static bool TryParse(string version, SemVersionStyles style,
@@ -331,7 +313,9 @@ namespace Semver
         /// otherwise they are optional.</param>
         /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
         [Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
-        public static bool TryParse(string version, out SemVersion semver, bool strict)
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParse(string version, out SemVersion semver, bool strict = false)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             semver = null;
             if (version is null) return false;

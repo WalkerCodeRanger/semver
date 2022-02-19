@@ -1,1 +1,28 @@
-﻿
+﻿override Semver.SemVersion.Equals(object obj) -> bool
+override Semver.SemVersion.GetHashCode() -> int
+override Semver.SemVersion.ToString() -> string
+Semver.SemVersion
+Semver.SemVersion.Build.get -> string
+Semver.SemVersion.Change(int? major = null, int? minor = null, int? patch = null, string prerelease = null, string build = null) -> Semver.SemVersion
+Semver.SemVersion.CompareByPrecedence(Semver.SemVersion other) -> int
+Semver.SemVersion.CompareTo(object obj) -> int
+Semver.SemVersion.CompareTo(Semver.SemVersion other) -> int
+Semver.SemVersion.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) -> void
+Semver.SemVersion.Major.get -> int
+Semver.SemVersion.Minor.get -> int
+Semver.SemVersion.Patch.get -> int
+Semver.SemVersion.PrecedenceMatches(Semver.SemVersion other) -> bool
+Semver.SemVersion.Prerelease.get -> string
+Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "") -> void
+Semver.SemVersion.SemVersion(System.Version version) -> void
+static Semver.SemVersion.Compare(Semver.SemVersion versionA, Semver.SemVersion versionB) -> int
+static Semver.SemVersion.Equals(Semver.SemVersion versionA, Semver.SemVersion versionB) -> bool
+static Semver.SemVersion.implicit operator Semver.SemVersion(string version) -> Semver.SemVersion
+static Semver.SemVersion.operator !=(Semver.SemVersion left, Semver.SemVersion right) -> bool
+static Semver.SemVersion.operator <(Semver.SemVersion left, Semver.SemVersion right) -> bool
+static Semver.SemVersion.operator <=(Semver.SemVersion left, Semver.SemVersion right) -> bool
+static Semver.SemVersion.operator ==(Semver.SemVersion left, Semver.SemVersion right) -> bool
+static Semver.SemVersion.operator >(Semver.SemVersion left, Semver.SemVersion right) -> bool
+static Semver.SemVersion.operator >=(Semver.SemVersion left, Semver.SemVersion right) -> bool
+static Semver.SemVersion.Parse(string version, bool strict = false) -> Semver.SemVersion
+static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, bool strict = false) -> bool
