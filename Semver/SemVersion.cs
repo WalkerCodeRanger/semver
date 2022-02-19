@@ -142,14 +142,20 @@ namespace Semver
         /// <summary>
         /// Construct a <see cref="SemVersion"/> from its proper parts.
         /// </summary>
-        /// <remarks>The <paramref name="prereleaseIdentifiers"/> and <paramref name="metadataIdentifiers"/>
-        /// must not be null and must be immutable.</remarks>
+        /// <remarks>Parameter validation is not performed. The <paramref name="major"/>,
+        /// <paramref name="minor"/>, and <paramref name="patch"/> versions must not be
+        /// negative. The <paramref name="prereleaseIdentifiers"/> and
+        /// <paramref name="metadataIdentifiers"/> must not be null or contain invalid
+        /// values and must be immutable.</remarks>
         internal SemVersion(int major, int minor, int patch,
             IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
             IReadOnlyList<string> metadataIdentifiers)
         {
+            Debug.Assert(major >= 0);
             Major = major;
+            Debug.Assert(minor >= 0);
             Minor = minor;
+            Debug.Assert(patch >= 0);
             Patch = patch;
             Debug.Assert(prereleaseIdentifiers != null);
             Prerelease = string.Join(".", prereleaseIdentifiers);
