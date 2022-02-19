@@ -53,7 +53,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier("", allowLeadingZeros));
 
             Assert.Equal("value", ex.ParamName);
-            Assert.StartsWith($"Cannot be empty string.", ex.Message);
+            Assert.StartsWith("Prerelease identifier cannot be empty.", ex.Message);
         }
 
         [Theory]

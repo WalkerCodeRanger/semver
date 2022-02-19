@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using Semver.Test.Builders;
 using Xunit;
 
 namespace Semver.Test

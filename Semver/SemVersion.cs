@@ -89,7 +89,7 @@ namespace Semver
                 PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
             else
                 PrereleaseIdentifiers = new ReadOnlyCollection<PrereleaseIdentifier>(
-                    Prerelease.SplitExceptEmpty('.')
+                    Prerelease.Split('.')
 #pragma warning disable CS0612 // Type or member is obsolete
                           .Select(PrereleaseIdentifier.CreateLoose).ToList());
 #pragma warning restore CS0612 // Type or member is obsolete
@@ -98,7 +98,7 @@ namespace Semver
             if (Metadata.Length == 0)
                 MetadataIdentifiers = ReadOnlyList<string>.Empty;
             else
-                MetadataIdentifiers = new ReadOnlyCollection<string>(Metadata.SplitExceptEmpty('.').ToList());
+                MetadataIdentifiers = new ReadOnlyCollection<string>(Metadata.Split('.').ToList());
         }
 
         /// <summary>

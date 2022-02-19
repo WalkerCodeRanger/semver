@@ -365,16 +365,14 @@ namespace Semver
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static FormatException NewFormatException(string messageTemplate, params object[] args)
-        {
-            return new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, args));
-        }
+            => new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, args));
 
-        private const int VersionDisplayLimit = 100 - 3;
+        private const int VersionDisplayLimit = 100;
 
         private static string LimitLength(string version)
         {
             if (version.Length > VersionDisplayLimit)
-                version = version.Substring(0, VersionDisplayLimit) + "...";
+                version = version.Substring(0, VersionDisplayLimit - 3) + "...";
 
             return version;
         }

@@ -14,7 +14,7 @@ namespace Semver.Test
     /// </summary>
     public class SemVersionParsingTests
     {
-        private static readonly string InvalidSemVersionStylesMessageStart = $"An invalid SemVersionStyles value was used.";
+        private const string InvalidSemVersionStylesMessageStart = "An invalid SemVersionStyles value was used.";
 
         private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace.";
         private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace.";
@@ -321,6 +321,13 @@ namespace Semver.Test
             ValidLongVersion(3218987),
             ValidLongVersion(1445670),
             ValidLongVersion(5646),
+
+            // Invalid versions around the version display limit to test exception message formatting
+            Invalid("1.2.3.length097.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.t", PrereleasePrefixedByDotMessage),
+            Invalid("1.2.3.length098.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.to", PrereleasePrefixedByDotMessage),
+            Invalid("1.2.3.length099.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.tip", PrereleasePrefixedByDotMessage),
+            Invalid("1.2.3.length100.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test", PrereleasePrefixedByDotMessage),
+            Invalid("1.2.3.length101.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.tests", PrereleasePrefixedByDotMessage),
 
             Invalid<ArgumentNullException>(null, "Value cannot be null."));
 
@@ -693,12 +700,12 @@ namespace Semver.Test
             }
         }
 
-        private const int VersionDisplayLimit = 100 - 3;
+        private const int VersionDisplayLimit = 100;
 
         private static string LimitLength(string version)
         {
             if (version?.Length > VersionDisplayLimit)
-                version = version.Substring(0, VersionDisplayLimit) + "...";
+                version = version.Substring(0, VersionDisplayLimit - 3) + "...";
 
             return version;
         }

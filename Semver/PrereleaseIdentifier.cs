@@ -31,12 +31,19 @@ namespace Semver
         /// Construct a <see cref="PrereleaseIdentifier"/> without checking that any of the invariants
         /// hold. Used by the parser for performance.
         /// </summary>
+        /// <remarks>This is a create method rather than a constructor to clearly indicate uses
+        /// of it. The other constructors have not been hidden behind create methods because only
+        /// constructors are visible to the package users. So they see a class consistently
+        /// using constructors without any create methods.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static PrereleaseIdentifier CreateUnsafe(string value, int? intValue)
         {
             return new PrereleaseIdentifier(value, intValue);
         }
 
+        /// <summary>
+        /// Private constructor used by <see cref="CreateUnsafe"/>.
+        /// </summary>
         private PrereleaseIdentifier(string value, int? intValue)
         {
             Value = value;
@@ -48,7 +55,7 @@ namespace Semver
         {
             _ = value ?? throw new ArgumentNullException(nameof(value));
             if (value.Length == 0)
-                throw new ArgumentException("Cannot be empty string.", nameof(value));
+                throw new ArgumentException("Prerelease identifier cannot be empty.", nameof(value));
             if (value.IsDigits())
             {
                 if (value.Length > 1 && value[0] == '0')
@@ -82,7 +89,10 @@ namespace Semver
             Value = value;
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Construct a numeric prerelease identifier.
+        /// </summary>
+        /// <param name="value">The non-negative value of this identifier.</param>
         public PrereleaseIdentifier(int value)
         {
             if (value < 0)
@@ -92,40 +102,24 @@ namespace Semver
         }
 
         #region Equality
-        public bool Equals(PrereleaseIdentifier other)
-        {
-            return Value == other.Value;
-        }
+        public bool Equals(PrereleaseIdentifier other) => Value == other.Value;
 
         public override bool Equals(object obj)
-        {
-            return obj is PrereleaseIdentifier other && Equals(other);
-        }
+            => obj is PrereleaseIdentifier other && Equals(other);
 
-        public override int GetHashCode()
-        {
-            return Value?.GetHashCode() ?? 0;
-        }
+        public override int GetHashCode() => Value?.GetHashCode() ?? 0;
 
         public static bool operator ==(PrereleaseIdentifier left, PrereleaseIdentifier right)
-        {
-            return left.Value == right.Value;
-        }
+            => left.Value == right.Value;
 
         public static bool operator !=(PrereleaseIdentifier left, PrereleaseIdentifier right)
-        {
-            return left.Value != right.Value;
-        }
+            => left.Value != right.Value;
+
         #endregion
 
         public static implicit operator string(PrereleaseIdentifier prereleaseIdentifier)
-        {
-            return prereleaseIdentifier.Value;
-        }
+            => prereleaseIdentifier.Value;
 
-        public override string ToString()
-        {
-            return Value;
-        }
+        public override string ToString() => Value;
     }
 }
