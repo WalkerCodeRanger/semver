@@ -41,7 +41,7 @@ Console.WriteLine($"Current: {version}");
 if (version.IsPrerelease)
 {
     Console.WriteLine($"Prerelease: {version.Prerelease}");
-    Console.WriteLine($"Next release version is: {version.Change(prerelease: "", build: "")}");
+    Console.WriteLine($"Next release version is: {version.WithoutPrereleaseOrMetadata()}");
 }
 ```
 
