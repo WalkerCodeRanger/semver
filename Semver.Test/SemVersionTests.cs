@@ -531,14 +531,16 @@ namespace Semver.Test
         }
 #else
         [Fact]
-        public void SerializationTest()
+        public void SerializationNotSupportedTest()
         {
             var semVer = new SemVersion(1, 2, 3, "alpha", "dev");
             using (var ms = new MemoryStream())
             {
                 var bf = new BinaryFormatter();
                 var ex = Assert.Throws<SerializationException>(() => bf.Serialize(ms, semVer));
-                const string expectedMessage = "Type 'Semver.SemVersion' in Assembly 'Semver, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null' is not marked as serializable.";
+                // The CI build ends up with a different assembly name, so it can't be hardcoded
+                var assemblyName = typeof(SemVersion).Assembly.FullName;
+                string expectedMessage = $"Type 'Semver.SemVersion' in Assembly '{assemblyName}' is not marked as serializable.";
                 Assert.Equal(expectedMessage, ex.Message);
             }
         }
