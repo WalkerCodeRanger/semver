@@ -116,14 +116,19 @@ namespace Semver.Test
             Assert.Equal(minor, v.Minor);
             Assert.Equal(patch, v.Patch);
             Assert.Equal(prerelease ?? "", v.Prerelease);
-#pragma warning disable CS0612 // Type or member is obsolete
             var expectedPrereleaseIdentifiers =
                 (prerelease?.SplitExceptEmpty('.') ?? Enumerable.Empty<string>())
-                            .Select(PrereleaseIdentifier.CreateLoose);
+#pragma warning disable CS0612 // Type or member is obsolete
+                    .Select(PrereleaseIdentifier.CreateLoose);
 #pragma warning restore CS0612 // Type or member is obsolete
             Assert.Equal(expectedPrereleaseIdentifiers, v.PrereleaseIdentifiers);
             Assert.Equal(metadata ?? "", v.Metadata);
-            var expectedMetadataIdentifiers = metadata?.SplitExceptEmpty('.') ?? Enumerable.Empty<string>();
+            var expectedMetadataIdentifiers =
+                (metadata?.SplitExceptEmpty('.') ?? Enumerable.Empty<string>())
+#pragma warning disable CS0612 // Type or member is obsolete
+                    .Select(MetadataIdentifier.CreateLoose);
+#pragma warning restore CS0612 // Type or member is obsolete
+            ;
             Assert.Equal(expectedMetadataIdentifiers, v.MetadataIdentifiers);
         }
         #endregion
@@ -183,7 +188,7 @@ namespace Semver.Test
             {
                 var metadata = build.ToString(CultureInfo.InvariantCulture);
                 Assert.Equal(metadata, v.Metadata);
-                Assert.Equal(new[] { metadata }, v.MetadataIdentifiers);
+                Assert.Equal(new[] { new MetadataIdentifier(metadata) }, v.MetadataIdentifiers);
             }
             else
             {
@@ -214,7 +219,7 @@ namespace Semver.Test
             {
                 var metadata = build.ToString(CultureInfo.InvariantCulture);
                 Assert.Equal(metadata, v.Metadata);
-                Assert.Equal(new[] { metadata }, v.MetadataIdentifiers);
+                Assert.Equal(new[] { new MetadataIdentifier(metadata) }, v.MetadataIdentifiers);
             }
             else
             {

@@ -97,9 +97,13 @@ namespace Semver
 
             Metadata = build ?? "";
             if (Metadata.Length == 0)
-                MetadataIdentifiers = ReadOnlyList<string>.Empty;
+                MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
             else
-                MetadataIdentifiers = Metadata.Split('.').ToReadOnlyList();
+                MetadataIdentifiers = Metadata.Split('.')
+#pragma warning disable CS0612 // Type or member is obsolete
+                                              .Select(MetadataIdentifier.CreateLoose)
+#pragma warning restore CS0612 // Type or member is obsolete
+                                              .ToReadOnlyList();
         }
 
         /// <summary>
@@ -130,12 +134,12 @@ namespace Semver
             if (version.Build > 0)
             {
                 Metadata = version.Build.ToString(CultureInfo.InvariantCulture);
-                MetadataIdentifiers = new List<string>(1) { Metadata }.AsReadOnly();
+                MetadataIdentifiers = new List<MetadataIdentifier>(1) { MetadataIdentifier.CreateUnsafe(Metadata) }.AsReadOnly();
             }
             else
             {
                 Metadata = "";
-                MetadataIdentifiers = ReadOnlyList<string>.Empty;
+                MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
             }
         }
 
@@ -149,7 +153,7 @@ namespace Semver
         /// values and must be immutable.</remarks>
         internal SemVersion(int major, int minor, int patch,
             IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
-            IReadOnlyList<string> metadataIdentifiers)
+            IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
             Debug.Assert(major >= 0);
             Major = major;
@@ -541,7 +545,7 @@ namespace Semver
         public string Metadata { get; }
 
         // TODO write doc comments for MetadataIdentifiers
-        public IReadOnlyList<string> MetadataIdentifiers { get; }
+        public IReadOnlyList<MetadataIdentifier> MetadataIdentifiers { get; }
 
         /// <summary>
         /// Converts this version to a <see cref="string" />.

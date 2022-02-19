@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using Semver.Utility;
 
 namespace Semver.Test.Builders
 {
@@ -14,7 +14,7 @@ namespace Semver.Test.Builders
             SemVersionStyles requiredStyles,
             int major, int minor, int patch,
             IEnumerable<PrereleaseIdentifier> prereleaseIdentifiers,
-            IEnumerable<string> metadataIdentifiers,
+            IEnumerable<MetadataIdentifier> metadataIdentifiers,
             int maxLength = SemVersion.MaxVersionLength)
         {
             return new ParsingTestCase(version, requiredStyles, major, minor, patch,
@@ -37,7 +37,7 @@ namespace Semver.Test.Builders
             int minor,
             int patch,
             IEnumerable<PrereleaseIdentifier> prereleaseIdentifiers,
-            IEnumerable<string> metadataIdentifiers,
+            IEnumerable<MetadataIdentifier> metadataIdentifiers,
             int maxLength)
         {
             Version = version;
@@ -47,8 +47,8 @@ namespace Semver.Test.Builders
             Minor = minor;
             Patch = patch;
             MaxLength = maxLength;
-            PrereleaseIdentifiers = prereleaseIdentifiers.ToList().AsReadOnly();
-            MetadataIdentifiers = metadataIdentifiers.ToList().AsReadOnly();
+            PrereleaseIdentifiers = prereleaseIdentifiers.ToReadOnlyList();
+            MetadataIdentifiers = metadataIdentifiers.ToReadOnlyList();
         }
 
         private ParsingTestCase(
@@ -74,7 +74,7 @@ namespace Semver.Test.Builders
             int minor,
             int patch,
             IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
-            IReadOnlyList<string> metadataIdentifiers,
+            IReadOnlyList<MetadataIdentifier> metadataIdentifiers,
             Type exceptionType,
             string exceptionMessageFormat,
             int maxLength)
@@ -94,10 +94,10 @@ namespace Semver.Test.Builders
 
         public ParsingTestCase Change(string version = null, SemVersionStyles? styles = null)
         {
-            return new ParsingTestCase(this.IsValid, version  ?? this.Version, styles ?? this.Styles,
-                this.Major, this.Minor, this.Patch,
-                this.PrereleaseIdentifiers, this.MetadataIdentifiers,
-                this.ExceptionType, this.ExceptionMessageFormat, this.MaxLength);
+            return new ParsingTestCase(IsValid, version  ?? Version, styles ?? Styles,
+                Major, Minor, Patch,
+                PrereleaseIdentifiers, MetadataIdentifiers,
+                ExceptionType, ExceptionMessageFormat, MaxLength);
         }
 
         public string Version { get; }
@@ -111,7 +111,7 @@ namespace Semver.Test.Builders
         public int Patch { get; }
 
         public IReadOnlyList<PrereleaseIdentifier> PrereleaseIdentifiers { get; }
-        public IReadOnlyList<string> MetadataIdentifiers { get; }
+        public IReadOnlyList<MetadataIdentifier> MetadataIdentifiers { get; }
         #endregion
 
         #region Invalid Values

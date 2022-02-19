@@ -59,9 +59,9 @@ namespace Semver.Test
             Valid("0.0.4", 0, 0, 4),
             Valid("1.2.3", 1, 2, 3),
             Valid("10.20.30", 10, 20, 30),
-            Valid("1.1.2-prerelease+meta", 1, 1, 2, Pre("prerelease"), "meta"),
-            Valid("1.1.2+meta", 1, 1, 2, Pre(), "meta"),
-            Valid("1.1.2+meta-valid", 1, 1, 2, Pre(), "meta-valid"),
+            Valid("1.1.2-prerelease+meta", 1, 1, 2, Pre("prerelease"), Meta("meta")),
+            Valid("1.1.2+meta", 1, 1, 2, Pre(), Meta("meta")),
+            Valid("1.1.2+meta-valid", 1, 1, 2, Pre(), Meta("meta-valid")),
             Valid("1.0.0-alpha", 1, 0, 0, Pre("alpha")),
             Valid("1.0.0-beta", 1, 0, 0, Pre("beta")),
             Valid("1.0.0-alpha.beta", 1, 0, 0, Pre("alpha", "beta")),
@@ -70,22 +70,22 @@ namespace Semver.Test
             Valid("1.0.0-alpha0.valid", 1, 0, 0, Pre("alpha0", "valid")),
             Valid("1.0.0-alpha.0valid", 1, 0, 0, Pre("alpha", "0valid")),
             Valid("1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay", 1, 0, 0,
-                Pre("alpha-a", "b-c-somethinglong"), "build.1-aef.1-its-okay"),
-            Valid("1.0.0-rc.1+build.1", 1, 0, 0, Pre("rc", 1), "build.1"),
-            Valid("2.0.0-rc.1+build.123", 2, 0, 0, Pre("rc", 1), "build.123"),
+                Pre("alpha-a", "b-c-somethinglong"), Meta("build", "1-aef", "1-its-okay")),
+            Valid("1.0.0-rc.1+build.1", 1, 0, 0, Pre("rc", 1), Meta("build", "1")),
+            Valid("2.0.0-rc.1+build.123", 2, 0, 0, Pre("rc", 1), Meta("build", "123")),
             Valid("1.2.3-beta", 1, 2, 3, Pre("beta")),
             Valid("10.2.3-DEV-SNAPSHOT", 10, 2, 3, Pre("DEV-SNAPSHOT")),
             Valid("1.2.3-SNAPSHOT-123", 1, 2, 3, Pre("SNAPSHOT-123")),
             Valid("1.0.0", 1),
             Valid("2.0.0", 2),
             Valid("1.1.7", 1, 1, 7),
-            Valid("2.0.0+build.1848", 2, 0, 0, Pre(), "build.1848"),
+            Valid("2.0.0+build.1848", 2, 0, 0, Pre(), Meta("build", "1848")),
             Valid("2.0.1-alpha.1227", 2, 0, 1, Pre("alpha", 1227)),
-            Valid("1.0.0-alpha+beta", 1, 0, 0, Pre("alpha"), "beta"),
-            Valid("1.2.3----RC-SNAPSHOT.12.9.1--.12+788", 1, 2, 3, Pre("---RC-SNAPSHOT", 12, 9, "1--", 12), "788"),
-            Valid("1.2.3----R-S.12.9.1--.12+meta", 1, 2, 3, Pre("---R-S", 12, 9, "1--", 12), "meta"),
+            Valid("1.0.0-alpha+beta", 1, 0, 0, Pre("alpha"), Meta("beta")),
+            Valid("1.2.3----RC-SNAPSHOT.12.9.1--.12+788", 1, 2, 3, Pre("---RC-SNAPSHOT", 12, 9, "1--", 12), Meta("788")),
+            Valid("1.2.3----R-S.12.9.1--.12+meta", 1, 2, 3, Pre("---R-S", 12, 9, "1--", 12), Meta("meta")),
             Valid("1.2.3----RC-SNAPSHOT.12.9.1--.12", 1, 2, 3, Pre("---RC-SNAPSHOT", 12, 9, "1--", 12)),
-            Valid("1.0.0+0.build.1-rc.10000aaa-kk-0.1", 1, 0, 0, Pre(), "0.build.1-rc.10000aaa-kk-0.1"),
+            Valid("1.0.0+0.build.1-rc.10000aaa-kk-0.1", 1, 0, 0, Pre(), Meta("0", "build", "1-rc", "10000aaa-kk-0", "1")),
             Valid("1.0.0-0A.is.legal", 1, 0, 0, Pre("0A", "is", "legal")),
             // This was given as a valid example, but isn't supported by the semver package because of overflow
             Invalid<OverflowException>("99999999999999999999999.999999999999999999.99999999999999999",
@@ -135,19 +135,19 @@ namespace Semver.Test
                 MajorOverflowMessage, "99999999999999999999999"),
 
             // Basic valid versions
-            Valid("1.2.3-a+b", 1, 2, 3, Pre("a"), "b"),
+            Valid("1.2.3-a+b", 1, 2, 3, Pre("a"), Meta("b")),
             Valid("1.2.3-a", 1, 2, 3, Pre("a")),
-            Valid("1.2.3+b", 1, 2, 3, Pre(), "b"),
+            Valid("1.2.3+b", 1, 2, 3, Pre(), Meta("b")),
             Valid("4.5.6", 4, 5, 6),
 
             // Valid letter Limits
-            Valid("1.2.3-A-Z.a-z.0-9+A-Z.a-z.0-9", 1, 2, 3, Pre("A-Z", "a-z", "0-9"), "A-Z.a-z.0-9"),
+            Valid("1.2.3-A-Z.a-z.0-9+A-Z.a-z.0-9", 1, 2, 3, Pre("A-Z", "a-z", "0-9"), Meta("A-Z", "a-z", "0-9")),
 
             // Misc valid
-            Valid("1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, Pre("alpha-beta"), "nightly.23.43-bla"),
-            Valid("1.2.45-alpha+nightly.23", 1, 2, 45, Pre("alpha"), "nightly.23"),
+            Valid("1.2.45-alpha-beta+nightly.23.43-bla", 1, 2, 45, Pre("alpha-beta"), Meta("nightly", "23", "43-bla")),
+            Valid("1.2.45-alpha+nightly.23", 1, 2, 45, Pre("alpha"), Meta("nightly", "23")),
             Valid("3.2.1-beta", 3, 2, 1, Pre("beta")),
-            Valid("2.0.0+nightly.23.43-bla", 2, 0, 0, Pre(), "nightly.23.43-bla"),
+            Valid("2.0.0+nightly.23.43-bla", 2, 0, 0, Pre(), Meta("nightly", "23", "43-bla")),
             Valid("5.6.7", 5, 6, 7),
 
             // Valid unusual versions
@@ -155,44 +155,44 @@ namespace Semver.Test
             Valid("1.0.0-0A", 1, 0, 0, Pre("0A")),
 
             // Dash in strange place
-            Valid("1.2.3--+b", 1, 2, 3, Pre("-"), "b"),
-            Valid("1.2.3---+b", 1, 2, 3, Pre("--"), "b"),
+            Valid("1.2.3--+b", 1, 2, 3, Pre("-"), Meta("b")),
+            Valid("1.2.3---+b", 1, 2, 3, Pre("--"), Meta("b")),
             Valid("1.2.3---", 1, 2, 3, Pre("--")),
-            Valid("1.2.3-a+-", 1, 2, 3, Pre("a"), "-"),
-            Valid("1.2.3-a+--", 1, 2, 3, Pre("a"), "--"),
-            Valid("1.2.3--a+b", 1, 2, 3, Pre("-a"), "b"),
-            Valid("1.2.3--1+b", 1, 2, 3, Pre("-1"), "b"),
-            Valid("1.2.3---a+b", 1, 2, 3, Pre("--a"), "b"),
-            Valid("1.2.3---1+b", 1, 2, 3, Pre("--1"), "b"),
-            Valid("1.2.3-a+-b", 1, 2, 3, Pre("a"), "-b"),
-            Valid("1.2.3-a+--b", 1, 2, 3, Pre("a"), "--b"),
-            Valid("1.2.3-a-+b", 1, 2, 3, Pre("a-"), "b"),
-            Valid("1.2.3-1-+b", 1, 2, 3, Pre("1-"), "b"),
-            Valid("1.2.3-a--+b", 1, 2, 3, Pre("a--"), "b"),
-            Valid("1.2.3-1--+b", 1, 2, 3, Pre("1--"), "b"),
-            Valid("1.2.3-a+b-", 1, 2, 3, Pre("a"), "b-"),
-            Valid("1.2.3-a+b--", 1, 2, 3, Pre("a"), "b--"),
-            Valid("1.2.3--.a+b", 1, 2, 3, Pre("-", "a"), "b"),
-            Valid("1.2.3-a+-.b", 1, 2, 3, Pre("a"), "-.b"),
-            Valid("1.2.3-a.-+b", 1, 2, 3, Pre("a", "-"), "b"),
-            Valid("1.2.3-a.-.c+b", 1, 2, 3, Pre("a", "-", "c"), "b"),
-            Valid("1.2.3-a+b.-", 1, 2, 3, Pre("a"), "b.-"),
-            Valid("1.2.3-a+b.-.c", 1, 2, 3, Pre("a"), "b.-.c"),
+            Valid("1.2.3-a+-", 1, 2, 3, Pre("a"), Meta("-")),
+            Valid("1.2.3-a+--", 1, 2, 3, Pre("a"), Meta("--")),
+            Valid("1.2.3--a+b", 1, 2, 3, Pre("-a"), Meta("b")),
+            Valid("1.2.3--1+b", 1, 2, 3, Pre("-1"), Meta("b")),
+            Valid("1.2.3---a+b", 1, 2, 3, Pre("--a"), Meta("b")),
+            Valid("1.2.3---1+b", 1, 2, 3, Pre("--1"), Meta("b")),
+            Valid("1.2.3-a+-b", 1, 2, 3, Pre("a"), Meta("-b")),
+            Valid("1.2.3-a+--b", 1, 2, 3, Pre("a"), Meta("--b")),
+            Valid("1.2.3-a-+b", 1, 2, 3, Pre("a-"), Meta("b")),
+            Valid("1.2.3-1-+b", 1, 2, 3, Pre("1-"), Meta("b")),
+            Valid("1.2.3-a--+b", 1, 2, 3, Pre("a--"), Meta("b")),
+            Valid("1.2.3-1--+b", 1, 2, 3, Pre("1--"), Meta("b")),
+            Valid("1.2.3-a+b-", 1, 2, 3, Pre("a"), Meta("b-")),
+            Valid("1.2.3-a+b--", 1, 2, 3, Pre("a"), Meta("b--")),
+            Valid("1.2.3--.a+b", 1, 2, 3, Pre("-", "a"), Meta("b")),
+            Valid("1.2.3-a+-.b", 1, 2, 3, Pre("a"), Meta("-", "b")),
+            Valid("1.2.3-a.-+b", 1, 2, 3, Pre("a", "-"), Meta("b")),
+            Valid("1.2.3-a.-.c+b", 1, 2, 3, Pre("a", "-", "c"), Meta("b")),
+            Valid("1.2.3-a+b.-", 1, 2, 3, Pre("a"), Meta("b", "-")),
+            Valid("1.2.3-a+b.-.c", 1, 2, 3, Pre("a"), Meta("b", "-", "c")),
 
             // Missing patch number, but otherwise valid
-            Valid("1.6-zeta.5+nightly.23.43-bla", OptionalPatch, 1, 6, 0, Pre("zeta", "5"), "nightly.23.43-bla"),
-            Valid("2.0+nightly.23.43-bla", OptionalPatch, 2, 0, 0, Pre(), "nightly.23.43-bla"),
+            Valid("1.6-zeta.5+nightly.23.43-bla", OptionalPatch, 1, 6, 0, Pre("zeta", "5"), Meta("nightly", "23", "43-bla")),
+            Valid("2.0+nightly.23.43-bla", OptionalPatch, 2, 0, 0, Pre(), Meta("nightly", "23", "43-bla")),
             Valid("2.1-alpha", OptionalPatch, 2, 1, 0, Pre("alpha")),
-            Valid("5.6+nightly.23.43-bla", OptionalPatch, 5, 6, 0, Pre(), "nightly.23.43-bla"),
+            Valid("5.6+nightly.23.43-bla", OptionalPatch, 5, 6, 0, Pre(), Meta("nightly", "23", "43-bla")),
             Valid("3.2", OptionalPatch, 3, 2),
             Valid("1.3", OptionalPatch, 1, 3),
             Valid("1.3-alpha", OptionalPatch, 1, 3, 0, Pre("alpha")),
-            Valid("1.3+build", OptionalPatch, 1, 3, 0, Pre(), "build"),
+            Valid("1.3+build", OptionalPatch, 1, 3, 0, Pre(), Meta("build")),
 
             // Missing minor and patch number, but otherwise valid
-            Valid("1-beta+dev.123", OptionalMinorPatch, 1, 0, 0, Pre("beta"), "dev.123"),
+            Valid("1-beta+dev.123", OptionalMinorPatch, 1, 0, 0, Pre("beta"), Meta("dev", "123")),
             Valid("7-rc.1", OptionalMinorPatch, 7, 0, 0, Pre("rc", 1)),
-            Valid("6+sha.a3456b", OptionalMinorPatch, 6, 0, 0, Pre(), "sha.a3456b"),
+            Valid("6+sha.a3456b", OptionalMinorPatch, 6, 0, 0, Pre(), Meta("sha", "a3456b")),
             Valid("64", OptionalMinorPatch, 64),
 
             // Leading zeros in major, minor, or patch, but otherwise valid
@@ -258,8 +258,8 @@ namespace Semver.Test
             Valid("11.2.3\t", AllowTrailingWhitespace, 11, 2, 3),
             Valid("11.2.3-a ", AllowTrailingWhitespace, 11, 2, 3, Pre("a")),
             Valid("11.2.3-a\t", AllowTrailingWhitespace, 11, 2, 3, Pre("a")),
-            Valid("11.2.3+b ", AllowTrailingWhitespace, 11, 2, 3, Pre(), "b"),
-            Valid("11.2.3+b\t", AllowTrailingWhitespace, 11, 2, 3, Pre(), "b"),
+            Valid("11.2.3+b ", AllowTrailingWhitespace, 11, 2, 3, Pre(), Meta("b")),
+            Valid("11.2.3+b\t", AllowTrailingWhitespace, 11, 2, 3, Pre(), Meta("b")),
 
             // Whitespace in middle
             Invalid("1 .2.3-alpha+build", InvalidCharacterInMajorMessage, " "),
@@ -559,11 +559,11 @@ namespace Semver.Test
             int minor = 0,
             int patch = 0,
             IEnumerable<PrereleaseIdentifier> prerelease = null,
-            string metadata = "")
+            IEnumerable<MetadataIdentifier> metadata = null)
         {
             return ParsingTestCase.Valid(version, requiredStyles, major, minor, patch,
                 prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
-                metadata.SplitExceptEmpty('.'));
+                metadata ?? Enumerable.Empty<MetadataIdentifier>());
         }
 
         private static ParsingTestCase Valid(
@@ -572,11 +572,11 @@ namespace Semver.Test
             int minor = 0,
             int patch = 0,
             IEnumerable<PrereleaseIdentifier> prerelease = null,
-            string metadata = "")
+            IEnumerable<MetadataIdentifier> metadata = null)
         {
             return ParsingTestCase.Valid(version, Strict, major, minor, patch,
             prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
-            metadata.SplitExceptEmpty('.'));
+            metadata ?? Enumerable.Empty<MetadataIdentifier>());
         }
 
         private static ParsingTestCase ValidLongVersion(int seed)
@@ -600,7 +600,7 @@ namespace Semver.Test
 
             v.Append('+');
             identifierCount = random.Next(1_000);
-            var metadataIdentifiers = new List<string>(identifierCount);
+            var metadataIdentifiers = new List<MetadataIdentifier>(identifierCount);
             for (int i = 0; i < identifierCount; i++)
                 metadataIdentifiers.Add(ValidMetadataIdentifier(random));
             v.Append(string.Join(".", metadataIdentifiers));
@@ -627,14 +627,14 @@ namespace Semver.Test
             return new PrereleaseIdentifier(identifier.ToString());
         }
 
-        private static string ValidMetadataIdentifier(Random random)
+        private static MetadataIdentifier ValidMetadataIdentifier(Random random)
         {
             var charCount = random.Next(1, 1_000);
             var identifier = new StringBuilder(charCount);
             for (int i = 0; i < charCount; i++)
                 identifier.Append(ValidIdentifierChars[random.Next(ValidIdentifierChars.Length)]);
 
-            return identifier.ToString();
+            return new MetadataIdentifier(identifier.ToString());
         }
 
         private static ParsingTestCase Invalid<T>(
@@ -684,9 +684,10 @@ namespace Semver.Test
         }
 
         public static IEnumerable<PrereleaseIdentifier> Pre(params TestPrereleaseIdentifier[] identifiers)
-        {
-            return identifiers.Select(i => (PrereleaseIdentifier)i);
-        }
+            => identifiers.Select(i => (PrereleaseIdentifier)i);
+
+        public static IEnumerable<MetadataIdentifier> Meta(params string[] identifiers)
+            => identifiers.Select(MetadataIdentifier.CreateUnsafe);
 
         private static string InjectValue(string format, string value)
         {

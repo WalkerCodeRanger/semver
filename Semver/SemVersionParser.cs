@@ -143,7 +143,7 @@ namespace Semver
                 prereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
 
             // Parse metadata
-            IReadOnlyList<string> metadataIdentifiers;
+            IReadOnlyList<MetadataIdentifier> metadataIdentifiers;
             if (i < version.Length && version[i] == '+')
             {
                 i += 1;
@@ -151,7 +151,7 @@ namespace Semver
                 if (parseEx != null) return parseEx;
             }
             else
-                metadataIdentifiers = ReadOnlyList<string>.Empty;
+                metadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
 
             // There shouldn't be any unprocessed characters before the trailing whitespace.
             // If there is, it is a programmer mistake, so immediately throw an exception rather
@@ -332,9 +332,9 @@ namespace Semver
             ref int i,
             int startOfNext,
             Exception ex,
-            out IReadOnlyList<string> metadataIdentifiers)
+            out IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
-            var identifiers = new List<string>();
+            var identifiers = new List<MetadataIdentifier>();
             metadataIdentifiers = identifiers.AsReadOnly();
             i -= 1; // Back up so we are before the start of the first identifier
             do
@@ -356,7 +356,7 @@ namespace Semver
                     return ex ?? NewFormatException(MissingMetadataIdentifierMessage, LimitLength(version));
 
                 var identifier = version.Substring(s, i - s);
-                identifiers.Add(identifier);
+                identifiers.Add(MetadataIdentifier.CreateUnsafe(identifier));
 
             } while (i < startOfNext && version[i] == '.');
 

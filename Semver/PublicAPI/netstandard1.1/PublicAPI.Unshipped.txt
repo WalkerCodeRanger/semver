@@ -19,7 +19,7 @@ Semver.PrereleaseIdentifier.Value.get -> string
 Semver.SemVersion.Equals(Semver.SemVersion other) -> bool
 Semver.SemVersion.IsPrerelease.get -> bool
 Semver.SemVersion.Metadata.get -> string
-Semver.SemVersion.MetadataIdentifiers.get -> System.Collections.Generic.IReadOnlyList<string>
+Semver.SemVersion.MetadataIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.MetadataIdentifier>
 Semver.SemVersion.PrereleaseIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.PrereleaseIdentifier>
 Semver.SemVersion.ToVersion() -> System.Version
 Semver.SemVersion.WithMajor(int major) -> Semver.SemVersion
