@@ -62,7 +62,6 @@ namespace Semver
             _ = value ?? throw new ArgumentNullException(paramName);
             if (value.Length == 0)
                 throw new ArgumentException("Metadata identifier cannot be empty.", paramName);
-
             if (!value.IsAlphanumericOrHyphens())
                 throw new ArgumentException($"A metadata identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.", paramName);
 

@@ -25,8 +25,14 @@ Semver.SemVersion.Prerelease.get -> string
 Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "") -> void
 Semver.SemVersion.SemVersion(System.Version version) -> void
 Semver.SemVersion.WithMajor(int major) -> Semver.SemVersion
+Semver.SemVersion.WithMetadata(params string[] metadataIdentifiers) -> Semver.SemVersion
+Semver.SemVersion.WithMetadata(string metadata) -> Semver.SemVersion
+Semver.SemVersion.WithMetadata(System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier> metadataIdentifiers) -> Semver.SemVersion
+Semver.SemVersion.WithMetadata(System.Collections.Generic.IEnumerable<string> metadataIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithMinor(int minor) -> Semver.SemVersion
+Semver.SemVersion.WithoutMetadata() -> Semver.SemVersion
 Semver.SemVersion.WithoutPrerelease() -> Semver.SemVersion
+Semver.SemVersion.WithoutPrereleaseOrMetadata() -> Semver.SemVersion
 Semver.SemVersion.WithPatch(int patch) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(params string[] prereleaseIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(string prerelease, bool allowLeadingZeros = false) -> Semver.SemVersion

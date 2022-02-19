@@ -168,6 +168,7 @@ namespace Semver.Test
         {
             string[] identifiers = null;
             var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease(identifiers));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
@@ -235,6 +236,7 @@ namespace Semver.Test
             IEnumerable<string> identifiers = null;
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithPrerelease(identifiers, allowLeadingZeros: false));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
@@ -319,6 +321,7 @@ namespace Semver.Test
         {
             IEnumerable<PrereleaseIdentifier> identifiers = null;
             var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease(identifiers));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
@@ -348,6 +351,280 @@ namespace Semver.Test
             var v = Version.WithoutPrerelease();
 
             Assert.Equal(new SemVersion(1, 2, 3, "", "metadata"), v);
+        }
+
+        #region WithMetadata() Overload Resolution
+        /// <summary>
+        /// This demonstrates that if you call <c>WithMetadata("value")</c> it
+        /// invokes <see cref="SemVersion.WithMetadata(string)"/> rather
+        /// than <see cref="SemVersion.WithMetadata(string[])"/>.
+        /// </summary>
+        [Fact]
+        public void WithMetadataSingleStringCallsParsingOverload()
+        {
+            var v = Version.WithMetadata("bar.baz");
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz"), v);
+        }
+        #endregion
+
+        #region WithMetadata(string)
+        [Fact]
+        public void WithMetadataParsing()
+        {
+            var v = Version.WithMetadata("bar.baz.100.123abc");
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
+        }
+
+        [Fact]
+        public void WithMetadataParsingNull()
+        {
+            string identifiers = null;
+            var ex = Assert.Throws<ArgumentNullException>(()
+                => Version.WithMetadata(identifiers));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("metadata", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataParsingEmptyString()
+        {
+            var v = Version.WithMetadata("");
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre"), v);
+        }
+
+        [Fact]
+        public void WithMetadataParsingEmptyIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => Version.WithMetadata("bar."));
+            Assert.StartsWith("Metadata identifier cannot be empty.", ex.Message);
+            Assert.Equal("metadata", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataParsingLeadingZeros()
+        {
+            var v = Version.WithMetadata("bar.0123");
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.0123"), v);
+        }
+
+        [Fact]
+        public void WithMetadataParsingToLarge()
+        {
+            var v = Version.WithMetadata("bar.99999999999999999");
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.99999999999999999"), v);
+        }
+
+        [Fact]
+        public void WithMetadataParsingInvalidCharacter()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => Version.WithMetadata("bar.abc@123"));
+            Assert.StartsWith("A metadata identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);
+            Assert.Equal("metadata", ex.ParamName);
+        }
+        #endregion
+
+        #region WithMetadata(string[])
+        [Fact]
+        public void WithMetadataParams()
+        {
+            var v = Version.WithMetadata("bar", "baz", "100", "123abc");
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
+        }
+
+        [Fact]
+        public void WithMetadataParamsNull()
+        {
+            string[] identifiers = null;
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(identifiers));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataParamsEmpty()
+        {
+            var v = Version.WithMetadata();
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre"), v);
+        }
+
+        [Fact]
+        public void WithMetadataParamsEmptyIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => Version.WithMetadata("bar", ""));
+            Assert.StartsWith("Metadata identifier cannot be empty.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataParamsNullIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata("bar", null));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataParamsLeadingZeros()
+        {
+            var v = Version.WithMetadata("bar", "0123");
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.0123"), v);
+        }
+
+        [Fact]
+        public void WithMetadataParamsToLarge()
+        {
+            var v = Version.WithMetadata("bar", "99999999999999999");
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.99999999999999999"), v);
+        }
+
+        [Fact]
+        public void WithMetadataParamsInvalidCharacter()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => Version.WithMetadata("bar", "abc@123"));
+            Assert.StartsWith("A metadata identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+        #endregion
+
+        #region WithMetadata(IEnumerable<string>)
+        [Fact]
+        public void WithMetadataEnumerable()
+        {
+            var v = Version.WithMetadata(new List<string> { "bar", "baz", "100", "123abc" });
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
+        }
+
+        [Fact]
+        public void WithMetadataEnumerableNull()
+        {
+            IEnumerable<string> identifiers = null;
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(identifiers));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataEnumerableEmpty()
+        {
+            var v = Version.WithMetadata(Enumerable.Empty<string>());
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre"), v);
+        }
+
+        [Fact]
+        public void WithMetadataEnumerableEmptyIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => Version.WithMetadata(new List<string> { "bar", "" }));
+            Assert.StartsWith("Metadata identifier cannot be empty.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataEnumerableNullIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(()
+                => Version.WithMetadata(new List<string> { "bar", null }));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataEnumerableLeadingZeros()
+        {
+            var v = Version.WithMetadata(new List<string> { "bar", "0123" });
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.0123"), v);
+        }
+
+        [Fact]
+        public void WithMetadataEnumerableToLarge()
+        {
+            var v = Version.WithMetadata(new List<string> { "bar", "99999999999999999" });
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.99999999999999999"), v);
+        }
+
+        [Fact]
+        public void WithMetadataEnumerableInvalidCharacter()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => Version.WithMetadata(new List<string> { "bar", "abc@123" }));
+            Assert.StartsWith("A metadata identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+        #endregion
+
+        #region WithMetadata(IEnumerable<MetadataIdentifier>)
+        [Fact]
+        public void WithMetadataIdentifiers()
+        {
+            var v = Version.WithMetadata(new[]
+            {
+                new MetadataIdentifier("bar"),
+                new MetadataIdentifier("baz"),
+                new MetadataIdentifier("100"),
+                new MetadataIdentifier("123abc")
+            });
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
+        }
+
+        [Fact]
+        public void WithMetadataIdentifiersNull()
+        {
+            IEnumerable<MetadataIdentifier> identifiers = null;
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(identifiers));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataIdentifiersEmpty()
+        {
+            var v = Version.WithMetadata(Enumerable.Empty<MetadataIdentifier>());
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre"), v);
+        }
+
+        [Fact]
+        public void WithMetadataIdentifiersDefaultIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => Version.WithMetadata(new[]
+            {
+                new MetadataIdentifier("bar"), default
+            }));
+            Assert.StartsWith("Metadata identifier cannot be default/null.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+        #endregion
+
+        [Fact]
+        public void WithoutMetadata()
+        {
+            var v = Version.WithoutMetadata();
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre"), v);
+        }
+
+        [Fact]
+        public void WithoutPrereleaseOrMetadata()
+        {
+            var v = Version.WithoutPrereleaseOrMetadata();
+
+            Assert.Equal(new SemVersion(1, 2, 3), v);
         }
     }
 }
