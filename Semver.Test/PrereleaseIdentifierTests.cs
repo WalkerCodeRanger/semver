@@ -13,6 +13,7 @@ namespace Semver.Test
         [InlineData("hello", null)]
         [InlineData("2147483648", null)] // int.MaxValue + 1
         [InlineData("hello@", null)]
+        [InlineData("", null)]
         public void CreateLoose(string value, int? intValue)
         {
 #pragma warning disable CS0612 // Type or member is obsolete
@@ -23,6 +24,17 @@ namespace Semver.Test
             Assert.Equal(intValue, identifier.IntValue);
         }
 
+        [Fact]
+        public void CreateLooseNull()
+        {
+#pragma warning disable CS0612 // Type or member is obsolete
+            var ex = Assert.Throws<ArgumentNullException>(() => PrereleaseIdentifier.CreateLoose(null));
+#pragma warning restore CS0612 // Type or member is obsolete
+
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("value", ex.ParamName);
+        }
+
         [Theory]
         [InlineData("ident", null)]
         [InlineData("42", 12)]
@@ -30,6 +42,8 @@ namespace Semver.Test
         [InlineData("hello", -1)]
         [InlineData("2147483648", 42)] // int.MaxValue + 1
         [InlineData("hello@", null)]
+        [InlineData("", null)]
+        [InlineData(null, null)]
         public void CreateUnsafe(string value, int? intValue)
         {
             var identifier = PrereleaseIdentifier.CreateUnsafe(value, intValue);

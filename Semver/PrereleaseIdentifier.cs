@@ -126,7 +126,6 @@ namespace Semver
 
         public static bool operator !=(PrereleaseIdentifier left, PrereleaseIdentifier right)
             => left.Value != right.Value;
-
         #endregion
 
         public static implicit operator string(PrereleaseIdentifier prereleaseIdentifier)
