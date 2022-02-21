@@ -109,8 +109,10 @@ namespace Semver.Test
                 {new MetadataIdentifier("42"), new MetadataIdentifier("42"), true},
                 {new MetadataIdentifier("42"), new MetadataIdentifier("0"), false},
                 {new MetadataIdentifier("hello"), new MetadataIdentifier("42"), false},
-                {MetadataIdentifier.CreateUnsafe(""), MetadataIdentifier.CreateUnsafe(""), true},
+                {MetadataIdentifier.CreateUnsafe(null), MetadataIdentifier.CreateUnsafe(null), true},
+                {MetadataIdentifier.CreateUnsafe(null), MetadataIdentifier.CreateUnsafe(""), false},
 #pragma warning disable CS0612 // Type or member is obsolete
+                {MetadataIdentifier.CreateLoose(""), MetadataIdentifier.CreateLoose(""), true},
                 {MetadataIdentifier.CreateLoose("loose"), new MetadataIdentifier("loose"), true},
                 {MetadataIdentifier.CreateLoose("045"), MetadataIdentifier.CreateLoose("45"), false},
                 {MetadataIdentifier.CreateLoose("10053"), new MetadataIdentifier("10053"), true},
@@ -118,6 +120,7 @@ namespace Semver.Test
 #pragma warning restore CS0612 // Type or member is obsolete
             };
 
+        #region Equality
         [Theory]
         [MemberData(nameof(EqualityCases))]
         public void EqualsMetadataIdentifier(MetadataIdentifier left, MetadataIdentifier right, bool expected)
@@ -166,6 +169,66 @@ namespace Semver.Test
             else
                 Assert.NotEqual(leftHashcode, rightHashcode);
         }
+        #endregion
+
+        #region Comparison
+        [Theory]
+        [InlineData("a", "a", 0)]
+        [InlineData("a", "b", -1)]
+        [InlineData("b", "a", 1)]
+        [InlineData(null, "", -1)]
+        [InlineData(null, null, 0)]
+        [InlineData("", null, 1)]
+        [InlineData("a", "aa", -1)]
+        [InlineData("aa", "aa", 0)]
+        [InlineData("aa", "ab", -1)]
+        [InlineData("ab", "aa", 1)]
+        [InlineData("01", "1", -1)]
+        [InlineData("beta", "rc", -1)] // Case that causes -16 for string comparison
+        public void CompareTo(string left, string right, int expected)
+        {
+            var leftIdentifier = MetadataIdentifier.CreateUnsafe(left);
+            var rightIdentifier = MetadataIdentifier.CreateUnsafe(right);
+
+            Assert.Equal(expected, leftIdentifier.CompareTo(rightIdentifier));
+        }
+
+        [Theory]
+        [MemberData(nameof(EqualityCases))]
+        public void CompareToMatchesEquality(MetadataIdentifier left, MetadataIdentifier right, bool equal)
+        {
+            var comparison = left.CompareTo(right);
+
+            if (equal)
+                Assert.Equal(0, comparison);
+            else
+                Assert.NotEqual(0, comparison);
+        }
+
+        [Theory]
+        [InlineData("a")]
+        [InlineData("")]
+        [InlineData(null)]
+        public void CompareToNullObject(string value)
+        {
+            var comparison = MetadataIdentifier.CreateUnsafe(value).CompareTo(null);
+
+            Assert.Equal(1, comparison);
+        }
+
+        [Theory]
+        [InlineData("a")]
+        [InlineData("")]
+        [InlineData(null)]
+        public void CompareToObject(string value)
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => MetadataIdentifier.CreateUnsafe(value).CompareTo(new object()));
+
+            Assert.StartsWith("Object must be of type MetadataIdentifier.", ex.Message);
+            Assert.Equal("obj", ex.ParamName);
+        }
+        #endregion
 
         [Theory]
         [InlineData("042")]
@@ -173,6 +236,7 @@ namespace Semver.Test
         [InlineData("123")]
         [InlineData("1-2")]
         [InlineData("@")]
+        [InlineData("")]
         [InlineData(null)]
         public void ImplicitConversionToString(string value)
         {
@@ -189,6 +253,7 @@ namespace Semver.Test
         [InlineData("123")]
         [InlineData("1-2")]
         [InlineData("@")]
+        [InlineData("")]
         [InlineData(null)]
         public void ToStringTest(string value)
         {

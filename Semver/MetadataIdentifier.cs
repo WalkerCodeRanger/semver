@@ -5,7 +5,7 @@ using Semver.Utility;
 namespace Semver
 {
     // TODO Doc Comment
-    public readonly struct MetadataIdentifier : IEquatable<MetadataIdentifier>
+    public readonly struct MetadataIdentifier : IEquatable<MetadataIdentifier>, IComparable<MetadataIdentifier>, IComparable
     {
         // TODO Doc Comment
         public string Value { get; }
@@ -82,7 +82,31 @@ namespace Semver
 
         public static bool operator !=(MetadataIdentifier left, MetadataIdentifier right)
             => left.Value != right.Value;
+        #endregion
 
+        #region Comparison
+        public int CompareTo(MetadataIdentifier other)
+            => IdentifierString.Compare(Value, other.Value);
+
+        public int CompareTo(object obj)
+        {
+            if (obj is null) return 1;
+            return obj is MetadataIdentifier other
+                ? CompareTo(other)
+                : throw new ArgumentException($"Object must be of type {nameof(MetadataIdentifier)}.", nameof(obj));
+        }
+
+        public static bool operator <(MetadataIdentifier left, MetadataIdentifier right)
+            => left.CompareTo(right) < 0;
+
+        public static bool operator >(MetadataIdentifier left, MetadataIdentifier right)
+            => left.CompareTo(right) > 0;
+
+        public static bool operator <=(MetadataIdentifier left, MetadataIdentifier right)
+            => left.CompareTo(right) <= 0;
+
+        public static bool operator >=(MetadataIdentifier left, MetadataIdentifier right)
+            => left.CompareTo(right) >= 0;
         #endregion
 
         public static implicit operator string(MetadataIdentifier metadataIdentifier)
