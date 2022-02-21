@@ -39,9 +39,6 @@ namespace Semver.Test
         [InlineData("042")]
         [InlineData("hello")]
         [InlineData("2147483648")] // int.MaxValue + 1
-        [InlineData("hello@")]
-        [InlineData("")]
-        [InlineData(null)]
         public void CreateUnsafe(string value)
         {
             var identifier = MetadataIdentifier.CreateUnsafe(value);
@@ -190,8 +187,8 @@ namespace Semver.Test
         [InlineData("beta", "rc", -1)] // Case that causes -16 for string comparison
         public void CompareTo(string left, string right, int expected)
         {
-            var leftIdentifier = MetadataIdentifier.CreateUnsafe(left);
-            var rightIdentifier = MetadataIdentifier.CreateUnsafe(right);
+            var leftIdentifier = CreateLooseOrDefault(left);
+            var rightIdentifier = CreateLooseOrDefault(right);
 
             Assert.Equal(expected, leftIdentifier.CompareTo(rightIdentifier));
         }
@@ -214,7 +211,7 @@ namespace Semver.Test
         [InlineData(null)]
         public void CompareToNullObject(string value)
         {
-            var comparison = MetadataIdentifier.CreateUnsafe(value).CompareTo(null);
+            var comparison = CreateLooseOrDefault(value).CompareTo(null);
 
             Assert.Equal(1, comparison);
         }
@@ -226,7 +223,7 @@ namespace Semver.Test
         public void CompareToObject(string value)
         {
             var ex = Assert.Throws<ArgumentException>(()
-                => MetadataIdentifier.CreateUnsafe(value).CompareTo(new object()));
+                => CreateLooseOrDefault(value).CompareTo(new object()));
 
             Assert.StartsWith("Object must be of type MetadataIdentifier.", ex.Message);
             Assert.Equal("obj", ex.ParamName);
@@ -243,7 +240,7 @@ namespace Semver.Test
         [InlineData(null)]
         public void ImplicitConversionToString(string value)
         {
-            var identifier = MetadataIdentifier.CreateUnsafe(value);
+            var identifier = CreateLooseOrDefault(value);
 
             string convertedValue = identifier;
 
@@ -260,11 +257,19 @@ namespace Semver.Test
         [InlineData(null)]
         public void ToStringTest(string value)
         {
-            var identifier = MetadataIdentifier.CreateUnsafe(value);
+            var identifier = CreateLooseOrDefault(value);
 
             string convertedValue = identifier.ToString();
 
             Assert.Equal(value, convertedValue);
+        }
+
+        private static MetadataIdentifier CreateLooseOrDefault(string value)
+        {
+            if (value is null) return default;
+#pragma warning disable CS0612 // Type or member is obsolete
+            return MetadataIdentifier.CreateLoose(value);
+#pragma warning restore CS0612 // Type or member is obsolete
         }
     }
 }

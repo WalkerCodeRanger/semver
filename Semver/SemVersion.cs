@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -24,7 +23,7 @@ namespace Semver
     public sealed class SemVersion : IComparable<SemVersion>, IComparable, IEquatable<SemVersion>
 #endif
     {
-        private const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
+        internal const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
         private const string InvalidMajorVersionMessage = "Major version must be greater than or equal to zero.";
         private const string InvalidMinorVersionMessage = "Minor version must be greater than or equal to zero.";
         private const string InvalidPatchVersionMessage = "Patch version must be greater than or equal to zero.";
@@ -158,16 +157,20 @@ namespace Semver
             IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
             IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
-            Debug.Assert(major >= 0);
+#if DEBUG
+            if (major < 0) throw new ArgumentException(InvalidMajorVersionMessage, nameof(major));
+            if (minor < 0) throw new ArgumentException(InvalidMinorVersionMessage, nameof(minor));
+            if (patch < 0) throw new ArgumentException(InvalidPatchVersionMessage, nameof(patch));
+            if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
+            if (prereleaseIdentifiers.Any(i => i==default)) throw new ArgumentException(PrereleaseIdentifierIsDefaultMessage, nameof(prereleaseIdentifiers));
+            if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
+            if (metadataIdentifiers.Any(i => i == default)) throw new ArgumentException(MetadataIdentifierIsDefaultMessage, nameof(metadataIdentifiers));
+#endif
             Major = major;
-            Debug.Assert(minor >= 0);
             Minor = minor;
-            Debug.Assert(patch >= 0);
             Patch = patch;
-            Debug.Assert(prereleaseIdentifiers != null);
             Prerelease = string.Join(".", prereleaseIdentifiers);
             PrereleaseIdentifiers = prereleaseIdentifiers;
-            Debug.Assert(metadataIdentifiers != null);
             Metadata = string.Join(".", metadataIdentifiers);
             MetadataIdentifiers = metadataIdentifiers;
         }

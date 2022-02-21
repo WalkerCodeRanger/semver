@@ -33,6 +33,12 @@ namespace Semver
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static MetadataIdentifier CreateUnsafe(string value)
         {
+#if DEBUG
+            if (value is null) throw new ArgumentNullException(nameof(value));
+            if (value.Length == 0) throw new ArgumentException("Metadata identifier cannot be empty.", nameof(value));
+            if (!value.IsAlphanumericOrHyphens())
+                throw new ArgumentException($"A metadata identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.", nameof(value));
+#endif
             return new MetadataIdentifier(value, UnsafeOverload.Marker);
         }
 
@@ -60,7 +66,8 @@ namespace Semver
         /// </summary>
         internal MetadataIdentifier(string value, string paramName)
         {
-            _ = value ?? throw new ArgumentNullException(paramName);
+            if (value is null)
+                throw new ArgumentNullException(paramName);
             if (value.Length == 0)
                 throw new ArgumentException("Metadata identifier cannot be empty.", paramName);
             if (!value.IsAlphanumericOrHyphens())

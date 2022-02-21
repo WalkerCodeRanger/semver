@@ -38,13 +38,10 @@ namespace Semver.Test
 
         [Theory]
         [InlineData("ident", null)]
-        [InlineData("42", 12)]
-        [InlineData("042", 13)]
-        [InlineData("hello", -1)]
-        [InlineData("2147483648", 42)] // int.MaxValue + 1
-        [InlineData("hello@", null)]
-        [InlineData("", null)]
-        [InlineData(null, null)]
+        [InlineData("42", 42)]
+        [InlineData("0-1", null)]
+        [InlineData("0A", null)]
+        [InlineData("-1", null)]
         public void CreateUnsafe(string value, int? intValue)
         {
             var identifier = PrereleaseIdentifier.CreateUnsafe(value, intValue);
@@ -303,7 +300,7 @@ namespace Semver.Test
         [InlineData(null)]
         public void ImplicitConversionToString(string value)
         {
-            var identifier = PrereleaseIdentifier.CreateUnsafe(value, null);
+            var identifier = CreateLooseOrDefault(value);
 
             string convertedValue = identifier;
 
@@ -319,7 +316,7 @@ namespace Semver.Test
         [InlineData(null)]
         public void ToStringTest(string value)
         {
-            var identifier = PrereleaseIdentifier.CreateUnsafe(value, null);
+            var identifier = CreateLooseOrDefault(value);
 
             string convertedValue = identifier.ToString();
 

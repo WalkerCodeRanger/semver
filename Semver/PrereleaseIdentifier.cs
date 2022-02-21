@@ -40,6 +40,13 @@ namespace Semver
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static PrereleaseIdentifier CreateUnsafe(string value, int? intValue)
         {
+#if DEBUG
+            var expected = new PrereleaseIdentifier(value);
+            if (expected.Value != value)
+                throw new ArgumentException("String value has leading zeros.", nameof(value));
+            if (expected.IntValue != intValue)
+                throw new ArgumentException($"Int value {intValue} doesn't match string value.", nameof(intValue));
+#endif
             return new PrereleaseIdentifier(value, intValue);
         }
 
@@ -65,7 +72,8 @@ namespace Semver
         /// </summary>
         internal PrereleaseIdentifier(string value, bool allowLeadingZeros, string paramName)
         {
-            _ = value ?? throw new ArgumentNullException(paramName);
+            if (value is null)
+                throw new ArgumentNullException(paramName);
             if (value.Length == 0)
                 throw new ArgumentException("Prerelease identifier cannot be empty.", paramName);
             if (value.IsDigits())

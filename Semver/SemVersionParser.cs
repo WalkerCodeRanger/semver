@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
@@ -54,7 +53,10 @@ namespace Semver
             int maxLength,
             out SemVersion semver)
         {
-            Debug.Assert(style.IsValid(), $"Invalid {nameof(style)}");
+#if DEBUG
+            if (!style.IsValid())
+                throw new ArgumentException(SemVersion.InvalidSemVersionStylesMessage, nameof(style));
+#endif
 
             // Assign null once so it doesn't have to be done any time parse fails
             semver = null;
