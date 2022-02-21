@@ -22,6 +22,7 @@ namespace Semver
         [Obsolete]
         internal static PrereleaseIdentifier CreateLoose(string value)
         {
+            if (value is null) throw new ArgumentNullException(nameof(value));
             if (int.TryParse(value, NumberStyles.None, null, out var intValue))
                 return new PrereleaseIdentifier(value, intValue);
 

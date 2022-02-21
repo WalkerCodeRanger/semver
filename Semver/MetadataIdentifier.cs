@@ -18,6 +18,7 @@ namespace Semver
         [Obsolete]
         internal static MetadataIdentifier CreateLoose(string value)
         {
+            if (value is null) throw new ArgumentNullException(nameof(value));
             return new MetadataIdentifier(value, UnsafeOverload.Marker);
         }
 
