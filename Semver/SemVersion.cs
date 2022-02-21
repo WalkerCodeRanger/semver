@@ -808,15 +808,15 @@ namespace Semver
         /// </returns>
         public override bool Equals(object obj)
         {
-            return Equals(obj as SemVersion);
+            return obj is SemVersion version && Equals(version);
         }
 
         /// <summary>
         /// Indicates whether the <see cref="SemVersion"/> is equal to another <see cref="SemVersion"/>.
         /// </summary>
-        /// <param name="other">An object to compare with this object.</param>
+        /// <param name="other">An version to compare with this object.</param>
         /// <returns>
-        ///   <see langword="true"/> if the current object is equal to the <paramref name="other"/> parameter, otherwise <see langword="false"/>.
+        ///   <see langword="true"/> if the current version is equal to the <paramref name="other"/> parameter, otherwise <see langword="false"/>.
         /// </returns>
         public bool Equals(SemVersion other)
         {
