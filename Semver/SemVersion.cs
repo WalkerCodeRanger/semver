@@ -61,7 +61,9 @@ namespace Semver
         private SemVersion(SerializationInfo info, StreamingContext context)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-            var semVersion = Parse(info.GetString("SemVersion"));
+#pragma warning disable CS0618 // Type or member is obsolete
+            var semVersion = Parse(info.GetString("SemVersion"), true);
+#pragma warning restore CS0618 // Type or member is obsolete
             Major = semVersion.Major;
             Minor = semVersion.Minor;
             Patch = semVersion.Patch;
@@ -219,23 +221,6 @@ namespace Semver
         }
         #endregion
 
-        /// <summary>
-        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
-        /// equivalent. Parsing is not strict, minor and patch version numbers are optional.
-        /// </summary>
-        /// <param name="version">The version string.</param>
-        /// <returns>The <see cref="SemVersion"/> object.</returns>
-        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
-        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <c>int.MaxValue</c>.</exception>
-        // TODO reconsider adding this overload that allows non-obsolete access to the old parsing
-        public static SemVersion Parse(string version)
-        {
-#pragma warning disable CS0618 // Type or member is obsolete
-            return Parse(version, false);
-#pragma warning restore CS0618 // Type or member is obsolete
-        }
-
         // TODO Doc Comment
         public static SemVersion Parse(string version, SemVersionStyles style, int maxLength = MaxVersionLength)
         {
@@ -258,7 +243,7 @@ namespace Semver
         /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing Minor or Patch versions and <paramref name="strict"/> is <see langword="true"/>.</exception>
         /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <c>int.MaxValue</c>.</exception>
         [Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
-        public static SemVersion Parse(string version, bool strict)
+        public static SemVersion Parse(string version, bool strict = false)
         {
             var match = ParseEx.Match(version);
             if (!match.Success)

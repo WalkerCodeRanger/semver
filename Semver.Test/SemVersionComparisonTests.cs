@@ -115,8 +115,10 @@ namespace Semver.Test
         [InlineData("1.2.3-a.000001", "1.2.3-a.1")]
         public void EqualsPrereleaseLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.Equals(v2);
 
@@ -129,8 +131,10 @@ namespace Semver.Test
         [InlineData("1.2.3+a.000001", "1.2.3+a.1")]
         public void EqualsBuildLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.Equals(v2);
 
@@ -159,8 +163,8 @@ namespace Semver.Test
         [InlineData(null, null, true)]
         public void StaticEqualsTest(string s1, string s2, bool expected)
         {
-            var v1 = s1 is null ? null : SemVersion.Parse(s1);
-            var v2 = s2 is null ? null : SemVersion.Parse(s2);
+            var v1 = s1 is null ? null : SemVersion.Parse(s1, SemVersionStyles.Strict);
+            var v2 = s2 is null ? null : SemVersion.Parse(s2, SemVersionStyles.Strict);
 
             var r = SemVersion.Equals(v1, v2);
 
@@ -244,8 +248,10 @@ namespace Semver.Test
         [InlineData("1.2.3-a.000001", "1.2.3-a.1")]
         public void CompareToPrereleaseLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.CompareTo(v2);
 
@@ -258,8 +264,10 @@ namespace Semver.Test
         [InlineData("1.2.3+a.000001", "1.2.3+a.1")]
         public void CompareToBuildLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.CompareTo(v2);
 
@@ -300,8 +308,8 @@ namespace Semver.Test
         [InlineData(null, null, 0)]
         public void StaticCompareTest(string s1, string s2, int expected)
         {
-            var v1 = s1 is null ? null : SemVersion.Parse(s1);
-            var v2 = s2 is null ? null : SemVersion.Parse(s2);
+            var v1 = s1 is null ? null : SemVersion.Parse(s1, SemVersionStyles.Strict);
+            var v2 = s2 is null ? null : SemVersion.Parse(s2, SemVersionStyles.Strict);
 
             var r = SemVersion.Compare(v1, v2);
 
@@ -344,8 +352,10 @@ namespace Semver.Test
         [InlineData("1.2.3-a.000001", "1.2.3-a.1")]
         public void PrecedenceMatchesPrereleaseLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.PrecedenceMatches(v2);
 
@@ -358,8 +368,10 @@ namespace Semver.Test
         [InlineData("1.2.3+a.000001", "1.2.3+a.1")]
         public void PrecedenceMatchesBuildLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.PrecedenceMatches(v2);
 
@@ -436,8 +448,10 @@ namespace Semver.Test
         [InlineData("1.2.3-a.000001", "1.2.3-a.1")]
         public void CompareByPrecedencePrereleaseLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.CompareByPrecedence(v2);
 
@@ -450,8 +464,10 @@ namespace Semver.Test
         [InlineData("1.2.3+a.000001", "1.2.3+a.1")]
         public void CompareByPrecedenceBuildLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.CompareByPrecedence(v2);
 
@@ -500,8 +516,10 @@ namespace Semver.Test
         [InlineData("1.2.3-a.000001", "1.2.3-a.1")]
         public void EqualsOperatorPrereleaseLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1 == v2;
 
@@ -514,8 +532,10 @@ namespace Semver.Test
         [InlineData("1.2.3+a.000001", "1.2.3+a.1")]
         public void EqualsOperatorBuildLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1 == v2;
 
@@ -535,8 +555,8 @@ namespace Semver.Test
         [InlineData(null, null, true)]
         public void EqualsOperatorTest(string s1, string s2, bool expected)
         {
-            var v1 = s1 is null ? null : SemVersion.Parse(s1);
-            var v2 = s2 is null ? null : SemVersion.Parse(s2);
+            var v1 = s1 is null ? null : SemVersion.Parse(s1, SemVersionStyles.Strict);
+            var v2 = s2 is null ? null : SemVersion.Parse(s2, SemVersionStyles.Strict);
 
             var r = v1 == v2;
 
@@ -576,8 +596,10 @@ namespace Semver.Test
         [InlineData("1.2.3-a.000001", "1.2.3-a.1")]
         public void NotEqualsOperatorPrereleaseLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1 != v2;
 
@@ -590,8 +612,10 @@ namespace Semver.Test
         [InlineData("1.2.3+a.000001", "1.2.3+a.1")]
         public void NotEqualsOperatorBuildLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1 != v2;
 
@@ -611,8 +635,8 @@ namespace Semver.Test
         [InlineData(null, null, false)]
         public void NotEqualsOperatorTest(string s1, string s2, bool expected)
         {
-            var v1 = s1 is null ? null : SemVersion.Parse(s1);
-            var v2 = s2 is null ? null : SemVersion.Parse(s2);
+            var v1 = s1 is null ? null : SemVersion.Parse(s1, SemVersionStyles.Strict);
+            var v2 = s2 is null ? null : SemVersion.Parse(s2, SemVersionStyles.Strict);
 
             var r = v1 != v2;
 
@@ -677,8 +701,10 @@ namespace Semver.Test
         [InlineData("1.2.3-a.000001", "1.2.3-a.1")]
         public void ComparisonOperatorsPrereleaseLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             // TODO it is a bug that none of these comparisons are true (issue #53)
             Assert.False(v1 < v2, $"{v1} < {v2}");
@@ -693,8 +719,10 @@ namespace Semver.Test
         [InlineData("1.2.3+a.000001", "1.2.3+a.1")]
         public void ComparisonOperatorsBuildLeadingZerosTest(string s1, string s2)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             // TODO it is a bug that none of these comparisons are true (issue #53)
             Assert.False(v1 < v2, $"{v1} < {v2}");

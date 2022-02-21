@@ -285,8 +285,10 @@ namespace Semver.Test
         [Fact]
         public void DefaultParseIsLoose()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             // Loose allows optional minor and patch
             var v = SemVersion.Parse("1-0123..a+build..metadata");
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(1, v.Major);
             Assert.Equal(0, v.Minor);
@@ -300,7 +302,9 @@ namespace Semver.Test
         [Fact]
         public void ParseLooseLongTest()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             SemVersion.Parse(LongValidVersionString);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Theory]
@@ -315,7 +319,9 @@ namespace Semver.Test
         [MemberData(nameof(LeadingZerosPrerelease))]
         public void ParseLooseValidTest(string versionString, int major, int minor, int patch, string prerelease, string metadata)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v = SemVersion.Parse(versionString);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(major, v.Major);
             Assert.Equal(minor, v.Minor);
@@ -333,7 +339,9 @@ namespace Semver.Test
         public void ParseLooseInvalidThrowsArgumentExceptionTest(string versionString)
         {
             // These exceptions should be FormatException etc.
+#pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<ArgumentException>(() => SemVersion.Parse(versionString));
+#pragma warning restore CS0618 // Type or member is obsolete
             Assert.StartsWith($"Invalid version '{versionString}'.", ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
@@ -342,14 +350,18 @@ namespace Semver.Test
         [MemberData(nameof(Overflow))]
         public void ParseLooseInvalidThrowsOverflowExceptionTest(string versionString)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<OverflowException>(() => SemVersion.Parse(versionString));
+#pragma warning restore CS0618 // Type or member is obsolete
             Assert.Equal("Value was either too large or too small for an Int32.", ex.Message);
         }
 
         [Fact]
         public void ParseLooseNullTest()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null));
+#pragma warning restore CS0618 // Type or member is obsolete
             Assert.StartsWith("Value cannot be null.", ex.Message);
             // This is an incorrect param name, should be "version"
             Assert.Equal("input", ex.ParamName);
@@ -414,7 +426,9 @@ namespace Semver.Test
         [MemberData(nameof(Overflow))]
         public void ParseStrictInvalidThrowsOverflowExceptionTest(string versionString)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<OverflowException>(() => SemVersion.Parse(versionString));
+#pragma warning restore CS0618 // Type or member is obsolete
             Assert.Equal("Value was either too large or too small for an Int32.", ex.Message);
         }
 
