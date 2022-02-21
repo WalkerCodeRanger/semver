@@ -34,10 +34,10 @@ namespace Semver
         internal static MetadataIdentifier CreateUnsafe(string value)
         {
 #if DEBUG
-            if (value is null) throw new ArgumentNullException(nameof(value));
-            if (value.Length == 0) throw new ArgumentException("Metadata identifier cannot be empty.", nameof(value));
+            if (value is null) throw new ArgumentNullException(nameof(value), "DEBUG: Value cannot be null.");
+            if (value.Length == 0) throw new ArgumentException("DEBUG: Metadata identifier cannot be empty.", nameof(value));
             if (!value.IsAlphanumericOrHyphens())
-                throw new ArgumentException($"A metadata identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.", nameof(value));
+                throw new ArgumentException($"DEBUG: A metadata identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.", nameof(value));
 #endif
             return new MetadataIdentifier(value, UnsafeOverload.Marker);
         }

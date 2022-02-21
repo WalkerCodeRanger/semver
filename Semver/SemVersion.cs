@@ -158,13 +158,13 @@ namespace Semver
             IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
 #if DEBUG
-            if (major < 0) throw new ArgumentException(InvalidMajorVersionMessage, nameof(major));
-            if (minor < 0) throw new ArgumentException(InvalidMinorVersionMessage, nameof(minor));
-            if (patch < 0) throw new ArgumentException(InvalidPatchVersionMessage, nameof(patch));
-            if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
-            if (prereleaseIdentifiers.Any(i => i==default)) throw new ArgumentException(PrereleaseIdentifierIsDefaultMessage, nameof(prereleaseIdentifiers));
-            if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
-            if (metadataIdentifiers.Any(i => i == default)) throw new ArgumentException(MetadataIdentifierIsDefaultMessage, nameof(metadataIdentifiers));
+            if (major < 0) throw new ArgumentException("DEBUG: " + InvalidMajorVersionMessage, nameof(major));
+            if (minor < 0) throw new ArgumentException("DEBUG: " + InvalidMinorVersionMessage, nameof(minor));
+            if (patch < 0) throw new ArgumentException("DEBUG: " + InvalidPatchVersionMessage, nameof(patch));
+            if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers), "DEBUG: Value cannot be null.");
+            if (prereleaseIdentifiers.Any(i => i==default)) throw new ArgumentException("DEBUG: " + PrereleaseIdentifierIsDefaultMessage, nameof(prereleaseIdentifiers));
+            if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers), "DEBUG: Value cannot be null.");
+            if (metadataIdentifiers.Any(i => i == default)) throw new ArgumentException("DEBUG: " + MetadataIdentifierIsDefaultMessage, nameof(metadataIdentifiers));
 #endif
             Major = major;
             Minor = minor;

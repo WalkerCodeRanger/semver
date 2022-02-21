@@ -41,11 +41,25 @@ namespace Semver
         internal static PrereleaseIdentifier CreateUnsafe(string value, int? intValue)
         {
 #if DEBUG
-            var expected = new PrereleaseIdentifier(value);
+            if (value is null) throw new ArgumentNullException(nameof(value), "DEBUG: Value cannot be null.");
+            PrereleaseIdentifier expected;
+            try
+            {
+                // Use the standard constructor as a way of validating the input
+                expected = new PrereleaseIdentifier(value);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException("DEBUG: " + ex.Message, ex.ParamName, ex);
+            }
+            catch (OverflowException ex)
+            {
+                throw new OverflowException("DEBUG: " + ex.Message, ex);
+            }
             if (expected.Value != value)
-                throw new ArgumentException("String value has leading zeros.", nameof(value));
+                throw new ArgumentException("DEBUG: String value has leading zeros.", nameof(value));
             if (expected.IntValue != intValue)
-                throw new ArgumentException($"Int value {intValue} doesn't match string value.", nameof(intValue));
+                throw new ArgumentException($"DEBUG: Int value {intValue} doesn't match string value.", nameof(intValue));
 #endif
             return new PrereleaseIdentifier(value, intValue);
         }

@@ -55,7 +55,7 @@ namespace Semver
         {
 #if DEBUG
             if (!style.IsValid())
-                throw new ArgumentException(SemVersion.InvalidSemVersionStylesMessage, nameof(style));
+                throw new ArgumentException("DEBUG: " + SemVersion.InvalidSemVersionStylesMessage, nameof(style));
 #endif
 
             // Assign null once so it doesn't have to be done any time parse fails
