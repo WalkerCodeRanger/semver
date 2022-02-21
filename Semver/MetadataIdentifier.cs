@@ -75,7 +75,7 @@ namespace Semver
         public override bool Equals(object obj)
             => obj is MetadataIdentifier other && Equals(other);
 
-        public override int GetHashCode() => Value?.GetHashCode() ?? 0;
+        public override int GetHashCode() => HashCodes.Combine(Value);
 
         public static bool operator ==(MetadataIdentifier left, MetadataIdentifier right)
             => left.Value == right.Value;

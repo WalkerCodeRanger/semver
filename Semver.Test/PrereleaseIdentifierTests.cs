@@ -9,6 +9,7 @@ namespace Semver.Test
         [Theory]
         [InlineData("ident", null)]
         [InlineData("42", 42)]
+        [InlineData("-42", null)]
         [InlineData("042", 42)]
         [InlineData("hello", null)]
         [InlineData("2147483648", null)] // int.MaxValue + 1
@@ -152,6 +153,7 @@ namespace Semver.Test
             Assert.Equal("value", ex.ParamName);
         }
 
+        #region Equality
         public static readonly TheoryData<PrereleaseIdentifier, PrereleaseIdentifier, bool> EqualityCases
             = new TheoryData<PrereleaseIdentifier, PrereleaseIdentifier, bool>()
             {
@@ -160,15 +162,15 @@ namespace Semver.Test
                 {new PrereleaseIdentifier(42), new PrereleaseIdentifier(42), true},
                 {new PrereleaseIdentifier(42), new PrereleaseIdentifier(0), false},
                 {new PrereleaseIdentifier("hello"), new PrereleaseIdentifier(42), false},
-                {PrereleaseIdentifier.CreateUnsafe("", null), PrereleaseIdentifier.CreateUnsafe("", null), true},
                 {default, default, true},
-                // Equality is based only on the string value
-                {PrereleaseIdentifier.CreateUnsafe("896", null), PrereleaseIdentifier.CreateUnsafe("896", 896), true},
 #pragma warning disable CS0612 // Type or member is obsolete
-                {PrereleaseIdentifier.CreateLoose("loose"), new PrereleaseIdentifier("loose"), true},
-                {PrereleaseIdentifier.CreateLoose("045"), PrereleaseIdentifier.CreateLoose("45"), false},
-                {PrereleaseIdentifier.CreateLoose("10053"), new PrereleaseIdentifier(10053), true},
+                {PrereleaseIdentifier.CreateLoose(""), PrereleaseIdentifier.CreateLoose(""), true},
                 {PrereleaseIdentifier.CreateLoose("2147483648"), PrereleaseIdentifier.CreateLoose("2147483648"), true}, // int.MaxValue + 1
+                // Equality treats leading zeros as equal numeric identifiers
+                {PrereleaseIdentifier.CreateLoose("045"), PrereleaseIdentifier.CreateLoose("45"), true},
+                // CreateLoose creates identifiers equal to the regular constructor
+                {PrereleaseIdentifier.CreateLoose("loose"), new PrereleaseIdentifier("loose"), true},
+                {PrereleaseIdentifier.CreateLoose("10053"), new PrereleaseIdentifier(10053), true},
 #pragma warning restore CS0612 // Type or member is obsolete
             };
 
@@ -220,6 +222,77 @@ namespace Semver.Test
             else
                 Assert.NotEqual(leftHashcode, rightHashcode);
         }
+        #endregion
+
+        #region Comparison
+        [Theory]
+        [InlineData("a", "a", 0)]
+        [InlineData("a", "b", -1)]
+        [InlineData("b", "a", 1)]
+        [InlineData(null, "", -1)]
+        [InlineData(null, null, 0)]
+        [InlineData("", null, 1)]
+        [InlineData("a", "aa", -1)]
+        [InlineData("aa", "aa", 0)]
+        [InlineData("aa", "ab", -1)]
+        [InlineData("ab", "aa", 1)]
+        [InlineData("01", "1", 0)]
+        [InlineData("001", "01", 0)]
+        [InlineData("1", "42", -1)]
+        [InlineData("1", "042", -1)]
+        [InlineData("beta", "rc", -1)] // Case that causes -16 for string comparison
+        // Numeric identifiers always have lower precedence than alphanumeric (even though '-' < '0')
+        [InlineData("0", "a", -1)]
+        [InlineData("9", "A", -1)]
+        [InlineData("9", "-", -1)]
+        [InlineData("-", "9", 1)]
+        [InlineData("0", "-100", -1)]
+        public void CompareTo(string left, string right, int expected)
+        {
+            var leftIdentifier = CreateLooseOrDefault(left);
+            var rightIdentifier = CreateLooseOrDefault(right);
+
+            Assert.Equal(expected, leftIdentifier.CompareTo(rightIdentifier));
+        }
+
+        [Theory]
+        [MemberData(nameof(EqualityCases))]
+        public void CompareToMatchesEquality(PrereleaseIdentifier left, PrereleaseIdentifier right, bool equal)
+        {
+            var comparison = left.CompareTo(right);
+
+            if (equal)
+                Assert.Equal(0, comparison);
+            else
+                Assert.NotEqual(0, comparison);
+        }
+
+        [Theory]
+        [InlineData("a")]
+        [InlineData("42")]
+        [InlineData("")]
+        [InlineData(null)]
+        public void CompareToNullObject(string value)
+        {
+            var comparison = CreateLooseOrDefault(value).CompareTo(null);
+
+            Assert.Equal(1, comparison);
+        }
+
+        [Theory]
+        [InlineData("a")]
+        [InlineData("42")]
+        [InlineData("")]
+        [InlineData(null)]
+        public void CompareToObject(string value)
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => CreateLooseOrDefault(value).CompareTo(new object()));
+
+            Assert.StartsWith("Object must be of type PrereleaseIdentifier.", ex.Message);
+            Assert.Equal("obj", ex.ParamName);
+        }
+        #endregion
 
         [Theory]
         [InlineData("042")]
@@ -251,6 +324,14 @@ namespace Semver.Test
             string convertedValue = identifier.ToString();
 
             Assert.Equal(value, convertedValue);
+        }
+
+        private static PrereleaseIdentifier CreateLooseOrDefault(string value)
+        {
+            if (value is null) return default;
+#pragma warning disable CS0612 // Type or member is obsolete
+            return PrereleaseIdentifier.CreateLoose(value);
+#pragma warning restore CS0612 // Type or member is obsolete
         }
     }
 }

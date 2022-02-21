@@ -12,6 +12,8 @@ Semver.MetadataIdentifier.MetadataIdentifier() -> void
 Semver.MetadataIdentifier.MetadataIdentifier(string value) -> void
 Semver.MetadataIdentifier.Value.get -> string
 Semver.PrereleaseIdentifier
+Semver.PrereleaseIdentifier.CompareTo(object obj) -> int
+Semver.PrereleaseIdentifier.CompareTo(Semver.PrereleaseIdentifier other) -> int
 Semver.PrereleaseIdentifier.Equals(Semver.PrereleaseIdentifier other) -> bool
 Semver.PrereleaseIdentifier.IntValue.get -> int?
 Semver.PrereleaseIdentifier.PrereleaseIdentifier() -> void
@@ -60,7 +62,11 @@ static Semver.MetadataIdentifier.operator >(Semver.MetadataIdentifier left, Semv
 static Semver.MetadataIdentifier.operator >=(Semver.MetadataIdentifier left, Semver.MetadataIdentifier right) -> bool
 static Semver.PrereleaseIdentifier.implicit operator string(Semver.PrereleaseIdentifier prereleaseIdentifier) -> string
 static Semver.PrereleaseIdentifier.operator !=(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
+static Semver.PrereleaseIdentifier.operator <(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
+static Semver.PrereleaseIdentifier.operator <=(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
 static Semver.PrereleaseIdentifier.operator ==(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
+static Semver.PrereleaseIdentifier.operator >(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
+static Semver.PrereleaseIdentifier.operator >=(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
 static Semver.SemVersion.FromVersion(System.Version version) -> Semver.SemVersion
 static Semver.SemVersion.Parse(string version, Semver.SemVersionStyles style, int maxLength = 1024) -> Semver.SemVersion
 static Semver.SemVersion.TryParse(string version, Semver.SemVersionStyles style, out Semver.SemVersion semver, int maxLength = 1024) -> bool

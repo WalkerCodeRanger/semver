@@ -101,6 +101,7 @@ namespace Semver.Test
             Assert.Equal("value", ex.ParamName);
         }
 
+        #region Equality
         public static readonly TheoryData<MetadataIdentifier, MetadataIdentifier, bool> EqualityCases
             = new TheoryData<MetadataIdentifier, MetadataIdentifier, bool>()
             {
@@ -109,18 +110,19 @@ namespace Semver.Test
                 {new MetadataIdentifier("42"), new MetadataIdentifier("42"), true},
                 {new MetadataIdentifier("42"), new MetadataIdentifier("0"), false},
                 {new MetadataIdentifier("hello"), new MetadataIdentifier("42"), false},
-                {MetadataIdentifier.CreateUnsafe(null), MetadataIdentifier.CreateUnsafe(null), true},
-                {MetadataIdentifier.CreateUnsafe(null), MetadataIdentifier.CreateUnsafe(""), false},
+                {new MetadataIdentifier("045"), new MetadataIdentifier("45"), false},
+                {new MetadataIdentifier("2147483648"), new MetadataIdentifier("2147483648"), true}, // int.MaxValue + 1
+                {default, default, true},
 #pragma warning disable CS0612 // Type or member is obsolete
+                {default, MetadataIdentifier.CreateLoose(""), false},
                 {MetadataIdentifier.CreateLoose(""), MetadataIdentifier.CreateLoose(""), true},
+                {MetadataIdentifier.CreateLoose("@"), MetadataIdentifier.CreateLoose("@"), true},
+                // CreateLoose creates identifiers equal to the regular constructor
                 {MetadataIdentifier.CreateLoose("loose"), new MetadataIdentifier("loose"), true},
-                {MetadataIdentifier.CreateLoose("045"), MetadataIdentifier.CreateLoose("45"), false},
                 {MetadataIdentifier.CreateLoose("10053"), new MetadataIdentifier("10053"), true},
-                {MetadataIdentifier.CreateLoose("2147483648"), MetadataIdentifier.CreateLoose("2147483648"), true}, // int.MaxValue + 1
 #pragma warning restore CS0612 // Type or member is obsolete
             };
 
-        #region Equality
         [Theory]
         [MemberData(nameof(EqualityCases))]
         public void EqualsMetadataIdentifier(MetadataIdentifier left, MetadataIdentifier right, bool expected)
@@ -184,6 +186,7 @@ namespace Semver.Test
         [InlineData("aa", "ab", -1)]
         [InlineData("ab", "aa", 1)]
         [InlineData("01", "1", -1)]
+        [InlineData("001", "01", -1)]
         [InlineData("beta", "rc", -1)] // Case that causes -16 for string comparison
         public void CompareTo(string left, string right, int expected)
         {
