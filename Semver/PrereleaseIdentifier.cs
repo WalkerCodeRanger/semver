@@ -147,8 +147,8 @@ namespace Semver
 
         public override int GetHashCode()
         {
-            if (IntValue is int value) return HashCodes.Combine(value);
-            return HashCodes.Combine(Value);
+            if (IntValue is int value) return CombinedHashCode.Create(value);
+            return CombinedHashCode.Create(Value);
         }
 
         public static bool operator ==(PrereleaseIdentifier left, PrereleaseIdentifier right)

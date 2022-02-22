@@ -5,19 +5,19 @@ namespace Semver.Utility
 {
     /// <summary>
     /// Combine hash codes in a good way since <c>System.HashCode</c> isn't available.
-    /// Tries to follow the same add API to make transition easy later.
+    /// Has a similar API to make transition easy later.
     /// </summary>
     /// <remarks>Algorithm based on HashHelpers previously used in the core CLR.
     /// https://github.com/dotnet/coreclr/blob/456afea9fbe721e57986a21eb3b4bb1c9c7e4c56/src/System.Private.CoreLib/shared/System/Numerics/Hashing/HashHelpers.cs
     /// </remarks>
-    internal static class HashCodes
+    internal static class CombinedHashCode
     {
         private static readonly int RandomSeed = new Random().Next(int.MinValue, int.MaxValue);
 
-        public static int Combine<T1>(T1 value1)
+        public static int Create<T1>(T1 value1)
             => CombineValue(RandomSeed, value1);
 
-        public static int Combine<T1, T2, T3, T4, T5>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5)
+        public static int Create<T1, T2, T3, T4, T5>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5)
         {
             var hash = RandomSeed;
             hash = CombineValue(hash, value1);

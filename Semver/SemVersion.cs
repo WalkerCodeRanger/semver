@@ -829,7 +829,7 @@ namespace Semver
         /// and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
-            => HashCodes.Combine(Major, Minor, Patch, Prerelease, Metadata);
+            => CombinedHashCode.Create(Major, Minor, Patch, Prerelease, Metadata);
 
 #if SERIALIZABLE
         /// <summary>
