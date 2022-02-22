@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Semver.Utility;
 
 namespace Semver.Comparers
 {
@@ -22,9 +23,26 @@ namespace Semver.Comparers
                    && Equals(x.PrereleaseIdentifiers, y.PrereleaseIdentifiers);
         }
 
-        public int GetHashCode(SemVersion obj)
+        private static bool Equals(
+            IReadOnlyList<PrereleaseIdentifier> xIdentifiers,
+            IReadOnlyList<PrereleaseIdentifier> yIdentifiers)
         {
-            throw new NotImplementedException();
+            if (xIdentifiers.Count != yIdentifiers.Count) return false;
+
+            for (int i = 0; i < xIdentifiers.Count; i++)
+                if (xIdentifiers[i] != yIdentifiers[i])
+                    return false;
+
+            return true;
+        }
+
+        public int GetHashCode(SemVersion v)
+        {
+            var hash = CombinedHashCode.Create(v.Major, v.Minor, v.Patch);
+            foreach (var identifier in v.PrereleaseIdentifiers)
+                hash.Add(identifier);
+
+            return hash;
         }
 
         public override int Compare(SemVersion x, SemVersion y)
