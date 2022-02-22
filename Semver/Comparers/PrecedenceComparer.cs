@@ -17,9 +17,7 @@ namespace Semver.Comparers
             if (ReferenceEquals(x, y)) return true;
             if (x is null || y is null) return false;
 
-            return x.Major == y.Major
-                   && x.Minor == y.Minor
-                   && x.Patch == y.Patch
+            return x.Major == y.Major && x.Minor == y.Minor && x.Patch == y.Patch
                    && Equals(x.PrereleaseIdentifiers, y.PrereleaseIdentifiers);
         }
 
@@ -64,9 +62,11 @@ namespace Semver.Comparers
             var yPrereleaseIdentifiers = y.PrereleaseIdentifiers;
 
             // Release are higher precedence than prerelease
-            if (xPrereleaseIdentifiers.Count == 0 && yPrereleaseIdentifiers.Count == 0) return 0;
-            if (xPrereleaseIdentifiers.Count == 0) return 1;
-            if (yPrereleaseIdentifiers.Count == 0) return -1;
+            var xIsRelease = xPrereleaseIdentifiers.Count == 0;
+            var yIsRelease = yPrereleaseIdentifiers.Count == 0;
+            if (xIsRelease && yIsRelease) return 0;
+            if (xIsRelease) return 1;
+            if (yIsRelease) return -1;
 
             var minLength = Math.Min(xPrereleaseIdentifiers.Count, yPrereleaseIdentifiers.Count);
             for (int i = 0; i < minLength; i++)

@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using Semver.Comparers;
 using Xunit;
 
 namespace Semver.Test.Comparers
 {
-    public class PrecedenceComparerTests
+    public class SortComparerTests
     {
-        private static readonly ISemVersionComparer Comparer = PrecedenceComparer.Instance;
+        private static readonly ISemVersionComparer Comparer = SortComparer.Instance;
 
         #region Equals
         [Fact]
@@ -34,14 +33,7 @@ namespace Semver.Test.Comparers
         public void EqualsDifferentTest()
         {
             foreach (var (v1, v2) in ComparerTestData.VersionPairs)
-            {
-                var expected = EqualPrecedence(v1, v2);
-                var actual = Comparer.Equals(v1, v2);
-                if (expected)
-                    Assert.True(actual, $"Equals({v1}, {v2})");
-                else
-                    Assert.False(actual, $"Equals({v1}, {v2})");
-            }
+                Assert.False(Comparer.Equals(v1, v2), $"Equals({v1}, {v2})");
         }
 
         [Fact]
@@ -74,14 +66,8 @@ namespace Semver.Test.Comparers
         public void GetHashCodeDifferentTest()
         {
             foreach (var (v1, v2) in ComparerTestData.VersionPairs)
-            {
-                var expected = EqualPrecedence(v1, v2);
-                var actual = Comparer.GetHashCode(v1) == Comparer.GetHashCode(v2);
-                if (expected)
-                    Assert.True(actual, $"GetHashCode({v1}) == GetHashCode({v2})");
-                else
-                    Assert.False(actual, $"GetHashCode({v1}) == GetHashCode({v2})");
-            }
+                Assert.False(Comparer.GetHashCode(v1) == Comparer.GetHashCode(v2),
+                    $"GetHashCode({v1}) == GetHashCode({v2})");
         }
         #endregion
 
@@ -110,26 +96,14 @@ namespace Semver.Test.Comparers
         public void CompareGreaterTest()
         {
             foreach (var (v1, v2) in ComparerTestData.VersionPairs)
-            {
-                var equal = EqualPrecedence(v1, v2);
-                if (equal)
-                    Assert.True(Comparer.Compare(v1, v2) == 0, $"Compare({v1}, {v2}) == 0");
-                else
-                    Assert.True(Comparer.Compare(v1, v2) == -1, $"Compare({v1}, {v2}) == -1");
-            }
+                Assert.True(Comparer.Compare(v1, v2) == -1, $"Compare({v1}, {v2}) == -1");
         }
 
         [Fact]
         public void CompareLesserTest()
         {
             foreach (var (v1, v2) in ComparerTestData.VersionPairs)
-            {
-                var equal = EqualPrecedence(v1, v2);
-                if (equal)
-                    Assert.True(Comparer.Compare(v2, v1) == 0, $"Compare({v2}, {v1}) == 0");
-                else
-                    Assert.True(Comparer.Compare(v2, v1) == 1, $"Compare({v2}, {v1}) == 1");
-            }
+                Assert.True(Comparer.Compare(v2, v1) == 1, $"Compare({v2}, {v1}) == 1");
         }
 
         [Fact]
@@ -153,26 +127,5 @@ namespace Semver.Test.Comparers
             Assert.True(Comparer.Compare(null, null) == 0, "Compare(null, null) == 0");
         }
         #endregion
-
-        private static bool EqualPrecedence(SemVersion v1, SemVersion v2)
-        {
-            return v1.Major == v2.Major
-                   && v1.Minor == v2.Minor
-                   && v1.Patch == v2.Patch
-                   && EqualPrecedence(v1.PrereleaseIdentifiers, v2.PrereleaseIdentifiers);
-        }
-
-        private static bool EqualPrecedence(
-            IReadOnlyList<PrereleaseIdentifier> xIdentifiers,
-            IReadOnlyList<PrereleaseIdentifier> yIdentifiers)
-        {
-            if (xIdentifiers.Count != yIdentifiers.Count) return false;
-
-            for (int i = 0; i < xIdentifiers.Count; i++)
-                if (xIdentifiers[i] != yIdentifiers[i])
-                    return false;
-
-            return true;
-        }
     }
 }
