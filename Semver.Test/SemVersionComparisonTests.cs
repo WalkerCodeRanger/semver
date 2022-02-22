@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Semver.Test.Comparers;
 using Xunit;
 
 namespace Semver.Test
@@ -11,15 +12,15 @@ namespace Semver.Test
     /// <see cref="SemVersion.GetHashCode()"/> because this is connected to equality.
     ///
     /// Because it is possible to construct invalid semver versions, the comparison
-    /// tests must be based of constructing <see cref="SemVersion"/> rather than just
-    /// using semver strings. The approach used it to work from a list of versions
+    /// tests must be based off constructing <see cref="SemVersion"/> rather than just
+    /// using semver strings. The approach used is to work from a list of versions
     /// in their correct order and then compare versions within the list. To
     /// avoid issues with xUnit serialization of <see cref="SemVersion"/>, this
     /// is done within the test rather than using theory data.
     /// </summary>
     public class SemVersionComparisonTests
     {
-        public static readonly IReadOnlyList<SemVersion> VersionsInOrder = new List<SemVersion>()
+        public static readonly IReadOnlyList<SemVersion> VersionsInSortOrder = new List<SemVersion>()
         {
 #pragma warning disable CS0618 // Type or member is obsolete
             new SemVersion(-2),
@@ -36,8 +37,10 @@ namespace Semver.Test
             new SemVersion(0, 0, 1, "gamma.12.87"),
             new SemVersion(0, 0, 1, "gamma.12.87.1"),
             new SemVersion(0, 0, 1, "gamma.12.87.99"),
+            new SemVersion(0, 0, 1, "gamma.12.87.-"),
             new SemVersion(0, 0, 1, "gamma.12.87.X"),
             new SemVersion(0, 0, 1, "gamma.12.88"),
+            new SemVersion(0, 0, 1),
             new SemVersion(0, 0, 1, "", "12"),
             new SemVersion(0, 0, 1, "", "."),
             new SemVersion(0, 0, 1, "", ".."),
@@ -46,6 +49,7 @@ namespace Semver.Test
             new SemVersion(0, 0, 1, "", "build.12"),
             new SemVersion(0, 0, 1, "", "build.12.2"),
             new SemVersion(0, 0, 1, "", "build.13"),
+            new SemVersion(0, 0, 1, "", "build.-"),
             new SemVersion(0, 0, 1, "", "uiui"),
             new SemVersion(0, 1, 1),
             new SemVersion(0, 2, 1),
@@ -53,6 +57,7 @@ namespace Semver.Test
             new SemVersion(1, 0, 0, "alpha", "dev.123"),
             new SemVersion(1, 0, 0, "alpha", "😞"),
             new SemVersion(1, 0, 0, "alpha.1"),
+            new SemVersion(1, 0, 0, "alpha.-"),
             new SemVersion(1, 0, 0, "alpha.beta"),
             new SemVersion(1, 0, 0, "beta"),
             new SemVersion(1, 0, 0, "beta", "dev.123"),
@@ -61,6 +66,7 @@ namespace Semver.Test
             new SemVersion(1, 0, 0, "rc.1"),
             new SemVersion(1, 0, 0, "😞"),
             new SemVersion(1),
+            new SemVersion(1, 0, 0, "", "CA6B10F"),
             new SemVersion(1, 0, 10, "alpha"),
             new SemVersion(1, 2, 0, "alpha", "dev"),
             new SemVersion(1, 2, 0, "nightly"),
@@ -68,9 +74,11 @@ namespace Semver.Test
             new SemVersion(1, 2, 0, "nightly2"),
             new SemVersion(1, 2),
             new SemVersion(1, 2, 0, "", "nightly"),
+            new SemVersion(1, 2, 1, "-1"), // Doesn't match spec (issue #69)
             new SemVersion(1, 2, 1, "0"),
             new SemVersion(1, 2, 1, "99"),
             new SemVersion(1, 2, 1, "-"),
+            new SemVersion(1, 2, 1, "-a"),
             new SemVersion(1, 2, 1, "0A"),
             new SemVersion(1, 2, 1, "A"),
             new SemVersion(1, 2, 1, "a"),
@@ -82,14 +90,14 @@ namespace Semver.Test
 #pragma warning restore CS0618 // Type or member is obsolete
         }.AsReadOnly();
 
-        public static readonly IReadOnlyList<(SemVersion, SemVersion)> VersionPairs =
-            AllPairs(VersionsInOrder).ToList().AsReadOnly();
+        public static readonly IReadOnlyList<(SemVersion, SemVersion)> VersionPairs
+            = ComparerTestData.AllPairs(VersionsInSortOrder).ToList().AsReadOnly();
 
         #region Equals
         [Fact]
         public void EqualsIdenticalTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -102,7 +110,7 @@ namespace Semver.Test
         [Fact]
         public void EqualsSameTest()
         {
-            foreach (var version in VersionsInOrder)
+            foreach (var version in VersionsInSortOrder)
                 Assert.True(version.Equals(version), version.ToString());
         }
 
@@ -148,7 +156,7 @@ namespace Semver.Test
         [Fact]
         public void EqualsNullTest()
         {
-            foreach (var version in VersionsInOrder)
+            foreach (var version in VersionsInSortOrder)
                 Assert.False(version.Equals(null), version.ToString());
         }
 
@@ -180,7 +188,7 @@ namespace Semver.Test
         [Fact]
         public void GetHashCodeOfEqualTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -202,7 +210,7 @@ namespace Semver.Test
         [Fact]
         public void CompareToIdenticalTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -215,7 +223,7 @@ namespace Semver.Test
         [Fact]
         public void CompareToSameTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
                 Assert.True(v.CompareTo(v) == 0, v.ToString());
         }
 
@@ -306,7 +314,7 @@ namespace Semver.Test
         [Fact]
         public void CompareToNullTest()
         {
-            foreach (var version in VersionsInOrder)
+            foreach (var version in VersionsInSortOrder)
                 Assert.True(version.CompareTo(null) > 0, version.ToString());
         }
 
@@ -329,7 +337,7 @@ namespace Semver.Test
         [Fact]
         public void PrecedenceMatchesIdenticalTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -342,7 +350,7 @@ namespace Semver.Test
         [Fact]
         public void PrecedenceMatchesSameTest()
         {
-            foreach (var version in VersionsInOrder)
+            foreach (var version in VersionsInSortOrder)
                 Assert.True(version.PrecedenceMatches(version), version.ToString());
         }
 
@@ -391,7 +399,7 @@ namespace Semver.Test
         [Fact]
         public void PrecedenceMatchesNullTest()
         {
-            foreach (var version in VersionsInOrder)
+            foreach (var version in VersionsInSortOrder)
                 Assert.False(version.PrecedenceMatches(null), version.ToString());
         }
         #endregion
@@ -400,7 +408,7 @@ namespace Semver.Test
         [Fact]
         public void CompareByPrecedenceIdenticalTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -413,7 +421,7 @@ namespace Semver.Test
         [Fact]
         public void CompareByPrecedenceSameTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
                 Assert.True(v.CompareByPrecedence(v) == 0, v.ToString());
         }
 
@@ -422,9 +430,9 @@ namespace Semver.Test
         {
             foreach (var (v1, v2) in VersionPairs)
                 if (DifferByMetadataOnly(v1, v2))
-                    Assert.True(v1.CompareByPrecedence(v2) == 0, $"({v1}).CompareTo({v2})");
+                    Assert.True(v1.CompareByPrecedence(v2) == 0, $"({v1}).CompareByPrecedence({v2}) == 0");
                 else
-                    Assert.True(v1.CompareByPrecedence(v2) < 0, $"({v1}).CompareTo({v2})");
+                    Assert.True(v1.CompareByPrecedence(v2) < 0, $"({v1}).CompareByPrecedence({v2}) < 0");
         }
 
         [Fact]
@@ -432,9 +440,9 @@ namespace Semver.Test
         {
             foreach (var (v1, v2) in VersionPairs)
                 if (DifferByMetadataOnly(v1, v2))
-                    Assert.True(v2.CompareByPrecedence(v1) == 0, $"({v2}).CompareTo({v1})");
+                    Assert.True(v2.CompareByPrecedence(v1) == 0, $"({v2}).CompareByPrecedence({v1}) == 0");
                 else
-                    Assert.True(v2.CompareByPrecedence(v1) > 0, $"({v2}).CompareTo({v1})");
+                    Assert.True(v2.CompareByPrecedence(v1) > 0, $"({v2}).CompareByPrecedence({v1}) > 0");
         }
 
         [Theory]
@@ -489,7 +497,7 @@ namespace Semver.Test
         [Fact]
         public void CompareByPrecedenceNullTest()
         {
-            foreach (var version in VersionsInOrder)
+            foreach (var version in VersionsInSortOrder)
                 Assert.True(version.CompareByPrecedence(null) > 0, version.ToString());
         }
         #endregion
@@ -498,7 +506,7 @@ namespace Semver.Test
         [Fact]
         public void EqualsOperatorIdenticalTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -511,7 +519,7 @@ namespace Semver.Test
         [Fact]
         public void EqualsOperatorSameTest()
         {
-            foreach (var version in VersionsInOrder)
+            foreach (var version in VersionsInSortOrder)
 #pragma warning disable CS1718 // Comparison made to same variable
                 Assert.True(version == version, version.ToString());
 #pragma warning restore CS1718 // Comparison made to same variable
@@ -559,7 +567,7 @@ namespace Semver.Test
         [Fact]
         public void EqualsOperatorNullTest()
         {
-            foreach (var version in VersionsInOrder)
+            foreach (var version in VersionsInSortOrder)
                 Assert.False(version == null, version.ToString());
         }
 
@@ -580,7 +588,7 @@ namespace Semver.Test
         [Fact]
         public void NotEqualsOperatorIdenticalTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -593,7 +601,7 @@ namespace Semver.Test
         [Fact]
         public void NotEqualsOperatorSameTest()
         {
-            foreach (var version in VersionsInOrder)
+            foreach (var version in VersionsInSortOrder)
 #pragma warning disable CS1718 // Comparison made to same variable
                 Assert.False(version != version, version.ToString());
 #pragma warning restore CS1718 // Comparison made to same variable
@@ -641,7 +649,7 @@ namespace Semver.Test
         [Fact]
         public void NotEqualsOperatorNullTest()
         {
-            foreach (var version in VersionsInOrder)
+            foreach (var version in VersionsInSortOrder)
                 Assert.True(version != null, version.ToString());
         }
 
@@ -662,7 +670,7 @@ namespace Semver.Test
         [Fact]
         public void ComparisonOperatorsIdenticalTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -678,7 +686,7 @@ namespace Semver.Test
         [Fact]
         public void ComparisonOperatorsSameTest()
         {
-            foreach (var v in VersionsInOrder)
+            foreach (var v in VersionsInSortOrder)
             {
 #pragma warning disable CS1718 // Comparison made to same variable
                 Assert.False(v < v, $"{v} < {v}");
@@ -785,13 +793,6 @@ namespace Semver.Test
             Assert.True(v1 >= v2, $"{v1} >= {v2}");
         }
         #endregion
-
-        private static IEnumerable<(SemVersion, SemVersion)> AllPairs(IReadOnlyList<SemVersion> versions)
-        {
-            for (var i = 0; i < versions.Count; i++)
-                for (var j = i + 1; j < versions.Count; j++)
-                    yield return (versions[i], versions[j]);
-        }
 
         private static bool DifferByMetadataOnly(SemVersion v1, SemVersion v2)
         {

@@ -62,6 +62,12 @@ namespace Semver.Comparers
 
             var xPrereleaseIdentifiers = x.PrereleaseIdentifiers;
             var yPrereleaseIdentifiers = y.PrereleaseIdentifiers;
+
+            // Release are higher precedence than prerelease
+            if (xPrereleaseIdentifiers.Count == 0 && yPrereleaseIdentifiers.Count == 0) return 0;
+            if (xPrereleaseIdentifiers.Count == 0) return 1;
+            if (yPrereleaseIdentifiers.Count == 0) return -1;
+
             var minLength = Math.Min(xPrereleaseIdentifiers.Count, yPrereleaseIdentifiers.Count);
             for (int i = 0; i < minLength; i++)
             {
