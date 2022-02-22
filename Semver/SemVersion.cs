@@ -301,9 +301,7 @@ namespace Semver
         /// otherwise they are optional.</param>
         /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
         [Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static bool TryParse(string version, out SemVersion semver, bool strict = false)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             semver = null;
             if (version is null) return false;
