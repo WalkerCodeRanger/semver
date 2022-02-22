@@ -1,1 +1,1 @@
-﻿
+﻿Semver.Comparers.ISemVersionComparer
