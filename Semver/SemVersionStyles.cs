@@ -3,15 +3,17 @@
 namespace Semver
 {
     /// <summary>
-    /// Determines the styles that are allowed in version strings passed to the
-    /// <c>Parse</c> and <c>TryParse</c> methods of <see cref="SemVersion"/>.
+    /// <para>Determines the styles that are allowed in version strings passed to the
+    /// <see cref="SemVersion.Parse(string,SemVersionStyles,int)"/> and <see cref="SemVersion.TryParse(string,SemVersionStyles,out SemVersion,int)"/>
+    /// <c>Parse</c> and <c>TryParse</c> methods of <see cref="SemVersion"/>.</para>
+    ///
+    /// <para>This enumeration supports a bitwise combination of its member values.</para>
     /// </summary>
     [Flags]
     public enum SemVersionStyles
     {
         /// <summary>
-        /// Accept version strings strictly conforming to the latest supported SemVer spec.
-        /// Currently, that is SemVer 2.0.0.
+        /// Accept version strings strictly conforming to the SemVer 2.0 spec.
         /// </summary>
         Strict = 0,
 
@@ -65,9 +67,9 @@ namespace Semver
         /// <summary>
         /// Accept any version string format supported.
         /// </summary>
-        /// <remarks>This is a composite semantic version style.
+        /// <remarks><para>This is a composite semantic version style.</para>
         ///
-        /// The formats accepted by this style will change when more formats are supported.</remarks>
+        /// <para>The formats accepted by this style will change when more formats are supported.</para></remarks>
         Any = unchecked((int)0xFFFF_FFFF),
     }
 }
