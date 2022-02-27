@@ -287,7 +287,7 @@ namespace Semver.Test
                 => CreateLooseOrDefault(value).CompareTo(new object()));
 
             Assert.StartsWith("Object must be of type PrereleaseIdentifier.", ex.Message);
-            Assert.Equal("obj", ex.ParamName);
+            Assert.Equal("value", ex.ParamName);
         }
         #endregion
 

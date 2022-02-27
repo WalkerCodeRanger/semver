@@ -136,14 +136,14 @@ namespace Semver
         }
 
         #region Equality
-        public bool Equals(PrereleaseIdentifier other)
+        public bool Equals(PrereleaseIdentifier value)
         {
-            if (IntValue is int value) return value == other.IntValue;
-            return Value == other.Value;
+            if (IntValue is int intValue) return intValue == value.IntValue;
+            return Value == value.Value;
         }
 
-        public override bool Equals(object obj)
-            => obj is PrereleaseIdentifier other && Equals(other);
+        public override bool Equals(object value)
+            => value is PrereleaseIdentifier other && Equals(other);
 
         public override int GetHashCode()
         {
@@ -159,43 +159,31 @@ namespace Semver
         #endregion
 
         #region Comparison
-        public int CompareTo(PrereleaseIdentifier other)
+        public int CompareTo(PrereleaseIdentifier value)
         {
             // Handle the fact that numeric identifiers are always less than alphanumeric
             // and numeric identifiers are compared equal even with leading zeros.
-            if (IntValue is int value)
+            if (IntValue is int intValue)
             {
-                if (other.IntValue is int otherValue)
-                    return value.CompareTo(otherValue);
+                if (value.IntValue is int otherValue)
+                    return intValue.CompareTo(otherValue);
 
                 return -1;
             }
 
-            if (other.IntValue != null)
+            if (value.IntValue != null)
                 return 1;
 
-            return IdentifierString.Compare(Value, other.Value);
+            return IdentifierString.Compare(Value, value.Value);
         }
 
-        public int CompareTo(object obj)
+        public int CompareTo(object value)
         {
-            if (obj is null) return 1;
-            return obj is PrereleaseIdentifier other
+            if (value is null) return 1;
+            return value is PrereleaseIdentifier other
                 ? CompareTo(other)
-                : throw new ArgumentException($"Object must be of type {nameof(PrereleaseIdentifier)}.", nameof(obj));
+                : throw new ArgumentException($"Object must be of type {nameof(PrereleaseIdentifier)}.", nameof(value));
         }
-
-        public static bool operator <(PrereleaseIdentifier left, PrereleaseIdentifier right)
-            => left.CompareTo(right) < 0;
-
-        public static bool operator >(PrereleaseIdentifier left, PrereleaseIdentifier right)
-            => left.CompareTo(right) > 0;
-
-        public static bool operator <=(PrereleaseIdentifier left, PrereleaseIdentifier right)
-            => left.CompareTo(right) <= 0;
-
-        public static bool operator >=(PrereleaseIdentifier left, PrereleaseIdentifier right)
-            => left.CompareTo(right) >= 0;
         #endregion
 
         public static implicit operator string(PrereleaseIdentifier prereleaseIdentifier)

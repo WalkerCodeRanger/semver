@@ -4,16 +4,37 @@ using Semver.Utility;
 
 namespace Semver
 {
-    // TODO Doc Comment
+    /// <summary>
+    /// An individual metadata identifier for a semantic version.
+    /// </summary>
+    /// <remarks>
+    /// <para>The metadata for a semantic version is composed of dot ('<c>.</c>') separated identifiers.
+    /// A valid identifier is a non-empty string of ASCII alphanumeric and hyphen characters
+    /// (<c>[0-9A-Za-z-]</c>). Metadata identifiers are compared lexically in ASCII sort order.</para>
+    ///
+    /// <para>Because <see cref="MetadataIdentifier"/> is a <see langword="struct"/>, the
+    /// <see langword="default"/> value is a <see cref="MetadataIdentifier"/> with a <see langword="null"/>
+    /// value. However, the <see cref="Semver"/> namespace types do not accept and will not return
+    /// such a <see cref="MetadataIdentifier"/>.</para>
+    ///
+    /// <para>Invalid metadata identifiers including arbitrary Unicode characters and empty string can
+    /// currently be produced by the <see cref="SemVersion(int, int, int, string, string)"/>
+    /// constructor. Such identifiers are compared via an ordinal string comparision.</para>
+    /// </remarks>
     public readonly struct MetadataIdentifier : IEquatable<MetadataIdentifier>, IComparable<MetadataIdentifier>, IComparable
     {
-        // TODO Doc Comment
+        /// <summary>
+        /// The value of the metadata identifier.
+        /// </summary>
+        /// <value>The string value of this metadata identifier or <see langword="null"/> if this is
+        /// a <see langword="default"/> <see cref="MetadataIdentifier"/>.</value>
         public string Value { get; }
 
         /// <summary>
-        /// Construct a metadata identifier and be loose in what is accepted.
+        /// Construct a potentially invalid <see cref="MetadataIdentifier"/>.
         /// </summary>
-        /// <remarks>This should be used only by the <see cref="SemVersion"/> constructor which
+        /// <exception cref="ArgumentNullException">The <paramref name="value"/> parameter is <see langword="null"/>.</exception>
+        /// <remarks>This should only be used by the <see cref="SemVersion"/> constructor which
         /// still accepts illegal values.</remarks>
         [Obsolete]
         internal static MetadataIdentifier CreateLoose(string value)
@@ -23,7 +44,7 @@ namespace Semver
         }
 
         /// <summary>
-        /// Construct a <see cref="MetadataIdentifier"/> without checking that any of the invariants
+        /// Constructs a <see cref="MetadataIdentifier"/> without checking that any of the invariants
         /// hold. Used by the parser for performance.
         /// </summary>
         /// <remarks>This is a create method rather than a constructor to clearly indicate uses
@@ -53,17 +74,25 @@ namespace Semver
             Value = value;
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Constructs a valid <see cref="MetadataIdentifier"/>.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">The <paramref name="value"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">The <paramref name="value"/> is empty or contains invalid characters
+        /// (i.e. characters that are not ASCII alphanumerics or hyphens.</exception>
         public MetadataIdentifier(string value)
             : this(value, nameof(value))
         {
         }
 
         /// <summary>
+        /// Constructs a valid <see cref="MetadataIdentifier"/>.
+        /// </summary>
+        /// <remarks>
         /// Internal constructor allows changing the parameter name to enable methods using this
         /// as part of their prerelease identifier validation to match the parameter name to their
         /// parameter name.
-        /// </summary>
+        /// </remarks>
         internal MetadataIdentifier(string value, string paramName)
         {
             if (value is null)
@@ -77,48 +106,122 @@ namespace Semver
         }
 
         #region Equality
-        public bool Equals(MetadataIdentifier other) => Value == other.Value;
+        /// <summary>
+        /// Determines whether two identifiers are equal.
+        /// </summary>
+        /// <returns><see langword="true"/> if <paramref name="value"/> is equal to the this identifier;
+        /// otherwise <see langword="false"/>.</returns>
+        public bool Equals(MetadataIdentifier value) => Value == value.Value;
 
-        public override bool Equals(object obj)
-            => obj is MetadataIdentifier other && Equals(other);
+        /// <summary>Determines whether the given object is equal to this identifier.</summary>
+        /// <returns><see langword="true"/> if <paramref name="value"/> is equal to the this identifier;
+        /// otherwise <see langword="false"/>.</returns>
+        public override bool Equals(object value)
+            => value is MetadataIdentifier other && Equals(other);
 
+        /// <summary>Gets a hash code for this identifier.</summary>
+        /// <returns>A hash code for this identifier.</returns>
         public override int GetHashCode() => CombinedHashCode.Create(Value);
 
+        /// <summary>
+        /// Determines whether two identifiers are equal.
+        /// </summary>
+        /// <returns><see langword="true"/> if the value of <paramref name="left"/> is the same as
+        /// the value of <paramref name="right"/>; otherwise <see langword="false"/>.</returns>
         public static bool operator ==(MetadataIdentifier left, MetadataIdentifier right)
             => left.Value == right.Value;
 
+        /// <summary>
+        /// Determines whether two identifiers are not equal.
+        /// </summary>
+        /// <returns><see langword="true"/> if the value of <paramref name="left"/> is different
+        /// from the value of <paramref name="right"/>; otherwise <see langword="false"/>.</returns>
         public static bool operator !=(MetadataIdentifier left, MetadataIdentifier right)
             => left.Value != right.Value;
         #endregion
 
         #region Comparison
-        public int CompareTo(MetadataIdentifier other)
-            => IdentifierString.Compare(Value, other.Value);
+        /// <summary>
+        /// Compares two identifiers and indicates whether this instance precedes, follows, or is
+        /// equal to the other in sort order.
+        /// </summary>
+        /// <returns>
+        /// An integer that indicates whether this instance precedes, follows, or is equal to
+        /// <paramref name="value"/> in sort order.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Value</term>
+        ///         <description>Condition</description>
+        ///     </listheader>
+        ///     <item>
+        ///          <term>-1</term>
+        ///          <description>This instance precedes <paramref name="value"/>.</description>
+        ///     </item>
+        ///     <item>
+        ///          <term>0</term>
+        ///          <description>This instance is equal to <paramref name="value"/>.</description>
+        ///     </item>
+        ///     <item>
+        ///          <term>1</term>
+        ///          <description>This instance follows <paramref name="value"/>.</description>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <remarks>Identifiers are compared lexically in ASCII sort order.</remarks>
+        public int CompareTo(MetadataIdentifier value)
+            => IdentifierString.Compare(Value, value.Value);
 
-        public int CompareTo(object obj)
+        /// <summary>
+        /// Compares this identifier to an <see cref="Object"/> and indicates whether this instance
+        /// precedes, follows, or is equal to the object in sort order.
+        /// </summary>
+        /// <returns>
+        /// An integer that indicates whether this instance precedes, follows, or is equal to
+        /// <paramref name="value"/> in sort order.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Value</term>
+        ///         <description>Condition</description>
+        ///     </listheader>
+        ///     <item>
+        ///          <term>-1</term>
+        ///          <description>This instance precedes <paramref name="value"/>.</description>
+        ///     </item>
+        ///     <item>
+        ///          <term>0</term>
+        ///          <description>This instance is equal to <paramref name="value"/>.</description>
+        ///     </item>
+        ///     <item>
+        ///          <term>1</term>
+        ///          <description>This instance follows <paramref name="value"/> or <paramref name="value"/>
+        ///                         is <see langword="null"/>.</description>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <exception cref="ArgumentException"><paramref name="value"/> is not a <see cref="MetadataIdentifier"/>.</exception>
+        /// <remarks>Identifiers are compared lexically in ASCII sort order.</remarks>
+        public int CompareTo(object value)
         {
-            if (obj is null) return 1;
-            return obj is MetadataIdentifier other
+            if (value is null) return 1;
+            return value is MetadataIdentifier other
                 ? CompareTo(other)
-                : throw new ArgumentException($"Object must be of type {nameof(MetadataIdentifier)}.", nameof(obj));
+                : throw new ArgumentException($"Object must be of type {nameof(MetadataIdentifier)}.", nameof(value));
         }
-
-        public static bool operator <(MetadataIdentifier left, MetadataIdentifier right)
-            => left.CompareTo(right) < 0;
-
-        public static bool operator >(MetadataIdentifier left, MetadataIdentifier right)
-            => left.CompareTo(right) > 0;
-
-        public static bool operator <=(MetadataIdentifier left, MetadataIdentifier right)
-            => left.CompareTo(right) <= 0;
-
-        public static bool operator >=(MetadataIdentifier left, MetadataIdentifier right)
-            => left.CompareTo(right) >= 0;
         #endregion
 
+        /// <summary>
+        /// Converts this identifier into an equivalent string value.
+        /// </summary>
+        /// <returns>The string <see cref="Value"/> of this identifier or <see langword="null"/> if this is
+        /// a <see langword="default"/> <see cref="MetadataIdentifier"/></returns>
         public static implicit operator string(MetadataIdentifier metadataIdentifier)
             => metadataIdentifier.Value;
 
+        /// <summary>
+        /// Converts this identifier into an equivalent string value.
+        /// </summary>
+        /// <returns>The string <see cref="Value"/> of this identifier or <see langword="null"/> if this is
+        /// a <see langword="default"/> <see cref="MetadataIdentifier"/></returns>
         public override string ToString() => Value;
     }
 }

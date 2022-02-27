@@ -14,6 +14,7 @@ The package strictly follows semantic versioning. No breaking changes are to be 
 
 * Follow the convention of existing, non-obsolete code.
 * This library has many users, make sure to cover all edge cases.
+* Provide clear doc comments for all public and protected members using the [recommended XML tags for C# documentation comments](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/recommended-tags).
 * Internal unsafe methods that do not validate arguments should validate them in debug builds.
   * Use `#if DEBUG` instead of `Debug.Assert()` because it works with unit tests.
   * Exception messages should begin "`DEBUG: `" to differentiate them from regular argument validation. This ensures that unit tests will detect when a public method argument validation only exists in debug.

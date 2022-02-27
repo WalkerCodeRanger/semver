@@ -14,7 +14,7 @@ namespace Semver
 {
     /// <summary>
     /// A semantic version number.
-    /// Conforms with v2.0.0 of semantic versioning (http://semver.org).
+    /// Conforms with v2.0.0 of semantic versioning (<a href="https://semver.org">semver.org</a>).
     /// </summary>
 #if SERIALIZABLE
     [Serializable]
@@ -79,7 +79,7 @@ namespace Semver
         /// <param name="major">The major version.</param>
         /// <param name="minor">The minor version.</param>
         /// <param name="patch">The patch version.</param>
-        /// <param name="prerelease">The prerelease version (e.g. "alpha").</param>
+        /// <param name="prerelease">The prerelease version (e.g. "alpha.5").</param>
         /// <param name="build">The build metadata (e.g. "nightly.232").</param>
         public SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "")
         {
@@ -598,6 +598,7 @@ namespace Semver
         /// be alphanumeric or numeric. Prerelease versions have lower precedence
         /// than release versions.
         /// </remarks>
+        // TODO v3.0.0 this should be null when there is no prerelease identifiers
         public string Prerelease { get; }
 
         // TODO Doc Comment
@@ -614,6 +615,7 @@ namespace Semver
         [Obsolete("This property is obsolete. Use Metadata instead.")]
         public string Build => Metadata;
 
+        /// <summary>The build metadata of this version.</summary>
         /// <value>The build metadata of this version or empty string if there
         /// is no metadata.</value>
         /// <remarks>
@@ -624,6 +626,7 @@ namespace Semver
         /// build metadata have the same precedence. However, metadata does affect
         /// sort order. A version without metadata sorts before one that has metadata.
         /// </remarks>
+        // TODO v3.0.0 this should be null when there is no metadata
         public string Metadata { get; }
 
         // TODO Doc Comment
