@@ -12,10 +12,10 @@ namespace Semver
     /// A valid identifier is a non-empty string of ASCII alphanumeric and hyphen characters
     /// (<c>[0-9A-Za-z-]</c>). Metadata identifiers are compared lexically in ASCII sort order.</para>
     ///
-    /// <para>Because <see cref="MetadataIdentifier"/> is a <see langword="struct"/>, the
-    /// <see langword="default"/> value is a <see cref="MetadataIdentifier"/> with a <see langword="null"/>
-    /// value. However, the <see cref="Semver"/> namespace types do not accept and will not return
-    /// such a <see cref="MetadataIdentifier"/>.</para>
+    /// <para>Because <see cref="MetadataIdentifier"/> is a struct, the default value is a
+    /// <see cref="MetadataIdentifier"/> with a <see langword="null"/> value. However, the
+    /// <see cref="Semver"/> namespace types do not accept and will not return such a
+    /// <see cref="MetadataIdentifier"/>.</para>
     ///
     /// <para>Invalid metadata identifiers including arbitrary Unicode characters and empty string can
     /// currently be produced by the <see cref="SemVersion(int, int, int, string, string)"/>
@@ -24,10 +24,10 @@ namespace Semver
     public readonly struct MetadataIdentifier : IEquatable<MetadataIdentifier>, IComparable<MetadataIdentifier>, IComparable
     {
         /// <summary>
-        /// The value of the metadata identifier.
+        /// The string value of the metadata identifier.
         /// </summary>
         /// <value>The string value of this metadata identifier or <see langword="null"/> if this is
-        /// a <see langword="default"/> <see cref="MetadataIdentifier"/>.</value>
+        /// a default <see cref="MetadataIdentifier"/>.</value>
         public string Value { get; }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Semver
         /// </summary>
         /// <exception cref="ArgumentNullException">The <paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The <paramref name="value"/> is empty or contains invalid characters
-        /// (i.e. characters that are not ASCII alphanumerics or hyphens.</exception>
+        /// (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         public MetadataIdentifier(string value)
             : this(value, nameof(value))
         {
@@ -212,16 +212,16 @@ namespace Semver
         /// <summary>
         /// Converts this identifier into an equivalent string value.
         /// </summary>
-        /// <returns>The string <see cref="Value"/> of this identifier or <see langword="null"/> if this is
-        /// a <see langword="default"/> <see cref="MetadataIdentifier"/></returns>
+        /// <returns>The string value of this identifier or <see langword="null"/> if this is
+        /// a default <see cref="MetadataIdentifier"/></returns>
         public static implicit operator string(MetadataIdentifier metadataIdentifier)
             => metadataIdentifier.Value;
 
         /// <summary>
         /// Converts this identifier into an equivalent string value.
         /// </summary>
-        /// <returns>The string <see cref="Value"/> of this identifier or <see langword="null"/> if this is
-        /// a <see langword="default"/> <see cref="MetadataIdentifier"/></returns>
+        /// <returns>The string value of this identifier or <see langword="null"/> if this is
+        /// a default <see cref="MetadataIdentifier"/></returns>
         public override string ToString() => Value;
     }
 }
