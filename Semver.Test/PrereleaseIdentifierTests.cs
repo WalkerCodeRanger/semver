@@ -15,6 +15,7 @@ namespace Semver.Test
         [InlineData("2147483648", null)] // int.MaxValue + 1
         [InlineData("hello@", null)]
         [InlineData("", null)]
+        [InlineData("၄", null)] // Non-ASCII digit
         public void CreateLoose(string value, int? intValue)
         {
 #pragma warning disable CS0612 // Type or member is obsolete
@@ -144,7 +145,7 @@ namespace Semver.Test
         [InlineData(int.MinValue)]
         public void ConstructWithNegativeInt(int value)
         {
-            var ex = Assert.Throws<ArgumentException>(() => new PrereleaseIdentifier(value));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new PrereleaseIdentifier(value));
 
             Assert.StartsWith($"Numeric prerelease identifiers can't be negative: {value}.", ex.Message);
             Assert.Equal("value", ex.ParamName);

@@ -34,7 +34,7 @@ namespace Semver
         /// Construct a potentially invalid <see cref="MetadataIdentifier"/>.
         /// </summary>
         /// <exception cref="ArgumentNullException">The <paramref name="value"/> parameter is <see langword="null"/>.</exception>
-        /// <remarks>This should only be used by the <see cref="SemVersion"/> constructor which
+        /// <remarks>This should only be used by the <see cref="SemVersion"/> constructor that
         /// still accepts illegal values.</remarks>
         [Obsolete]
         internal static MetadataIdentifier CreateLoose(string value)
@@ -90,7 +90,7 @@ namespace Semver
         /// </summary>
         /// <remarks>
         /// Internal constructor allows changing the parameter name to enable methods using this
-        /// as part of their prerelease identifier validation to match the parameter name to their
+        /// as part of their metadata identifier validation to match the parameter name to their
         /// parameter name.
         /// </remarks>
         internal MetadataIdentifier(string value, string paramName)
@@ -167,7 +167,8 @@ namespace Semver
         ///     </item>
         /// </list>
         /// </returns>
-        /// <remarks>Identifiers are compared lexically in ASCII sort order.</remarks>
+        /// <remarks>Identifiers are compared lexically in ASCII sort order. Invalid identifiers are
+        /// compared via an ordinal string comparision.</remarks>
         public int CompareTo(MetadataIdentifier value)
             => IdentifierString.Compare(Value, value.Value);
 
@@ -199,7 +200,8 @@ namespace Semver
         /// </list>
         /// </returns>
         /// <exception cref="ArgumentException"><paramref name="value"/> is not a <see cref="MetadataIdentifier"/>.</exception>
-        /// <remarks>Identifiers are compared lexically in ASCII sort order.</remarks>
+        /// <remarks>Identifiers are compared lexically in ASCII sort order. Invalid identifiers are
+        /// compared via an ordinal string comparision.</remarks>
         public int CompareTo(object value)
         {
             if (value is null) return 1;
