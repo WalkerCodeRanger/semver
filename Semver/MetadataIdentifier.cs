@@ -132,7 +132,7 @@ namespace Semver
             => left.Value == right.Value;
 
         /// <summary>
-        /// Determines whether two identifiers are not equal.
+        /// Determines whether two identifiers are <em>not</em> equal.
         /// </summary>
         /// <returns><see langword="true"/> if the value of <paramref name="left"/> is different
         /// from the value of <paramref name="right"/>; otherwise <see langword="false"/>.</returns>

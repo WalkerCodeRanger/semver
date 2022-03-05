@@ -76,10 +76,10 @@ namespace Semver
         /// <summary>
         /// Constructs a new instance of the <see cref="SemVersion" /> class.
         /// </summary>
-        /// <param name="major">The major version.</param>
-        /// <param name="minor">The minor version.</param>
-        /// <param name="patch">The patch version.</param>
-        /// <param name="prerelease">The prerelease version (e.g. "alpha.5").</param>
+        /// <param name="major">The major version number.</param>
+        /// <param name="minor">The minor version number.</param>
+        /// <param name="patch">The patch version number.</param>
+        /// <param name="prerelease">The prerelease portion (e.g. "alpha.5").</param>
         /// <param name="build">The build metadata (e.g. "nightly.232").</param>
         public SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "")
         {
@@ -112,13 +112,13 @@ namespace Semver
         /// Constructs a new instance of the <see cref="SemVersion"/> class from
         /// a <see cref="Version"/>.
         /// </summary>
-        /// <param name="version">The <see cref="Version"/> used to initialize
-        /// the Major, Minor, and Patch versions and the build metadata.</param>
+        /// <param name="version"><see cref="Version"/> used to initialize
+        /// the major, minor, and match version numbers and the build metadata.</param>
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is null.</exception>
         /// <remarks>Constructs a <see cref="SemVersion"/> with the same major and
-        /// minor version numbers. The patch version will be the fourth component
-        /// of the version number. The build meta data will contain the third component
-        /// of the version number if it is greater than zero.</remarks>
+        /// minor version numbers. The patch version number will be the fourth component
+        /// of the <paramref name="version"/>. The build meta data will contain the third component
+        /// of the <paramref name="version"/> if it is greater than zero.</remarks>
         [Obsolete("This constructor is obsolete. Use SemVersion.FromVersion() instead.")]
         public SemVersion(Version version)
         {
@@ -428,7 +428,7 @@ namespace Semver
         /// or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="build">The value to replace the build metadata or <see langword="null"/>
         /// to leave it unchanged.</param>
-        /// <returns>The new version.</returns>
+        /// <returns>The new version with changed properties.</returns>
         /// <remarks>
         /// The change method is intended to be called using named argument syntax, passing only
         /// those fields to be changed.
@@ -775,22 +775,7 @@ namespace Semver
         /// <value>
         /// The prerelease identifiers for this version or empty if this is a release version.
         /// </value>
-        /// <remarks>
-        /// <para>A prerelease version is denoted by appending a hyphen ('<c>-</c>')
-        /// and a series of dot separated immediately following the patch version
-        /// number. Each prerelease identifier may be numeric or alphanumeric.
-        /// Valid numeric identifiers consist of ASCII digits (<c>[0-9]</c>)
-        /// without leading zeros. Valid alphanumeric identifiers are non-empty
-        /// strings of ASCII alphanumeric and hyphen characters (<c>[0-9A-Za-z-]</c>)
-        /// with at least one non-digit character.</para>
-        ///
-        /// <para>Prerelease versions have lower precedence than release versions.
-        /// Prerelease version precedence is determined by comparing each prerelease
-        /// identifier in order from left to right. Numeric identifiers have lower
-        /// precedence than alphanumeric identifiers. Numeric identifiers are
-        /// compared numerically. Alphanumeric identifiers are compare lexically
-        /// in ASCII sort order.</para>
-        /// </remarks>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrereleaseIdentifiers"]/*'/>
         // TODO v3.0.0 this should be null when there is no prerelease identifiers
         public string Prerelease { get; }
 
@@ -798,24 +783,9 @@ namespace Semver
         /// The prerelease identifiers for this version.
         /// </summary>
         /// <value>
-        /// The prerelease identifiers for this version or empty string if this is a release version.
+        /// The prerelease identifiers for this version or empty if this is a release version.
         /// </value>
-        /// <remarks>
-        /// <para>A prerelease version is denoted by appending a hyphen ('<c>-</c>')
-        /// and a series of dot separated immediately following the patch version
-        /// number. Each prerelease identifier may be numeric or alphanumeric.
-        /// Valid numeric identifiers consist of ASCII digits (<c>[0-9]</c>)
-        /// without leading zeros. Valid alphanumeric identifiers are non-empty
-        /// strings of ASCII alphanumeric and hyphen characters (<c>[0-9A-Za-z-]</c>)
-        /// with at least one non-digit character.</para>
-        ///
-        /// <para>Prerelease versions have lower precedence than release versions.
-        /// Prerelease version precedence is determined by comparing each prerelease
-        /// identifier in order from left to right. Numeric identifiers have lower
-        /// precedence than alphanumeric identifiers. Numeric identifiers are
-        /// compared numerically. Alphanumeric identifiers are compare lexically
-        /// in ASCII sort order.</para>
-        /// </remarks>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrereleaseIdentifiers"]/*'/>
         public IReadOnlyList<PrereleaseIdentifier> PrereleaseIdentifiers { get; }
 
         /// <summary>Whether this is a prerelease version.</summary>
@@ -828,44 +798,25 @@ namespace Semver
         /// be an empty collection.</remarks>
         public bool IsPrerelease => Prerelease.Length != 0;
 
-        /// <summary>The build metadata or empty string if there is no build metadata.</summary>
+        /// <summary>The build metadata for this version.</summary>
         /// <value>
-        /// The build metadata or empty string if there is no build metadata.
+        /// The build metadata for this version or empty string if there is no build metadata.
         /// </value>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="MetadataIdentifiers"]/*'/>
         [Obsolete("This property is obsolete. Use Metadata instead.")]
         public string Build => Metadata;
 
         /// <summary>The build metadata for this version.</summary>
         /// <value>The build metadata for this version or empty string if there
         /// is no metadata.</value>
-        /// <remarks>
-        /// <para>The build metadata is a series of dot separated identifiers separated
-        /// from the rest of the version number with a plus sign ('<c>+</c>'). Valid
-        /// metadata identifiers are non-empty and consist of ASCII alphanumeric
-        /// characters and hyphens (<c>[0-9A-Za-z-]</c>).</para>
-        ///
-        /// <para>The metadata does not affect precedence. Two version numbers differing only in
-        /// build metadata have the same precedence. However, metadata does affect
-        /// sort order. An otherwise identical version without metadata sorts before
-        /// one that has metadata.</para>
-        /// </remarks>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="MetadataIdentifiers"]/*'/>
         // TODO v3.0.0 this should be null when there is no metadata
         public string Metadata { get; }
 
         /// <summary>The build metadata identifiers for this version.</summary>
         /// <value>The build metadata identifiers for this version or empty if there
         /// is no metadata.</value>
-        /// <remarks>
-        /// <para>The build metadata is a series of dot separated identifiers separated
-        /// from the rest of the version number with a plus sign ('<c>+</c>'). Valid
-        /// metadata identifiers are non-empty and consist of ASCII alphanumeric
-        /// characters and hyphens (<c>[0-9A-Za-z-]</c>).</para>
-        ///
-        /// <para>The metadata does not affect precedence. Two version numbers differing only in
-        /// build metadata have the same precedence. However, metadata does affect
-        /// sort order. An otherwise identical version without metadata sorts before
-        /// one that has metadata.</para>
-        /// </remarks>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="MetadataIdentifiers"]/*'/>
         public IReadOnlyList<MetadataIdentifier> MetadataIdentifiers { get; }
 
         /// <summary>
@@ -941,12 +892,12 @@ namespace Semver
 
         /// <summary>
         /// Compares two versions and indicates whether the first precedes, follows, or is in the same
-        /// position as the other in precedence order. Versions that differ only by build metadata
+        /// position as the other in the precedence order. Versions that differ only by build metadata
         /// have the same precedence.
         /// </summary>
         /// <returns>
         /// An integer that indicates whether this instance precedes, follows, or is in the same
-        /// position as <paramref name="other"/> in precedence order.
+        /// position as <paramref name="other"/> in the precedence order.
         /// <list type="table">
         ///     <listheader>
         ///         <term>Value</term>
@@ -954,7 +905,7 @@ namespace Semver
         ///     </listheader>
         ///     <item>
         ///         <term>Less than zero</term>
-        ///         <description>This instance precedes <paramref name="other"/> in precedence order.</description>
+        ///         <description>This instance precedes <paramref name="other"/> in the precedence order.</description>
         ///     </item>
         ///     <item>
         ///         <term>Zero</term>
@@ -963,17 +914,17 @@ namespace Semver
         ///     <item>
         ///         <term>Greater than zero</term>
         ///         <description>
-        ///             This instance follows <paramref name="other"/> in precedence order
+        ///             This instance follows <paramref name="other"/> in the precedence order
         ///             or <paramref name="other"/> is <see langword="null" />.
         ///         </description>
         ///     </item>
         /// </list>
         /// </returns>
         /// <remarks>
-        /// <para>Precedence order is determined by comparing the major, minor, patch, and portions
-        /// in order from left to right. Versions that differ only by build metadata have the same
-        /// precedence. The major, minor, and patch versions are compared numerically. A prerelease
-        /// version precedes a release version.</para>
+        /// <para>Precedence order is determined by comparing the major, minor, patch, and prerelease
+        /// portion in order from left to right. Versions that differ only by build metadata have the
+        /// same precedence. The major, minor, and patch version numbers are compared numerically. A
+        /// prerelease version precedes a release version.</para>
         ///
         /// <para>The prerelease portion is compared by comparing each prerelease identifier from
         /// left to right. Numeric prerelease identifiers proceed alphanumeric identifiers. Numeric
