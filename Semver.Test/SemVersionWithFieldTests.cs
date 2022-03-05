@@ -11,6 +11,9 @@ namespace Semver.Test
     public class SemVersionWithFieldTests
     {
         public static readonly SemVersion Version = new SemVersion(1, 2, 3, "pre", "metadata");
+        public static readonly SemVersion ReleaseVersion = new SemVersion(1, 2, 3, "", "metadata");
+        public static readonly SemVersion NoMetadataVersion = new SemVersion(1, 2, 3, "pre");
+        public static readonly SemVersion ReleaseWithoutMetadataVersion = new SemVersion(1, 2, 3);
 
         #region WithMajor, WithMinor, WithPatch
         [Fact]
@@ -19,6 +22,14 @@ namespace Semver.Test
             var v = Version.WithMajor(42);
 
             Assert.Equal(new SemVersion(42, 2, 3, "pre", "metadata"), v);
+        }
+
+        [Fact]
+        public void WithSameMajor()
+        {
+            var v = Version.WithMajor(1);
+
+            Assert.Same(Version, v);
         }
 
         [Theory]
@@ -39,6 +50,14 @@ namespace Semver.Test
             Assert.Equal(new SemVersion(1, 42, 3, "pre", "metadata"), v);
         }
 
+        [Fact]
+        public void WithSameMinor()
+        {
+            var v = Version.WithMinor(2);
+
+            Assert.Same(Version, v);
+        }
+
         [Theory]
         [InlineData(-1)]
         [InlineData(int.MinValue)]
@@ -55,6 +74,14 @@ namespace Semver.Test
             var v = Version.WithPatch(42);
 
             Assert.Equal(new SemVersion(1, 2, 42, "pre", "metadata"), v);
+        }
+
+        [Fact]
+        public void WithSamePatch()
+        {
+            var v = Version.WithPatch(3);
+
+            Assert.Same(Version, v);
         }
 
         [Theory]
@@ -90,6 +117,14 @@ namespace Semver.Test
             var v = Version.WithPrerelease("bar.baz.100.123abc", allowLeadingZeros: false);
 
             Assert.Equal(new SemVersion(1, 2, 3, "bar.baz.100.123abc", "metadata"), v);
+        }
+
+        [Fact]
+        public void WithPrereleaseParsingAlreadyRelease()
+        {
+            var v = ReleaseVersion.WithPrerelease("", allowLeadingZeros: false);
+
+            Assert.Same(ReleaseVersion, v);
         }
 
         [Fact]
@@ -164,6 +199,14 @@ namespace Semver.Test
         }
 
         [Fact]
+        public void WithPrereleaseParamsAlreadyRelease()
+        {
+            var v = ReleaseVersion.WithPrerelease();
+
+            Assert.Same(ReleaseVersion, v);
+        }
+
+        [Fact]
         public void WithPrereleaseParamsNull()
         {
             string[] identifiers = null;
@@ -228,6 +271,14 @@ namespace Semver.Test
             var v = Version.WithPrerelease(new[] { "bar", "baz", "100", "123abc" }, allowLeadingZeros: false);
 
             Assert.Equal(new SemVersion(1, 2, 3, "bar.baz.100.123abc", "metadata"), v);
+        }
+
+        [Fact]
+        public void WithPrereleaseEnumerableAlreadyRelease()
+        {
+            var v = ReleaseVersion.WithPrerelease(Enumerable.Empty<string>(), allowLeadingZeros: false);
+
+            Assert.Same(ReleaseVersion, v);
         }
 
         [Fact]
@@ -317,6 +368,14 @@ namespace Semver.Test
         }
 
         [Fact]
+        public void WithPrereleaseIdentifiersAlreadyRelease()
+        {
+            var v = ReleaseVersion.WithPrerelease(Enumerable.Empty<PrereleaseIdentifier>());
+
+            Assert.Same(ReleaseVersion, v);
+        }
+
+        [Fact]
         public void WithPrereleaseIdentifiersNull()
         {
             IEnumerable<PrereleaseIdentifier> identifiers = null;
@@ -353,6 +412,14 @@ namespace Semver.Test
             Assert.Equal(new SemVersion(1, 2, 3, "", "metadata"), v);
         }
 
+        [Fact]
+        public void WithoutPrereleaseAlreadyRelease()
+        {
+            var v = ReleaseVersion.WithoutPrerelease();
+
+            Assert.Same(ReleaseVersion, v);
+        }
+
         #region WithMetadata() Overload Resolution
         /// <summary>
         /// This demonstrates that if you call <c>WithMetadata("value")</c> it
@@ -375,6 +442,14 @@ namespace Semver.Test
             var v = Version.WithMetadata("bar.baz.100.123abc");
 
             Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
+        }
+
+        [Fact]
+        public void WithMetadataParsingAlreadyNoMetadata()
+        {
+            var v = NoMetadataVersion.WithMetadata("");
+
+            Assert.Same(NoMetadataVersion, v);
         }
 
         [Fact]
@@ -437,6 +512,14 @@ namespace Semver.Test
             var v = Version.WithMetadata("bar", "baz", "100", "123abc");
 
             Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
+        }
+
+        [Fact]
+        public void WithMetadataParamsAlreadyNoMetadata()
+        {
+            var v = NoMetadataVersion.WithMetadata();
+
+            Assert.Same(NoMetadataVersion, v);
         }
 
         [Fact]
@@ -504,6 +587,14 @@ namespace Semver.Test
             var v = Version.WithMetadata(new List<string> { "bar", "baz", "100", "123abc" });
 
             Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
+        }
+
+        [Fact]
+        public void WithMetadataEnumerableAlreadyNoMetadata()
+        {
+            var v = NoMetadataVersion.WithMetadata(Enumerable.Empty<string>());
+
+            Assert.Same(NoMetadataVersion, v);
         }
 
         [Fact]
@@ -583,6 +674,14 @@ namespace Semver.Test
         }
 
         [Fact]
+        public void WithMetadataIdentifiersAlreadyNoMetadata()
+        {
+            var v = NoMetadataVersion.WithMetadata(Enumerable.Empty<MetadataIdentifier>());
+
+            Assert.Same(NoMetadataVersion, v);
+        }
+
+        [Fact]
         public void WithMetadataIdentifiersNull()
         {
             IEnumerable<MetadataIdentifier> identifiers = null;
@@ -620,11 +719,27 @@ namespace Semver.Test
         }
 
         [Fact]
+        public void WithoutMetadataAlreadyNoMetadata()
+        {
+            var v = NoMetadataVersion.WithoutMetadata();
+
+            Assert.Same(NoMetadataVersion, v);
+        }
+
+        [Fact]
         public void WithoutPrereleaseOrMetadata()
         {
             var v = Version.WithoutPrereleaseOrMetadata();
 
             Assert.Equal(new SemVersion(1, 2, 3), v);
+        }
+
+        [Fact]
+        public void WithoutPrereleaseOrMetadataAlreadyReleaseWithoutMetadata()
+        {
+            var v = ReleaseWithoutMetadataVersion.WithoutPrereleaseOrMetadata();
+
+            Assert.Same(ReleaseWithoutMetadataVersion, v);
         }
     }
 }

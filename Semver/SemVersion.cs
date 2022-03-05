@@ -513,6 +513,7 @@ namespace Semver
         public SemVersion WithMajor(int major)
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (Major == major) return this;
             return new SemVersion(major, Minor, Patch, PrereleaseIdentifiers, MetadataIdentifiers);
         }
 
@@ -525,6 +526,7 @@ namespace Semver
         public SemVersion WithMinor(int minor)
         {
             if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
+            if (Minor == minor) return this;
             return new SemVersion(Major, minor, Patch, PrereleaseIdentifiers, MetadataIdentifiers);
         }
 
@@ -537,6 +539,7 @@ namespace Semver
         public SemVersion WithPatch(int patch)
         {
             if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
+            if (Patch == patch) return this;
             return new SemVersion(Major, Minor, patch, PrereleaseIdentifiers, MetadataIdentifiers);
         }
 
@@ -563,8 +566,7 @@ namespace Semver
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             if (prerelease is null) throw new ArgumentNullException(nameof(prerelease));
-            if (prerelease.Length == 0)
-                return new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, MetadataIdentifiers);
+            if (prerelease.Length == 0) return WithoutPrerelease();
             var identifiers = prerelease.Split('.')
                               .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prerelease)))
                               .ToReadOnlyList();
@@ -586,8 +588,7 @@ namespace Semver
         public SemVersion WithPrerelease(params string[] prereleaseIdentifiers)
         {
             if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
-            if (prereleaseIdentifiers.Length == 0)
-                return new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, MetadataIdentifiers);
+            if (prereleaseIdentifiers.Length == 0) return WithoutPrerelease();
             var identifiers = prereleaseIdentifiers
                               .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros: false, nameof(prereleaseIdentifiers)))
                               .ToReadOnlyList();
@@ -622,6 +623,7 @@ namespace Semver
             var identifiers = prereleaseIdentifiers
                               .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prereleaseIdentifiers)))
                               .ToReadOnlyList();
+            if (identifiers.Count == 0) return WithoutPrerelease();
             return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
         }
 
@@ -636,6 +638,7 @@ namespace Semver
         {
             if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
             var identifiers = prereleaseIdentifiers.ToReadOnlyList();
+            if (identifiers.Count == 0) return WithoutPrerelease();
             if (identifiers.Any(i => i == default)) throw new ArgumentException(PrereleaseIdentifierIsDefaultMessage, nameof(prereleaseIdentifiers));
             return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
         }
@@ -645,7 +648,10 @@ namespace Semver
         /// </summary>
         /// <returns>The new version without prerelease portion.</returns>
         public SemVersion WithoutPrerelease()
-            => new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, MetadataIdentifiers);
+        {
+            if (!IsPrerelease) return this;
+            return new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, MetadataIdentifiers);
+        }
 
         /// <summary>
         /// Creates a copy of the current instance with different build metadata.
@@ -658,8 +664,7 @@ namespace Semver
         public SemVersion WithMetadata(string metadata)
         {
             if (metadata is null) throw new ArgumentNullException(nameof(metadata));
-            if (metadata.Length == 0)
-                return new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, ReadOnlyList<MetadataIdentifier>.Empty);
+            if (metadata.Length == 0) return WithoutMetadata();
             var identifiers = metadata.Split('.')
                                       .Select(i => new MetadataIdentifier(i, nameof(metadata)))
                                       .ToReadOnlyList();
@@ -678,8 +683,7 @@ namespace Semver
         public SemVersion WithMetadata(params string[] metadataIdentifiers)
         {
             if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
-            if (metadataIdentifiers.Length == 0)
-                return new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, ReadOnlyList<MetadataIdentifier>.Empty);
+            if (metadataIdentifiers.Length == 0) return WithoutMetadata();
             var identifiers = metadataIdentifiers
                               .Select(i => new MetadataIdentifier(i, nameof(metadataIdentifiers)))
                               .ToReadOnlyList();
@@ -701,6 +705,7 @@ namespace Semver
             var identifiers = metadataIdentifiers
                               .Select(i => new MetadataIdentifier(i, nameof(metadataIdentifiers)))
                               .ToReadOnlyList();
+            if (identifiers.Count == 0) return WithoutMetadata();
             return new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, identifiers);
         }
 
@@ -716,6 +721,7 @@ namespace Semver
         {
             if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
             var identifiers = metadataIdentifiers.ToReadOnlyList();
+            if (identifiers.Count == 0) return WithoutMetadata();
             if (identifiers.Any(i => i == default))
                 throw new ArgumentException(MetadataIdentifierIsDefaultMessage, nameof(metadataIdentifiers));
             return new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, identifiers);
@@ -726,14 +732,23 @@ namespace Semver
         /// </summary>
         /// <returns>The new version without build metadata.</returns>
         public SemVersion WithoutMetadata()
-            => new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, ReadOnlyList<MetadataIdentifier>.Empty);
+        {
+            if (MetadataIdentifiers.Count == 0) return this;
+            return new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, ReadOnlyList<MetadataIdentifier>.Empty);
+        }
 
         /// <summary>
         /// Creates a copy of the current instance without prerelease identifiers or build metadata.
         /// </summary>
         /// <returns>The new version without prerelease identifiers or build metadata.</returns>
         public SemVersion WithoutPrereleaseOrMetadata()
-            => new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, ReadOnlyList<MetadataIdentifier>.Empty);
+        {
+            if (!IsPrerelease && MetadataIdentifiers.Count == 0) return this;
+            return new SemVersion(Major, Minor, Patch,
+                ReadOnlyList<PrereleaseIdentifier>.Empty,
+                ReadOnlyList<MetadataIdentifier>.Empty);
+        }
+
         #endregion
 
         /// <summary>The major version number.</summary>
