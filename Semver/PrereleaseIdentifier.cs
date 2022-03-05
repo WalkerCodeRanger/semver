@@ -9,12 +9,12 @@ namespace Semver
     /// An individual prerelease identifier for a semantic version.
     /// </summary>
     /// <remarks>
-    /// <para>The metadata for a semantic version is composed of dot ('<c>.</c>') separated identifiers.
+    /// <para>The prerelease segment of a semantic version is composed of dot ('<c>.</c>') separated identifiers.
     /// A prerelease identifier is either an alphanumeric or numeric identifier. A valid numeric
     /// identifier is composed of ASCII digits (<c>[0-9]</c>) without leading zeros. A valid
     /// alphanumeric identifier is a non-empty string of ASCII alphanumeric and hyphen characters
-    /// (<c>[0-9A-Za-z-]</c>) including at least one non-digit character. Prerelease identifiers are
-    /// compared first on whether they are numeric or alphanumeric with numeric identifiers having lower
+    /// (<c>[0-9A-Za-z-]</c>) with at least one non-digit character. Prerelease identifiers are
+    /// compared first by whether they are numeric or alphanumeric. Numeric identifiers have lower
     /// precedence than alphanumeric identifiers. Numeric identifiers are compared to each other
     /// numerically. Alphanumeric identifiers are compared to each other lexically in ASCII sort
     /// order.</para>
@@ -26,7 +26,9 @@ namespace Semver
     ///
     /// <para>Invalid prerelease identifiers including arbitrary Unicode characters, empty string,
     /// and numeric identifiers with leading zero can currently be produced by the
-    /// <see cref="SemVersion(int, int, int, string, string)"/> constructor. Such alphanumeric
+    /// <see cref="SemVersion(int, int, int, string, string)"/> constructor and the obsolete
+    /// <see cref="SemVersion.Parse(string,bool)"/> and
+    /// <see cref="SemVersion.TryParse(string,out SemVersion,bool)"/> methods. Such alphanumeric
     /// identifiers are compared via an ordinal string comparision. Numeric identifiers with
     /// leading zeros are considered equal (e.g. '<c>15</c>' is equal to '<c>015</c>').
     /// </para>
@@ -44,12 +46,12 @@ namespace Semver
         public string Value { get; }
 
         /// <summary>
-        /// The numeric value of the prerelease identifier if it is a numeric identifiers, otherwise
+        /// The numeric value of the prerelease identifier if it is a numeric identifier, otherwise
         /// <see langword="null"/>.
         /// </summary>
-        /// <value>The numeric value of the prerelease identifier if it is a numeric identifiers, otherwise
-        /// <see langword="null"/>.</value>
-        /// <remarks>The numeric value of a prerelease identifier will never be null.</remarks>
+        /// <value>The numeric value of the prerelease identifier if it is a numeric identifier,
+        /// otherwise <see langword="null"/>.</value>
+        /// <remarks>The numeric value of a prerelease identifier will never be negative.</remarks>
         public int? IntValue { get; }
 
         /// <summary>
@@ -118,12 +120,12 @@ namespace Semver
         /// </summary>
         /// <param name="value">The string value of this prerelease identifier.</param>
         /// <param name="allowLeadingZeros">Whether to allow leading zeros in the <paramref name="value"/>
-        /// parameter. If <see langword="true"/>, leading zeros will be allowed on but removed from
-        /// numeric identifiers.</param>
+        /// parameter. If <see langword="true"/>, leading zeros will be allowed on numeric identifiers
+        /// but will be removed.</param>
         /// <exception cref="ArgumentNullException">The <paramref name="value"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The <paramref name="value"/> is empty or contains invalid characters
         /// (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading zeros for
-        /// a numeric identifier and <paramref name="allowLeadingZeros"/> is <see langword="false"/>.</exception>
+        /// a numeric identifier when <paramref name="allowLeadingZeros"/> is <see langword="false"/>.</exception>
         /// <exception cref="OverflowException">The numeric identifier value is too large for <see cref="Int32"/>.</exception>
         /// <remarks>Because a valid numeric identifier does not have leading zeros, this constructor
         /// will never create a <see cref="PrereleaseIdentifier"/> with leading zeros even if
@@ -184,7 +186,7 @@ namespace Semver
         /// <summary>
         /// Construct a valid numeric <see cref="PrereleaseIdentifier"/> from an integer value.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="value"/> is negative</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="value"/> is negative.</exception>
         /// <param name="value">The non-negative value of this identifier.</param>
         public PrereleaseIdentifier(int value)
         {
