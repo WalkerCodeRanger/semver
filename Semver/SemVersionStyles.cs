@@ -21,9 +21,10 @@ namespace Semver
         Strict = 0,
 
         /// <summary>
-        /// Allow leading zeros on major, minor, patch, and prerelease version numbers.
+        /// <para>Allow leading zeros on major, minor, patch, and prerelease version numbers.</para>
+        ///
+        /// <para>Leading zeros will be removed from the constructed version number.</para>
         /// </summary>
-        /// <remarks>Leading zeros will be removed from the constructed version number.</remarks>
         AllowLeadingZeros = 1,
 
         /// <summary>
@@ -69,11 +70,10 @@ namespace Semver
         OptionalMinorPatch = 1 << 6 | OptionalPatch,
 
         /// <summary>
-        /// Accept any version string format supported.
-        /// </summary>
-        /// <remarks><para>This is a composite semantic version style.</para>
+        /// <para>Accept any version string format supported.</para>
         ///
-        /// <para>The formats accepted by this style will change when more formats are supported.</para></remarks>
+        /// <para>The formats accepted by this style will change if/when more formats are supported.</para>
+        /// </summary>
         Any = unchecked((int)0xFFFF_FFFF),
     }
 }
