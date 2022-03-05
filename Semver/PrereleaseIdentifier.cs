@@ -9,7 +9,7 @@ namespace Semver
     /// An individual prerelease identifier for a semantic version.
     /// </summary>
     /// <remarks>
-    /// <para>The prerelease segment of a semantic version is composed of dot ('<c>.</c>') separated identifiers.
+    /// <para>The prerelease portion of a semantic version is composed of dot ('<c>.</c>') separated identifiers.
     /// A prerelease identifier is either an alphanumeric or numeric identifier. A valid numeric
     /// identifier is composed of ASCII digits (<c>[0-9]</c>) without leading zeros. A valid
     /// alphanumeric identifier is a non-empty string of ASCII alphanumeric and hyphen characters
@@ -239,7 +239,7 @@ namespace Semver
             => Equals(left, right);
 
         /// <summary>
-        /// Determines whether two identifiers are not equal.
+        /// Determines whether two identifiers are <em>not</em> equal.
         /// </summary>
         /// <returns><see langword="true"/> if the value of <paramref name="left"/> is different
         /// from the value of <paramref name="right"/>; otherwise <see langword="false"/>.</returns>

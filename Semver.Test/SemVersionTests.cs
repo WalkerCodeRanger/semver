@@ -36,7 +36,7 @@ namespace Semver.Test
         [InlineData(1, 2, 3, "a", "b")]
         // Letter Limits
         [InlineData(1, 2, 3, "A-Z.a-z.0-9", "A-Z.a-z.0-9")]
-        // Dash in strange places
+        // Hyphen in strange places
         [InlineData(1, 2, 3, "-", "b")]
         [InlineData(1, 2, 3, "--", "b")]
         [InlineData(1, 2, 3, "a", "-")]

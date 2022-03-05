@@ -154,7 +154,7 @@ namespace Semver.Test
             Valid("1.0.0--ci.1", 1, 0, 0, Pre("-ci", 1)),
             Valid("1.0.0-0A", 1, 0, 0, Pre("0A")),
 
-            // Dash in strange place
+            // Hyphen in strange place
             Valid("1.2.3--+b", 1, 2, 3, Pre("-"), Meta("b")),
             Valid("1.2.3---+b", 1, 2, 3, Pre("--"), Meta("b")),
             Valid("1.2.3---", 1, 2, 3, Pre("--")),

@@ -13,8 +13,8 @@ using Semver.Utility;
 namespace Semver
 {
     /// <summary>
-    /// A semantic version number.
-    /// Conforms with v2.0.0 of semantic versioning (<a href="https://semver.org">semver.org</a>).
+    /// A semantic version number. Conforms with v2.0.0 of semantic versioning
+    /// (<a href="https://semver.org">semver.org</a>).
     /// </summary>
 #if SERIALIZABLE
     [Serializable]
@@ -112,12 +112,13 @@ namespace Semver
         /// Constructs a new instance of the <see cref="SemVersion"/> class from
         /// a <see cref="Version"/>.
         /// </summary>
-        /// <param name="version">The <see cref="Version"/> that is used to initialize
+        /// <param name="version">The <see cref="Version"/> used to initialize
         /// the Major, Minor, and Patch versions and the build metadata.</param>
-        /// <returns>A <see cref="SemVersion"/> with the same Major and Minor version.
-        /// The Patch version will be the fourth component of the version number. The
-        /// build meta data will contain the third component of the version number if
-        /// it is greater than zero.</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is null.</exception>
+        /// <remarks>Constructs a <see cref="SemVersion"/> with the same major and
+        /// minor version numbers. The patch version will be the fourth component
+        /// of the version number. The build meta data will contain the third component
+        /// of the version number if it is greater than zero.</remarks>
         [Obsolete("This constructor is obsolete. Use SemVersion.FromVersion() instead.")]
         public SemVersion(Version version)
         {
@@ -186,8 +187,8 @@ namespace Semver
         /// <remarks>
         /// <see cref="Version"/> numbers have the form <em>major</em>.<em>minor</em>[.<em>build</em>[.<em>revision</em>]]
         /// where square brackets ('[' and ']')  indicate optional components. The first three parts
-        /// are converted to the Major, Minor, and Patch versions of a semantic version. If the build component
-        /// is not defined (-1), the Patch number is assumed to be zero. <see cref="Version"/> numbers
+        /// are converted to the major, minor, and match versions of a semantic version. If the build component
+        /// is not defined (-1), the patch number is assumed to be zero. <see cref="Version"/> numbers
         /// with a revision greater than zero cannot be converted to semantic versions. An
         /// <see cref="ArgumentException"/> is thrown when this method is called with such a <see cref="Version"/>.
         /// </remarks>
@@ -224,7 +225,22 @@ namespace Semver
         }
         #endregion
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/> equivalent.
+        /// </summary>
+        /// <param name="version">The version string.</param>
+        /// <param name="style">A bitwise combination of enumeration values that indicates the style
+        /// elements that can be present in <paramref name="version"/>. The preferred value to use
+        /// is <see cref="SemVersionStyles.Strict"/>.</param>
+        /// <param name="maxLength">The maximum length of <paramref name="version"/> that should be
+        /// parsed. This prevents attacks using very long version strings.</param>
+        /// <exception cref="ArgumentException"><paramref name="style"/> is not a valid
+        /// <see cref="SemVersionStyles"/> value.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="version"/> is <see langword="null"/>.</exception>
+        /// <exception cref="FormatException">The <paramref name="version"/> is invalid or not in a
+        /// format compliant with <paramref name="style"/>.</exception>
+        /// <exception cref="OverflowException">A numeric part of <paramref name="version"/> is too
+        /// large for an <see cref="Int32"/>.</exception>
         public static SemVersion Parse(string version, SemVersionStyles style, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
@@ -238,13 +254,13 @@ namespace Semver
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/> equivalent.
         /// </summary>
         /// <param name="version">The version string.</param>
-        /// <param name="strict">If set to <see langword="true"/> minor and patch version are required,
+        /// <param name="strict">If set to <see langword="true"/>, minor and patch version are required;
         /// otherwise they are optional.</param>
-        /// <returns>The <see cref="SemVersion"/> object.</returns>
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
-        /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing Minor or Patch versions and <paramref name="strict"/> is <see langword="true"/>.</exception>
-        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <c>int.MaxValue</c>.</exception>
+        /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing minor
+        /// or patch version numbers when <paramref name="strict"/> is <see langword="true"/>.</exception>
+        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <see cref="int.MaxValue"/>.</exception>
         [Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
         public static SemVersion Parse(string version, bool strict = false)
         {
@@ -274,8 +290,19 @@ namespace Semver
             return new SemVersion(major, minor, patch, prerelease, metadata);
         }
 
-        // TODO Doc Comment
-        // TODO MS guidelines say to always put out params last, perhaps the default maxLength should be an overload so it can come before the out param?
+        /// <summary>
+        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
+        /// equivalent. The return value indicates whether the conversion succeeded.
+        /// </summary>
+        /// <param name="version">The version string.</param>
+        /// <param name="style">A bitwise combination of enumeration values that indicates the style
+        /// elements that can be present in <paramref name="version"/>. The preferred value to use
+        /// is <see cref="SemVersionStyles.Strict"/>.</param>4
+        /// <param name="semver">When this method returns, contains a <see cref="SemVersion"/> instance equivalent
+        /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
+        /// version string was invalid.</param>
+        /// <param name="maxLength">The maximum length of <paramref name="version"/> that should be
+        /// parsed. This prevents attacks using very long version strings.</param>
         public static bool TryParse(string version, SemVersionStyles style,
             out SemVersion semver, int maxLength = MaxVersionLength)
         {
@@ -291,13 +318,13 @@ namespace Semver
 
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
-        /// equivalent and returns a value that indicates whether the conversion succeeded.
+        /// equivalent. The return value indicates whether the conversion succeeded.
         /// </summary>
         /// <param name="version">The version string.</param>
-        /// <param name="semver">When the method returns, contains a <see cref="SemVersion"/> instance equivalent
+        /// <param name="semver">When this method returns, contains a <see cref="SemVersion"/> instance equivalent
         /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
-        /// version string was not valid.</param>
-        /// <param name="strict">If set to <see langword="true"/> minor and patch version are required,
+        /// version string was invalid.</param>
+        /// <param name="strict">If set to <see langword="true"/>, minor and patch version numbers are required;
         /// otherwise they are optional.</param>
         /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
         [Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
@@ -338,11 +365,11 @@ namespace Semver
         }
 
         /// <summary>
-        /// Checks whether two semantic versions are equal.
+        /// Determines whether two semantic versions are equal.
         /// </summary>
-        /// <param name="versionA">The first version to compare.</param>
-        /// <param name="versionB">The second version to compare.</param>
         /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not be equal.</remarks>
         public static bool Equals(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return true;
@@ -351,11 +378,35 @@ namespace Semver
         }
 
         /// <summary>
-        /// Compares the specified versions.
+        /// Compares two versions and indicates whether the first precedes, follows, or is
+        /// equal to the other in the sort order. Note that sort order is more specific than precedence order.
         /// </summary>
-        /// <param name="versionA">The first version to compare.</param>
-        /// <param name="versionB">The second version to compare.</param>
-        /// <returns>A signed number indicating the relative values of <paramref name="versionA"/> and <paramref name="versionB"/>.</returns>
+        /// <returns>
+        /// An integer that indicates whether <paramref name="versionA"/> precedes, follows, or
+        /// is equal to <paramref name="versionB"/> in the sort order.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Value</term>
+        ///         <description>Condition</description>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <description><paramref name="versionA"/> precedes <paramref name="versionB"/> in the sort order.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <description><paramref name="versionA"/> is equal to <paramref name="versionB"/>.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <description>
+        ///             <paramref name="versionA"/> follows <paramref name="versionB"/> in the sort order
+        ///             or <paramref name="versionB"/> is <see langword="null" />.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
         public static int Compare(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return 0;
@@ -367,19 +418,24 @@ namespace Semver
         /// <summary>
         /// Make a copy of the current instance with changed properties.
         /// </summary>
-        /// <param name="major">The value to replace the major version or <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="minor">The value to replace the minor version or <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="patch">The value to replace the patch version or <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="prerelease">The value to replace the prerelease version or <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="build">The value to replace the build metadata or <see langword="null"/> to leave it unchanged.</param>
-        /// <returns>The new version object.</returns>
+        /// <param name="major">The value to replace the major version number or
+        /// <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="minor">The value to replace the minor version number or
+        /// <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="patch">The value to replace the patch version number or
+        /// <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="prerelease">The value to replace the prerelease version
+        /// or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="build">The value to replace the build metadata or <see langword="null"/>
+        /// to leave it unchanged.</param>
+        /// <returns>The new version.</returns>
         /// <remarks>
         /// The change method is intended to be called using named argument syntax, passing only
         /// those fields to be changed.
         /// </remarks>
         /// <example>
         /// To change only the patch version:
-        /// <code>version.Change(patch: 4)</code>
+        /// <code>var newVersion = version.Change(patch: 4);</code>
         /// </example>
         [Obsolete("Method is obsolete. Use With() or With...() method instead.")]
         public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
@@ -394,7 +450,7 @@ namespace Semver
         }
 
         /// <summary>
-        /// Make a copy of the current instance with changed properties.
+        /// Creates a copy of the current instance with changed properties.
         /// </summary>
         /// <param name="major">The value to replace the major version or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="minor">The value to replace the minor version or <see langword="null"/> to leave it unchanged.</param>
@@ -402,7 +458,7 @@ namespace Semver
         /// <param name="prerelease">The value to replace the prerelease identifiers or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="metadata">The value to replace the build metadata identifiers or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading zeros will be trimmed.</param>
-        /// <returns>The new version object.</returns>
+        /// <returns>The new version with changed properties.</returns>
         /// <remarks>
         /// The <see cref="With"/> method is intended to be called using named argument syntax, passing only
         /// those fields to be changed.
@@ -448,28 +504,60 @@ namespace Semver
         }
 
         #region With... Methods
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with a different major version number.
+        /// </summary>
+        /// <param name="major">The value to replace the major version number.</param>
+        /// <returns>The new version with the different major version number.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="major"/> is negative.</exception>
         public SemVersion WithMajor(int major)
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             return new SemVersion(major, Minor, Patch, PrereleaseIdentifiers, MetadataIdentifiers);
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with a different minor version number.
+        /// </summary>
+        /// <param name="minor">The value to replace the minor version number.</param>
+        /// <returns>The new version with the different minor version number.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="minor"/> is negative.</exception>
         public SemVersion WithMinor(int minor)
         {
             if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
             return new SemVersion(Major, minor, Patch, PrereleaseIdentifiers, MetadataIdentifiers);
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with a different patch version number.
+        /// </summary>
+        /// <param name="patch">The value to replace the patch version number.</param>
+        /// <returns>The new version with the different patch version number.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="patch"/> is negative.</exception>
         public SemVersion WithPatch(int patch)
         {
             if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
             return new SemVersion(Major, Minor, patch, PrereleaseIdentifiers, MetadataIdentifiers);
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with a different prerelease portion.
+        /// </summary>
+        /// <param name="prerelease">The value to replace the prerelease portion.</param>
+        /// <param name="allowLeadingZeros">Whether to allow leading zeros in the prerelease identifiers.
+        /// If <see langword="true"/>, leading zeros will be allowed on numeric identifiers
+        /// but will be removed.</param>
+        /// <returns>The new version with the different prerelease portion.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="prerelease"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
+        /// zeros for a numeric identifier when <paramref name="allowLeadingZeros"/> is <see langword="false"/>.</exception>
+        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
+        /// for <see cref="Int32"/>.</exception>
+        /// <remarks>Because a valid numeric identifier does not have leading zeros, this constructor
+        /// will never create a <see cref="PrereleaseIdentifier"/> with leading zeros even if
+        /// <paramref name="allowLeadingZeros"/> is <see langword="true"/>. Any leading zeros will
+        /// be removed.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public SemVersion WithPrerelease(string prerelease, bool allowLeadingZeros = false)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -483,7 +571,18 @@ namespace Semver
             return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with a different prerelease identifiers.
+        /// </summary>
+        /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
+        /// <returns>The new version with the different prerelease identifiers.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is
+        /// <see langword="null"/> or one of the prerelease identifiers is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
+        /// zeros for a numeric identifier.</exception>
+        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
+        /// for <see cref="Int32"/>.</exception>
         public SemVersion WithPrerelease(params string[] prereleaseIdentifiers)
         {
             if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
@@ -496,7 +595,25 @@ namespace Semver
             return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with a different prerelease identifiers.
+        /// </summary>
+        /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
+        /// <param name="allowLeadingZeros">Whether to allow leading zeros in the prerelease identifiers.
+        /// If <see langword="true"/>, leading zeros will be allowed on numeric identifiers
+        /// but will be removed.</param>
+        /// <returns>The new version with the different prerelease portion.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is
+        /// <see langword="null"/> or one of the prerelease identifiers is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
+        /// zeros for a numeric identifier when <paramref name="allowLeadingZeros"/> is <see langword="false"/>.</exception>
+        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
+        /// for <see cref="Int32"/>.</exception>
+        /// <remarks>Because a valid numeric identifier does not have leading zeros, this constructor
+        /// will never create a <see cref="PrereleaseIdentifier"/> with leading zeros even if
+        /// <paramref name="allowLeadingZeros"/> is <see langword="true"/>. Any leading zeros will
+        /// be removed.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public SemVersion WithPrerelease(IEnumerable<string> prereleaseIdentifiers, bool allowLeadingZeros = false)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -508,7 +625,13 @@ namespace Semver
             return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with a different prerelease identifiers.
+        /// </summary>
+        /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
+        /// <returns>The new version with the different prerelease portion.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A prerelease identifier has the default value.</exception>
         public SemVersion WithPrerelease(IEnumerable<PrereleaseIdentifier> prereleaseIdentifiers)
         {
             if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
@@ -517,11 +640,21 @@ namespace Semver
             return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance without prerelease identifiers.
+        /// </summary>
+        /// <returns>The new version without prerelease portion.</returns>
         public SemVersion WithoutPrerelease()
             => new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, MetadataIdentifiers);
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with different build metadata.
+        /// </summary>
+        /// <param name="metadata">The value to replace the build metadata.</param>
+        /// <returns>The new version with the different build metadata.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="metadata"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A metadata identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         public SemVersion WithMetadata(string metadata)
         {
             if (metadata is null) throw new ArgumentNullException(nameof(metadata));
@@ -533,7 +666,15 @@ namespace Semver
             return new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, identifiers);
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with different build metadata identifiers.
+        /// </summary>
+        /// <param name="metadataIdentifiers">The values to replace the build metadata identifiers.</param>
+        /// <returns>The new version with the different build metadata identifiers.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="metadataIdentifiers"/> is
+        /// <see langword="null"/> or one of the metadata identifiers is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A metadata identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         public SemVersion WithMetadata(params string[] metadataIdentifiers)
         {
             if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
@@ -545,7 +686,15 @@ namespace Semver
             return new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, identifiers);
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with different build metadata identifiers.
+        /// </summary>
+        /// <param name="metadataIdentifiers">The values to replace the build metadata identifiers.</param>
+        /// <returns>The new version with the different build metadata identifiers.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="metadataIdentifiers"/> is
+        /// <see langword="null"/> or one of the metadata identifiers is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A metadata identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         public SemVersion WithMetadata(IEnumerable<string> metadataIdentifiers)
         {
             if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
@@ -555,7 +704,14 @@ namespace Semver
             return new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, identifiers);
         }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// Creates a copy of the current instance with different build metadata identifiers.
+        /// </summary>
+        /// <param name="metadataIdentifiers">The values to replace the build metadata identifiers.</param>
+        /// <returns>The new version with the different build metadata identifiers.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="metadataIdentifiers"/> is
+        /// <see langword="null"/> or one of the metadata identifiers is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A metadata identifier has the default value.</exception>
         public SemVersion WithMetadata(IEnumerable<MetadataIdentifier> metadataIdentifiers)
         {
             if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
@@ -565,75 +721,140 @@ namespace Semver
             return new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, identifiers);
         }
 
-        // TODO Doc Comment
-        public SemVersion WithoutMetadata() =>
-            new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, ReadOnlyList<MetadataIdentifier>.Empty);
+        /// <summary>
+        /// Creates a copy of the current instance without build metadata.
+        /// </summary>
+        /// <returns>The new version without build metadata.</returns>
+        public SemVersion WithoutMetadata()
+            => new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, ReadOnlyList<MetadataIdentifier>.Empty);
 
-        // TODO Doc Comment
-        public SemVersion WithoutPrereleaseOrMetadata() =>
-            new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, ReadOnlyList<MetadataIdentifier>.Empty);
+        /// <summary>
+        /// Creates a copy of the current instance without prerelease identifiers or build metadata.
+        /// </summary>
+        /// <returns>The new version without prerelease identifiers or build metadata.</returns>
+        public SemVersion WithoutPrereleaseOrMetadata()
+            => new SemVersion(Major, Minor, Patch, ReadOnlyList<PrereleaseIdentifier>.Empty, ReadOnlyList<MetadataIdentifier>.Empty);
         #endregion
 
-        /// <value>
-        /// The major version.
-        /// </value>
+        /// <summary>The major version number.</summary>
+        /// <value>The major version number.</value>
+        /// <remarks>An increase in the major version number indicates a backwards
+        /// incompatible change.</remarks>
         public int Major { get; }
 
-        /// <value>
-        /// The minor version.
-        /// </value>
+        /// <summary>The minor version number.</summary>
+        /// <value>The minor version number.</value>
+        /// <remarks>An increase in the minor version number indicates backwards
+        /// compatible changes.</remarks>
         public int Minor { get; }
 
-        /// <value>
-        /// The patch version.
-        /// </value>
+        /// <summary>The patch version number.</summary>
+        /// <value>The patch version number.</value>
+        /// <remarks>An increase in the patch version number indicates backwards
+        /// compatible bug fixes.</remarks>
         public int Patch { get; }
 
+        /// <summary>
+        /// The prerelease identifiers for this version.
+        /// </summary>
         /// <value>
-        /// The prerelease identifiers or empty string if this is a release version.
+        /// The prerelease identifiers for this version or empty if this is a release version.
         /// </value>
         /// <remarks>
-        /// A prerelease version label follows the main version number separated
-        /// by a dash ('-'). It is a series of identifiers each of which may either
-        /// be alphanumeric or numeric. Prerelease versions have lower precedence
-        /// than release versions.
+        /// <para>A prerelease version is denoted by appending a hyphen ('<c>-</c>')
+        /// and a series of dot separated immediately following the patch version
+        /// number. Each prerelease identifier may be numeric or alphanumeric.
+        /// Valid numeric identifiers consist of ASCII digits (<c>[0-9]</c>)
+        /// without leading zeros. Valid alphanumeric identifiers are non-empty
+        /// strings of ASCII alphanumeric and hyphen characters (<c>[0-9A-Za-z-]</c>)
+        /// with at least one non-digit character.</para>
+        ///
+        /// <para>Prerelease versions have lower precedence than release versions.
+        /// Prerelease version precedence is determined by comparing each prerelease
+        /// identifier in order from left to right. Numeric identifiers have lower
+        /// precedence than alphanumeric identifiers. Numeric identifiers are
+        /// compared numerically. Alphanumeric identifiers are compare lexically
+        /// in ASCII sort order.</para>
         /// </remarks>
         // TODO v3.0.0 this should be null when there is no prerelease identifiers
         public string Prerelease { get; }
 
-        // TODO Doc Comment
+        /// <summary>
+        /// The prerelease identifiers for this version.
+        /// </summary>
+        /// <value>
+        /// The prerelease identifiers for this version or empty string if this is a release version.
+        /// </value>
+        /// <remarks>
+        /// <para>A prerelease version is denoted by appending a hyphen ('<c>-</c>')
+        /// and a series of dot separated immediately following the patch version
+        /// number. Each prerelease identifier may be numeric or alphanumeric.
+        /// Valid numeric identifiers consist of ASCII digits (<c>[0-9]</c>)
+        /// without leading zeros. Valid alphanumeric identifiers are non-empty
+        /// strings of ASCII alphanumeric and hyphen characters (<c>[0-9A-Za-z-]</c>)
+        /// with at least one non-digit character.</para>
+        ///
+        /// <para>Prerelease versions have lower precedence than release versions.
+        /// Prerelease version precedence is determined by comparing each prerelease
+        /// identifier in order from left to right. Numeric identifiers have lower
+        /// precedence than alphanumeric identifiers. Numeric identifiers are
+        /// compared numerically. Alphanumeric identifiers are compare lexically
+        /// in ASCII sort order.</para>
+        /// </remarks>
         public IReadOnlyList<PrereleaseIdentifier> PrereleaseIdentifiers { get; }
 
-        /// <value>Whether this is a prerelease version. <see langword="true"/>
-        /// if the <see cref="Prerelease"/> property is non-empty; <see langword="false"/>
-        /// if it is empty.</value>
+        /// <summary>Whether this is a prerelease version.</summary>
+        /// <value>Whether this is a prerelease version. A semantic version with
+        /// prerelease identifiers is a prerelease version.</value>
+        /// <remarks>When this is <see langword="true"/>, the <see cref="Prerelease"/>
+        /// and <see cref="PrereleaseIdentifiers"/> properties are non-empty. When
+        /// this is <see langword="false"/>, the <see cref="Prerelease"/> property
+        /// will be an empty string and the <see cref="PrereleaseIdentifiers"/> will
+        /// be an empty collection.</remarks>
         public bool IsPrerelease => Prerelease.Length != 0;
 
+        /// <summary>The build metadata or empty string if there is no build metadata.</summary>
         /// <value>
         /// The build metadata or empty string if there is no build metadata.
         /// </value>
         [Obsolete("This property is obsolete. Use Metadata instead.")]
         public string Build => Metadata;
 
-        /// <summary>The build metadata of this version.</summary>
-        /// <value>The build metadata of this version or empty string if there
+        /// <summary>The build metadata for this version.</summary>
+        /// <value>The build metadata for this version or empty string if there
         /// is no metadata.</value>
         /// <remarks>
-        /// The build metadata is a series of dot separated alphanumeric identifiers separated
-        /// from the rest of the version number with a plus sign ('+').
+        /// <para>The build metadata is a series of dot separated identifiers separated
+        /// from the rest of the version number with a plus sign ('<c>+</c>'). Valid
+        /// metadata identifiers are non-empty and consist of ASCII alphanumeric
+        /// characters and hyphens (<c>[0-9A-Za-z-]</c>).</para>
         ///
-        /// The metadata does not affect precedence. Two versions with different
+        /// <para>The metadata does not affect precedence. Two version numbers differing only in
         /// build metadata have the same precedence. However, metadata does affect
-        /// sort order. A version without metadata sorts before one that has metadata.
+        /// sort order. An otherwise identical version without metadata sorts before
+        /// one that has metadata.</para>
         /// </remarks>
         // TODO v3.0.0 this should be null when there is no metadata
         public string Metadata { get; }
 
-        // TODO Doc Comment
+        /// <summary>The build metadata identifiers for this version.</summary>
+        /// <value>The build metadata identifiers for this version or empty if there
+        /// is no metadata.</value>
+        /// <remarks>
+        /// <para>The build metadata is a series of dot separated identifiers separated
+        /// from the rest of the version number with a plus sign ('<c>+</c>'). Valid
+        /// metadata identifiers are non-empty and consist of ASCII alphanumeric
+        /// characters and hyphens (<c>[0-9A-Za-z-]</c>).</para>
+        ///
+        /// <para>The metadata does not affect precedence. Two version numbers differing only in
+        /// build metadata have the same precedence. However, metadata does affect
+        /// sort order. An otherwise identical version without metadata sorts before
+        /// one that has metadata.</para>
+        /// </remarks>
         public IReadOnlyList<MetadataIdentifier> MetadataIdentifiers { get; }
 
         /// <summary>
-        /// Converts this version to a <see cref="string" />.
+        /// Converts this version to an equivalent string value.
         /// </summary>
         /// <returns>
         /// The <see cref="string" /> equivalent of this version.
@@ -665,44 +886,31 @@ namespace Semver
         }
 
         /// <summary>
-        /// Compares the current instance with another object of the same type and returns an integer that indicates
-        /// whether the current instance precedes, follows, or occurs in the same position in the sort order as the
-        /// other object.
+        /// Compares this version to an <see cref="Object"/> and indicates whether this instance
+        /// precedes, follows, or is equal to the object in the sort order. Note that sort order
+        /// is more specific than precedence order.
         /// </summary>
-        /// <param name="obj">An object to compare with this instance.</param>
-        /// <returns>
-        /// A value that indicates the relative order of the objects being compared.
-        /// The return value has these meanings:
-        ///  Less than zero: This instance precedes <paramref name="obj" /> in the sort order.
-        ///  Zero: This instance occurs in the same position in the sort order as <paramref name="obj" />.
-        ///  Greater than zero: This instance follows <paramref name="obj" /> in the sort order.
-        /// </returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
         /// <exception cref="InvalidCastException">The <paramref name="obj"/> is not a <see cref="SemVersion"/>.</exception>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
         public int CompareTo(object obj)
         {
             return CompareTo((SemVersion)obj);
         }
 
         /// <summary>
-        /// Compares the current instance with another object of the same type and returns an integer that indicates
-        /// whether the current instance precedes, follows, or occurs in the same position in the sort order as the
-        /// other object.
+        /// Compares two versions and indicates whether this instance precedes, follows, or is
+        /// equal to the other in the sort order. Note that sort order is more specific than precedence order.
         /// </summary>
-        /// <param name="other">An object to compare with this instance.</param>
-        /// <returns>
-        /// A value that indicates the relative order of the objects being compared.
-        /// The return value has these meanings:
-        ///  Less than zero: This instance precedes <paramref name="other" /> in the sort order.
-        ///  Zero: This instance occurs in the same position in the sort order as <paramref name="other" />.
-        ///  Greater than zero: This instance follows <paramref name="other" /> in the sort order.
-        /// </returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
         public int CompareTo(SemVersion other)
         {
             var r = CompareByPrecedence(other);
             if (r != 0) return r;
 
             // If other is null, CompareByPrecedence() returns 1
-            return CompareComponent(Metadata, other.Metadata);
+            return CompareComponents(Metadata, other.Metadata);
         }
 
         /// <summary>
@@ -717,17 +925,47 @@ namespace Semver
         }
 
         /// <summary>
-        /// Compares two semantic versions by precedence as defined in the SemVer spec. Versions
-        /// that differ only by build metadata have the same precedence.
+        /// Compares two versions and indicates whether the first precedes, follows, or is in the same
+        /// position as the other in precedence order. Versions that differ only by build metadata
+        /// have the same precedence.
         /// </summary>
-        /// <param name="other">The semantic version.</param>
         /// <returns>
-        /// A value that indicates the relative order of the objects being compared.
-        /// The return value has these meanings:
-        ///  Less than zero: This instance precedes <paramref name="other" /> in the sort order.
-        ///  Zero: This instance occurs in the same position in the sort order as <paramref name="other" />.
-        ///  Greater than zero: This instance follows <paramref name="other" /> in the sort order.
+        /// An integer that indicates whether this instance precedes, follows, or is in the same
+        /// position as <paramref name="other"/> in precedence order.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Value</term>
+        ///         <description>Condition</description>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <description>This instance precedes <paramref name="other"/> in precedence order.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <description>This instance is has the same precedence as <paramref name="other"/>.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <description>
+        ///             This instance follows <paramref name="other"/> in precedence order
+        ///             or <paramref name="other"/> is <see langword="null" />.
+        ///         </description>
+        ///     </item>
+        /// </list>
         /// </returns>
+        /// <remarks>
+        /// <para>Precedence order is determined by comparing the major, minor, patch, and portions
+        /// in order from left to right. Versions that differ only by build metadata have the same
+        /// precedence. The major, minor, and patch versions are compared numerically. A prerelease
+        /// version precedes a release version.</para>
+        ///
+        /// <para>The prerelease portion is compared by comparing each prerelease identifier from
+        /// left to right. Numeric prerelease identifiers proceed alphanumeric identifiers. Numeric
+        /// identifiers are compared numerically. Alphanumeric identifiers are compared lexically
+        /// in ASCII sort order. A longer series of prerelease identifiers follows a shorter series
+        /// if all the preceding identifiers are equal.</para>
+        /// </remarks>
         public int CompareByPrecedence(SemVersion other)
         {
             if (other is null)
@@ -742,10 +980,10 @@ namespace Semver
             r = Patch.CompareTo(other.Patch);
             if (r != 0) return r;
 
-            return CompareComponent(Prerelease, other.Prerelease, true);
+            return CompareComponents(Prerelease, other.Prerelease, true);
         }
 
-        private static int CompareComponent(string a, string b, bool nonemptyIsLower = false)
+        private static int CompareComponents(string a, string b, bool nonEmptyIsLower = false)
         {
             var aEmpty = string.IsNullOrEmpty(a);
             var bEmpty = string.IsNullOrEmpty(b);
@@ -753,9 +991,9 @@ namespace Semver
                 return 0;
 
             if (aEmpty)
-                return nonemptyIsLower ? 1 : -1;
+                return nonEmptyIsLower ? 1 : -1;
             if (bEmpty)
-                return nonemptyIsLower ? -1 : 1;
+                return nonEmptyIsLower ? -1 : 1;
 
             var aComps = a.Split('.');
             var bComps = b.Split('.');
@@ -788,25 +1026,24 @@ namespace Semver
             return aComps.Length.CompareTo(bComps.Length);
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="object" /> is equal to this instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="object" /> to compare with this instance.</param>
-        /// <returns>
-        ///   <see langword="true"/> if the specified <see cref="object" /> is equal to this instance, otherwise <see langword="false"/>.
-        /// </returns>
+
+        /// <summary>Determines whether the given object is equal to this version.</summary>
+        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this identifier;
+        /// otherwise <see langword="false"/>.</returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not be equal.</remarks>
         public override bool Equals(object obj)
         {
             return obj is SemVersion version && Equals(version);
         }
 
         /// <summary>
-        /// Indicates whether the <see cref="SemVersion"/> is equal to another <see cref="SemVersion"/>.
+        /// Determines whether two versions are equal.
         /// </summary>
-        /// <param name="other">An version to compare with this object.</param>
-        /// <returns>
-        ///   <see langword="true"/> if the current version is equal to the <paramref name="other"/> parameter, otherwise <see langword="false"/>.
-        /// </returns>
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the this version;
+        /// otherwise <see langword="false"/>.</returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not be equal.</remarks>
         public bool Equals(SemVersion other)
         {
             if (other is null)
@@ -823,12 +1060,14 @@ namespace Semver
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
+        /// Gets a hash code for this instance.
         /// </summary>
         /// <returns>
         /// A hash code for this instance, suitable for use in hashing algorithms
         /// and data structures like a hash table.
         /// </returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not have the same hash code.</remarks>
         public override int GetHashCode()
             => CombinedHashCode.Create(Major, Minor, Patch, Prerelease, Metadata);
 
@@ -859,56 +1098,56 @@ namespace Semver
             => Parse(version);
 
         /// <summary>
-        /// Compares two semantic versions for equality.
+        /// Determines whether two semantic versions are equal.
         /// </summary>
-        /// <param name="left">The left value.</param>
-        /// <param name="right">The right value.</param>
-        /// <returns>If left is equal to right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not be equal.</remarks>
         public static bool operator ==(SemVersion left, SemVersion right)
             => Equals(left, right);
 
         /// <summary>
-        /// Compares two semantic versions for inequality.
+        /// Determines whether two semantic versions are <em>not</em> equal.
         /// </summary>
-        /// <param name="left">The left value.</param>
-        /// <param name="right">The right value.</param>
-        /// <returns>If left is not equal to right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the two values are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not be equal.</remarks>
         public static bool operator !=(SemVersion left, SemVersion right)
             => !Equals(left, right);
 
         /// <summary>
-        /// Compares two semantic versions.
+        /// Compares two versions by sort order. Note that sort order is more specific than precedence order.
         /// </summary>
-        /// <param name="left">The left value.</param>
-        /// <param name="right">The right value.</param>
-        /// <returns>If left is greater than right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="left"/> follows <paramref name="right"/>
+        /// in the sort order; otherwise <see langword="false"/>.</returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
         public static bool operator >(SemVersion left, SemVersion right)
             => Compare(left, right) > 0;
 
         /// <summary>
-        /// Compares two semantic versions.
+        /// Compares two versions by sort order. Note that sort order is more specific than precedence order.
         /// </summary>
-        /// <param name="left">The left value.</param>
-        /// <param name="right">The right value.</param>
-        /// <returns>If left is greater than or equal to right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="left"/> follows or is equal to
+        /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
         public static bool operator >=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) > 0;
 
         /// <summary>
-        /// Compares two semantic versions.
+        /// Compares two versions by sort order. Note that sort order is more specific than precedence order.
         /// </summary>
-        /// <param name="left">The left value.</param>
-        /// <param name="right">The right value.</param>
-        /// <returns>If left is less than right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="left"/> precedes <paramref name="right"/>
+        /// in the sort order; otherwise <see langword="false"/>.</returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
         public static bool operator <(SemVersion left, SemVersion right)
             => Compare(left, right) < 0;
 
         /// <summary>
-        /// Compares two semantic versions.
+        /// Compares two versions by sort order. Note that sort order is more specific than precedence order.
         /// </summary>
-        /// <param name="left">The left value.</param>
-        /// <param name="right">The right value.</param>
-        /// <returns>If left is less than or equal to right <see langword="true"/>, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if <paramref name="left"/> precedes or is equal to
+        /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
         public static bool operator <=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) < 0;
     }

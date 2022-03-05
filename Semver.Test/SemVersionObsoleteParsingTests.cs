@@ -162,7 +162,7 @@ namespace Semver.Test
                 {"1.0.0-0A", 1, 0, 0, "0A", ""},
             };
 
-        public static readonly TheoryData<string, int, int, int, string, string> DashInStrangePlace =
+        public static readonly TheoryData<string, int, int, int, string, string> HyphenInStrangePlace =
             new TheoryData<string, int, int, int, string, string>()
             {
                 {"1.2.3--+b", 1, 2, 3, "-", "b"},
@@ -311,7 +311,7 @@ namespace Semver.Test
         [MemberData(nameof(RegexValidExamples))]
         [MemberData(nameof(BasicValid))]
         [MemberData(nameof(MiscValid))]
-        [MemberData(nameof(DashInStrangePlace))]
+        [MemberData(nameof(HyphenInStrangePlace))]
         [MemberData(nameof(MissingPatchValid))]
         [MemberData(nameof(MissingMinorPatchValid))]
         [MemberData(nameof(LeadingZeros))]
@@ -379,7 +379,7 @@ namespace Semver.Test
         [MemberData(nameof(RegexValidExamples))]
         [MemberData(nameof(BasicValid))]
         [MemberData(nameof(MiscValid))]
-        [MemberData(nameof(DashInStrangePlace))]
+        [MemberData(nameof(HyphenInStrangePlace))]
         [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
         // Leading zero versions are accepted and shouldn't be (issue #16)
         [MemberData(nameof(LeadingZeros))]
@@ -469,7 +469,7 @@ namespace Semver.Test
         [MemberData(nameof(RegexValidExamples))]
         [MemberData(nameof(BasicValid))]
         [MemberData(nameof(MiscValid))]
-        [MemberData(nameof(DashInStrangePlace))]
+        [MemberData(nameof(HyphenInStrangePlace))]
         [MemberData(nameof(MissingPatchValid))]
         [MemberData(nameof(MissingMinorPatchValid))]
         [MemberData(nameof(LeadingZeros))]
@@ -507,7 +507,7 @@ namespace Semver.Test
         [MemberData(nameof(RegexValidExamples))]
         [MemberData(nameof(BasicValid))]
         [MemberData(nameof(MiscValid))]
-        [MemberData(nameof(DashInStrangePlace))]
+        [MemberData(nameof(HyphenInStrangePlace))]
         [MemberData(nameof(LeadingZerosPrereleaseAlphanumeric))]
         // Leading zero versions are accepted and shouldn't be (issue #16)
         [MemberData(nameof(LeadingZeros))]
@@ -558,7 +558,7 @@ namespace Semver.Test
         [MemberData(nameof(RegexValidExamples))]
         [MemberData(nameof(BasicValid))]
         [MemberData(nameof(MiscValid))]
-        [MemberData(nameof(DashInStrangePlace))]
+        [MemberData(nameof(HyphenInStrangePlace))]
         [MemberData(nameof(MissingPatchValid))]
         [MemberData(nameof(MissingMinorPatchValid))]
         [MemberData(nameof(LeadingZeros))]

@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<docParts>
+    <part id="OldSortOrder">
+        <remarks>
+            <para>Sort order is consistent with precedence order, but provides an order for versions
+            with the same precedence. Sort order is determined by comparing the major, minor,
+            patch, prerelease, and build metadata portions in order from left to right. The major,
+            minor, and patch versions are compared numerically. A prerelease version precedes a release
+            version.</para>
+            <para>The prerelease portion is compared by comparing each prerelease identifier from
+            left to right. Numeric prerelease identifiers proceed alphanumeric identifiers. Numeric
+            identifiers are compared numerically. Alphanumeric identifiers are compared lexically
+            in ASCII sort order. A longer series of prerelease identifiers follows a shorter series
+            if all the preceding identifiers are equal.</para>
+            <para>Otherwise equal versions without build metadata precede those with metadata. The
+            build metadata is compared by comparing each metadata identifier. Numeric identifiers
+            are compared numerically. Alphanumeric identifiers are compared lexically in ASCII sort
+            order. A longer series of metadata identifiers follows a shorter series if all the
+            preceding identifiers are equal.</para>
+        </remarks>
+    </part>
+    <part id="CompareToReturns">
+        <returns>
+            An integer that indicates whether this instance precedes, follows, or is equal to
+            the other in the sort order.
+            <list type="table">
+                <listheader>
+                    <term>Value</term>
+                    <description>Condition</description>
+                </listheader>
+                <item>
+                    <term>Less than zero</term>
+                    <description>This instance precedes the other in the sort order.</description>
+                </item>
+                <item>
+                    <term>Zero</term>
+                    <description>This instance is equal to the other.</description>
+                </item>
+                <item>
+                    <term>Greater than zero</term>
+                    <description>
+                        This instance follows the other in the sort order
+                        or the other is <see langword="null" />.
+                    </description>
+                </item>
+            </list>
+        </returns>
+    </part>
+</docParts>
