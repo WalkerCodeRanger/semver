@@ -4,8 +4,11 @@ namespace Semver
 {
     /// <summary>
     /// <para>Determines the styles that are allowed in version strings passed to the
-    /// <see cref="SemVersion.Parse(string,SemVersionStyles,int)"/> and <see cref="SemVersion.TryParse(string,SemVersionStyles,out SemVersion,int)"/>
-    /// <c>Parse</c> and <c>TryParse</c> methods of <see cref="SemVersion"/>.</para>
+    /// <see cref="SemVersion.Parse(string,SemVersionStyles,int)"/> and
+    /// <see cref="SemVersion.TryParse(string,SemVersionStyles,out SemVersion,int)"/>
+    /// methods. These styles only affect which strings are accepted when parsing. The
+    /// constructed version numbers are valid semantic versions without any of the
+    /// optional features in the original string.</para>
     ///
     /// <para>This enumeration supports a bitwise combination of its member values.</para>
     /// </summary>
@@ -20,6 +23,7 @@ namespace Semver
         /// <summary>
         /// Allow leading zeros on major, minor, patch, and prerelease version numbers.
         /// </summary>
+        /// <remarks>Leading zeros will be removed from the constructed version number.</remarks>
         AllowLeadingZeros = 1,
 
         /// <summary>
