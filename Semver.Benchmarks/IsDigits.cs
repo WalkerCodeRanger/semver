@@ -12,12 +12,15 @@ namespace Semver.Benchmarks
         private const string Value = "245413548946516575165756156751323245451984";
 
         [Benchmark]
-        public bool ForeachLoop() => ForeachIsDigit(Value);
+        public bool Standard() => Value.IsDigits();
 
         [Benchmark]
-        public bool ForLoop() => ForIsDigit(Value);
+        public bool ForeachLoop() => ForeachIsDigits(Value);
 
-        public static bool ForeachIsDigit(string value)
+        [Benchmark]
+        public bool ForLoop() => ForIsDigits(Value);
+
+        public static bool ForeachIsDigits(string value)
         {
             foreach (var c in value)
                 if (!c.IsDigit())
@@ -26,7 +29,7 @@ namespace Semver.Benchmarks
             return true;
         }
 
-        public static bool ForIsDigit(string value)
+        public static bool ForIsDigits(string value)
         {
             for (var i = 0; i < value.Length; i++)
                 if (!value[i].IsDigit())
