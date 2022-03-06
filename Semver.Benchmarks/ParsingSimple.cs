@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Semver.Benchmarks.Builders;
+using Semver.Utility;
 
 namespace Semver.Benchmarks
 {
@@ -13,8 +13,8 @@ namespace Semver.Benchmarks
         {
             var random = new Random(Seed);
             return Enumerables.Generate(VersionCount,
-                                      () => random.VersionString(maxMetadataIdentifiers: 0))
-                                  .ToList().AsReadOnly();
+                    () => random.VersionString(maxPrereleaseIdentifiers: 0, maxMetadataIdentifiers: 0))
+                .ToReadOnlyList();
         }
     }
 }

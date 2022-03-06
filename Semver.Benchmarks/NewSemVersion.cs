@@ -14,15 +14,15 @@ namespace Semver.Benchmarks
         private const string Metadata = "some.random.metadata.35435345.03534634";
 
         [Benchmark]
-        public string PreviousSimple() => new Previous.SemVersion(1, 2, 3).Prerelease;
+        public string Simple_Previous() => new Previous.SemVersion(1, 2, 3).Prerelease;
 
         [Benchmark]
-        public string Previous() => new Previous.SemVersion(1, 2, 3, Prerelease, Metadata).Prerelease;
+        public string Full_Previous() => new Previous.SemVersion(1, 2, 3, Prerelease, Metadata).Prerelease;
 
         [Benchmark]
-        public string CurrentSimple() => new SemVersion(1, 2, 3).Prerelease;
+        public string Simple_Current() => new SemVersion(1, 2, 3).Prerelease;
 
         [Benchmark]
-        public string Current() => new SemVersion(1, 2, 3, Prerelease, Metadata).Prerelease;
+        public string Full_Current() => new SemVersion(1, 2, 3, Prerelease, Metadata).Prerelease;
     }
 }

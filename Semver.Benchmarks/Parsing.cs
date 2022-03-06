@@ -28,7 +28,7 @@ namespace Semver.Benchmarks
         [Benchmark(OperationsPerInvoke = VersionCount)]
         [Arguments(true)]
         [Arguments(false)]
-        public long PreviousRegExParse(bool strict)
+        public long RegExParse_Previous(bool strict)
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
@@ -44,7 +44,7 @@ namespace Semver.Benchmarks
         [Benchmark(OperationsPerInvoke = VersionCount)]
         [Arguments(true)]
         [Arguments(false)]
-        public long PreviousRegExTryParse(bool strict)
+        public long RegExTryParse_Previous(bool strict)
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
@@ -60,7 +60,7 @@ namespace Semver.Benchmarks
         [Benchmark(OperationsPerInvoke = VersionCount)]
         [Arguments(true)]
         [Arguments(false)]
-        public long CurrentRegExParse(bool strict)
+        public long RegExParse_Current(bool strict)
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
@@ -78,7 +78,7 @@ namespace Semver.Benchmarks
         [Benchmark(OperationsPerInvoke = VersionCount)]
         [Arguments(true)]
         [Arguments(false)]
-        public long CurrentRegExTryParse(bool strict)
+        public long RegExTryParse_Current(bool strict)
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
@@ -96,7 +96,7 @@ namespace Semver.Benchmarks
         [Benchmark(OperationsPerInvoke = VersionCount)]
         [Arguments(SemVersionStyles.Strict)]
         [Arguments(SemVersionStyles.Any)]
-        public long CurrentParsing(SemVersionStyles style)
+        public long Parse_Current(SemVersionStyles style)
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
@@ -112,7 +112,7 @@ namespace Semver.Benchmarks
         [Benchmark(OperationsPerInvoke = VersionCount)]
         [Arguments(SemVersionStyles.Strict)]
         [Arguments(SemVersionStyles.Any)]
-        public long CurrentTryParse(SemVersionStyles style)
+        public long TryParse_Current(SemVersionStyles style)
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
