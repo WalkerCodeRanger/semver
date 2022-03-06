@@ -5,7 +5,9 @@ A Semantic Version Library for .Net
 ===================================
 
 This library implements the `SemVersion` class, which
-complies with v2.0.0 of the spec from <http://semver.org.>
+complies with v2.0.0 of the spec from [semver.org](http://semver.org).
+
+API docs for the most recent release are available online at [semver-nuget.org](https://semver-nuget.org/).
 
 ## Installation
 
