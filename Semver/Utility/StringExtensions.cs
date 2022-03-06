@@ -1,4 +1,7 @@
-﻿namespace Semver.Utility
+﻿using System;
+using System.Collections.Generic;
+
+namespace Semver.Utility
 {
     internal static class StringExtensions
     {
@@ -24,6 +27,49 @@
                     return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// Split a string, map the parts, and return a read only list of the values.
+        /// </summary>
+        /// <remarks>Splitting a string, mapping the result and storing into a <see cref="IReadOnlyList{T}"/>
+        /// is a common operation in this package. This method optimizes that. It avoids the
+        /// performance overhead of:
+        /// <list type="bullet">
+        ///   <item><description>Constructing the params array for <see cref="string.Split(char[])"/></description></item>
+        ///   <item><description>Constructing the intermediate <see cref="T:string[]"/> returned by <see cref="string.Split(char[])"/></description></item>
+        ///   <item><description><see cref="System.Linq.Enumerable.Select{TSource,TResult}(IEnumerable{TSource},Func{TSource,TResult})"/></description></item>
+        ///   <item><description>Not allocating list capacity based on the size</description></item>
+        /// </list>
+        /// Benchmarking shows this to be 30%+ faster and that may not reflect the whole benefit
+        /// since it doesn't fully account for reduced allocations.
+        /// </remarks>
+        public static IReadOnlyList<T> SplitAndMapToReadOnlyList<T>(
+            this string value,
+            char splitOn,
+            Func<string, T> func)
+        {
+            if (value.Length == 0) return ReadOnlyList<T>.Empty;
+
+            // Figure out how many items the resulting list will have
+            int count = 1; // Always one more item than there are separators
+            for (int i = 0; i < value.Length; i++)
+                if (value[i] == splitOn)
+                    count++;
+
+            // Allocate enough capacity for the items
+            var items = new List<T>(count);
+            int start = 0;
+            for (int i = 0; i < value.Length; i++)
+                if (value[i] == splitOn)
+                {
+                    items.Add(func(value.Substring(start, i-start)));
+                    start = i + 1;
+                }
+            // Add the final items from the last separator to the end of the string
+            items.Add(func(value.Substring(start, value.Length - start)));
+
+            return items.AsReadOnly();
         }
     }
 }

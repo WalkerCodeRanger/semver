@@ -15,40 +15,24 @@ namespace Semver.Benchmarks
         public int Number { get; set; }
 
         [Benchmark]
-        public int Standard()
-        {
-            return Number.DecimalDigits();
-        }
+        public int Standard() => Number.DecimalDigits();
 
         [Benchmark]
-        public int Logarithm()
-        {
-            return LogarithmDecimalDigits(Number);
-        }
+        public int Logarithm() => LogarithmDecimalDigits(Number);
 
         [Benchmark]
-        public int String()
-        {
-            return StringDecimalDigits(Number);
-        }
+        public int String() => StringDecimalDigits(Number);
 
         [Benchmark]
-        public int While()
-        {
-            return WhileDecimalDigits(Number);
-        }
+        public int While() => WhileDecimalDigits(Number);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static int LogarithmDecimalDigits(int n)
-        {
-            return (int)Math.Floor(Math.Log10(n) + 1);
-        }
+            => (int)Math.Floor(Math.Log10(n) + 1);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static int StringDecimalDigits(int n)
-        {
-            return n.ToString().Length;
-        }
+            => n.ToString().Length;
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static int WhileDecimalDigits(int n)
