@@ -63,7 +63,9 @@ namespace Semver
         [Obsolete]
         internal static PrereleaseIdentifier CreateLoose(string value)
         {
-            if (value is null) throw new ArgumentNullException(nameof(value));
+#if DEBUG
+            if (value is null) throw new ArgumentNullException(nameof(value), "DEBUG: Value cannot be null.");
+#endif
             // Avoid parsing some non-ASCII digits as a number by checking that they are all digits
             if (value.IsDigits() && int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out var intValue))
                 return new PrereleaseIdentifier(value, intValue);
@@ -236,7 +238,7 @@ namespace Semver
         /// <remarks>Numeric identifiers with leading zeros are considered equal (e.g. '<c>15</c>'
         /// is equal to '<c>015</c>').</remarks>
         public static bool operator ==(PrereleaseIdentifier left, PrereleaseIdentifier right)
-            => Equals(left, right);
+            => left.Equals(right);
 
         /// <summary>
         /// Determines whether two identifiers are <em>not</em> equal.
@@ -246,7 +248,7 @@ namespace Semver
         /// <remarks>Numeric identifiers with leading zeros are considered equal (e.g. '<c>15</c>'
         /// is equal to '<c>015</c>').</remarks>
         public static bool operator !=(PrereleaseIdentifier left, PrereleaseIdentifier right)
-            => !Equals(left, right);
+            => !left.Equals(right);
         #endregion
 
         #region Comparison

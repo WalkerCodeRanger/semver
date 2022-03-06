@@ -87,25 +87,27 @@ namespace Semver
             Minor = minor;
             Patch = patch;
 
-            Prerelease = prerelease ?? "";
-            if (Prerelease.Length == 0)
+            prerelease = prerelease ?? "";
+            Prerelease = prerelease;
+            if (prerelease.Length == 0)
                 PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
             else
-                PrereleaseIdentifiers = Prerelease.Split('.')
+                PrereleaseIdentifiers = prerelease.Split('.')
 #pragma warning disable CS0612 // Type or member is obsolete
                                                   .Select(PrereleaseIdentifier.CreateLoose)
 #pragma warning restore CS0612 // Type or member is obsolete
                                                   .ToReadOnlyList();
 
-            Metadata = build ?? "";
-            if (Metadata.Length == 0)
+            build = build ?? "";
+            Metadata = build;
+            if (build.Length == 0)
                 MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
             else
-                MetadataIdentifiers = Metadata.Split('.')
+                MetadataIdentifiers = build.Split('.')
 #pragma warning disable CS0612 // Type or member is obsolete
-                                              .Select(MetadataIdentifier.CreateLoose)
+                                           .Select(MetadataIdentifier.CreateLoose)
 #pragma warning restore CS0612 // Type or member is obsolete
-                                              .ToReadOnlyList();
+                                           .ToReadOnlyList();
         }
 
         /// <summary>
@@ -277,7 +279,7 @@ namespace Semver
         /// </remarks>
         public static SemVersion FromVersion(Version version)
         {
-            if (version == null) throw new ArgumentNullException(nameof(version));
+            if (version is null) throw new ArgumentNullException(nameof(version));
             if (version.Revision > 0) throw new ArgumentException("Version with Revision number can't be converted to SemVer.", nameof(version));
             var patch = version.Build > 0 ? version.Build : 0;
             return new SemVersion(version.Major, version.Minor, patch);
@@ -673,7 +675,6 @@ namespace Semver
             var identifiers = prereleaseIdentifiers
                               .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros: false, nameof(prereleaseIdentifiers)))
                               .ToReadOnlyList();
-
             return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
         }
 

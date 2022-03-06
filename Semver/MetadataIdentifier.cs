@@ -39,7 +39,9 @@ namespace Semver
         [Obsolete]
         internal static MetadataIdentifier CreateLoose(string value)
         {
-            if (value is null) throw new ArgumentNullException(nameof(value));
+#if DEBUG
+            if (value is null) throw new ArgumentNullException(nameof(value), "DEBUG: Value cannot be null.");
+#endif
             return new MetadataIdentifier(value, UnsafeOverload.Marker);
         }
 
@@ -206,7 +208,7 @@ namespace Semver
         {
             if (value is null) return 1;
             return value is MetadataIdentifier other
-                ? CompareTo(other)
+                ? IdentifierString.Compare(Value, other.Value)
                 : throw new ArgumentException($"Object must be of type {nameof(MetadataIdentifier)}.", nameof(value));
         }
         #endregion

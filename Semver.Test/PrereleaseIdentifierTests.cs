@@ -26,17 +26,6 @@ namespace Semver.Test
             Assert.Equal(intValue, identifier.IntValue);
         }
 
-        [Fact]
-        public void CreateLooseNull()
-        {
-#pragma warning disable CS0612 // Type or member is obsolete
-            var ex = Assert.Throws<ArgumentNullException>(() => PrereleaseIdentifier.CreateLoose(null));
-#pragma warning restore CS0612 // Type or member is obsolete
-
-            Assert.StartsWith("Value cannot be null.", ex.Message);
-            Assert.Equal("value", ex.ParamName);
-        }
-
         [Theory]
         [InlineData("ident", null)]
         [InlineData("42", 42)]
