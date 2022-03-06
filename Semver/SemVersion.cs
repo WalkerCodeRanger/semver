@@ -942,10 +942,7 @@ namespace Semver
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
         /// <exception cref="InvalidCastException">The <paramref name="obj"/> is not a <see cref="SemVersion"/>.</exception>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
-        public int CompareTo(object obj)
-        {
-            return CompareTo((SemVersion)obj);
-        }
+        public int CompareTo(object obj) => CompareTo((SemVersion)obj);
 
         /// <summary>
         /// Compares two versions and indicates whether this instance precedes, follows, or is
@@ -968,10 +965,7 @@ namespace Semver
         /// </summary>
         /// <param name="other">The semantic version to compare to.</param>
         /// <returns><see langword="true"/> if the version precedences are equal.</returns>
-        public bool PrecedenceMatches(SemVersion other)
-        {
-            return CompareByPrecedence(other) == 0;
-        }
+        public bool PrecedenceMatches(SemVersion other) => CompareByPrecedence(other) == 0;
 
         /// <summary>
         /// Compares two versions and indicates whether the first precedes, follows, or is in the same
