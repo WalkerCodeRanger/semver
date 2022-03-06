@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Semver.Utility;
@@ -37,16 +38,19 @@ namespace Semver.Benchmarks
             return WhileDecimalDigits(Number);
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private static int LogarithmDecimalDigits(int n)
         {
             return (int)Math.Floor(Math.Log10(n) + 1);
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private static int StringDecimalDigits(int n)
         {
             return n.ToString().Length;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static int WhileDecimalDigits(int n)
         {
             int digits = 1;
