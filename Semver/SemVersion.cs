@@ -109,6 +109,88 @@ namespace Semver
         }
 
         /// <summary>
+        /// Constructs a new instance of the <see cref="SemVersion" /> class.
+        /// </summary>
+        /// <param name="major">The major version number.</param>
+        /// <param name="minor">The minor version number.</param>
+        /// <param name="patch">The patch version number.</param>
+        // Constructor needed to resolve ambiguity between other overloads with default parameters.
+        public SemVersion(int major, int minor, int patch)
+            : this(major, minor, patch, "", "")
+        {
+        }
+
+        /// <summary>
+        /// Constructs a new instance of the <see cref="SemVersion" /> class.
+        /// </summary>
+        /// <param name="major">The major version number.</param>
+        /// <param name="minor">The minor version number.</param>
+        /// <param name="patch">The patch version number.</param>
+        /// <param name="prerelease">The prerelease identifiers.</param>
+        /// <param name="metadata">The build metadata identifiers.</param>
+        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
+        /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public SemVersion(
+            int major,
+            int minor,
+            int patch,
+            IEnumerable<PrereleaseIdentifier> prerelease = null,
+            IEnumerable<MetadataIdentifier> metadata = null)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+        {
+            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
+            if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
+            IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers;
+            if (prerelease is null)
+                prereleaseIdentifiers = null;
+            else
+            {
+                prereleaseIdentifiers = prerelease.ToReadOnlyList();
+                if (prereleaseIdentifiers.Any(i => i == default))
+                    throw new ArgumentException(PrereleaseIdentifierIsDefaultMessage, nameof(prerelease));
+            }
+
+            IReadOnlyList<MetadataIdentifier> metadataIdentifiers;
+            if (metadata is null)
+                metadataIdentifiers = null;
+            else
+            {
+                metadataIdentifiers = metadata.ToReadOnlyList();
+                if (metadataIdentifiers.Any(i => i == default))
+                    throw new ArgumentException(MetadataIdentifierIsDefaultMessage, nameof(metadata));
+            }
+
+            Major = major;
+            Minor = minor;
+            Patch = patch;
+
+            if (prereleaseIdentifiers is null || prereleaseIdentifiers.Count == 0)
+            {
+                Prerelease = "";
+                PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
+            }
+            else
+            {
+                Prerelease = string.Join(".", prereleaseIdentifiers);
+                PrereleaseIdentifiers = prereleaseIdentifiers;
+            }
+
+            if (metadataIdentifiers is null || metadataIdentifiers.Count == 0)
+            {
+                Metadata = "";
+                MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
+            }
+            else
+            {
+                Metadata = string.Join(".", metadataIdentifiers);
+                MetadataIdentifiers = metadataIdentifiers;
+            }
+        }
+
+        /// <summary>
         /// Constructs a new instance of the <see cref="SemVersion"/> class from
         /// a <see cref="Version"/>.
         /// </summary>
@@ -146,13 +228,11 @@ namespace Semver
             }
         }
 
-        // TODO create a public constructor accepting IReadOnlyList<PrereleaseIdentifier> and  IReadOnlyList<MetadataIdentifier>
-
         /// <summary>
         /// Construct a <see cref="SemVersion"/> from its proper parts.
         /// </summary>
         /// <remarks>Parameter validation is not performed. The <paramref name="major"/>,
-        /// <paramref name="minor"/>, and <paramref name="patch"/> versions must not be
+        /// <paramref name="minor"/>, and <paramref name="patch"/> version numbers must not be
         /// negative. The <paramref name="prereleaseIdentifiers"/> and
         /// <paramref name="metadataIdentifiers"/> must not be null or contain invalid
         /// values and must be immutable.</remarks>
@@ -994,7 +1074,6 @@ namespace Semver
 
             return aComps.Length.CompareTo(bComps.Length);
         }
-
 
         /// <summary>Determines whether the given object is equal to this version.</summary>
         /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this identifier;
