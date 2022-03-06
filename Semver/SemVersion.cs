@@ -113,7 +113,7 @@ namespace Semver
         /// a <see cref="Version"/>.
         /// </summary>
         /// <param name="version"><see cref="Version"/> used to initialize
-        /// the major, minor, and match version numbers and the build metadata.</param>
+        /// the major, minor, and patch version numbers and the build metadata.</param>
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is null.</exception>
         /// <remarks>Constructs a <see cref="SemVersion"/> with the same major and
         /// minor version numbers. The patch version number will be the fourth component
@@ -145,6 +145,8 @@ namespace Semver
                 MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
             }
         }
+
+        // TODO create a public constructor accepting IReadOnlyList<PrereleaseIdentifier> and  IReadOnlyList<MetadataIdentifier>
 
         /// <summary>
         /// Construct a <see cref="SemVersion"/> from its proper parts.
@@ -183,14 +185,15 @@ namespace Semver
         /// <param name="version">The version to be converted to a semantic version.</param>
         /// <returns>The equivalent semantic version.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="version"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="version"/> has a Revision greater than zero.</exception>
+        /// <exception cref="ArgumentException"><paramref name="version"/> has a revision number greater than zero.</exception>
         /// <remarks>
         /// <see cref="Version"/> numbers have the form <em>major</em>.<em>minor</em>[.<em>build</em>[.<em>revision</em>]]
         /// where square brackets ('[' and ']')  indicate optional components. The first three parts
-        /// are converted to the major, minor, and match versions of a semantic version. If the build component
-        /// is not defined (-1), the patch number is assumed to be zero. <see cref="Version"/> numbers
-        /// with a revision greater than zero cannot be converted to semantic versions. An
-        /// <see cref="ArgumentException"/> is thrown when this method is called with such a <see cref="Version"/>.
+        /// are converted to the major, minor, and patch version numbers of a semantic version. If the
+        /// build component is not defined (-1), the patch number is assumed to be zero.
+        /// <see cref="Version"/> numbers with a revision greater than zero cannot be converted to
+        /// semantic versions. An <see cref="ArgumentException"/> is thrown when this method is called
+        /// with such a <see cref="Version"/>.
         /// </remarks>
         public static SemVersion FromVersion(Version version)
         {
@@ -205,7 +208,7 @@ namespace Semver
         /// </summary>
         /// <returns>The equivalent <see cref="Version"/>.</returns>
         /// <exception cref="InvalidOperationException">The semantic version is a prerelease version
-        /// or has build metadata or has a negative major, minor, or patch version.</exception>
+        /// or has build metadata or has a negative major, minor, or patch version number.</exception>
         /// <remarks>
         /// A semantic version of the form <em>major</em>.<em>minor</em>.<em>patch</em>
         /// is converted to a <see cref="Version"/> of the form
@@ -424,7 +427,7 @@ namespace Semver
         /// <see langword="null"/> to leave it unchanged.</param>
         /// <param name="patch">The value to replace the patch version number or
         /// <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="prerelease">The value to replace the prerelease version
+        /// <param name="prerelease">The value to replace the prerelease portion
         /// or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="build">The value to replace the build metadata or <see langword="null"/>
         /// to leave it unchanged.</param>
@@ -435,7 +438,7 @@ namespace Semver
         /// </remarks>
         /// <example>
         /// To change only the patch version:
-        /// <code>var newVersion = version.Change(patch: 4);</code>
+        /// <code>var changedVersion = version.Change(patch: 4);</code>
         /// </example>
         [Obsolete("Method is obsolete. Use With() or With...() method instead.")]
         public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
@@ -452,12 +455,12 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance with changed properties.
         /// </summary>
-        /// <param name="major">The value to replace the major version or <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="minor">The value to replace the minor version or <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="patch">The value to replace the patch version or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="major">The value to replace the major version number or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="minor">The value to replace the minor version number or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="patch">The value to replace the patch version number or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="prerelease">The value to replace the prerelease identifiers or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="metadata">The value to replace the build metadata identifiers or <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading zeros will be trimmed.</param>
+        /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading zeros will be removed.</param>
         /// <returns>The new version with changed properties.</returns>
         /// <remarks>
         /// The <see cref="With"/> method is intended to be called using named argument syntax, passing only
@@ -465,7 +468,7 @@ namespace Semver
         /// </remarks>
         /// <example>
         /// To change only the patch version:
-        /// <code>version.With(patch: 4)</code>
+        /// <code>var modifiedVersion = version.With(patch: 4);</code>
         /// </example>
         public SemVersion With(
             int? major = null,
@@ -773,7 +776,7 @@ namespace Semver
         /// The prerelease identifiers for this version.
         /// </summary>
         /// <value>
-        /// The prerelease identifiers for this version or empty if this is a release version.
+        /// The prerelease identifiers for this version or empty string if this is a release version.
         /// </value>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrereleaseIdentifiers"]/*'/>
         // TODO v3.0.0 this should be null when there is no prerelease identifiers
@@ -927,7 +930,7 @@ namespace Semver
         /// prerelease version precedes a release version.</para>
         ///
         /// <para>The prerelease portion is compared by comparing each prerelease identifier from
-        /// left to right. Numeric prerelease identifiers proceed alphanumeric identifiers. Numeric
+        /// left to right. Numeric prerelease identifiers precede alphanumeric identifiers. Numeric
         /// identifiers are compared numerically. Alphanumeric identifiers are compared lexically
         /// in ASCII sort order. A longer series of prerelease identifiers follows a shorter series
         /// if all the preceding identifiers are equal.</para>
@@ -1058,7 +1061,7 @@ namespace Semver
         /// <returns>The <see cref="SemVersion"/> object.</returns>
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
-        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <c>int.MaxValue</c>.</exception>
+        /// <exception cref="OverflowException">The major, minor, or patch version number is larger than <see cref="int.MaxValue"/>.</exception>
         [Obsolete("Implicit conversion from string is obsolete. Use Parse() or TryParse() method instead.")]
         public static implicit operator SemVersion(string version)
             => Parse(version);
