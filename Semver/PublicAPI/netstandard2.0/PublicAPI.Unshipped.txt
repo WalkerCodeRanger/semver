@@ -42,7 +42,7 @@ Semver.SemVersion.WithPatch(int patch) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(params string[] prereleaseIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(string prerelease, bool allowLeadingZeros = false) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier> prereleaseIdentifiers) -> Semver.SemVersion
-Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<string> prereleaseIdentifiers, bool allowLeadingZeros = false) -> Semver.SemVersion
+Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<string> prereleaseIdentifiers) -> Semver.SemVersion
 Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLeadingWhitespace = 2 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLeadingZeros = 1 -> Semver.SemVersionStyles

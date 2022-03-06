@@ -644,9 +644,7 @@ namespace Semver
         /// will never create a <see cref="PrereleaseIdentifier"/> with leading zeros even if
         /// <paramref name="allowLeadingZeros"/> is <see langword="true"/>. Any leading zeros will
         /// be removed.</remarks>
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public SemVersion WithPrerelease(string prerelease, bool allowLeadingZeros = false)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             if (prerelease is null) throw new ArgumentNullException(nameof(prerelease));
             if (prerelease.Length == 0) return WithoutPrerelease();
@@ -683,28 +681,19 @@ namespace Semver
         /// Creates a copy of the current instance with a different prerelease identifiers.
         /// </summary>
         /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
-        /// <param name="allowLeadingZeros">Whether to allow leading zeros in the prerelease identifiers.
-        /// If <see langword="true"/>, leading zeros will be allowed on numeric identifiers
-        /// but will be removed.</param>
         /// <returns>The new version with the different prerelease portion.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is
         /// <see langword="null"/> or one of the prerelease identifiers is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
-        /// zeros for a numeric identifier when <paramref name="allowLeadingZeros"/> is <see langword="false"/>.</exception>
+        /// zeros for a numeric identifier.</exception>
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
         /// for <see cref="Int32"/>.</exception>
-        /// <remarks>Because a valid numeric identifier does not have leading zeros, this constructor
-        /// will never create a <see cref="PrereleaseIdentifier"/> with leading zeros even if
-        /// <paramref name="allowLeadingZeros"/> is <see langword="true"/>. Any leading zeros will
-        /// be removed.</remarks>
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
-        public SemVersion WithPrerelease(IEnumerable<string> prereleaseIdentifiers, bool allowLeadingZeros = false)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+        public SemVersion WithPrerelease(IEnumerable<string> prereleaseIdentifiers)
         {
             if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
             var identifiers = prereleaseIdentifiers
-                              .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prereleaseIdentifiers)))
+                              .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros: false, nameof(prereleaseIdentifiers)))
                               .ToReadOnlyList();
             if (identifiers.Count == 0) return WithoutPrerelease();
             return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
@@ -831,7 +820,6 @@ namespace Semver
                 ReadOnlyList<PrereleaseIdentifier>.Empty,
                 ReadOnlyList<MetadataIdentifier>.Empty);
         }
-
         #endregion
 
         /// <summary>The major version number.</summary>
