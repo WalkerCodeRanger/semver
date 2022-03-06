@@ -89,25 +89,15 @@ namespace Semver
 
             prerelease = prerelease ?? "";
             Prerelease = prerelease;
-            if (prerelease.Length == 0)
-                PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
-            else
-                PrereleaseIdentifiers = prerelease.Split('.')
 #pragma warning disable CS0612 // Type or member is obsolete
-                                                  .Select(PrereleaseIdentifier.CreateLoose)
+            PrereleaseIdentifiers = prerelease.SplitAndMapToReadOnlyList('.', PrereleaseIdentifier.CreateLoose);
 #pragma warning restore CS0612 // Type or member is obsolete
-                                                  .ToReadOnlyList();
 
             build = build ?? "";
             Metadata = build;
-            if (build.Length == 0)
-                MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
-            else
-                MetadataIdentifiers = build.Split('.')
 #pragma warning disable CS0612 // Type or member is obsolete
-                                           .Select(MetadataIdentifier.CreateLoose)
+            MetadataIdentifiers = build.SplitAndMapToReadOnlyList('.', MetadataIdentifier.CreateLoose);
 #pragma warning restore CS0612 // Type or member is obsolete
-                                           .ToReadOnlyList();
         }
 
         /// <summary>
@@ -569,16 +559,10 @@ namespace Semver
             if (patch is int patchInt && patchInt < 0)
                 throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
 
-            var prereleaseIdentifiers = prerelease?.Length == 0
-                ? ReadOnlyList<PrereleaseIdentifier>.Empty
-                : prerelease?.Split('.')
-                             .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prerelease)))
-                             .ToReadOnlyList();
-            var metadataIdentifiers = metadata?.Length == 0
-                ? ReadOnlyList<MetadataIdentifier>.Empty
-                : metadata?.Split('.')
-                           .Select(i => new MetadataIdentifier(i, nameof(metadata)))
-                           .ToReadOnlyList();
+            var prereleaseIdentifiers = prerelease?.SplitAndMapToReadOnlyList('.',
+                i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prerelease)));
+            var metadataIdentifiers = metadata?.SplitAndMapToReadOnlyList('.',
+                i => new MetadataIdentifier(i, nameof(metadata)));
 
             return new SemVersion(
                 major ?? Major,
@@ -650,9 +634,8 @@ namespace Semver
         {
             if (prerelease is null) throw new ArgumentNullException(nameof(prerelease));
             if (prerelease.Length == 0) return WithoutPrerelease();
-            var identifiers = prerelease.Split('.')
-                              .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prerelease)))
-                              .ToReadOnlyList();
+            var identifiers = prerelease.SplitAndMapToReadOnlyList('.',
+                i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prerelease)));
             return new SemVersion(Major, Minor, Patch, identifiers, MetadataIdentifiers);
         }
 
@@ -738,9 +721,8 @@ namespace Semver
         {
             if (metadata is null) throw new ArgumentNullException(nameof(metadata));
             if (metadata.Length == 0) return WithoutMetadata();
-            var identifiers = metadata.Split('.')
-                                      .Select(i => new MetadataIdentifier(i, nameof(metadata)))
-                                      .ToReadOnlyList();
+            var identifiers = metadata.SplitAndMapToReadOnlyList('.',
+                i => new MetadataIdentifier(i, nameof(metadata)));
             return new SemVersion(Major, Minor, Patch, PrereleaseIdentifiers, identifiers);
         }
 
