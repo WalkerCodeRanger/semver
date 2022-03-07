@@ -442,7 +442,9 @@ namespace Semver.Test
             Assert.Equal(testCase.Patch, version.Patch);
             Assert.Equal(testCase.PrereleaseIdentifiers, version.PrereleaseIdentifiers);
             Assert.Equal(string.Join(".", testCase.PrereleaseIdentifiers), version.Prerelease);
-            Assert.Equal(testCase.PrereleaseIdentifiers.Any(), version.IsPrerelease);
+            var isPrerelease = testCase.PrereleaseIdentifiers.Any();
+            Assert.Equal(isPrerelease, version.IsPrerelease);
+            Assert.Equal(!isPrerelease, version.IsRelease);
             Assert.Equal(testCase.MetadataIdentifiers, version.MetadataIdentifiers);
             Assert.Equal(string.Join(".", testCase.MetadataIdentifiers), version.Metadata);
 #pragma warning disable 618 // Obsolete Warning

@@ -20,11 +20,12 @@ namespace Semver.Test
         [InlineData(1, 2, 3, "😞", "b", true)]
         [InlineData(1, 2, 3, "", "b", false)]
         [InlineData(1, 2, 3, null, "b", false)]
-        public void IsPrereleaseTest(int major, int minor, int patch, string prerelease, string metadata, bool expected)
+        public void IsPrereleaseAndIsReleaseTest(int major, int minor, int patch, string prerelease, string metadata, bool expected)
         {
             var v = new SemVersion(major, minor, patch, prerelease, metadata);
 
-            Assert.True(expected == v.IsPrerelease, v.ToString());
+            Assert.True(expected == v.IsPrerelease, $"({v}).IsPrerelease");
+            Assert.True(expected != v.IsRelease, $"({v}).IsRelease");
         }
 
         #region System.Version

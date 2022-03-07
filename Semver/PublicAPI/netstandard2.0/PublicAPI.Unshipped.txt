@@ -22,6 +22,7 @@ Semver.PrereleaseIdentifier.PrereleaseIdentifier(string value, bool allowLeading
 Semver.PrereleaseIdentifier.Value.get -> string
 Semver.SemVersion.Equals(Semver.SemVersion other) -> bool
 Semver.SemVersion.IsPrerelease.get -> bool
+Semver.SemVersion.IsRelease.get -> bool
 Semver.SemVersion.Metadata.get -> string
 Semver.SemVersion.MetadataIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.MetadataIdentifier>
 Semver.SemVersion.PrereleaseIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.PrereleaseIdentifier>

@@ -882,6 +882,16 @@ namespace Semver
         /// be an empty collection.</remarks>
         public bool IsPrerelease => Prerelease.Length != 0;
 
+        /// <summary>Whether this is a release version.</summary>
+        /// <value>Whether this is a release version. A semantic version without
+        /// prerelease identifiers is a release version.</value>
+        /// <remarks>When this is <see langword="true"/>, the <see cref="Prerelease"/>
+        /// property will be an empty string and the <see cref="PrereleaseIdentifiers"/>
+        /// will be an empty collection. When this is <see langword="false"/>,
+        /// the <see cref="Prerelease"/> and <see cref="PrereleaseIdentifiers"/>
+        /// properties are non-empty.</remarks>
+        public bool IsRelease => Prerelease.Length == 0;
+
         /// <summary>The build metadata for this version.</summary>
         /// <value>
         /// The build metadata for this version or empty string if there is no build metadata.
