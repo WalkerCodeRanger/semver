@@ -157,10 +157,7 @@ namespace Semver
                 if (value.Length > 1 && value[0] == '0')
                 {
                     if (allowLeadingZeros)
-                    {
-                        value = value.TrimStart('0');
-                        if (value.Length == 0) value = "0";
-                    }
+                        value = value.TrimLeadingZeros();
                     else
                         throw new ArgumentException($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'.", paramName);
                 }

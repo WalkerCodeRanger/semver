@@ -213,7 +213,13 @@ namespace Semver.Test
             Valid("1.2.3-01", AllowLeadingZeros, 1, 2, 3, Pre(1)),
             Valid("1.2.3-a.01", AllowLeadingZeros, 1, 2, 3, Pre("a", 1)),
             Valid("1.2.3-a.01.c", AllowLeadingZeros, 1, 2, 3, Pre("a", 1, "c")),
+            Valid("1.2.3-a.050.c", AllowLeadingZeros, 1, 2, 3, Pre("a", 50, "c")),
             Valid("1.2.3-a.00001.c", AllowLeadingZeros, 1, 2, 3, Pre("a", 1, "c")),
+
+            // Simple zero in prerelease identifiers (leading zero check is correct)
+            Valid("1.2.3-0", 1, 2, 3, Pre(0)),
+            Valid("1.2.3-pre.0", 1, 2, 3, Pre("pre", 0)),
+            Valid("1.2.3-pre.0.42", 1, 2, 3, Pre("pre", 0, 42)),
 
             // Longer than max length
             Invalid("1.0.0-length", TooLongVersionMessage, "2", maxLength: 2),

@@ -134,26 +134,34 @@ namespace Semver
             }
 
             // Parse prerelease version
+            string prerelease;
             IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers;
             if (i < version.Length && version[i] == '-')
             {
                 i += 1;
-                parseEx = ParsePrerelease(version, ref i, startOfMetadata, allowLeadingZeros, ex, out prereleaseIdentifiers);
+                parseEx = ParsePrerelease(version, ref i, startOfMetadata, allowLeadingZeros, ex, out prerelease, out prereleaseIdentifiers);
                 if (parseEx != null) return parseEx;
             }
             else
+            {
+                prerelease = "";
                 prereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
+            }
 
             // Parse metadata
+            string metadata;
             IReadOnlyList<MetadataIdentifier> metadataIdentifiers;
             if (i < version.Length && version[i] == '+')
             {
                 i += 1;
-                parseEx = ParseMetadata(version, ref i, startOfTrailingWhitespace, ex, out metadataIdentifiers);
+                parseEx = ParseMetadata(version, ref i, startOfTrailingWhitespace, ex, out metadata, out metadataIdentifiers);
                 if (parseEx != null) return parseEx;
             }
             else
+            {
+                metadata = "";
                 metadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
+            }
 
             // There shouldn't be any unprocessed characters before the trailing whitespace.
             // If there is, it is a programmer mistake, so immediately throw an exception rather
@@ -165,7 +173,8 @@ namespace Semver
             if (startOfTrailingWhitespace != version.Length && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
                 return ex ?? NewFormatException(TrailingWhitespaceMessage, LimitLength(version));
 
-            semver = new SemVersion(major, minor, patch, prereleaseIdentifiers, metadataIdentifiers);
+            semver = new SemVersion(major, minor, patch,
+                prerelease, prereleaseIdentifiers, metadata, metadataIdentifiers);
             return null;
         }
 
@@ -280,10 +289,14 @@ namespace Semver
             int startOfNext,
             bool allowLeadingZero,
             Exception ex,
+            out string prerelease,
             out IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers)
         {
+            prerelease = null;
             var identifiers = new List<PrereleaseIdentifier>();
             prereleaseIdentifiers = identifiers.AsReadOnly();
+            var startOfPrerelease = i;
+            bool hasLeadingZeros = false;
             i -= 1; // Back up so we are before the start of the first identifier
             do
             {
@@ -312,8 +325,12 @@ namespace Semver
                     identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, null));
                 else
                 {
-                    if (!allowLeadingZero && version[s] == '0')
-                        return ex ?? NewFormatException(LeadingZeroInPrereleaseMessage, LimitLength(version));
+                    if (identifier[0] == '0' && identifier.Length > 1)
+                    {
+                        if (!allowLeadingZero) return ex ?? NewFormatException(LeadingZeroInPrereleaseMessage, LimitLength(version));
+                        hasLeadingZeros = true;
+                        identifier = identifier.TrimLeadingZeros();
+                    }
 
                     if (!int.TryParse(identifier, NumberStyles.None, null, out var intValue))
                         // Parsing validated this as a string of digits possibly proceeded by zero so the only
@@ -321,10 +338,14 @@ namespace Semver
                         return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
                             PrereleaseOverflowMessage, LimitLength(version), identifier));
 
-                    identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier.TrimStart('0'), intValue));
+                    identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, intValue));
                 }
 
             } while (i < startOfNext && version[i] == '.');
+
+            // If there are leading zeros, reconstruct the string from the identifiers, otherwise just take a substring
+            prerelease = hasLeadingZeros
+                ? string.Join(".", identifiers) : version.Substring(startOfPrerelease, startOfNext - startOfPrerelease);
 
             return null;
         }
@@ -334,8 +355,10 @@ namespace Semver
             ref int i,
             int startOfNext,
             Exception ex,
+            out string metadata,
             out IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
+            metadata = version.Substring(i, startOfNext - i);
             var identifiers = new List<MetadataIdentifier>();
             metadataIdentifiers = identifiers.AsReadOnly();
             i -= 1; // Back up so we are before the start of the first identifier

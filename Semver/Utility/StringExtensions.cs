@@ -71,5 +71,22 @@ namespace Semver.Utility
 
             return items.AsReadOnly();
         }
+
+        /// <summary>
+        /// Trim leading zeros from a numeric string. If the string consists of all zeros, return
+        /// <c>"0"</c>.
+        /// </summary>
+        /// <remarks>The standard <see cref="string.TrimStart"/> method handles all zeros
+        /// by returning <c>""</c>. This efficiently handles the kind of trimming needed.</remarks>
+        public static string TrimLeadingZeros(this string value)
+        {
+            int start;
+            var searchUpTo = value.Length - 1;
+            for (start = 0; start < searchUpTo; start++)
+                if (value[start] != '0')
+                    break;
+
+            return value.Substring(start);
+        }
     }
 }
