@@ -15,7 +15,7 @@ Semver.PrereleaseIdentifier
 Semver.PrereleaseIdentifier.CompareTo(object value) -> int
 Semver.PrereleaseIdentifier.CompareTo(Semver.PrereleaseIdentifier value) -> int
 Semver.PrereleaseIdentifier.Equals(Semver.PrereleaseIdentifier value) -> bool
-Semver.PrereleaseIdentifier.IntValue.get -> int?
+Semver.PrereleaseIdentifier.NumericValue.get -> int?
 Semver.PrereleaseIdentifier.PrereleaseIdentifier() -> void
 Semver.PrereleaseIdentifier.PrereleaseIdentifier(int value) -> void
 Semver.PrereleaseIdentifier.PrereleaseIdentifier(string value, bool allowLeadingZeros = false) -> void

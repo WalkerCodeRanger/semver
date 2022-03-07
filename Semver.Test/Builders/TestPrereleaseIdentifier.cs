@@ -5,12 +5,12 @@ namespace Semver.Test.Builders
     public readonly struct TestPrereleaseIdentifier
     {
         public string Value { get; }
-        public int? IntValue { get; }
+        public int? NumericValue { get; }
 
-        public TestPrereleaseIdentifier(string value, int? intValue)
+        public TestPrereleaseIdentifier(string value, int? numericValue)
         {
             Value = value;
-            IntValue = intValue;
+            NumericValue = numericValue;
         }
 
         public static implicit operator TestPrereleaseIdentifier(string value)
@@ -25,7 +25,7 @@ namespace Semver.Test.Builders
 
         public static implicit operator PrereleaseIdentifier(TestPrereleaseIdentifier identifier)
         {
-            if (identifier.IntValue is int intValue) return new PrereleaseIdentifier(intValue);
+            if (identifier.NumericValue is int numericValue) return new PrereleaseIdentifier(numericValue);
 
             return new PrereleaseIdentifier(identifier.Value);
         }

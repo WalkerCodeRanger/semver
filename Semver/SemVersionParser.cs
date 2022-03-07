@@ -332,13 +332,13 @@ namespace Semver
                         identifier = identifier.TrimLeadingZeros();
                     }
 
-                    if (!int.TryParse(identifier, NumberStyles.None, null, out var intValue))
+                    if (!int.TryParse(identifier, NumberStyles.None, null, out var numericValue))
                         // Parsing validated this as a string of digits possibly proceeded by zero so the only
                         // possible issue is a numeric overflow for `int`
                         return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
                             PrereleaseOverflowMessage, LimitLength(version), identifier));
 
-                    identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, intValue));
+                    identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, numericValue));
                 }
 
             } while (i < startOfNext && version[i] == '.');

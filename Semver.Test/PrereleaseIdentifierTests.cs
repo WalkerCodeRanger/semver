@@ -16,14 +16,14 @@ namespace Semver.Test
         [InlineData("hello@", null)]
         [InlineData("", null)]
         [InlineData("၄", null)] // Non-ASCII digit
-        public void CreateLoose(string value, int? intValue)
+        public void CreateLoose(string value, int? numericValue)
         {
 #pragma warning disable CS0612 // Type or member is obsolete
             var identifier = PrereleaseIdentifier.CreateLoose(value);
 #pragma warning restore CS0612 // Type or member is obsolete
 
             Assert.Equal(value, identifier.Value);
-            Assert.Equal(intValue, identifier.IntValue);
+            Assert.Equal(numericValue, identifier.NumericValue);
         }
 
         [Theory]
@@ -32,12 +32,12 @@ namespace Semver.Test
         [InlineData("0-1", null)]
         [InlineData("0A", null)]
         [InlineData("-1", null)]
-        public void CreateUnsafe(string value, int? intValue)
+        public void CreateUnsafe(string value, int? numericValue)
         {
-            var identifier = PrereleaseIdentifier.CreateUnsafe(value, intValue);
+            var identifier = PrereleaseIdentifier.CreateUnsafe(value, numericValue);
 
             Assert.Equal(value, identifier.Value);
-            Assert.Equal(intValue, identifier.IntValue);
+            Assert.Equal(numericValue, identifier.NumericValue);
         }
 
         [Theory]
@@ -72,12 +72,13 @@ namespace Semver.Test
         [InlineData("1", false, "1", 1)]
         [InlineData("00", true, "0", 0)]
         [InlineData("01", true, "1", 1)]
-        public void ConstructWithString(string value, bool allowLeadingZeros, string expectedValue, int? expectedIntValue)
+        public void ConstructWithString(string value, bool allowLeadingZeros,
+            string expectedValue, int? expectedNumericValue)
         {
             var identifier = new PrereleaseIdentifier(value, allowLeadingZeros);
 
             Assert.Equal(expectedValue, identifier.Value);
-            Assert.Equal(expectedIntValue, identifier.IntValue);
+            Assert.Equal(expectedNumericValue, identifier.NumericValue);
         }
 
         [Fact]
@@ -126,7 +127,7 @@ namespace Semver.Test
             var identifier = new PrereleaseIdentifier(value);
 
             Assert.Equal(value.ToString(CultureInfo.InvariantCulture), identifier.Value);
-            Assert.Equal(value, identifier.IntValue);
+            Assert.Equal(value, identifier.NumericValue);
         }
 
         [Theory]
