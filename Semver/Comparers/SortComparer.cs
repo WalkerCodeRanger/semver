@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Semver.Utility;
 
 namespace Semver.Comparers
@@ -19,57 +18,15 @@ namespace Semver.Comparers
             if (x is null || y is null) return false;
 
             return x.Major == y.Major && x.Minor == y.Minor && x.Patch == y.Patch
-                   && Equals(x.PrereleaseIdentifiers, y.PrereleaseIdentifiers)
-                   && Equals(x.MetadataIdentifiers, y.MetadataIdentifiers);
-        }
-
-        /// <summary>
-        /// Compare prerelease identifiers by their string value so that "01" != "1"
-        /// </summary>
-        private static bool Equals(
-            IReadOnlyList<PrereleaseIdentifier> xIdentifiers,
-            IReadOnlyList<PrereleaseIdentifier> yIdentifiers)
-        {
-            if (xIdentifiers.Count != yIdentifiers.Count) return false;
-
-            for (int i = 0; i < xIdentifiers.Count; i++)
-                if (xIdentifiers[i].Value != yIdentifiers[i].Value)
-                    return false;
-
-            return true;
-        }
-
-        private static bool Equals(
-            IReadOnlyList<MetadataIdentifier> xIdentifiers,
-            IReadOnlyList<MetadataIdentifier> yIdentifiers)
-        {
-            if (xIdentifiers.Count != yIdentifiers.Count) return false;
-
-            for (int i = 0; i < xIdentifiers.Count; i++)
-                if (xIdentifiers[i] != yIdentifiers[i])
-                    return false;
-
-            return true;
+                   // Compare prerelease identifiers by their string value so that "01" != "1"
+                   && string.Equals(x.Prerelease, y.Prerelease, StringComparison.Ordinal)
+                   && string.Equals(x.Metadata, y.Metadata, StringComparison.Ordinal);
         }
 
         public int GetHashCode(SemVersion v)
         {
-            var hash = CombinedHashCode.Create(v.Major, v.Minor, v.Patch);
-            foreach (var identifier in v.PrereleaseIdentifiers)
-            {
-                hash.Add(identifier);
-                // TODO remove the next `if` in v3.0.0 when prerelease identifiers can't have leading zeros
-                // Change the hash for leading zero so "01" != "1"
-                if (identifier.NumericValue != null && identifier.Value[0] == '0')
-                    hash.Add(identifier.Value);
-            }
-            // Mark the start of metadata so 1.0.0-a and 1.0.0+a have different hashes
-            if (v.MetadataIdentifiers.Any())
-                hash.Add("+");
-            foreach (var identifier in v.MetadataIdentifiers)
-                hash.Add(identifier);
-
-            return hash;
+            // Using v.Prerelease handles leading zero so "01" != "1"
+            return CombinedHashCode.Create(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
         }
 
         public override int Compare(SemVersion x, SemVersion y)
