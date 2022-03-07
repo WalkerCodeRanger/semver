@@ -343,7 +343,8 @@ namespace Semver
         /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
         /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing minor
         /// or patch version numbers when <paramref name="strict"/> is <see langword="true"/>.</exception>
-        /// <exception cref="OverflowException">The Major, Minor, or Patch versions are larger than <see cref="int.MaxValue"/>.</exception>
+        /// <exception cref="OverflowException">The major, minor, or patch version number is larger
+        /// than <see cref="int.MaxValue"/>.</exception>
         [Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
         public static SemVersion Parse(string version, bool strict = false)
         {
@@ -636,7 +637,7 @@ namespace Semver
         /// <param name="allowLeadingZeros">Whether to allow leading zeros in the prerelease identifiers.
         /// If <see langword="true"/>, leading zeros will be allowed on numeric identifiers
         /// but will be removed.</param>
-        /// <returns>The new version with the different prerelease portion.</returns>
+        /// <returns>The new version with the different prerelease identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="prerelease"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
@@ -687,7 +688,7 @@ namespace Semver
         /// Creates a copy of the current instance with a different prerelease identifiers.
         /// </summary>
         /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
-        /// <returns>The new version with the different prerelease portion.</returns>
+        /// <returns>The new version with the different prerelease identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is
         /// <see langword="null"/> or one of the prerelease identifiers is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
@@ -710,7 +711,7 @@ namespace Semver
         /// Creates a copy of the current instance with a different prerelease identifiers.
         /// </summary>
         /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
-        /// <returns>The new version with the different prerelease portion.</returns>
+        /// <returns>The new version with the different prerelease identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier has the default value.</exception>
         public SemVersion WithPrerelease(IEnumerable<PrereleaseIdentifier> prereleaseIdentifiers)
@@ -726,7 +727,7 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance without prerelease identifiers.
         /// </summary>
-        /// <returns>The new version without prerelease portion.</returns>
+        /// <returns>The new version without prerelease identifiers.</returns>
         public SemVersion WithoutPrerelease()
         {
             if (!IsPrerelease) return this;
@@ -798,7 +799,7 @@ namespace Semver
         /// <param name="metadataIdentifiers">The values to replace the build metadata identifiers.</param>
         /// <returns>The new version with the different build metadata identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="metadataIdentifiers"/> is
-        /// <see langword="null"/> or one of the metadata identifiers is <see langword="null"/>.</exception>
+        /// <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A metadata identifier has the default value.</exception>
         public SemVersion WithMetadata(IEnumerable<MetadataIdentifier> metadataIdentifiers)
         {

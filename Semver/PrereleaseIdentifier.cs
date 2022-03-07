@@ -41,8 +41,8 @@ namespace Semver
         /// <value>The string value of this prerelease identifier even if it is a numeric identifier
         /// or <see langword="null"/> if this is a default <see cref="PrereleaseIdentifier"/>.</value>
         /// <remarks>Invalid numeric prerelease identifiers with leading zeros will have a string
-        /// value including the leading zeros. This can be used to distinguish numeric identifiers
-        /// with different numbers of leading zeros.</remarks>
+        /// value including the leading zeros. This can be used to distinguish invalid numeric
+        /// identifiers with different numbers of leading zeros.</remarks>
         public string Value { get; }
 
         /// <summary>
