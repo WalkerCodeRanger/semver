@@ -45,6 +45,7 @@ Semver.SemVersion.WithPrerelease(Semver.PrereleaseIdentifier prereleaseIdentifie
 Semver.SemVersion.WithPrerelease(string prereleaseIdentifier, params string[] prereleaseIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier> prereleaseIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<string> prereleaseIdentifiers) -> Semver.SemVersion
+Semver.SemVersion.WithPrereleaseParsedFrom(string prerelease, bool allowLeadingZeros = false) -> Semver.SemVersion
 Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLeadingWhitespace = 2 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.AllowLeadingZeros = 1 -> Semver.SemVersionStyles
