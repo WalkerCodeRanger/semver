@@ -740,6 +740,47 @@ namespace Semver.Test
         }
         #endregion
 
+        #region WithMetadata(MetadataIdentifier, params MetadataIdentifier[])
+        [Fact]
+        public void WithMetadataIdentifierParams()
+        {
+            var v = Version.WithMetadata(
+                new MetadataIdentifier("bar"),
+                new MetadataIdentifier("baz"),
+                new MetadataIdentifier("100"),
+                new MetadataIdentifier("123abc"));
+
+            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
+        }
+
+        [Fact]
+        public void WithMetadataIdentifierParamsRestNull()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(
+                new MetadataIdentifier("bar"), null));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataIdentifierParamsDefaultIdentifierInFirst()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => Version.WithMetadata(
+                default, new MetadataIdentifier("bar"), default));
+            Assert.StartsWith("Metadata identifier cannot be default/null.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithMetadataIdentifierParamsDefaultIdentifierInRest()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => Version.WithMetadata(
+                new MetadataIdentifier("bar"), new MetadataIdentifier("baz"), default));
+            Assert.StartsWith("Metadata identifier cannot be default/null.", ex.Message);
+            Assert.Equal("metadataIdentifiers", ex.ParamName);
+        }
+        #endregion
+
         #region WithMetadata(IEnumerable<MetadataIdentifier>)
         [Fact]
         public void WithMetadataIdentifiers()

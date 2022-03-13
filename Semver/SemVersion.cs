@@ -666,9 +666,9 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance with different prerelease identifiers.
         /// </summary>
-        /// <param name="prereleaseIdentifier">The first prerelease identifier to replace the existing
+        /// <param name="prereleaseIdentifier">The first identifier to replace the existing
         /// prerelease identifiers.</param>
-        /// <param name="prereleaseIdentifiers">The rest of the prerelease identifiers to replace the
+        /// <param name="prereleaseIdentifiers">The rest of the identifiers to replace the
         /// existing prerelease identifiers.</param>
         /// <returns>The new version with the different prerelease identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifier"/> or
@@ -694,7 +694,7 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance with different prerelease identifiers.
         /// </summary>
-        /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
+        /// <param name="prereleaseIdentifiers">The identifiers to replace the prerelease identifiers.</param>
         /// <returns>The new version with the different prerelease identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is
         /// <see langword="null"/> or one of the prerelease identifiers is <see langword="null"/>.</exception>
@@ -717,9 +717,9 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance with different prerelease identifiers.
         /// </summary>
-        /// <param name="prereleaseIdentifier">The first prerelease identifier to replace the existing
+        /// <param name="prereleaseIdentifier">The first identifier to replace the existing
         /// prerelease identifiers.</param>
-        /// <param name="prereleaseIdentifiers">The rest of the prerelease identifiers to replace the
+        /// <param name="prereleaseIdentifiers">The rest of the identifiers to replace the
         /// existing prerelease identifiers.</param>
         /// <returns>The new version with the different prerelease identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is
@@ -739,7 +739,7 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance with different prerelease identifiers.
         /// </summary>
-        /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
+        /// <param name="prereleaseIdentifiers">The identifiers to replace the prerelease identifiers.</param>
         /// <returns>The new version with the different prerelease identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier has the default value.</exception>
@@ -785,7 +785,7 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance with different build metadata identifiers.
         /// </summary>
-        /// <param name="metadataIdentifier">The first build metadata identifier to replace the existing
+        /// <param name="metadataIdentifier">The first identifier to replace the existing
         /// build metadata identifiers.</param>
         /// <param name="metadataIdentifiers">The rest of the build metadata identifiers to replace the
         /// existing build metadata identifiers.</param>
@@ -810,7 +810,7 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance with different build metadata identifiers.
         /// </summary>
-        /// <param name="metadataIdentifiers">The values to replace the build metadata identifiers.</param>
+        /// <param name="metadataIdentifiers">The identifiers to replace the build metadata identifiers.</param>
         /// <returns>The new version with the different build metadata identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="metadataIdentifiers"/> is
         /// <see langword="null"/> or one of the metadata identifiers is <see langword="null"/>.</exception>
@@ -830,7 +830,29 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance with different build metadata identifiers.
         /// </summary>
-        /// <param name="metadataIdentifiers">The values to replace the build metadata identifiers.</param>
+        /// <param name="metadataIdentifier">The first identifier to replace the existing
+        /// build metadata identifiers.</param>
+        /// <param name="metadataIdentifiers">The rest of the identifiers to replace the
+        /// existing build metadata identifiers.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="metadataIdentifiers"/> is
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A metadata identifier has the default value.</exception>
+        public SemVersion WithMetadata(
+            MetadataIdentifier metadataIdentifier,
+            params MetadataIdentifier[] metadataIdentifiers)
+        {
+            if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
+            var identifiers = metadataIdentifiers.Prepend(metadataIdentifier).ToReadOnlyList();
+            if (identifiers.Any(i => i == default))
+                throw new ArgumentException(MetadataIdentifierIsDefaultMessage, nameof(metadataIdentifiers));
+            return new SemVersion(Major, Minor, Patch,
+                Prerelease, PrereleaseIdentifiers, string.Join(".", identifiers), identifiers);
+        }
+
+        /// <summary>
+        /// Creates a copy of the current instance with different build metadata identifiers.
+        /// </summary>
+        /// <param name="metadataIdentifiers">The identifiers to replace the build metadata identifiers.</param>
         /// <returns>The new version with the different build metadata identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="metadataIdentifiers"/> is
         /// <see langword="null"/>.</exception>
