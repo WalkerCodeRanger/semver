@@ -736,7 +736,6 @@ namespace Semver
                 string.Join(".", identifiers), identifiers, Metadata, MetadataIdentifiers);
         }
 
-
         /// <summary>
         /// Creates a copy of the current instance with different prerelease identifiers.
         /// </summary>
@@ -786,21 +785,26 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance with different build metadata identifiers.
         /// </summary>
-        /// <param name="metadataIdentifiers">The values to replace the build metadata identifiers.</param>
+        /// <param name="metadataIdentifier">The first build metadata identifier to replace the existing
+        /// build metadata identifiers.</param>
+        /// <param name="metadataIdentifiers">The rest of the build metadata identifiers to replace the
+        /// existing build metadata identifiers.</param>
         /// <returns>The new version with the different build metadata identifiers.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="metadataIdentifiers"/> is
-        /// <see langword="null"/> or one of the metadata identifiers is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="metadataIdentifier"/> or
+        /// <paramref name="metadataIdentifiers"/> is <see langword="null"/> or one of the metadata
+        /// identifiers is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A metadata identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
-        public SemVersion WithMetadata(params string[] metadataIdentifiers)
+        public SemVersion WithMetadata(string metadataIdentifier, params string[] metadataIdentifiers)
         {
+            if (metadataIdentifier is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
             if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
-            if (metadataIdentifiers.Length == 0) return WithoutMetadata();
             var identifiers = metadataIdentifiers
+                              .Prepend(metadataIdentifier)
                               .Select(i => new MetadataIdentifier(i, nameof(metadataIdentifiers)))
                               .ToReadOnlyList();
             return new SemVersion(Major, Minor, Patch,
-                Prerelease, PrereleaseIdentifiers, string.Join(".", metadataIdentifiers), identifiers);
+                Prerelease, PrereleaseIdentifiers, string.Join(".", identifiers), identifiers);
         }
 
         /// <summary>
