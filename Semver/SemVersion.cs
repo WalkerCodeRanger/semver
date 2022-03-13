@@ -108,7 +108,7 @@ namespace Semver
         /// <param name="patch">The patch version number.</param>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
         public SemVersion(int major, int minor, int patch)
-            : this(major, minor, patch, "", "")
+            : this(major, minor, patch, "")
         {
         }
 
@@ -124,10 +124,7 @@ namespace Semver
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
-        public SemVersion(
-            int major,
-            int minor,
-            int patch,
+        public SemVersion(int major, int minor, int patch,
             IEnumerable<PrereleaseIdentifier> prerelease = null,
             IEnumerable<MetadataIdentifier> metadata = null)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -154,6 +151,67 @@ namespace Semver
                 if (metadataIdentifiers.Any(i => i == default))
                     throw new ArgumentException(MetadataIdentifierIsDefaultMessage, nameof(metadata));
             }
+
+            Major = major;
+            Minor = minor;
+            Patch = patch;
+
+            if (prereleaseIdentifiers is null || prereleaseIdentifiers.Count == 0)
+            {
+                Prerelease = "";
+                PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
+            }
+            else
+            {
+                Prerelease = string.Join(".", prereleaseIdentifiers);
+                PrereleaseIdentifiers = prereleaseIdentifiers;
+            }
+
+            if (metadataIdentifiers is null || metadataIdentifiers.Count == 0)
+            {
+                Metadata = "";
+                MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
+            }
+            else
+            {
+                Metadata = string.Join(".", metadataIdentifiers);
+                MetadataIdentifiers = metadataIdentifiers;
+            }
+        }
+
+        /// <summary>
+        /// Constructs a new instance of the <see cref="SemVersion" /> class.
+        /// </summary>
+        /// <param name="major">The major version number.</param>
+        /// <param name="minor">The minor version number.</param>
+        /// <param name="patch">The patch version number.</param>
+        /// <param name="prerelease">The prerelease identifiers.</param>
+        /// <param name="metadata">The build metadata identifiers.</param>
+        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
+        /// <exception cref="ArgumentNullException">One of the prerelease or metadata identifiers is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
+        /// zeros for a numeric identifier. Or, a metadata identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
+        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
+        /// for <see cref="Int32"/>.</exception>
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public SemVersion(int major, int minor, int patch,
+            IEnumerable<string> prerelease = null,
+            IEnumerable<string> metadata = null)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+        {
+            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
+            if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
+            var prereleaseIdentifiers = prerelease?
+                                        .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros: false, nameof(prerelease)))
+                                        .ToReadOnlyList();
+
+            var metadataIdentifiers = metadata
+                                      .Select(i => new MetadataIdentifier(i, nameof(metadata)))
+                                      .ToReadOnlyList();
 
             Major = major;
             Minor = minor;
@@ -231,10 +289,8 @@ namespace Semver
         /// and <paramref name="metadata"/> must not be null and must be equal to the
         /// corresponding identifiers.</remarks>
         internal SemVersion(int major, int minor, int patch,
-            string prerelease,
-            IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
-            string metadata,
-            IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
+            string prerelease, IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
+            string metadata, IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
 #if DEBUG
             if (major < 0) throw new ArgumentException("DEBUG: " + InvalidMajorVersionMessage, nameof(major));
@@ -541,8 +597,18 @@ namespace Semver
         /// <param name="patch">The value to replace the patch version number or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="prerelease">The value to replace the prerelease identifiers or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="metadata">The value to replace the build metadata identifiers or <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading zeros will be removed.</param>
+        /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading
+        /// zeros will be removed.</param>
         /// <returns>The new version with changed properties.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
+        /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
+        /// zeros for a numeric identifier when <paramref name="allowLeadingZeros"/> is
+        /// <see langword="false"/>. Or, metadata identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
+        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
+        /// for <see cref="Int32"/>.</exception>
         /// <remarks>
         /// The <see cref="With"/> method is intended to be called using named argument syntax, passing only
         /// those fields to be changed.

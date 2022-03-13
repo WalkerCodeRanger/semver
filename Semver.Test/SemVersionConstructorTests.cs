@@ -154,7 +154,7 @@ namespace Semver.Test
         }
         #endregion
 
-        #region SemVersion(int major, int minor, int patch, IEnumerable<PrereleaseIdentifier>, IEnumerable<MetadataIdentifier> metadata)
+        #region SemVersion(int major, int minor, int patch, IEnumerable<PrereleaseIdentifier> prerelease, IEnumerable<MetadataIdentifier> metadata)
         [Fact]
         public void ConstructWithIdentifiersTest()
         {
@@ -204,6 +204,42 @@ namespace Semver.Test
             Assert.StartsWith(MetadataIdentifierIsDefaultMessage, ex.Message);
             Assert.Equal("metadata", ex.ParamName);
         }
+        #endregion
+
+        #region SemVersion(int major, int minor, int patch, IEnumerable<string> prerelease, IEnumerable<string> metadata)
+        [Fact]
+        public void ConstructWithStringIdentifiersTest()
+        {
+            var prereleaseIdentifiers = new[] { "pre", "42" };
+            var metadata = new[] { "build", "42" };
+            var v = new SemVersion(1, 2, 3, prereleaseIdentifiers, metadata);
+
+            Assert.Equal(1, v.Major);
+            Assert.Equal(2, v.Minor);
+            Assert.Equal(3, v.Patch);
+            Assert.Equal("pre.42", v.Prerelease);
+            var expectedPrereleaseIdentifiers = new[] { new PrereleaseIdentifier("pre"), new PrereleaseIdentifier(42) };
+            Assert.Equal(expectedPrereleaseIdentifiers, v.PrereleaseIdentifiers);
+            Assert.Equal("build.42", v.Metadata);
+            var expectedMetadata = new[] { new MetadataIdentifier("build"), new MetadataIdentifier("42") };
+            Assert.Equal(expectedMetadata, v.MetadataIdentifiers);
+        }
+
+        [Theory]
+        [InlineData(-1, 0, 0, InvalidMajorVersionMessage, "major")]
+        [InlineData(0, -1, 0, InvalidMinorVersionMessage, "minor")]
+        [InlineData(0, 0, -1, InvalidPatchVersionMessage, "patch")]
+        [InlineData(-1, -1, -1, InvalidMajorVersionMessage, "major")]
+        [InlineData(0, -1, -1, InvalidMinorVersionMessage, "minor")]
+        public void ConstructWithStringIdentifiersInvalidTest(int major, int minor, int patch, string expectedMessage, string expectedParamName)
+        {
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new SemVersion(major, minor, patch, Enumerable.Empty<string>()));
+
+            Assert.StartsWith(expectedMessage, ex.Message);
+            Assert.Equal(expectedParamName, ex.ParamName);
+        }
+
+        // TODO add tests for validation of prerelease and metadata
         #endregion
     }
 }
