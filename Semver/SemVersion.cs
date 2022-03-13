@@ -648,9 +648,7 @@ namespace Semver
         /// will never create a <see cref="PrereleaseIdentifier"/> with leading zeros even if
         /// <paramref name="allowLeadingZeros"/> is <see langword="true"/>. Any leading zeros will
         /// be removed.</remarks>
-#pragma warning disable RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
-        public SemVersion WithPrerelease(string prerelease, bool allowLeadingZeros = false)
-#pragma warning restore RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
+        public SemVersion WithPrereleaseParsedFrom(string prerelease, bool allowLeadingZeros = false)
         {
             if (prerelease is null) throw new ArgumentNullException(nameof(prerelease));
             if (prerelease.Length == 0) return WithoutPrerelease();
@@ -772,7 +770,7 @@ namespace Semver
         /// <exception cref="ArgumentNullException"><paramref name="metadata"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A metadata identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
-        public SemVersion WithMetadata(string metadata)
+        public SemVersion WithMetadataParsedFrom(string metadata)
         {
             if (metadata is null) throw new ArgumentNullException(nameof(metadata));
             if (metadata.Length == 0) return WithoutMetadata();
