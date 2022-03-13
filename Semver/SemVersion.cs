@@ -717,6 +717,29 @@ namespace Semver
         /// <summary>
         /// Creates a copy of the current instance with different prerelease identifiers.
         /// </summary>
+        /// <param name="prereleaseIdentifier">The first prerelease identifier to replace the existing
+        /// prerelease identifiers.</param>
+        /// <param name="prereleaseIdentifiers">The rest of the prerelease identifiers to replace the
+        /// existing prerelease identifiers.</param>
+        /// <returns>The new version with the different prerelease identifiers.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">A prerelease identifier has the default value.</exception>
+        public SemVersion WithPrerelease(
+                    PrereleaseIdentifier prereleaseIdentifier,
+                    params PrereleaseIdentifier[] prereleaseIdentifiers)
+        {
+            if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
+            var identifiers = prereleaseIdentifiers.Prepend(prereleaseIdentifier).ToReadOnlyList();
+            if (identifiers.Any(i => i == default)) throw new ArgumentException(PrereleaseIdentifierIsDefaultMessage, nameof(prereleaseIdentifiers));
+            return new SemVersion(Major, Minor, Patch,
+                string.Join(".", identifiers), identifiers, Metadata, MetadataIdentifiers);
+        }
+
+
+        /// <summary>
+        /// Creates a copy of the current instance with different prerelease identifiers.
+        /// </summary>
         /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
         /// <returns>The new version with the different prerelease identifiers.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is <see langword="null"/>.</exception>
