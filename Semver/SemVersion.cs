@@ -1086,9 +1086,7 @@ namespace Semver
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
         public override bool Equals(object obj)
-        {
-            return obj is SemVersion version && Equals(version);
-        }
+            => obj is SemVersion version && Equals(version);
 
         /// <summary>
         /// Determines whether two versions are equal.
