@@ -189,7 +189,7 @@ namespace Semver.Test
         }
         #endregion
 
-        #region WithPrerelease(string[])
+        #region WithPrerelease(string, string[])
         [Fact]
         public void WithPrereleaseParams()
         {
@@ -199,32 +199,31 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithPrereleaseParamsAlreadyRelease()
+        public void WithPrereleaseParamsFirstIdentifierNull()
         {
-            var v = ReleaseVersion.WithPrerelease();
-
-            Assert.Same(ReleaseVersion, v);
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease(null, "more"));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("prereleaseIdentifier", ex.ParamName);
         }
 
         [Fact]
-        public void WithPrereleaseParamsNull()
+        public void WithPrereleaseParamsRestNull()
         {
-            string[] identifiers = null;
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease(identifiers));
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease("pre", null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
         [Fact]
-        public void WithPrereleaseParamsEmpty()
+        public void WithPrereleaseParamsEmptyIdentifierInFirst()
         {
-            var v = Version.WithPrerelease();
-
-            Assert.Equal(new SemVersion(1, 2, 3, "", "metadata"), v);
+            var ex = Assert.Throws<ArgumentException>(() => Version.WithPrerelease("", "bax"));
+            Assert.StartsWith("Prerelease identifier cannot be empty.", ex.Message);
+            Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
         [Fact]
-        public void WithPrereleaseParamsEmptyIdentifier()
+        public void WithPrereleaseParamsEmptyIdentifierInRest()
         {
             var ex = Assert.Throws<ArgumentException>(() => Version.WithPrerelease("bar", ""));
             Assert.StartsWith("Prerelease identifier cannot be empty.", ex.Message);
@@ -232,15 +231,23 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithPrereleaseParamsNullIdentifier()
+        public void WithPrereleaseParamsNullIdentifierInRest()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease("bar", null));
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease("bar", "baz", null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
         [Fact]
-        public void WithPrereleaseParamsLeadingZeros()
+        public void WithPrereleaseParamsLeadingZerosInFirst()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => Version.WithPrerelease("0123", "bar"));
+            Assert.StartsWith("Leading zeros are not allowed on numeric prerelease identifiers '0123'.", ex.Message);
+            Assert.Equal("prereleaseIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithPrereleaseParamsLeadingZerosInRest()
         {
             var ex = Assert.Throws<ArgumentException>(() => Version.WithPrerelease("bar", "0123"));
             Assert.StartsWith("Leading zeros are not allowed on numeric prerelease identifiers '0123'.", ex.Message);
@@ -248,7 +255,14 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithPrereleaseParamsTooLarge()
+        public void WithPrereleaseParamsTooLargeInFirst()
+        {
+            var ex = Assert.Throws<OverflowException>(() => Version.WithPrerelease("99999999999999999", "bar"));
+            Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
+        }
+
+        [Fact]
+        public void WithPrereleaseParamsTooLargeInRest()
         {
             var ex = Assert.Throws<OverflowException>(()
                 => Version.WithPrerelease("bar", "99999999999999999"));
@@ -256,7 +270,17 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithPrereleaseParamsInvalidCharacter()
+        public void WithPrereleaseParamsInvalidCharacterInFirst()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => Version.WithPrerelease("abc@123", "bar"));
+            Assert.StartsWith(
+                "A prerelease identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.",
+                ex.Message);
+            Assert.Equal("prereleaseIdentifiers", ex.ParamName);
+        }
+
+        [Fact]
+        public void WithPrereleaseParamsInvalidCharacterInRest()
         {
             var ex = Assert.Throws<ArgumentException>(() => Version.WithPrerelease("bar", "abc@123"));
             Assert.StartsWith("A prerelease identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);

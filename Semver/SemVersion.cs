@@ -648,7 +648,9 @@ namespace Semver
         /// will never create a <see cref="PrereleaseIdentifier"/> with leading zeros even if
         /// <paramref name="allowLeadingZeros"/> is <see langword="true"/>. Any leading zeros will
         /// be removed.</remarks>
+#pragma warning disable RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
         public SemVersion WithPrerelease(string prerelease, bool allowLeadingZeros = false)
+#pragma warning restore RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
         {
             if (prerelease is null) throw new ArgumentNullException(nameof(prerelease));
             if (prerelease.Length == 0) return WithoutPrerelease();
@@ -662,30 +664,35 @@ namespace Semver
         }
 
         /// <summary>
-        /// Creates a copy of the current instance with a different prerelease identifiers.
+        /// Creates a copy of the current instance with different prerelease identifiers.
         /// </summary>
-        /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
+        /// <param name="prereleaseIdentifier">The first prerelease identifier to replace the existing
+        /// prerelease identifiers.</param>
+        /// <param name="prereleaseIdentifiers">The rest of the prerelease identifiers to replace the
+        /// existing prerelease identifiers.</param>
         /// <returns>The new version with the different prerelease identifiers.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifiers"/> is
-        /// <see langword="null"/> or one of the prerelease identifiers is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="prereleaseIdentifier"/> or
+        /// <paramref name="prereleaseIdentifiers"/> is <see langword="null"/> or one of the
+        /// prerelease identifiers is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
         /// zeros for a numeric identifier.</exception>
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
         /// for <see cref="Int32"/>.</exception>
-        public SemVersion WithPrerelease(params string[] prereleaseIdentifiers)
+        public SemVersion WithPrerelease(string prereleaseIdentifier, params string[] prereleaseIdentifiers)
         {
+            if (prereleaseIdentifier is null) throw new ArgumentNullException(nameof(prereleaseIdentifier));
             if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
-            if (prereleaseIdentifiers.Length == 0) return WithoutPrerelease();
             var identifiers = prereleaseIdentifiers
+                              .Prepend(prereleaseIdentifier)
                               .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros: false, nameof(prereleaseIdentifiers)))
                               .ToReadOnlyList();
             return new SemVersion(Major, Minor, Patch,
-                string.Join(".", prereleaseIdentifiers), identifiers, Metadata, MetadataIdentifiers);
+                string.Join(".", identifiers), identifiers, Metadata, MetadataIdentifiers);
         }
 
         /// <summary>
-        /// Creates a copy of the current instance with a different prerelease identifiers.
+        /// Creates a copy of the current instance with different prerelease identifiers.
         /// </summary>
         /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
         /// <returns>The new version with the different prerelease identifiers.</returns>
@@ -708,7 +715,7 @@ namespace Semver
         }
 
         /// <summary>
-        /// Creates a copy of the current instance with a different prerelease identifiers.
+        /// Creates a copy of the current instance with different prerelease identifiers.
         /// </summary>
         /// <param name="prereleaseIdentifiers">The values to replace the prerelease identifiers.</param>
         /// <returns>The new version with the different prerelease identifiers.</returns>

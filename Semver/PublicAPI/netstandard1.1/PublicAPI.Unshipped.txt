@@ -40,8 +40,8 @@ Semver.SemVersion.WithoutMetadata() -> Semver.SemVersion
 Semver.SemVersion.WithoutPrerelease() -> Semver.SemVersion
 Semver.SemVersion.WithoutPrereleaseOrMetadata() -> Semver.SemVersion
 Semver.SemVersion.WithPatch(int patch) -> Semver.SemVersion
-Semver.SemVersion.WithPrerelease(params string[] prereleaseIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(string prerelease, bool allowLeadingZeros = false) -> Semver.SemVersion
+Semver.SemVersion.WithPrerelease(string prereleaseIdentifier, params string[] prereleaseIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier> prereleaseIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<string> prereleaseIdentifiers) -> Semver.SemVersion
 Semver.SemVersionStyles
