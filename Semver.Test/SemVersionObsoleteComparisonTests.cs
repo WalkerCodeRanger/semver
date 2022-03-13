@@ -18,7 +18,7 @@ namespace Semver.Test
     /// avoid issues with xUnit serialization of <see cref="SemVersion"/>, this
     /// is done within the test rather than using theory data.
     /// </summary>
-    public class SemVersionComparisonTests
+    public class SemVersionObsoleteComparisonTests
     {
         public static readonly IReadOnlyList<SemVersion> VersionsInSortOrder = new List<SemVersion>()
         {
@@ -215,8 +215,9 @@ namespace Semver.Test
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+
                 Assert.True(v.CompareTo(identical) == 0, v.ToString());
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 
@@ -224,21 +225,27 @@ namespace Semver.Test
         public void CompareToSameTest()
         {
             foreach (var v in VersionsInSortOrder)
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.True(v.CompareTo(v) == 0, v.ToString());
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Fact]
         public void CompareToGreaterTest()
         {
             foreach (var (v1, v2) in VersionPairs)
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.True(v1.CompareTo(v2) < 0, $"({v1}).CompareTo({v2})");
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Fact]
         public void CompareToLesserTest()
         {
             foreach (var (v1, v2) in VersionPairs)
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.True(v2.CompareTo(v1) > 0, $"({v2}).CompareTo({v1})");
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Theory]
@@ -251,8 +258,10 @@ namespace Semver.Test
             var v2 = SemVersion.Parse(s2, true);
 #pragma warning restore CS0618 // Type or member is obsolete
 
+#pragma warning disable CS0618 // Type or member is obsolete
             var r1 = v1.CompareTo(v2);
             var r2 = v2.CompareTo(v1);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(expected, r1);
             Assert.Equal(-expected, r2);
@@ -267,9 +276,9 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.CompareTo(v2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.True(r == 0, $"({v1}).CompareTo({v2})");
         }
@@ -283,9 +292,9 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.CompareTo(v2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.True(r == 0, $"({v1}).CompareTo({v2})");
         }
@@ -296,7 +305,9 @@ namespace Semver.Test
             var v1 = new SemVersion(1);
             var v2 = new SemVersion(1);
 
+#pragma warning disable CS0618 // Type or member is obsolete
             var c = v1.CompareTo((object)v2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(0, c);
         }
@@ -306,7 +317,9 @@ namespace Semver.Test
         {
             var v = new SemVersion(1);
             // TODO should throw argument exception (issue #39)
+#pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<InvalidCastException>(() => v.CompareTo(new object()));
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal("Unable to cast object of type 'System.Object' to type 'Semver.SemVersion'.", ex.Message);
         }
@@ -315,7 +328,9 @@ namespace Semver.Test
         public void CompareToNullTest()
         {
             foreach (var version in VersionsInSortOrder)
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.True(version.CompareTo(null) > 0, version.ToString());
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Theory]
@@ -327,7 +342,9 @@ namespace Semver.Test
             var v1 = s1 is null ? null : SemVersion.Parse(s1, SemVersionStyles.Strict);
             var v2 = s2 is null ? null : SemVersion.Parse(s2, SemVersionStyles.Strict);
 
+#pragma warning disable CS0618 // Type or member is obsolete
             var r = SemVersion.Compare(v1, v2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(expected, r);
         }
@@ -342,8 +359,9 @@ namespace Semver.Test
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+
                 Assert.True(v.PrecedenceMatches(identical), v.ToString());
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 
@@ -351,17 +369,24 @@ namespace Semver.Test
         public void PrecedenceMatchesSameTest()
         {
             foreach (var version in VersionsInSortOrder)
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.True(version.PrecedenceMatches(version), version.ToString());
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Fact]
         public void PrecedenceMatchesDifferentTest()
         {
             foreach (var (v1, v2) in VersionPairs)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                var precedenceMatches = v1.PrecedenceMatches(v2);
+#pragma warning restore CS0618 // Type or member is obsolete
                 if (DifferByMetadataOnly(v1, v2))
-                    Assert.True(v1.PrecedenceMatches(v2), $"({v1}).PrecedenceMatches({v2})");
+                    Assert.True(precedenceMatches, $"({v1}).PrecedenceMatches({v2})");
                 else
-                    Assert.False(v1.PrecedenceMatches(v2), $"({v1}).PrecedenceMatches({v2})");
+                    Assert.False(precedenceMatches, $"({v1}).PrecedenceMatches({v2})");
+            }
         }
 
         [Theory]
@@ -373,9 +398,9 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.PrecedenceMatches(v2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.True(r, $"({v1}).PrecedenceMatches({v2})");
         }
@@ -389,9 +414,9 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.PrecedenceMatches(v2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.True(r, $"({v1}).PrecedenceMatches({v2})");
         }
@@ -400,7 +425,9 @@ namespace Semver.Test
         public void PrecedenceMatchesNullTest()
         {
             foreach (var version in VersionsInSortOrder)
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.False(version.PrecedenceMatches(null), version.ToString());
+#pragma warning restore CS0618 // Type or member is obsolete
         }
         #endregion
 
@@ -413,8 +440,9 @@ namespace Semver.Test
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+
                 Assert.True(v.CompareByPrecedence(identical) == 0, v.ToString());
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 
@@ -422,27 +450,39 @@ namespace Semver.Test
         public void CompareByPrecedenceSameTest()
         {
             foreach (var v in VersionsInSortOrder)
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.True(v.CompareByPrecedence(v) == 0, v.ToString());
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Fact]
         public void CompareByPrecedenceGreaterTest()
         {
             foreach (var (v1, v2) in VersionPairs)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                var comparison = v1.CompareByPrecedence(v2);
+#pragma warning restore CS0618 // Type or member is obsolete
                 if (DifferByMetadataOnly(v1, v2))
-                    Assert.True(v1.CompareByPrecedence(v2) == 0, $"({v1}).CompareByPrecedence({v2}) == 0");
+                    Assert.True(comparison == 0, $"({v1}).CompareByPrecedence({v2}) == 0");
                 else
-                    Assert.True(v1.CompareByPrecedence(v2) < 0, $"({v1}).CompareByPrecedence({v2}) < 0");
+                    Assert.True(comparison < 0, $"({v1}).CompareByPrecedence({v2}) < 0");
+            }
         }
 
         [Fact]
         public void CompareByPrecedenceLesserTest()
         {
             foreach (var (v1, v2) in VersionPairs)
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                var comparison = v2.CompareByPrecedence(v1);
+#pragma warning restore CS0618 // Type or member is obsolete
                 if (DifferByMetadataOnly(v1, v2))
-                    Assert.True(v2.CompareByPrecedence(v1) == 0, $"({v2}).CompareByPrecedence({v1}) == 0");
+                    Assert.True(comparison == 0, $"({v2}).CompareByPrecedence({v1}) == 0");
                 else
-                    Assert.True(v2.CompareByPrecedence(v1) > 0, $"({v2}).CompareByPrecedence({v1}) > 0");
+                    Assert.True(comparison > 0, $"({v2}).CompareByPrecedence({v1}) > 0");
+            }
         }
 
         [Theory]
@@ -453,10 +493,10 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1, true);
             var v2 = SemVersion.Parse(s2, true);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             var r1 = v1.CompareByPrecedence(v2);
             var r2 = v2.CompareByPrecedence(v1);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.Equal(expected, r1);
             Assert.Equal(-expected, r2);
@@ -471,9 +511,9 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.CompareByPrecedence(v2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.True(r == 0, $"({v1}).CompareTo({v2})");
         }
@@ -487,9 +527,9 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             var r = v1.CompareByPrecedence(v2);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.True(r == 0, $"({v1}).CompareTo({v2})");
         }
@@ -498,7 +538,9 @@ namespace Semver.Test
         public void CompareByPrecedenceNullTest()
         {
             foreach (var version in VersionsInSortOrder)
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.True(version.CompareByPrecedence(null) > 0, version.ToString());
+#pragma warning restore CS0618 // Type or member is obsolete
         }
         #endregion
 
@@ -675,11 +717,12 @@ namespace Semver.Test
                 // Construct an identical version, but different instance
 #pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+
                 Assert.False(v < identical, $"{v} < {identical}");
                 Assert.True(v <= identical, $"{v} <= {identical}");
                 Assert.False(v > identical, $"{v} > {identical}");
                 Assert.True(v >= identical, $"{v} >= {identical}");
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 
@@ -689,10 +732,12 @@ namespace Semver.Test
             foreach (var v in VersionsInSortOrder)
             {
 #pragma warning disable CS1718 // Comparison made to same variable
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.False(v < v, $"{v} < {v}");
                 Assert.True(v <= v, $"{v} <= {v}");
                 Assert.False(v > v, $"{v} > {v}");
                 Assert.True(v >= v, $"{v} >= {v}");
+#pragma warning restore CS0618 // Type or member is obsolete
 #pragma warning restore CS1718 // Comparison made to same variable
             }
         }
@@ -702,10 +747,12 @@ namespace Semver.Test
         {
             foreach (var (v1, v2) in VersionPairs)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.True(v1 < v2, $"{v1} < {v2}");
                 Assert.True(v1 <= v2, $"{v1} <= {v2}");
                 Assert.False(v1 > v2, $"{v1} > {v2}");
                 Assert.False(v1 >= v2, $"{v1} >= {v2}");
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 
@@ -714,10 +761,12 @@ namespace Semver.Test
         {
             foreach (var (v1, v2) in VersionPairs)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.False(v2 < v1, $"{v2} < {v1}");
                 Assert.False(v2 <= v1, $"{v2} <= {v1}");
                 Assert.True(v2 > v1, $"{v2} > {v1}");
                 Assert.True(v2 >= v1, $"{v2} >= {v1}");
+#pragma warning restore CS0618 // Type or member is obsolete
             }
         }
 
@@ -730,13 +779,13 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             // TODO it is a bug that none of these comparisons are true (issue #53)
             Assert.False(v1 < v2, $"{v1} < {v2}");
             Assert.False(v1 <= v2, $"{v1} <= {v2}");
             Assert.False(v1 > v2, $"{v1} > {v2}");
             Assert.False(v1 >= v2, $"{v1} >= {v2}");
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Theory]
@@ -748,13 +797,13 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var v1 = SemVersion.Parse(s1);
             var v2 = SemVersion.Parse(s2);
-#pragma warning restore CS0618 // Type or member is obsolete
 
             // TODO it is a bug that none of these comparisons are true (issue #53)
             Assert.False(v1 < v2, $"{v1} < {v2}");
             Assert.False(v1 <= v2, $"{v1} <= {v2}");
             Assert.False(v1 > v2, $"{v1} > {v2}");
             Assert.False(v1 >= v2, $"{v1} >= {v2}");
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Fact]
@@ -763,10 +812,12 @@ namespace Semver.Test
             var v1 = default(SemVersion);
             var v2 = new SemVersion(1);
 
+#pragma warning disable CS0618 // Type or member is obsolete
             Assert.True(v1 < v2, $"{v1} < {v2}");
             Assert.True(v1 <= v2, $"{v1} <= {v2}");
             Assert.False(v1 > v2, $"{v1} > {v2}");
             Assert.False(v1 >= v2, $"{v1} >= {v2}");
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Fact]
@@ -775,10 +826,12 @@ namespace Semver.Test
             var v1 = new SemVersion(1);
             var v2 = default(SemVersion);
 
+#pragma warning disable CS0618 // Type or member is obsolete
             Assert.False(v1 < v2, $"{v1} < {v2}");
             Assert.False(v1 <= v2, $"{v1} <= {v2}");
             Assert.True(v1 > v2, $"{v1} > {v2}");
             Assert.True(v1 >= v2, $"{v1} >= {v2}");
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [Fact]
@@ -787,10 +840,12 @@ namespace Semver.Test
             var v1 = default(SemVersion);
             var v2 = default(SemVersion);
 
+#pragma warning disable CS0618 // Type or member is obsolete
             Assert.False(v1 < v2, $"{v1} < {v2}");
             Assert.True(v1 <= v2, $"{v1} <= {v2}");
             Assert.False(v1 > v2, $"{v1} > {v2}");
             Assert.True(v1 >= v2, $"{v1} >= {v2}");
+#pragma warning restore CS0618 // Type or member is obsolete
         }
         #endregion
 
