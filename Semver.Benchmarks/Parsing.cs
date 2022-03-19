@@ -34,7 +34,9 @@ namespace Semver.Benchmarks
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 var version = Previous.SemVersion.Parse(versions[i], strict);
+#pragma warning restore CS0618 // Type or member is obsolete
                 accumulator += version.Major;
             }
 
@@ -50,7 +52,9 @@ namespace Semver.Benchmarks
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 Previous.SemVersion.TryParse(versions[i], out var version, strict);
+#pragma warning restore CS0618 // Type or member is obsolete
                 accumulator += version.Major;
             }
 

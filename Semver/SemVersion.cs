@@ -158,11 +158,9 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public SemVersion(int major, int minor = 0, int patch = 0,
             IEnumerable<PrereleaseIdentifier> prerelease = null,
             IEnumerable<MetadataIdentifier> metadata = null)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
@@ -231,11 +229,9 @@ namespace Semver
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
         /// for <see cref="Int32"/>.</exception>
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public SemVersion(int major, int minor = 0, int patch = 0,
             IEnumerable<string> prerelease = null,
             IEnumerable<string> metadata = null)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
