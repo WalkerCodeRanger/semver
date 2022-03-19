@@ -1,4 +1,4 @@
-version: 2.1.0-dev.{build}
+version: 2.2.0-dev.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_branch_with_pr: true
