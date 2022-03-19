@@ -72,6 +72,32 @@ namespace Semver
             MetadataIdentifiers = semVersion.MetadataIdentifiers;
         }
 #endif
+        /// <summary>
+        /// Constructs a new instance of the <see cref="SemVersion" /> class.
+        /// </summary>
+        /// <param name="major">The major version number.</param>
+        // Constructor needed to resolve ambiguity between other overloads with default parameters.
+        public SemVersion(int major)
+            : this(major, 0, 0, "") { }
+
+        /// <summary>
+        /// Constructs a new instance of the <see cref="SemVersion" /> class.
+        /// </summary>
+        /// <param name="major">The major version number.</param>
+        /// <param name="minor">The minor version number.</param>
+        // Constructor needed to resolve ambiguity between other overloads with default parameters.
+        public SemVersion(int major, int minor)
+            : this(major, minor, 0, "") { }
+
+        /// <summary>
+        /// Constructs a new instance of the <see cref="SemVersion" /> class.
+        /// </summary>
+        /// <param name="major">The major version number.</param>
+        /// <param name="minor">The minor version number.</param>
+        /// <param name="patch">The patch version number.</param>
+        // Constructor needed to resolve ambiguity between other overloads with default parameters.
+        public SemVersion(int major, int minor, int patch)
+            : this(major, minor, patch, "") { }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="SemVersion" /> class.
@@ -106,25 +132,13 @@ namespace Semver
         /// <param name="major">The major version number.</param>
         /// <param name="minor">The minor version number.</param>
         /// <param name="patch">The patch version number.</param>
-        // Constructor needed to resolve ambiguity between other overloads with default parameters.
-        public SemVersion(int major, int minor, int patch)
-            : this(major, minor, patch, "")
-        {
-        }
-
-        /// <summary>
-        /// Constructs a new instance of the <see cref="SemVersion" /> class.
-        /// </summary>
-        /// <param name="major">The major version number.</param>
-        /// <param name="minor">The minor version number.</param>
-        /// <param name="patch">The patch version number.</param>
         /// <param name="prerelease">The prerelease identifiers.</param>
         /// <param name="metadata">The build metadata identifiers.</param>
         /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
-        public SemVersion(int major, int minor, int patch,
+        public SemVersion(int major, int minor = 0, int patch = 0,
             IEnumerable<PrereleaseIdentifier> prerelease = null,
             IEnumerable<MetadataIdentifier> metadata = null)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -197,7 +211,7 @@ namespace Semver
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
         /// for <see cref="Int32"/>.</exception>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
-        public SemVersion(int major, int minor, int patch,
+        public SemVersion(int major, int minor = 0, int patch = 0,
             IEnumerable<string> prerelease = null,
             IEnumerable<string> metadata = null)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -590,7 +604,8 @@ namespace Semver
         }
 
         /// <summary>
-        /// Creates a copy of the current instance with changed properties.
+        /// Creates a copy of the current instance with multiple changed properties. If changing only
+        /// one property use one of the more specific <c>WithX()</c> methods.
         /// </summary>
         /// <param name="major">The value to replace the major version number or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="minor">The value to replace the minor version number or <see langword="null"/> to leave it unchanged.</param>
@@ -670,9 +685,10 @@ namespace Semver
         }
 
         /// <summary>
-        /// Creates a copy of the current instance with changed properties. Parses prerelease and
-        /// metadata identifiers from dot separated strings. Use <see cref="With"/> instead if
-        /// parsing is not needed.
+        /// Creates a copy of the current instance with multiple changed properties. Parses prerelease
+        /// and metadata identifiers from dot separated strings. Use <see cref="With"/> instead if
+        /// parsing is not needed. If changing only one property use one of the more specific
+        /// <c>WithX()</c> methods.
         /// </summary>
         /// <param name="major">The value to replace the major version number or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="minor">The value to replace the minor version number or <see langword="null"/> to leave it unchanged.</param>

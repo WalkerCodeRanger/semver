@@ -13,6 +13,81 @@ namespace Semver.Test
         private const string PrereleaseIdentifierIsDefaultMessage = "Prerelease identifier cannot be default/null.";
         private const string MetadataIdentifierIsDefaultMessage = "Metadata identifier cannot be default/null.";
 
+        /// <summary>
+        /// This test shows that named arguments will resolve to a constructor with few parameters
+        /// rather than one with more parameters that might be obsolete.
+        /// </summary>
+        [Fact]
+        public void NamedArgumentsResolveToShortestConstructor()
+        {
+            var v = new SemVersion(major: 2, minor: 1, patch: 3);
+
+            Assert.Equal(new SemVersion(2, 1, 3), v);
+        }
+
+        #region SemVersion(int major)
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        // TODO Negative versions should be invalid and throw argument exceptions (issue#41)
+        [InlineData(-1)]
+        public void ConstructWithMajorTest(int major)
+        {
+            var v = new SemVersion(major);
+
+            Assert.Equal(major, v.Major);
+            Assert.Equal(0, v.Minor);
+            Assert.Equal(0, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Empty(v.PrereleaseIdentifiers);
+            Assert.Equal("", v.Metadata);
+            Assert.Empty(v.MetadataIdentifiers);
+        }
+        #endregion
+
+        #region SemVersion(int major, int minor)
+        [Theory]
+        [InlineData(1, 2)]
+        // TODO Negative versions should be invalid and throw argument exceptions (issue#41)
+        [InlineData(-1, 0)]
+        [InlineData(0, -1)]
+        [InlineData(-1, -1)]
+        public void ConstructWithMajorMinorTest(int major, int minor)
+        {
+            var v = new SemVersion(major, minor);
+
+            Assert.Equal(major, v.Major);
+            Assert.Equal(minor, v.Minor);
+            Assert.Equal(0, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Empty(v.PrereleaseIdentifiers);
+            Assert.Equal("", v.Metadata);
+            Assert.Empty(v.MetadataIdentifiers);
+        }
+        #endregion
+
+        #region SemVersion(int major, int minor, int patch)
+        [Theory]
+        [InlineData(1, 2, 3)]
+        // TODO Negative versions should be invalid and throw argument exceptions (issue#41)
+        [InlineData(-1, 0, 0)]
+        [InlineData(0, -1, 0)]
+        [InlineData(0, 0, -1)]
+        [InlineData(-1, -1, -1)]
+        public void ConstructWithMajorMinorPatchTest(int major, int minor, int patch)
+        {
+            var v = new SemVersion(major, minor, patch);
+
+            Assert.Equal(major, v.Major);
+            Assert.Equal(minor, v.Minor);
+            Assert.Equal(patch, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Empty(v.PrereleaseIdentifiers);
+            Assert.Equal("", v.Metadata);
+            Assert.Empty(v.MetadataIdentifiers);
+        }
+        #endregion
+
         #region SemVersion(int major, int minor = 0, int patch = 0, string prerelease, string build)
         /// <summary>
         /// Verifies the default values of the arguments to the primary constructor.
@@ -132,29 +207,7 @@ namespace Semver.Test
         }
         #endregion
 
-        #region SemVersion(int major, int minor, int patch)
-        [Theory]
-        [InlineData(1, 2, 3)]
-        // TODO Negative versions should be invalid and throw argument exceptions (issue#41)
-        [InlineData(-1, 0, 0)]
-        [InlineData(0, -1, 0)]
-        [InlineData(0, 0, -1)]
-        [InlineData(-1, -1, -1)]
-        public void ConstructWithMajorMinorPatchTest(int major, int minor, int patch)
-        {
-            var v = new SemVersion(major, minor, patch);
-
-            Assert.Equal(major, v.Major);
-            Assert.Equal(minor, v.Minor);
-            Assert.Equal(patch, v.Patch);
-            Assert.Equal("", v.Prerelease);
-            Assert.Empty(v.PrereleaseIdentifiers);
-            Assert.Equal("", v.Metadata);
-            Assert.Empty(v.MetadataIdentifiers);
-        }
-        #endregion
-
-        #region SemVersion(int major, int minor, int patch, IEnumerable<PrereleaseIdentifier> prerelease, IEnumerable<MetadataIdentifier> metadata)
+        #region SemVersion(int major, int minor = 0, int patch = 0, IEnumerable<PrereleaseIdentifier> prerelease = null, IEnumerable<MetadataIdentifier> metadata = null)
         [Fact]
         public void ConstructWithIdentifiersTest()
         {
@@ -206,7 +259,7 @@ namespace Semver.Test
         }
         #endregion
 
-        #region SemVersion(int major, int minor, int patch, IEnumerable<string> prerelease, IEnumerable<string> metadata)
+        #region SemVersion(int major, int minor = 0, int patch = 0, IEnumerable<string> prerelease = null, IEnumerable<string> metadata = null)
         [Fact]
         public void ConstructWithStringIdentifiersTest()
         {
