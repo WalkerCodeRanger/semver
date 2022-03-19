@@ -597,6 +597,88 @@ namespace Semver
         /// <param name="patch">The value to replace the patch version number or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="prerelease">The value to replace the prerelease identifiers or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="metadata">The value to replace the build metadata identifiers or <see langword="null"/> to leave it unchanged.</param>
+        /// <returns>The new version with changed properties.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
+        /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
+        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
+        /// for <see cref="int"/>.</exception>
+        /// <remarks>
+        /// The <see cref="With"/> method is intended to be called using named argument syntax, passing only
+        /// those fields to be changed.
+        /// </remarks>
+        /// <example>
+        /// To change the minor and patch versions:
+        /// <code>var modifiedVersion = version.With(minor: 2, patch: 4);</code>
+        /// </example>
+        public SemVersion With(
+            int? major = null,
+            int? minor = null,
+            int? patch = null,
+            IEnumerable<PrereleaseIdentifier> prerelease = null,
+            IEnumerable<MetadataIdentifier> metadata = null)
+        {
+            // Note: It is tempting to null coalesce first, but then this method would report invalid
+            // arguments on invalid SemVersion instances.
+            if (major is int majorInt && majorInt < 0)
+                throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (minor is int minorInt && minorInt < 0)
+                throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
+            if (patch is int patchInt && patchInt < 0)
+                throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
+
+            IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers = null;
+            string prereleaseString = null;
+            if (prerelease != null)
+            {
+                prereleaseIdentifiers = prerelease.ToReadOnlyList();
+                if (prereleaseIdentifiers.Count == 0)
+                {
+                    prereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
+                    prereleaseString = "";
+                }
+                else if (prereleaseIdentifiers.Any(i => i == default))
+                    throw new ArgumentException(PrereleaseIdentifierIsDefaultMessage, nameof(prerelease));
+                else
+                    prereleaseString = string.Join(".", prereleaseIdentifiers);
+            }
+
+            IReadOnlyList<MetadataIdentifier> metadataIdentifiers = null;
+            string metadataString = null;
+            if (metadata != null)
+            {
+                metadataIdentifiers = metadata.ToReadOnlyList();
+                if (metadataIdentifiers.Count == 0)
+                {
+                    metadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
+                    metadataString = "";
+                }
+                else if (metadataIdentifiers.Any(i => i == default))
+                    throw new ArgumentException(MetadataIdentifierIsDefaultMessage, nameof(metadata));
+                else
+                    metadataString = string.Join(".", metadataIdentifiers);
+            }
+
+            return new SemVersion(
+                major ?? Major,
+                minor ?? Minor,
+                patch ?? Patch,
+                prereleaseString ?? Prerelease,
+                prereleaseIdentifiers ?? PrereleaseIdentifiers,
+                metadataString ?? Metadata,
+                metadataIdentifiers ?? MetadataIdentifiers);
+        }
+
+        /// <summary>
+        /// Creates a copy of the current instance with changed properties. Parses prerelease and
+        /// metadata identifiers from dot separated strings. Use <see cref="With"/> instead if
+        /// parsing is not needed.
+        /// </summary>
+        /// <param name="major">The value to replace the major version number or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="minor">The value to replace the minor version number or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="patch">The value to replace the patch version number or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="prerelease">The value to replace the prerelease identifiers or <see langword="null"/> to leave it unchanged.</param>
+        /// <param name="metadata">The value to replace the build metadata identifiers or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading
         /// zeros will be removed.</param>
         /// <returns>The new version with changed properties.</returns>
@@ -608,14 +690,14 @@ namespace Semver
         /// <see langword="false"/>. Or, metadata identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
-        /// for <see cref="Int32"/>.</exception>
+        /// for <see cref="int"/>.</exception>
         /// <remarks>
-        /// The <see cref="WithParsedFrom"/> method is intended to be called using named argument syntax, passing only
-        /// those fields to be changed.
+        /// The <see cref="WithParsedFrom"/> method is intended to be called using named argument
+        /// syntax, passing only those fields to be changed.
         /// </remarks>
         /// <example>
-        /// To change only the patch version:
-        /// <code>var modifiedVersion = version.With(patch: 4);</code>
+        /// To change the patch version and prerelease identifiers version:
+        /// <code>var modifiedVersion = version.WithParsedFrom(patch: 4, prerelease: "alpha.5");</code>
         /// </example>
         public SemVersion WithParsedFrom(
             int? major = null,

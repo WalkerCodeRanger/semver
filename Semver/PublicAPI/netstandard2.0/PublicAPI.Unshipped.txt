@@ -30,6 +30,7 @@ Semver.SemVersion.SemVersion(int major, int minor, int patch) -> void
 Semver.SemVersion.SemVersion(int major, int minor, int patch, System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier> prerelease = null, System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier> metadata = null) -> void
 Semver.SemVersion.SemVersion(int major, int minor, int patch, System.Collections.Generic.IEnumerable<string> prerelease = null, System.Collections.Generic.IEnumerable<string> metadata = null) -> void
 Semver.SemVersion.ToVersion() -> System.Version
+Semver.SemVersion.With(int? major = null, int? minor = null, int? patch = null, System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier> prerelease = null, System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier> metadata = null) -> Semver.SemVersion
 Semver.SemVersion.WithMajor(int major) -> Semver.SemVersion
 Semver.SemVersion.WithMetadata(Semver.MetadataIdentifier metadataIdentifier, params Semver.MetadataIdentifier[] metadataIdentifiers) -> Semver.SemVersion
 Semver.SemVersion.WithMetadata(string metadataIdentifier, params string[] metadataIdentifiers) -> Semver.SemVersion
