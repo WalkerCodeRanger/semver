@@ -610,14 +610,14 @@ namespace Semver
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
         /// for <see cref="Int32"/>.</exception>
         /// <remarks>
-        /// The <see cref="With"/> method is intended to be called using named argument syntax, passing only
+        /// The <see cref="WithParsedFrom"/> method is intended to be called using named argument syntax, passing only
         /// those fields to be changed.
         /// </remarks>
         /// <example>
         /// To change only the patch version:
         /// <code>var modifiedVersion = version.With(patch: 4);</code>
         /// </example>
-        public SemVersion With(
+        public SemVersion WithParsedFrom(
             int? major = null,
             int? minor = null,
             int? patch = null,
