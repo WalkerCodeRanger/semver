@@ -99,7 +99,7 @@ namespace Semver.Test
         [Fact]
         public void WithPrereleaseParsedFrom()
         {
-            var v = Version.WithPrereleaseParsedFrom("bar.baz.100.123abc", allowLeadingZeros: false);
+            var v = Version.WithPrereleaseParsedFrom("bar.baz.100.123abc");
 
             Assert.Equal(new SemVersion(1, 2, 3, "bar.baz.100.123abc", "metadata"), v);
         }
@@ -107,7 +107,7 @@ namespace Semver.Test
         [Fact]
         public void WithPrereleaseParsedFromAlreadyRelease()
         {
-            var v = ReleaseVersion.WithPrereleaseParsedFrom("", allowLeadingZeros: false);
+            var v = ReleaseVersion.WithPrereleaseParsedFrom("");
 
             Assert.Same(ReleaseVersion, v);
         }
@@ -115,9 +115,8 @@ namespace Semver.Test
         [Fact]
         public void WithPrereleaseParsedFromNull()
         {
-            string identifiers = null;
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithPrereleaseParsedFrom(identifiers, allowLeadingZeros: false));
+                => Version.WithPrereleaseParsedFrom(null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("prerelease", ex.ParamName);
         }
@@ -125,7 +124,7 @@ namespace Semver.Test
         [Fact]
         public void WithPrereleaseParsedFromEmptyString()
         {
-            var v = Version.WithPrereleaseParsedFrom("", allowLeadingZeros: false);
+            var v = Version.WithPrereleaseParsedFrom("");
 
             Assert.Equal(new SemVersion(1, 2, 3, "", "metadata"), v);
         }
@@ -134,7 +133,7 @@ namespace Semver.Test
         public void WithPrereleaseParsedFromEmptyIdentifier()
         {
             var ex = Assert.Throws<ArgumentException>(()
-                => Version.WithPrereleaseParsedFrom("bar.", allowLeadingZeros: false));
+                => Version.WithPrereleaseParsedFrom("bar."));
             Assert.StartsWith("Prerelease identifier cannot be empty.", ex.Message);
             Assert.Equal("prerelease", ex.ParamName);
         }
@@ -143,7 +142,7 @@ namespace Semver.Test
         public void WithPrereleaseParsedFromLeadingZeros()
         {
             var ex = Assert.Throws<ArgumentException>(()
-                => Version.WithPrereleaseParsedFrom("bar.0123", allowLeadingZeros: false));
+                => Version.WithPrereleaseParsedFrom("bar.0123"));
             Assert.StartsWith("Leading zeros are not allowed on numeric prerelease identifiers '0123'.", ex.Message);
             Assert.Equal("prerelease", ex.ParamName);
         }
@@ -160,7 +159,7 @@ namespace Semver.Test
         public void WithPrereleaseParsedFromTooLarge()
         {
             var ex = Assert.Throws<OverflowException>(()
-               => Version.WithPrereleaseParsedFrom("bar.99999999999999999", allowLeadingZeros: false));
+               => Version.WithPrereleaseParsedFrom("bar.99999999999999999"));
             Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
         }
 
@@ -168,7 +167,7 @@ namespace Semver.Test
         public void WithPrereleaseParsedFromInvalidCharacter()
         {
             var ex = Assert.Throws<ArgumentException>(()
-                => Version.WithPrereleaseParsedFrom("bar.abc@123", allowLeadingZeros: false));
+                => Version.WithPrereleaseParsedFrom("bar.abc@123"));
             Assert.StartsWith("A prerelease identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);
             Assert.Equal("prerelease", ex.ParamName);
         }
@@ -277,7 +276,7 @@ namespace Semver.Test
         [Fact]
         public void WithPrereleaseStringEnumerable()
         {
-            var v = Version.WithPrerelease(new[] { "bar", "baz", "100", "123abc" }.AsEnumerable());
+            var v = Version.WithPrerelease(new[] { "bar", "baz", "100", "123abc" });
 
             Assert.Equal(new SemVersion(1, 2, 3, "bar.baz.100.123abc", "metadata"), v);
         }
@@ -293,9 +292,8 @@ namespace Semver.Test
         [Fact]
         public void WithPrereleaseStringEnumerableNull()
         {
-            IEnumerable<string> identifiers = null;
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithPrerelease(identifiers));
+                => Version.WithPrerelease((IEnumerable<string>)null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -312,7 +310,7 @@ namespace Semver.Test
         public void WithPrereleaseStringEnumerableEmptyIdentifier()
         {
             var ex = Assert.Throws<ArgumentException>(()
-                => Version.WithPrerelease(new[] { "bar", "" }.AsEnumerable()));
+                => Version.WithPrerelease(new[] { "bar", "" }));
             Assert.StartsWith("Prerelease identifier cannot be empty.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -321,7 +319,7 @@ namespace Semver.Test
         public void WithPrereleaseStringEnumerableNullIdentifier()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithPrerelease(new[] { "bar", null }.AsEnumerable()));
+                => Version.WithPrerelease(new[] { "bar", null }));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -330,7 +328,7 @@ namespace Semver.Test
         public void WithPrereleaseStringEnumerableLeadingZeros()
         {
             var ex = Assert.Throws<ArgumentException>(()
-                => Version.WithPrerelease(new[] { "bar", "0123" }.AsEnumerable()));
+                => Version.WithPrerelease(new[] { "bar", "0123" }));
             Assert.StartsWith("Leading zeros are not allowed on numeric prerelease identifiers '0123'.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -339,7 +337,7 @@ namespace Semver.Test
         public void WithPrereleaseStringEnumerableTooLarge()
         {
             var ex = Assert.Throws<OverflowException>(()
-                => Version.WithPrerelease(new[] { "bar", "99999999999999999" }.AsEnumerable()));
+                => Version.WithPrerelease(new[] { "bar", "99999999999999999" }));
             Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
         }
 
@@ -347,7 +345,7 @@ namespace Semver.Test
         public void WithPrereleaseStringEnumerableInvalidCharacter()
         {
             var ex = Assert.Throws<ArgumentException>(()
-                => Version.WithPrerelease(new[] { "bar", "abc@123" }.AsEnumerable()));
+                => Version.WithPrerelease(new[] { "bar", "abc@123" }));
             Assert.StartsWith("A prerelease identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -379,7 +377,7 @@ namespace Semver.Test
         public void WithPrereleaseIdentifierParamsDefaultIdentifierInFirst()
         {
             var ex = Assert.Throws<ArgumentException>(() => Version.WithPrerelease(
-                default, new PrereleaseIdentifier("bar"), default));
+                default, new PrereleaseIdentifier("bar")));
             Assert.StartsWith("Prerelease identifier cannot be default/null.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -420,8 +418,8 @@ namespace Semver.Test
         [Fact]
         public void WithPrereleaseIdentifiersNull()
         {
-            IEnumerable<PrereleaseIdentifier> identifiers = null;
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease(identifiers));
+            var ex = Assert.Throws<ArgumentNullException>(()
+                => Version.WithPrerelease((IEnumerable<PrereleaseIdentifier>)null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -482,9 +480,8 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataParsedFromNull()
         {
-            string identifiers = null;
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithMetadataParsedFrom(identifiers));
+                => Version.WithMetadataParsedFrom(null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("metadata", ex.ParamName);
         }
@@ -576,7 +573,8 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataStringParamsNullIdentifierInRest()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata("bar", "baz", null));
+            var ex = Assert.Throws<ArgumentNullException>(()
+                => Version.WithMetadata("bar", "baz", null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -627,7 +625,9 @@ namespace Semver.Test
         public void WithMetadataStringParamsInvalidCharacterInRest()
         {
             var ex = Assert.Throws<ArgumentException>(() => Version.WithMetadata("bar", "abc@123"));
-            Assert.StartsWith("A metadata identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);
+            Assert.StartsWith(
+                "A metadata identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.",
+                ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
         #endregion
@@ -636,7 +636,7 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataEnumerable()
         {
-            var v = Version.WithMetadata(new List<string> { "bar", "baz", "100", "123abc" });
+            var v = Version.WithMetadata(new[] { "bar", "baz", "100", "123abc" });
 
             Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
         }
@@ -652,8 +652,8 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataEnumerableNull()
         {
-            IEnumerable<string> identifiers = null;
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(identifiers));
+            var ex = Assert.Throws<ArgumentNullException>(()
+                => Version.WithMetadata((IEnumerable<string>)null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -670,7 +670,7 @@ namespace Semver.Test
         public void WithMetadataEnumerableEmptyIdentifier()
         {
             var ex = Assert.Throws<ArgumentException>(()
-                => Version.WithMetadata(new List<string> { "bar", "" }));
+                => Version.WithMetadata(new[] { "bar", "" }));
             Assert.StartsWith("Metadata identifier cannot be empty.", ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -679,7 +679,7 @@ namespace Semver.Test
         public void WithMetadataEnumerableNullIdentifier()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithMetadata(new List<string> { "bar", null }));
+                => Version.WithMetadata(new[] { "bar", null }));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -687,7 +687,7 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataEnumerableLeadingZeros()
         {
-            var v = Version.WithMetadata(new List<string> { "bar", "0123" });
+            var v = Version.WithMetadata(new[] { "bar", "0123" });
 
             Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.0123"), v);
         }
@@ -695,7 +695,7 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataEnumerableTooLarge()
         {
-            var v = Version.WithMetadata(new List<string> { "bar", "99999999999999999" });
+            var v = Version.WithMetadata(new[] { "bar", "99999999999999999" });
 
             Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.99999999999999999"), v);
         }
@@ -704,8 +704,10 @@ namespace Semver.Test
         public void WithMetadataEnumerableInvalidCharacter()
         {
             var ex = Assert.Throws<ArgumentException>(()
-                => Version.WithMetadata(new List<string> { "bar", "abc@123" }));
-            Assert.StartsWith("A metadata identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);
+                => Version.WithMetadata(new[] { "bar", "abc@123" }));
+            Assert.StartsWith(
+                "A metadata identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.",
+                ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
         #endregion
@@ -726,8 +728,8 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataIdentifierParamsRestNull()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(
-                new MetadataIdentifier("bar"), null));
+            var ex = Assert.Throws<ArgumentNullException>(()
+                => Version.WithMetadata(new MetadataIdentifier("bar"), null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -735,8 +737,8 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataIdentifierParamsDefaultIdentifierInFirst()
         {
-            var ex = Assert.Throws<ArgumentException>(() => Version.WithMetadata(
-                default, new MetadataIdentifier("bar"), default));
+            var ex = Assert.Throws<ArgumentException>(()
+                => Version.WithMetadata(default, new MetadataIdentifier("bar")));
             Assert.StartsWith("Metadata identifier cannot be default/null.", ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -777,8 +779,8 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataIdentifiersNull()
         {
-            IEnumerable<MetadataIdentifier> identifiers = null;
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(identifiers));
+            var ex = Assert.Throws<ArgumentNullException>(()
+                => Version.WithMetadata((IEnumerable<MetadataIdentifier>)null));
             Assert.StartsWith("Value cannot be null.", ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
