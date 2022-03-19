@@ -255,6 +255,52 @@ namespace Semver
         }
 
         /// <summary>
+        /// Create a new instance of the <see cref="SemVersion" /> class. Parses prerelease
+        /// and metadata identifiers from dot separated strings. If parsing is not needed, use a
+        /// constructor instead.
+        /// </summary>
+        /// <param name="major">The major version number.</param>
+        /// <param name="minor">The minor version number.</param>
+        /// <param name="patch">The patch version number.</param>
+        /// <param name="prerelease">The prerelease portion (e.g. "alpha.5").</param>
+        /// <param name="metadata">The build metadata (e.g. "nightly.232").</param>
+        /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading
+        /// zeros will be removed.</param>
+        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
+        /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
+        /// zeros for a numeric identifier when <paramref name="allowLeadingZeros"/> is
+        /// <see langword="false"/>. Or, a metadata identifier is empty or contains invalid
+        /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
+        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
+        /// for <see cref="int"/>.</exception>
+        public static SemVersion ParsedFrom(int major, int minor = 0, int patch = 0,
+            string prerelease = "", string metadata = "", bool allowLeadingZeros = false)
+        {
+            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
+            if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
+
+            if (prerelease is null) throw new ArgumentNullException(nameof(prerelease));
+            var prereleaseIdentifiers = prerelease.Length == 0
+                ? ReadOnlyList<PrereleaseIdentifier>.Empty
+                : prerelease.SplitAndMapToReadOnlyList('.',
+                    i => new PrereleaseIdentifier(i, allowLeadingZeros, nameof(prerelease)));
+            if (allowLeadingZeros)
+                // Leading zeros may have been removed, need to reconstruct the prerelease string
+                prerelease = string.Join(".", prereleaseIdentifiers);
+
+            if (metadata is null) throw new ArgumentNullException(nameof(metadata));
+            var metadataIdentifiers = metadata.Length == 0
+                ? ReadOnlyList<MetadataIdentifier>.Empty
+                : metadata.SplitAndMapToReadOnlyList('.', i => new MetadataIdentifier(i, nameof(metadata)));
+
+            return new SemVersion(major, minor, patch,
+                prerelease, prereleaseIdentifiers, metadata, metadataIdentifiers);
+        }
+
+        /// <summary>
         /// Constructs a new instance of the <see cref="SemVersion"/> class from
         /// a <see cref="Version"/>.
         /// </summary>
@@ -703,7 +749,7 @@ namespace Semver
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
         /// zeros for a numeric identifier when <paramref name="allowLeadingZeros"/> is
-        /// <see langword="false"/>. Or, metadata identifier is empty or contains invalid
+        /// <see langword="false"/>. Or, a metadata identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
         /// for <see cref="int"/>.</exception>

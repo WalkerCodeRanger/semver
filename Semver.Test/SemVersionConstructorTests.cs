@@ -88,7 +88,7 @@ namespace Semver.Test
         }
         #endregion
 
-        #region SemVersion(int major, int minor = 0, int patch = 0, string prerelease, string build)
+        #region SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "")
         /// <summary>
         /// Verifies the default values of the arguments to the primary constructor.
         /// </summary>
@@ -232,7 +232,8 @@ namespace Semver.Test
         [InlineData(0, -1, -1, InvalidMinorVersionMessage, "minor")]
         public void ConstructWithIdentifiersInvalidTest(int major, int minor, int patch, string expectedMessage, string expectedParamName)
         {
-            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new SemVersion(major, minor, patch, Enumerable.Empty<PrereleaseIdentifier>()));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(()
+                => new SemVersion(major, minor, patch, Enumerable.Empty<PrereleaseIdentifier>()));
 
             Assert.StartsWith(expectedMessage, ex.Message);
             Assert.Equal(expectedParamName, ex.ParamName);
@@ -293,6 +294,150 @@ namespace Semver.Test
         }
 
         // TODO add tests for validation of prerelease and metadata
+        #endregion
+
+        #region SemVersion.ParsedFrom(int major, int minor = 0, int patch = 0, string prerelease, string build)
+        [Fact]
+        public void ParsedFromDefaultValuesTest()
+        {
+            var v = SemVersion.ParsedFrom(1);
+
+            Assert.Equal(1, v.Major);
+            Assert.Equal(0, v.Minor);
+            Assert.Equal(0, v.Patch);
+            Assert.Equal("", v.Prerelease);
+            Assert.Empty(v.PrereleaseIdentifiers);
+            Assert.Equal("", v.Metadata);
+            Assert.Empty(v.MetadataIdentifiers);
+        }
+
+        [Fact]
+        public void ParsedFromTest()
+        {
+            var v = SemVersion.ParsedFrom(2, 3, 4, "pre.42", "build.42");
+
+            Assert.Equal(2, v.Major);
+            Assert.Equal(3, v.Minor);
+            Assert.Equal(4, v.Patch);
+            Assert.Equal("pre.42", v.Prerelease);
+            var expectedPrereleaseIdentifiers = new[] { new PrereleaseIdentifier("pre"), new PrereleaseIdentifier(42) };
+            Assert.Equal(expectedPrereleaseIdentifiers, v.PrereleaseIdentifiers);
+            Assert.Equal("build.42", v.Metadata);
+            var expectedMetadata = new[] { new MetadataIdentifier("build"), new MetadataIdentifier("42") };
+            Assert.Equal(expectedMetadata, v.MetadataIdentifiers);
+        }
+
+        [Theory]
+        [InlineData(-1, 0, 0, InvalidMajorVersionMessage, "major")]
+        [InlineData(0, -1, 0, InvalidMinorVersionMessage, "minor")]
+        [InlineData(0, 0, -1, InvalidPatchVersionMessage, "patch")]
+        [InlineData(-1, -1, -1, InvalidMajorVersionMessage, "major")]
+        [InlineData(0, -1, -1, InvalidMinorVersionMessage, "minor")]
+        public void ParsedFromInvalidTest(
+            int major,
+            int minor,
+            int patch,
+            string expectedMessage,
+            string expectedParamName)
+        {
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(()
+                => SemVersion.ParsedFrom(major, minor, patch));
+
+            Assert.StartsWith(expectedMessage, ex.Message);
+            Assert.Equal(expectedParamName, ex.ParamName);
+        }
+
+        [Fact]
+        public void ParsedFromPrereleaseEmptyString()
+        {
+            var v = SemVersion.ParsedFrom(1, 2, 3, "");
+
+            Assert.Equal(new SemVersion(1, 2, 3), v);
+        }
+
+        [Fact]
+        public void ParsedFromPrereleaseEmptyIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => SemVersion.ParsedFrom(1, 2, 3, "bar."));
+            Assert.StartsWith("Prerelease identifier cannot be empty.", ex.Message);
+            Assert.Equal("prerelease", ex.ParamName);
+        }
+
+        [Fact]
+        public void ParsedFromPrereleaseLeadingZeros()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => SemVersion.ParsedFrom(1, 2, 3, "bar.0123"));
+            Assert.StartsWith("Leading zeros are not allowed on numeric prerelease identifiers '0123'.", ex.Message);
+            Assert.Equal("prerelease", ex.ParamName);
+        }
+
+        [Fact]
+        public void ParsedFromPrereleaseLeadingZerosAllowed()
+        {
+            var v = SemVersion.ParsedFrom(1, 2, 3, "bar.0123", allowLeadingZeros: true);
+
+            Assert.Equal(new SemVersion(1, 2, 3, "bar.123"), v);
+        }
+
+        [Fact]
+        public void ParsedFromPrereleaseTooLarge()
+        {
+            var ex = Assert.Throws<OverflowException>(()
+               => SemVersion.ParsedFrom(1, 2, 3, "bar.99999999999999999"));
+            Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
+        }
+
+        [Fact]
+        public void ParsedFromPrereleaseInvalidCharacter()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => SemVersion.ParsedFrom(1, 2, 3, "bar.abc@123"));
+            Assert.StartsWith("A prerelease identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);
+            Assert.Equal("prerelease", ex.ParamName);
+        }
+
+        [Fact]
+        public void ParsedFromMetadataEmptyString()
+        {
+            var v = SemVersion.ParsedFrom(1, metadata: "");
+
+            Assert.Equal(new SemVersion(1, 0, 0), v);
+        }
+
+        [Fact]
+        public void ParsedFromMetadataEmptyIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => SemVersion.ParsedFrom(1, metadata: "bar."));
+            Assert.StartsWith("Metadata identifier cannot be empty.", ex.Message);
+            Assert.Equal("metadata", ex.ParamName);
+        }
+
+        [Fact]
+        public void ParsedFromMetadataLeadingZeros()
+        {
+            var v = SemVersion.ParsedFrom(1, metadata: "bar.0123");
+
+            Assert.Equal(new SemVersion(1, 0, 0, "", "bar.0123"), v);
+        }
+
+        [Fact]
+        public void ParsedFromMetadataTooLarge()
+        {
+            var v = SemVersion.ParsedFrom(1, metadata: "bar.99999999999999999");
+
+            Assert.Equal(new SemVersion(1, 0, 0, "", "bar.99999999999999999"), v);
+        }
+
+        [Fact]
+        public void ParsedFromMetadataInvalidCharacter()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => SemVersion.ParsedFrom(1, metadata: "bar.abc@123"));
+            Assert.StartsWith("A metadata identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);
+            Assert.Equal("metadata", ex.ParamName);
+        }
         #endregion
     }
 }
