@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Semver.Test.Builders;
 using Xunit;
@@ -293,7 +294,126 @@ namespace Semver.Test
             Assert.Equal(expectedParamName, ex.ParamName);
         }
 
-        // TODO add tests for validation of prerelease and metadata
+        [Fact]
+        public void ConstructWithStringIdentifiersPrereleaseNull()
+        {
+            var v = new SemVersion(1, 2, 3, (IEnumerable<string>)null);
+
+            Assert.Equal(new SemVersion(1, 2, 3, ""), v);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersPrereleaseEmpty()
+        {
+            var v = new SemVersion(1, 2, 3, Enumerable.Empty<string>());
+
+            Assert.Equal(new SemVersion(1, 2, 3, ""), v);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersPrereleaseEmptyIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => new SemVersion(1, 2, 3, new[] { "bar", "" }));
+            Assert.StartsWith("Prerelease identifier cannot be empty.", ex.Message);
+            Assert.Equal("prerelease", ex.ParamName);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersPrereleaseNullIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(()
+                => new SemVersion(1, 2, 3, new[] { "bar", null }));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("prerelease", ex.ParamName);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersPrereleaseLeadingZeros()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => new SemVersion(1, 2, 3, new[] { "bar", "0123" }));
+            Assert.StartsWith("Leading zeros are not allowed on numeric prerelease identifiers '0123'.", ex.Message);
+            Assert.Equal("prerelease", ex.ParamName);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersPrereleaseTooLarge()
+        {
+            var ex = Assert.Throws<OverflowException>(()
+                => new SemVersion(1, 2, 3, new[] { "bar", "99999999999999999" }));
+            Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersPrereleaseInvalidCharacter()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => new SemVersion(1, 2, 3, new[] { "bar", "abc@123" }));
+            Assert.StartsWith("A prerelease identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.", ex.Message);
+            Assert.Equal("prerelease", ex.ParamName);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersMetadataNull()
+        {
+            var v = new SemVersion(1, 2, 3, metadata: (IEnumerable<string>)null);
+
+            Assert.Equal(new SemVersion(1, 2, 3), v);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersMetadataEmpty()
+        {
+            var v = new SemVersion(1, 2, 3, metadata: Enumerable.Empty<string>());
+
+            Assert.Equal(new SemVersion(1, 2, 3), v);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersMetadataEmptyIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => new SemVersion(1, 2, 3, metadata: new[] { "bar", "" }));
+            Assert.StartsWith("Metadata identifier cannot be empty.", ex.Message);
+            Assert.Equal("metadata", ex.ParamName);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersMetadataNullIdentifier()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(()
+                => new SemVersion(1, 2, 3, metadata: new[] { "bar", null }));
+            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.Equal("metadata", ex.ParamName);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersMetadataLeadingZeros()
+        {
+            var v = new SemVersion(1, 2, 3, metadata: new[] { "bar", "0123" });
+
+            Assert.Equal(new SemVersion(1, 2, 3, "", "bar.0123"), v);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersMetadataTooLarge()
+        {
+            var v = new SemVersion(1, 2, 3, metadata: new[] { "bar", "99999999999999999" });
+
+            Assert.Equal(new SemVersion(1, 2, 3, "", "bar.99999999999999999"), v);
+        }
+
+        [Fact]
+        public void ConstructWithStringIdentifiersMetadataInvalidCharacter()
+        {
+            var ex = Assert.Throws<ArgumentException>(()
+                => new SemVersion(1, 2, 3, metadata: new[] { "bar", "abc@123" }));
+            Assert.StartsWith(
+                "A metadata identifier can contain only ASCII alphanumeric characters and hyphens 'abc@123'.",
+                ex.Message);
+            Assert.Equal("metadata", ex.ParamName);
+        }
         #endregion
 
         #region SemVersion.ParsedFrom(int major, int minor = 0, int patch = 0, string prerelease, string build)

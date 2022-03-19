@@ -223,7 +223,7 @@ namespace Semver
                                         .Select(i => new PrereleaseIdentifier(i, allowLeadingZeros: false, nameof(prerelease)))
                                         .ToReadOnlyList();
 
-            var metadataIdentifiers = metadata
+            var metadataIdentifiers = metadata?
                                       .Select(i => new MetadataIdentifier(i, nameof(metadata)))
                                       .ToReadOnlyList();
 
