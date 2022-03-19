@@ -21,6 +21,7 @@ namespace Semver.Test
     {
         public static readonly IReadOnlyList<SemVersion> VersionsInOrder = new List<SemVersion>()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             new SemVersion(-2),
             new SemVersion(-1, -1),
             new SemVersion(-1),
@@ -78,6 +79,7 @@ namespace Semver.Test
             new SemVersion(2),
             new SemVersion(2, 1),
             new SemVersion(2, 1, 1),
+#pragma warning restore CS0618 // Type or member is obsolete
         }.AsReadOnly();
 
         public static readonly IReadOnlyList<(SemVersion, SemVersion)> VersionPairs =
@@ -90,7 +92,9 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
+#pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
                 Assert.True(v.Equals(identical), v.ToString());
             }
         }
@@ -179,7 +183,9 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
+#pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
                 Assert.True(v.GetHashCode() == identical.GetHashCode(), v.ToString());
             }
         }
@@ -199,7 +205,9 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
+#pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
                 Assert.True(v.CompareTo(identical) == 0, v.ToString());
             }
         }
@@ -324,7 +332,9 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
+#pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
                 Assert.True(v.PrecedenceMatches(identical), v.ToString());
             }
         }
@@ -393,7 +403,9 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
+#pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
                 Assert.True(v.CompareByPrecedence(identical) == 0, v.ToString());
             }
         }
@@ -489,7 +501,9 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
+#pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
                 Assert.True(v == identical, v.ToString());
             }
         }
@@ -569,7 +583,9 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
+#pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
                 Assert.False(v != identical, v.ToString());
             }
         }
@@ -649,7 +665,9 @@ namespace Semver.Test
             foreach (var v in VersionsInOrder)
             {
                 // Construct an identical version, but different instance
+#pragma warning disable CS0618 // Type or member is obsolete
                 var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
                 Assert.False(v < identical, $"{v} < {identical}");
                 Assert.True(v <= identical, $"{v} <= {identical}");
                 Assert.False(v > identical, $"{v} > {identical}");

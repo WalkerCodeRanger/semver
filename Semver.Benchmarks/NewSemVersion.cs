@@ -20,9 +20,15 @@ namespace Semver.Benchmarks
         public string Full_Previous() => new Previous.SemVersion(1, 2, 3, Prerelease, Metadata).Prerelease;
 
         [Benchmark]
-        public string Simple_Current() => new SemVersion(1, 2, 3).Prerelease;
+        public string Simple_Current()
+#pragma warning disable CS0618 // Type or member is obsolete
+            => new SemVersion(1, 2, 3, "").Prerelease;
+#pragma warning restore CS0618 // Type or member is obsolete
 
         [Benchmark]
-        public string Full_Current() => new SemVersion(1, 2, 3, Prerelease, Metadata).Prerelease;
+        public string Full_Current()
+#pragma warning disable CS0618 // Type or member is obsolete
+            => new SemVersion(1, 2, 3, Prerelease, Metadata).Prerelease;
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

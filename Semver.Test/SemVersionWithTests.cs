@@ -10,7 +10,7 @@ namespace Semver.Test
     /// </summary>
     public class SemVersionWithTests
     {
-        public static readonly SemVersion Version = new SemVersion(1, 2, 3, "pre", "metadata");
+        public static readonly SemVersion Version = SemVersion.ParsedFrom(1, 2, 3, "pre", "metadata");
 
         #region With(...)
         [Fact]
@@ -18,7 +18,7 @@ namespace Semver.Test
         {
             var v = Version.With(major: 42);
 
-            Assert.Equal(new SemVersion(42, 2, 3, "pre", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(42, 2, 3, "pre", "metadata"), v);
         }
 
         [Theory]
@@ -36,7 +36,7 @@ namespace Semver.Test
         {
             var v = Version.With(minor: 42);
 
-            Assert.Equal(new SemVersion(1, 42, 3, "pre", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 42, 3, "pre", "metadata"), v);
         }
 
         [Theory]
@@ -54,7 +54,7 @@ namespace Semver.Test
         {
             var v = Version.With(patch: 42);
 
-            Assert.Equal(new SemVersion(1, 2, 42, "pre", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 42, "pre", "metadata"), v);
         }
 
         [Theory]
@@ -78,7 +78,7 @@ namespace Semver.Test
                 new PrereleaseIdentifier("123abc"),
             });
 
-            Assert.Equal(new SemVersion(1, 2, 3, "bar.baz.100.123abc", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "bar.baz.100.123abc", "metadata"), v);
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Semver.Test
         {
             var v = Version.With(prerelease: Enumerable.Empty<PrereleaseIdentifier>());
 
-            Assert.Equal(new SemVersion(1, 2, 3, "", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "", "metadata"), v);
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace Semver.Test
                 new MetadataIdentifier("123abc"),
             });
 
-            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace Semver.Test
         {
             var v = Version.With(metadata: Enumerable.Empty<MetadataIdentifier>());
 
-            Assert.Equal(new SemVersion(1, 2, 3, "pre"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "pre"), v);
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace Semver.Test
         {
             var v = Version.WithParsedFrom(major: 42);
 
-            Assert.Equal(new SemVersion(42, 2, 3, "pre", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(42, 2, 3, "pre", "metadata"), v);
         }
 
         [Theory]
@@ -154,7 +154,7 @@ namespace Semver.Test
         {
             var v = Version.WithParsedFrom(minor: 42);
 
-            Assert.Equal(new SemVersion(1, 42, 3, "pre", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 42, 3, "pre", "metadata"), v);
         }
 
         [Theory]
@@ -172,7 +172,7 @@ namespace Semver.Test
         {
             var v = Version.WithParsedFrom(patch: 42);
 
-            Assert.Equal(new SemVersion(1, 2, 42, "pre", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 42, "pre", "metadata"), v);
         }
 
         [Theory]
@@ -190,7 +190,7 @@ namespace Semver.Test
         {
             var v = Version.WithParsedFrom(prerelease: "bar.baz.100.123abc");
 
-            Assert.Equal(new SemVersion(1, 2, 3, "bar.baz.100.123abc", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "bar.baz.100.123abc", "metadata"), v);
         }
 
         [Fact]
@@ -198,7 +198,7 @@ namespace Semver.Test
         {
             var v = Version.WithParsedFrom(prerelease: "");
 
-            Assert.Equal(new SemVersion(1, 2, 3, "", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "", "metadata"), v);
         }
 
         [Fact]
@@ -223,7 +223,7 @@ namespace Semver.Test
         {
             var v = Version.WithParsedFrom(prerelease: "bar.0123", allowLeadingZeros: true);
 
-            Assert.Equal(new SemVersion(1, 2, 3, "bar.123", "metadata"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "bar.123", "metadata"), v);
         }
 
         [Fact]
@@ -248,7 +248,7 @@ namespace Semver.Test
         {
             var v = Version.WithParsedFrom(metadata: "bar.baz.100.123abc");
 
-            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "pre", "bar.baz.100.123abc"), v);
         }
 
         [Fact]
@@ -256,7 +256,7 @@ namespace Semver.Test
         {
             var v = Version.WithParsedFrom(metadata: "");
 
-            Assert.Equal(new SemVersion(1, 2, 3, "pre"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "pre"), v);
         }
 
         [Fact]
@@ -273,7 +273,7 @@ namespace Semver.Test
         {
             var v = Version.WithParsedFrom(metadata: "bar.0123");
 
-            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.0123"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "pre", "bar.0123"), v);
         }
 
         [Fact]
@@ -281,7 +281,7 @@ namespace Semver.Test
         {
             var v = Version.WithParsedFrom(metadata: "bar.99999999999999999");
 
-            Assert.Equal(new SemVersion(1, 2, 3, "pre", "bar.99999999999999999"), v);
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "pre", "bar.99999999999999999"), v);
         }
 
         [Fact]

@@ -22,7 +22,9 @@ namespace Semver.Test
         [InlineData(1, 2, 3, null, "b", false)]
         public void IsPrereleaseAndIsReleaseTest(int major, int minor, int patch, string prerelease, string metadata, bool expected)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v = new SemVersion(major, minor, patch, prerelease, metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.True(expected == v.IsPrerelease, $"({v}).IsPrerelease");
             Assert.True(expected != v.IsRelease, $"({v}).IsRelease");
@@ -135,7 +137,9 @@ namespace Semver.Test
         [InlineData(-1, -1, -1, "", "build.42")]
         public void ToVersionFromNegativeTest(int major, int minor, int patch, string prerelease, string metadata)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v = new SemVersion(major, minor, patch, prerelease, metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var ex = Assert.Throws<InvalidOperationException>(() => v.ToVersion());
 
@@ -151,7 +155,9 @@ namespace Semver.Test
         [InlineData(1, 2, 3, "😞", "b")]
         public void ToVersionFromPrereleaseTest(int major, int minor, int patch, string prerelease, string metadata)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v = new SemVersion(major, minor, patch, prerelease, metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var ex = Assert.Throws<InvalidOperationException>(() => v.ToVersion());
 
@@ -167,7 +173,9 @@ namespace Semver.Test
         [InlineData(1, 2, 3, "", "b..c")]
         public void ToVersionFromMetadataTest(int major, int minor, int patch, string prerelease, string metadata)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v = new SemVersion(major, minor, patch, prerelease, metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var ex = Assert.Throws<InvalidOperationException>(() => v.ToVersion());
 
@@ -190,7 +198,9 @@ namespace Semver.Test
         [InlineData(-1, -1, -1, "", "", "-1.-1.-1")]
         public void ToStringTest(int major, int minor, int patch, string prerelease, string metadata, string expected)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var v = new SemVersion(major, minor, patch, prerelease, metadata);
+#pragma warning restore CS0618 // Type or member is obsolete
 
             var actual = v.ToString();
 
@@ -201,7 +211,7 @@ namespace Semver.Test
         [Fact]
         public void SerializationTest()
         {
-            var semVer = new SemVersion(1, 2, 3, "alpha", "dev");
+            var semVer = SemVersion.ParsedFrom(1, 2, 3, "alpha", "dev");
             SemVersion semVerSerializedDeserialized;
             using (var ms = new MemoryStream())
             {
@@ -218,7 +228,7 @@ namespace Semver.Test
         [Fact]
         public void SerializationNotSupportedTest()
         {
-            var semVer = new SemVersion(1, 2, 3, "alpha", "dev");
+            var semVer = SemVersion.ParsedFrom(1, 2, 3, "alpha", "dev");
             using (var ms = new MemoryStream())
             {
                 var bf = new BinaryFormatter();

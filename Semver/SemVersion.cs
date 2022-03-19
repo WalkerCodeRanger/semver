@@ -78,7 +78,15 @@ namespace Semver
         /// <param name="major">The major version number.</param>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
         public SemVersion(int major)
-            : this(major, 0, 0, "") { }
+        {
+            Major = major;
+            Minor = 0;
+            Patch = 0;
+            Prerelease = "";
+            PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
+            Metadata = "";
+            MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
+        }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="SemVersion" /> class.
@@ -87,7 +95,15 @@ namespace Semver
         /// <param name="minor">The minor version number.</param>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
         public SemVersion(int major, int minor)
-            : this(major, minor, 0, "") { }
+        {
+            Major = major;
+            Minor = minor;
+            Patch = 0;
+            Prerelease = "";
+            PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
+            Metadata = "";
+            MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
+        }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="SemVersion" /> class.
@@ -97,7 +113,15 @@ namespace Semver
         /// <param name="patch">The patch version number.</param>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
         public SemVersion(int major, int minor, int patch)
-            : this(major, minor, patch, "") { }
+        {
+            Major = major;
+            Minor = minor;
+            Patch = patch;
+            Prerelease = "";
+            PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
+            Metadata = "";
+            MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
+        }
 
         /// <summary>
         /// Constructs a new instance of the <see cref="SemVersion" /> class.
@@ -107,6 +131,7 @@ namespace Semver
         /// <param name="patch">The patch version number.</param>
         /// <param name="prerelease">The prerelease portion (e.g. "alpha.5").</param>
         /// <param name="build">The build metadata (e.g. "nightly.232").</param>
+        [Obsolete("This constructor is obsolete. Use another constructor or SemVersion.ParsedFrom() instead.")]
         public SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "")
         {
             Major = major;
@@ -115,15 +140,11 @@ namespace Semver
 
             prerelease = prerelease ?? "";
             Prerelease = prerelease;
-#pragma warning disable CS0612 // Type or member is obsolete
             PrereleaseIdentifiers = prerelease.SplitAndMapToReadOnlyList('.', PrereleaseIdentifier.CreateLoose);
-#pragma warning restore CS0612 // Type or member is obsolete
 
             build = build ?? "";
             Metadata = build;
-#pragma warning disable CS0612 // Type or member is obsolete
             MetadataIdentifiers = build.SplitAndMapToReadOnlyList('.', MetadataIdentifier.CreateLoose);
-#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         /// <summary>
