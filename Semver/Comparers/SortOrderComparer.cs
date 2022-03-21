@@ -4,12 +4,12 @@ using Semver.Utility;
 
 namespace Semver.Comparers
 {
-    internal class SortComparer : Comparer<SemVersion>, ISemVersionComparer
+    internal class SortOrderComparer : Comparer<SemVersion>, ISemVersionComparer
     {
         #region Singleton
-        public static readonly ISemVersionComparer Instance = new SortComparer();
+        public static readonly ISemVersionComparer Instance = new SortOrderComparer();
 
-        private SortComparer() { }
+        private SortOrderComparer() { }
         #endregion
 
         public bool Equals(SemVersion x, SemVersion y)

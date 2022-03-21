@@ -72,7 +72,20 @@ namespace Semver
             Metadata = semVersion.Metadata;
             MetadataIdentifiers = semVersion.MetadataIdentifiers;
         }
+
+        /// <summary>
+        /// Populates a <see cref="SerializationInfo"/> with the data needed to serialize the target object.
+        /// </summary>
+        /// <param name="info">The <see cref="SerializationInfo"/> to populate with data.</param>
+        /// <param name="context">The destination (see <see cref="SerializationInfo"/>) for this serialization.</param>
+        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null) throw new ArgumentNullException(nameof(info));
+            info.AddValue("SemVersion", ToString());
+        }
 #endif
+
         /// <summary>
         /// Constructs a new instance of the <see cref="SemVersion" /> class.
         /// </summary>
@@ -580,19 +593,6 @@ namespace Semver
 
             semver = new SemVersion(major, minor, patch, prerelease, metadata);
             return true;
-        }
-
-        /// <summary>
-        /// Determines whether two semantic versions are equal.
-        /// </summary>
-        /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
-        /// versions with the same precedence may not be equal.</remarks>
-        public static bool Equals(SemVersion versionA, SemVersion versionB)
-        {
-            if (ReferenceEquals(versionA, versionB)) return true;
-            if (versionA is null || versionB is null) return false;
-            return versionA.Equals(versionB);
         }
 
         /// <summary>
@@ -1228,6 +1228,107 @@ namespace Semver
             return version.ToString();
         }
 
+        #region Equality
+        /// <summary>
+        /// Determines whether two semantic versions are equal.
+        /// </summary>
+        /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not be equal.</remarks>
+        public static bool Equals(SemVersion versionA, SemVersion versionB)
+        {
+            if (ReferenceEquals(versionA, versionB)) return true;
+            if (versionA is null || versionB is null) return false;
+            return versionA.Equals(versionB);
+        }
+
+        /// <summary>Determines whether the given object is equal to this version.</summary>
+        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this identifier;
+        /// otherwise <see langword="false"/>.</returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not be equal.</remarks>
+        public override bool Equals(object obj)
+            => obj is SemVersion version && Equals(version);
+
+        /// <summary>
+        /// Determines whether two versions are equal.
+        /// </summary>
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the this version;
+        /// otherwise <see langword="false"/>.</returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not be equal.</remarks>
+        public bool Equals(SemVersion other)
+        {
+            if (other is null)
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return Major == other.Major
+                && Minor == other.Minor
+                && Patch == other.Patch
+                && string.Equals(Prerelease, other.Prerelease, StringComparison.Ordinal)
+                && string.Equals(Metadata, other.Metadata, StringComparison.Ordinal);
+        }
+
+        public bool PrecedenceEquals(SemVersion other)
+            => PrecedenceComparer.Compare(this, other) == 0;
+
+        public static bool PrecedenceEquals(SemVersion left, SemVersion right)
+            => PrecedenceComparer.Compare(left, right) == 0;
+
+        /// <summary>
+        /// Returns whether two semantic versions have the same precedence. Versions
+        /// that differ only by build metadata have the same precedence.
+        /// </summary>
+        /// <param name="other">The semantic version to compare to.</param>
+        /// <returns><see langword="true"/> if the version precedences are equal.</returns>
+        [Obsolete("Method is obsolete. Use PrecedenceEquals() instead.")]
+        public bool PrecedenceMatches(SemVersion other) => CompareByPrecedence(other) == 0;
+
+        /// <summary>
+        /// Gets a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms
+        /// and data structures like a hash table.
+        /// </returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not have the same hash code.</remarks>
+        public override int GetHashCode()
+            => CombinedHashCode.Create(Major, Minor, Patch, Prerelease, Metadata);
+
+        /// <summary>
+        /// Determines whether two semantic versions are equal.
+        /// </summary>
+        /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not be equal.</remarks>
+        public static bool operator ==(SemVersion left, SemVersion right) => Equals(left, right);
+
+        /// <summary>
+        /// Determines whether two semantic versions are <em>not</em> equal.
+        /// </summary>
+        /// <returns><see langword="true"/> if the two values are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// versions with the same precedence may not be equal.</remarks>
+        public static bool operator !=(SemVersion left, SemVersion right) => !Equals(left, right);
+        #endregion
+
+        #region Comparison
+        public static readonly ISemVersionComparer PrecedenceComparer = Comparers.PrecedenceComparer.Instance;
+        public static readonly ISemVersionComparer SortOrderComparer = Comparers.SortOrderComparer.Instance;
+
+        public int ComparePrecedenceTo(SemVersion other) => PrecedenceComparer.Compare(this, other);
+        public int CompareSortOrderTo(SemVersion other) => SortOrderComparer.Compare(this, other);
+
+        public static int ComparePrecedence(SemVersion left, SemVersion right)
+            => PrecedenceComparer.Compare(left, right);
+
+        public static int CompareSortOrder(SemVersion left, SemVersion right)
+            => SortOrderComparer.Compare(left, right);
+
         /// <summary>
         /// Compares this version to an <see cref="Object"/> and indicates whether this instance
         /// precedes, follows, or is equal to the object in the sort order. Note that sort order
@@ -1254,15 +1355,6 @@ namespace Semver
             // If other is null, CompareByPrecedence() returns 1
             return CompareComponents(Metadata, other.Metadata);
         }
-
-        /// <summary>
-        /// Returns whether two semantic versions have the same precedence. Versions
-        /// that differ only by build metadata have the same precedence.
-        /// </summary>
-        /// <param name="other">The semantic version to compare to.</param>
-        /// <returns><see langword="true"/> if the version precedences are equal.</returns>
-        [Obsolete("Method is obsolete. Use PrecedenceEquals() instead.")]
-        public bool PrecedenceMatches(SemVersion other) => CompareByPrecedence(other) == 0;
 
         /// <summary>
         /// Compares two versions and indicates whether the first precedes, follows, or is in the same
@@ -1367,114 +1459,6 @@ namespace Semver
             return aComps.Length.CompareTo(bComps.Length);
         }
 
-        #region Equality
-        /// <summary>Determines whether the given object is equal to this version.</summary>
-        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this identifier;
-        /// otherwise <see langword="false"/>.</returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
-        /// versions with the same precedence may not be equal.</remarks>
-        public override bool Equals(object obj)
-            => obj is SemVersion version && Equals(version);
-
-        /// <summary>
-        /// Determines whether two versions are equal.
-        /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the this version;
-        /// otherwise <see langword="false"/>.</returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
-        /// versions with the same precedence may not be equal.</remarks>
-        public bool Equals(SemVersion other)
-        {
-            if (other is null)
-                return false;
-
-            if (ReferenceEquals(this, other))
-                return true;
-
-            return Major == other.Major
-                && Minor == other.Minor
-                && Patch == other.Patch
-                && string.Equals(Prerelease, other.Prerelease, StringComparison.Ordinal)
-                && string.Equals(Metadata, other.Metadata, StringComparison.Ordinal);
-        }
-
-        public bool PrecedenceEquals(SemVersion other)
-            => PrecedenceComparer.Compare(this, other) == 0;
-
-        public static bool PrecedenceEquals(SemVersion left, SemVersion right)
-            => PrecedenceComparer.Compare(left, right) == 0;
-
-        /// <summary>
-        /// Gets a hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms
-        /// and data structures like a hash table.
-        /// </returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
-        /// versions with the same precedence may not have the same hash code.</remarks>
-        public override int GetHashCode()
-            => CombinedHashCode.Create(Major, Minor, Patch, Prerelease, Metadata);
-        #endregion
-
-        #region Comparison
-        public static readonly ISemVersionComparer PrecedenceComparer = Comparers.PrecedenceComparer.Instance;
-        public static readonly ISemVersionComparer SortOrderComparer = Comparers.SortComparer.Instance;
-
-        public int ComparePrecedenceTo(SemVersion other) => PrecedenceComparer.Compare(this, other);
-        public int CompareSortOrderTo(SemVersion other) => SortOrderComparer.Compare(this, other);
-
-        public static int ComparePrecedence(SemVersion left, SemVersion right)
-            => PrecedenceComparer.Compare(left, right);
-
-        public static int CompareSortOrder(SemVersion left, SemVersion right)
-            => SortOrderComparer.Compare(left, right);
-        #endregion
-
-#if SERIALIZABLE
-        /// <summary>
-        /// Populates a <see cref="SerializationInfo"/> with the data needed to serialize the target object.
-        /// </summary>
-        /// <param name="info">The <see cref="SerializationInfo"/> to populate with data.</param>
-        /// <param name="context">The destination (see <see cref="SerializationInfo"/>) for this serialization.</param>
-        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            if (info == null) throw new ArgumentNullException(nameof(info));
-            info.AddValue("SemVersion", ToString());
-        }
-#endif
-
-        /// <summary>
-        /// Implicit conversion from <see cref="string"/> to <see cref="SemVersion"/>.
-        /// </summary>
-        /// <param name="version">The semantic version.</param>
-        /// <returns>The <see cref="SemVersion"/> object.</returns>
-        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
-        /// <exception cref="OverflowException">The major, minor, or patch version number is larger than <see cref="int.MaxValue"/>.</exception>
-        [Obsolete("Implicit conversion from string is obsolete. Use Parse() or TryParse() method instead.")]
-        public static implicit operator SemVersion(string version)
-            => Parse(version);
-
-        /// <summary>
-        /// Determines whether two semantic versions are equal.
-        /// </summary>
-        /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
-        /// versions with the same precedence may not be equal.</remarks>
-        public static bool operator ==(SemVersion left, SemVersion right)
-            => Equals(left, right);
-
-        /// <summary>
-        /// Determines whether two semantic versions are <em>not</em> equal.
-        /// </summary>
-        /// <returns><see langword="true"/> if the two values are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
-        /// versions with the same precedence may not be equal.</remarks>
-        public static bool operator !=(SemVersion left, SemVersion right)
-            => !Equals(left, right);
-
         /// <summary>
         /// Compares two versions by sort order. Note that sort order is more specific than precedence order.
         /// </summary>
@@ -1514,5 +1498,18 @@ namespace Semver
         [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator <=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) < 0;
+        #endregion
+
+        /// <summary>
+        /// Implicit conversion from <see cref="string"/> to <see cref="SemVersion"/>.
+        /// </summary>
+        /// <param name="version">The semantic version.</param>
+        /// <returns>The <see cref="SemVersion"/> object.</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
+        /// <exception cref="OverflowException">The major, minor, or patch version number is larger than <see cref="int.MaxValue"/>.</exception>
+        [Obsolete("Implicit conversion from string is obsolete. Use Parse() or TryParse() method instead.")]
+        public static implicit operator SemVersion(string version)
+            => Parse(version);
     }
 }

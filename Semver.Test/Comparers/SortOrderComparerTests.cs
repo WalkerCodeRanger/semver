@@ -4,9 +4,9 @@ using Xunit;
 
 namespace Semver.Test.Comparers
 {
-    public class SortComparerTests
+    public class SortOrderComparerTests
     {
-        private static readonly ISemVersionComparer Comparer = SortComparer.Instance;
+        private static readonly ISemVersionComparer Comparer = SortOrderComparer.Instance;
 
         #region Equals
         [Fact]
