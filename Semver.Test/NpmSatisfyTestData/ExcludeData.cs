@@ -4,6 +4,13 @@ using Semver.Ranges.Comparers.Npm;
 
 namespace Semver.Test.NpmSatisfyTestData
 {
+    /// <summary>
+    /// All values should be parseable ranges and versions
+    /// First argument is a range
+    /// Second argument is a fully qualified version
+    /// Third argument is optional, and is <see cref="NpmParseOptions"/>
+    /// Versions should be excluded by the range
+    /// </summary>
     public class ExcludeData : IEnumerable<object[]>
     {
         public IEnumerator<object[]> GetEnumerator()

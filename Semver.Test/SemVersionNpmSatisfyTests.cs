@@ -26,6 +26,9 @@ namespace Semver.Test
             testOutput.WriteLine($"{parsedRange} includes {version}");
         }
 
+        /// <summary>
+        /// All ranges should be valid and exclude the version
+        /// </summary>
         [Theory]
         [ClassData(typeof(ExcludeData))]
         public void AllExcludes(string range, string version, NpmParseOptions options = default)
