@@ -26,5 +26,8 @@
         <Compile Include="..\Semver\Comparers\*.cs">
             <Link>LocalVersion\%(RecursiveDir)\Comparers\%(FileName)%(Extension)</Link>
         </Compile>
+        <Compile Include="..\Semver\Ranges\**\*.cs">
+            <Link>LocalVersion\Ranges\%(RecursiveDir)%(FileName)%(Extension)</Link>
+        </Compile>
     </ItemGroup>
 </Project>
