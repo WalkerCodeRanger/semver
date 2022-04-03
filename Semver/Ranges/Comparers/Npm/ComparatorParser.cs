@@ -50,7 +50,7 @@ namespace Semver.Ranges.Comparers.Npm
 
         public IEnumerable<NpmComparator> ParseComparators(string range, NpmParseOptions options)
         {
-            if (range == string.Empty)
+            if (range == string.Empty) // Empty ranges imply *
             {
                 yield return new NpmComparator(options);
                 yield break;
@@ -82,20 +82,20 @@ namespace Semver.Ranges.Comparers.Npm
                 throw new RangeParseException($"Unknown range syntax: {range}");
         }
 
-        private void ParseHyphenRange(Match match, NpmParseOptions options, out NpmComparator minNpmComparator, out NpmComparator maxComparator)
+        private void ParseHyphenRange(Match match, NpmParseOptions options, out NpmComparator minComparator, out NpmComparator maxComparator)
         {
             ParseVersion(match.Groups["minVersion"].Value, out var minMajor, out var minMinor, out var minPatch, out string minPrerelease, out string minMetadata);
             ParseVersion(match.Groups["maxVersion"].Value, out var maxMajor, out var maxMinor, out var maxPatch, out string maxPrerelease, out string maxMetadata);
             
             if (minMajor == null)
             {
-                minNpmComparator = new NpmComparator(options);
+                minComparator = new NpmComparator(options);
             }
             else
             {
                 RoundVersion(VersionRoundingType.Zero, ref minMajor, ref minMinor, ref minPatch);
                 SemVersion minVersion = SemVersion.ParsedFrom(minMajor.Value, minMinor.Value, minPatch.Value, minPrerelease, minMetadata);
-                minNpmComparator = new NpmComparator(ComparatorOp.GreaterThanOrEqualTo, minVersion, options);
+                minComparator = new NpmComparator(ComparatorOp.GreaterThanOrEqualTo, minVersion, options);
             }
 
             if (maxMajor == null)
@@ -202,13 +202,11 @@ namespace Semver.Ranges.Comparers.Npm
                 RoundVersion(VersionRoundingType.Zero, ref minMajor, ref minMinor, ref minPatch);
 
                 int? maxMajor = major, maxMinor = minor, maxPatch = patch;
-                {
-                    // 0.0.x rounds to next minor version and 0.x.x rounds to next major version, regardless of whether major is 0 or not.
-                    if (minor == null)
-                        RoundVersion(VersionRoundingType.ClosestCompatible, ref maxMajor, ref maxMinor, ref maxPatch);
-                    else
-                        RoundVersion(VersionRoundingType.ReasonablyClose, ref maxMajor, ref maxMinor, ref maxPatch);
-                }
+                // 0.0.x rounds to next minor version and 0.x.x rounds to next major version, regardless of whether major is 0 or not.
+                if (minor == null)
+                    RoundVersion(VersionRoundingType.ClosestCompatible, ref maxMajor, ref maxMinor, ref maxPatch);
+                else
+                    RoundVersion(VersionRoundingType.ReasonablyClose, ref maxMajor, ref maxMinor, ref maxPatch);
 
                 var minVersion = SemVersion.ParsedFrom(minMajor.Value, minMinor.Value, minPatch.Value);
                 var maxVersion = SemVersion.ParsedFrom(maxMajor.Value, maxMinor.Value, maxPatch.Value);
@@ -295,6 +293,9 @@ namespace Semver.Ranges.Comparers.Npm
                 case VersionRoundingType.ReasonablyClose:
                 {
                     // Only increment minor, without exceptions for 0.x or 0.0.x
+                    // Note that this method behaves differently than the behaviour for ~, in that the version number is fully qualified (missing values are zeroed)
+                    // The behaviour for ~1 (--> 2.0.0) is different than ~1.0.0 (--> 1.2.0)
+                    // For clarification, this method does not handle ~1 ranges
                     // Some examples:
                     // 1.0.0 -> 1.1.0
                     // 0.1.0 --> 0.2.0
