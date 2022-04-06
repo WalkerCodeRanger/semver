@@ -35,8 +35,9 @@ namespace Semver.Ranges.Comparers.Npm
         // only the first instance will be added to this dictionary.
         internal static readonly IDictionary<ComparatorOp, string> OperatorsReverse;
 
-        private static readonly SemVersion ZeroVersion = new SemVersion(0, 0, 0);
-        
+        internal static readonly SemVersion ZeroVersion = new SemVersion(0, 0, 0);
+        internal static readonly SemVersion ZeroVersionWithPrerelease = SemVersion.ParsedFrom(0, 0, 0, "0");
+
         static ComparatorParser()
         {
             OperatorsReverse = new Dictionary<ComparatorOp, string>();
@@ -63,7 +64,7 @@ namespace Semver.Ranges.Comparers.Npm
 
                 yield return minComp;
                 yield return maxComp;
-                
+
                 yield break;
             }
 
@@ -86,7 +87,12 @@ namespace Semver.Ranges.Comparers.Npm
         {
             ParseVersion(match.Groups["minVersion"].Value, out var minMajor, out var minMinor, out var minPatch, out string minPrerelease, out string minMetadata);
             ParseVersion(match.Groups["maxVersion"].Value, out var maxMajor, out var maxMinor, out var maxPatch, out string maxPrerelease, out string maxMetadata);
-            
+
+            if (options.IncludePreRelease && string.IsNullOrEmpty(minPrerelease))
+            {
+                minPrerelease = "0";
+            }
+
             if (minMajor == null)
             {
                 minComparator = new NpmComparator(options);
@@ -105,11 +111,31 @@ namespace Semver.Ranges.Comparers.Npm
             else
             {
                 ComparatorOp op = ComparatorOp.LessThanOrEqualTo;
-                
+
                 if (maxMinor == null || maxPatch == null)
                 {
-                    RoundVersion(VersionRoundingType.ClosestCompatible, ref maxMajor, ref maxMinor, ref maxPatch);
+                    bool changed = false;
+                    
+                    if (maxMinor == null && maxPatch == null)
+                        changed = RoundVersion(VersionRoundingType.ClosestCompatible, ref maxMajor, ref maxMinor, ref maxPatch);
+                    else if (maxPatch == null)
+                        changed = RoundVersion(VersionRoundingType.ReasonablyClose, ref maxMajor, ref maxMinor, ref maxPatch);
+
                     op = ComparatorOp.LessThan;
+
+                    if (changed)
+                        maxPrerelease = "0";
+                }
+                else if (options.IncludePreRelease && maxPrerelease != "0")
+                {
+                    maxPatch += 1;
+                    maxPrerelease = "0";
+                    op = ComparatorOp.LessThan;
+                }
+                
+                if (options.IncludePreRelease && string.IsNullOrEmpty(maxPrerelease))
+                {
+                    maxPrerelease = "0";
                 }
 
                 SemVersion maxVersion = SemVersion.ParsedFrom(maxMajor.Value, maxMinor.Value, maxPatch.Value, maxPrerelease, maxMetadata);
@@ -128,10 +154,16 @@ namespace Semver.Ranges.Comparers.Npm
 
             if (major == null)
             {
+                if (op == ComparatorOp.GreaterThan || op == ComparatorOp.LessThan)
+                {
+                    yield return new NpmComparator(ComparatorOp.LessThan, ZeroVersionWithPrerelease, options);
+                    yield break;
+                }
+                
                 yield return new NpmComparator(options);
                 yield break;
             }
-            
+
             if (op == ComparatorOp.Equals && minor != null && patch != null)
             {
                 var semVersion = SemVersion.ParsedFrom(major.Value, minor.Value, patch.Value, prerelease, metadata);
@@ -143,16 +175,36 @@ namespace Semver.Ranges.Comparers.Npm
             {
                 if (op == ComparatorOp.GreaterThan)
                 {
-                    if ((minor == null || patch == null) && RoundVersion(VersionRoundingType.ClosestCompatible, ref major, ref minor, ref patch))
+                    bool minorOrPatchNull = minor == null || patch == null;
+                    
+                    if (minor == null)
+                        RoundVersion(VersionRoundingType.ClosestCompatible, ref major, ref minor, ref patch);
+                    else if (patch == null)
+                        RoundVersion(VersionRoundingType.ReasonablyClose, ref major, ref minor, ref patch);
+
+                    if (minorOrPatchNull)
                     {
                         op = ComparatorOp.GreaterThanOrEqualTo;
+
+                        if (options.IncludePreRelease)
+                        {
+                            prerelease = "0";
+                            metadata = "";
+                        }
                     }
                 }
                 else
                 {
+                    bool minorOrPatchNull = minor == null || patch == null;
                     RoundVersion(VersionRoundingType.Zero, ref major, ref minor, ref patch);
+
+                    if (minorOrPatchNull && options.IncludePreRelease)
+                    {
+                        prerelease = "0";
+                        metadata = "";
+                    }
                 }
-                
+
                 SemVersion version = SemVersion.ParsedFrom(major.Value, minor.Value, patch.Value, prerelease, metadata);
                 yield return new NpmComparator(op, version, options);
                 yield break;
@@ -162,14 +214,38 @@ namespace Semver.Ranges.Comparers.Npm
             {
                 if (op == ComparatorOp.LessThan)
                 {
+                    bool minorOrPatchNull = minor == null || patch == null;
+                    
                     RoundVersion(VersionRoundingType.Zero, ref major, ref minor, ref patch);
+
+                    if (minorOrPatchNull)
+                    {
+                        prerelease = "0";
+                        metadata = "";
+                    }
                 }
                 else
                 {
-                    if ((minor == null || patch == null) && RoundVersion(VersionRoundingType.ClosestCompatible, ref major, ref minor, ref patch))
+                    if (minor == null || patch == null)
+                    {
+                        if (minor == null)
+                        {
+                            RoundVersion(VersionRoundingType.ClosestCompatible, ref major, ref minor, ref patch);
+                        }
+                        else
+                        {
+                            RoundVersion(VersionRoundingType.ReasonablyClose, ref major, ref minor, ref patch);
+                        }
+
+                        op = ComparatorOp.LessThan;
+                        prerelease = "0";
+                    }
+
+                    /*if ((minor == null || patch == null) && RoundVersion(VersionRoundingType.ClosestCompatible, ref major, ref minor, ref patch))
                     {
                         op = ComparatorOp.LessThan;
-                    }
+                        prerelease = "0";
+                    }*/
                 }
 
                 SemVersion version = SemVersion.ParsedFrom(major.Value, minor.Value, patch.Value, prerelease, metadata);
@@ -186,13 +262,13 @@ namespace Semver.Ranges.Comparers.Npm
                 RoundVersion(op == ComparatorOp.CompatibleWith ? VersionRoundingType.ClosestCompatible : VersionRoundingType.ReasonablyClose, ref maxMajor, ref maxMinor, ref maxPatch);
 
                 var minVersion = SemVersion.ParsedFrom(minMajor.Value, minMinor.Value, minPatch.Value, prerelease, metadata);
-                var maxVersion = SemVersion.ParsedFrom(maxMajor.Value, maxMinor.Value, maxPatch.Value);
+                var maxVersion = SemVersion.ParsedFrom(maxMajor.Value, maxMinor.Value, maxPatch.Value, "0");
 
                 if (minVersion.ComparePrecedenceTo(ZeroVersion) != 0)
                     yield return new NpmComparator(ComparatorOp.GreaterThanOrEqualTo, minVersion, options);
-                
+
                 yield return new NpmComparator(ComparatorOp.LessThan, maxVersion, options);
-                
+
                 yield break;
             }
 
@@ -208,8 +284,8 @@ namespace Semver.Ranges.Comparers.Npm
                 else
                     RoundVersion(VersionRoundingType.ReasonablyClose, ref maxMajor, ref maxMinor, ref maxPatch);
 
-                var minVersion = SemVersion.ParsedFrom(minMajor.Value, minMinor.Value, minPatch.Value);
-                var maxVersion = SemVersion.ParsedFrom(maxMajor.Value, maxMinor.Value, maxPatch.Value);
+                var minVersion = SemVersion.ParsedFrom(minMajor.Value, minMinor.Value, minPatch.Value, options.IncludePreRelease ? "0" : "");
+                var maxVersion = SemVersion.ParsedFrom(maxMajor.Value, maxMinor.Value, maxPatch.Value, "0");
 
                 if (minVersion.ComparePrecedenceTo(ZeroVersion) != 0)
                     yield return new NpmComparator(ComparatorOp.GreaterThanOrEqualTo, minVersion, options);
@@ -238,6 +314,9 @@ namespace Semver.Ranges.Comparers.Npm
             if (major == null)
                 throw new ArgumentException("Major can not be null");
 
+            bool minorNull = minor == null;
+            bool patchNull = patch == null;
+
             // Special case where ~0 or ~1 etc increments major version always
             if (roundingType == VersionRoundingType.ReasonablyClose && minor == null)
             {
@@ -246,7 +325,7 @@ namespace Semver.Ranges.Comparers.Npm
                 patch = 0;
                 return true;
             }
-            
+
             bool changed = false;
 
             if (minor == null)
@@ -258,35 +337,51 @@ namespace Semver.Ranges.Comparers.Npm
             {
                 patch = 0;
             }
-            
+
             switch (roundingType)
             {
                 case VersionRoundingType.Zero: return false;
                 case VersionRoundingType.ClosestCompatible:
                 {
-                    // Missing values are raised to the next major/minor
-                    // Some examples:
-                    // 1.0.0 --> 2.0.0
-                    // 0.1.0 --> 0.2.0 (0 major is only compatible with versions of the same minor number)
-                    // 0.0.1 --> 0.0.2 (it's only compatible version is itself)
-                    if (major == 0 && minor == 0) // 0.0.1 --> 0.0.2
+                    if (major == 0)
                     {
-                        patch += 1;
-                        changed = true;
+                        if (minorNull && patchNull)
+                        {
+                            major = 1;
+                            minor = 0;
+                            patch = 0;
+                            changed = true;
+                            break;
+                        }
+
+                        if (patchNull)
+                        {
+                            minor += 1;
+                            patch = 0;
+                            changed = true;
+                            break;
+                        }
+                        
+                        if (major == 0 && minor == 0) // 0.0.1 --> 0.0.2
+                        {
+                            patch += 1;
+                            changed = true;
+                            break;
+                        }
+
+                        if (major == 0 && minor > 0) // 0.1.x --> 0.2.0
+                        {
+                            minor += 1;
+                            patch = 0;
+                            changed = true;
+                            break;
+                        }
                     }
-                    else if (major == 0 && minor > 0) // 0.1.x --> 0.2.0
-                    {
-                        minor += 1;
-                        patch = 0;
-                        changed = true;
-                    }
-                    else if (major > 0) // (n>0).x.x --> n+1.0.0
-                    {
-                        major += 1;
-                        minor = 0;
-                        patch = 0;
-                        changed = true;
-                    }
+                    
+                    major += 1;
+                    minor = 0;
+                    patch = 0;
+                    changed = true;
 
                     break;
                 }
@@ -303,7 +398,7 @@ namespace Semver.Ranges.Comparers.Npm
                     minor += 1;
                     patch = 0;
                     changed = true;
-                    
+
                     break;
                 }
             }

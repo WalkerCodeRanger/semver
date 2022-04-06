@@ -13,7 +13,10 @@ namespace Semver.Ranges.Comparers.Npm
 
         internal NpmRange(IEnumerable<NpmComparator[]> comparators)
         {
-            Ranges = comparators.ToArray();
+            if (comparators is NpmComparator[][] arrayComparators)
+                Ranges = arrayComparators;
+            else
+                Ranges = comparators.ToArray();
 
             if (Ranges.Length == 0)
                 throw new ArgumentException("There must be atleast one comparator in the range");

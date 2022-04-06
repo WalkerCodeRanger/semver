@@ -13,9 +13,9 @@ namespace Semver.Ranges.Comparers.Npm
         public static readonly Regex Operator = new Regex(@"(?'operator'(?:<=|<|>=|>|\^|~>|~|=){0,1})", CompiledOptions);
 
         public static readonly Regex PartialVersion = new Regex(
-            @"(?'major'x|\*|0|[1-9]\d*)" +
-            @"(?:\.(?'minor'x|\*|0|[1-9]\d*)){0,1}" +
-            @"(?:\.(?'patch'x|\*|0|[1-9]\d*)){0,1}" +
+            @"(?'major'x|X|\*|[0-9]\d*)" +
+            @"(?:\.(?'minor'x|X|\*|[0-9]\d*)){0,1}" +
+            @"(?:\.(?'patch'x|X|\*|[0-9]\d*)){0,1}" +
             @"(?:-(?'prerelease'(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))" +
             @"?(?:\+(?'buildmetadata'[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?",
             CompiledOptions

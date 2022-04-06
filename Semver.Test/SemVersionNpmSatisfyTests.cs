@@ -14,6 +14,16 @@ namespace Semver.Test
             this.testOutput = testOutput;
         }
 
+        [Theory]
+        [ClassData(typeof(ParseData))]
+        public void ParseTests(string strRange, string expectedRange, NpmParseOptions options = default)
+        {
+            NpmRange.TryParse(strRange, options, out NpmRange range);
+            string result = range?.ToString();
+
+            Assert.Equal(expectedRange, result);
+        }
+
         /// <summary>
         /// All ranges should be valid and include the version
         /// </summary>
