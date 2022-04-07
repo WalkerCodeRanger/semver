@@ -99,13 +99,13 @@ namespace Semver.Benchmarks.Builders
         {
             var builder = new StringBuilder();
 
-            builder.Append(random.Next(0, maxMajor));
-
             if (prependOperator && random.NextBool())
             {
                 // Prepend ^ or ~
-                builder.Insert(0, random.NextBool() ? "^" : "~");
+                builder.Append(random.NextBool() ? "^" : "~");
             }
+
+            builder.Append(random.Next(0, maxMajor));
 
             if (random.NextBool())
             {
