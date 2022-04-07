@@ -13,7 +13,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     public class NpmRangeComparison
     {
-        protected const int NumRanges = 1000;
+        private const int NumRanges = 1000;
         private readonly IReadOnlyList<NpmRange> ranges;
         private readonly IReadOnlyList<NpmRange> prereleaseRanges;
 
