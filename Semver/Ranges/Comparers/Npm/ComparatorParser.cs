@@ -68,19 +68,23 @@ namespace Semver.Ranges.Comparers.Npm
                 yield break;
             }
 
-            MatchCollection operatorRanges = Rgx.OperatorRange.Matches(range);
-            foreach (Match rangeMatch in operatorRanges)
+            if (Rgx.OperatorRangeTest.IsMatch(range))
             {
-                IEnumerable<NpmComparator> comps = ParseOperatorRange(rangeMatch, options);
-
-                foreach (var comp in comps)
+                MatchCollection operatorRanges = Rgx.OperatorRange.Matches(range);
+                foreach (Match rangeMatch in operatorRanges)
                 {
-                    yield return comp;
+                    IEnumerable<NpmComparator> comps = ParseOperatorRange(rangeMatch, options);
+
+                    foreach (var comp in comps)
+                    {
+                        yield return comp;
+                    }
                 }
+                
+                yield break;
             }
 
-            if (operatorRanges.Count == 0)
-                throw new RangeParseException($"Unknown range syntax: {range}");
+            throw new RangeParseException($"Unknown range syntax: {range}");
         }
 
         private void ParseHyphenRange(Match match, NpmParseOptions options, out NpmComparator minComparator, out NpmComparator maxComparator)

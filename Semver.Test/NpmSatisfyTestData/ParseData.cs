@@ -103,6 +103,15 @@ namespace Semver.Test.NpmSatisfyTestData
             yield return new object[] { ">=09090", ">=9090.0.0-0", prOptions };
             yield return new object[] { ">09090", ">=9091.0.0" };
             yield return new object[] { ">09090", ">=9091.0.0-0", prOptions };
+            yield return new object[] { "v1.0.0", "1.0.0" };
+            yield return new object[] { "vx", "*" };
+            yield return new object[] { "v*", "*" };
+            yield return new object[] { "V*", "*" };
+            
+            // Invalid ranges
+            yield return new object[] { ">=1 invalid ^2", null };
+            yield return new object[] { "v", null };
+            yield return new object[] { "* || invalid", null };
         }
 
         IEnumerator IEnumerable.GetEnumerator()

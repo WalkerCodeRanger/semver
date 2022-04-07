@@ -13,15 +13,17 @@ namespace Semver.Ranges.Comparers.Npm
         public static readonly Regex Operator = new Regex(@"(?'operator'(?:<=|<|>=|>|\^|~>|~|=){0,1})", CompiledOptions);
 
         public static readonly Regex PartialVersion = new Regex(
-            @"(?'major'x|X|\*|[0-9]\d*)" +
-            @"(?:\.(?'minor'x|X|\*|[0-9]\d*)){0,1}" +
-            @"(?:\.(?'patch'x|X|\*|[0-9]\d*)){0,1}" +
-            @"(?:-(?'prerelease'(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))" +
-            @"?(?:\+(?'buildmetadata'[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?",
+            @"[vV]?(?'major'x|X|\*|[0-9]\d*)" +
+            @"(?:\.(?'minor'x|X|\*|[0-9]\d*))?" +
+            @"(?:\.(?'patch'x|X|\*|[0-9]\d*))?" +
+            @"(?:-(?'prerelease'(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?" +
+            @"(?:\+(?'buildmetadata'[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?",
             CompiledOptions
         );
 
         public static readonly Regex HyphenRange = new Regex($@"^(?'minVersion'(?:{PartialVersion}))\s*-\s*(?'maxVersion'(?:{PartialVersion}))$", CompiledOptions);
         public static readonly Regex OperatorRange = new Regex($@"{Operator}(?:\s*)(?'version'{PartialVersion})\s*", CompiledOptions);
+        
+        public static readonly Regex OperatorRangeTest = new Regex($@"^(?:(?:\s*{OperatorRange}))+\s*$", CompiledOptions);
     }
 }
