@@ -23,7 +23,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
 
             NpmRange CreateRange(bool includePrerelease)
             {
-                string strRange = random.RandomPartialVersion(includePrerelease);
+                string strRange = random.RandomPartialVersion(prependOperator: true);
                 NpmRange range = NpmRange.Parse(strRange, new NpmParseOptions(includePrerelease));
 
                 return range;
