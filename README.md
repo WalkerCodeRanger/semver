@@ -47,6 +47,14 @@ if (version.IsPrerelease)
 }
 ```
 
+Outputs:
+
+```text
+Current: 1.1.0-rc.1+nightly.2345
+Prerelease: rc.1
+Next release version is: 1.1.0
+```
+
 ## Range checking (using NPM syntax)
 
 ```csharp
@@ -67,9 +75,6 @@ Console.WriteLine(version.SatisfiesNpm(range));
 Outputs:
 
 ```text
-Current: 1.1.0-rc.1+nightly.2345
-Prerelease: rc.1
-Next release version is: 1.1.0
 Range: >=1.0.0 <2.0.0-0
 Prerelease range: >=1.0.0-0 <2.0.0-0
 Range includes version: False
