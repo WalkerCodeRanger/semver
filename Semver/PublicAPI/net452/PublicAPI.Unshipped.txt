@@ -10,19 +10,20 @@ override Semver.Ranges.Comparers.Npm.NpmParseOptions.GetHashCode() -> int
 override Semver.Ranges.Comparers.Npm.NpmParseOptions.ToString() -> string
 Semver.Ranges.Comparers.Npm.NpmRange
 Semver.Ranges.Comparers.Npm.NpmRange.Includes(Semver.SemVersion version) -> bool
+Semver.Ranges.Comparers.Npm.SemVersionExtensions
 Semver.Ranges.RangeParseException
 Semver.Ranges.RangeParseException.RangeParseException(string message) -> void
 Semver.Ranges.RangeParseException.RangeParseException(string message, System.Exception innerException) -> void
 Semver.SemVersion.ComparePrecedenceTo(Semver.SemVersion other) -> int
 Semver.SemVersion.CompareSortOrderTo(Semver.SemVersion other) -> int
 Semver.SemVersion.PrecedenceEquals(Semver.SemVersion other) -> bool
-Semver.SemVersion.SatisfiesNpm(string range, Semver.Ranges.Comparers.Npm.NpmParseOptions options = default(Semver.Ranges.Comparers.Npm.NpmParseOptions)) -> bool
 static readonly Semver.SemVersion.PrecedenceComparer -> Semver.Comparers.ISemVersionComparer
 static readonly Semver.SemVersion.SortOrderComparer -> Semver.Comparers.ISemVersionComparer
 static Semver.Ranges.Comparers.Npm.NpmRange.Parse(string range) -> Semver.Ranges.Comparers.Npm.NpmRange
 static Semver.Ranges.Comparers.Npm.NpmRange.Parse(string range, Semver.Ranges.Comparers.Npm.NpmParseOptions options) -> Semver.Ranges.Comparers.Npm.NpmRange
 static Semver.Ranges.Comparers.Npm.NpmRange.TryParse(string strRange, out Semver.Ranges.Comparers.Npm.NpmRange range) -> bool
 static Semver.Ranges.Comparers.Npm.NpmRange.TryParse(string strRange, Semver.Ranges.Comparers.Npm.NpmParseOptions options, out Semver.Ranges.Comparers.Npm.NpmRange range) -> bool
+static Semver.Ranges.Comparers.Npm.SemVersionExtensions.SatisfiesNpm(this Semver.SemVersion version, string range, Semver.Ranges.Comparers.Npm.NpmParseOptions options = default(Semver.Ranges.Comparers.Npm.NpmParseOptions)) -> bool
 static Semver.SemVersion.ComparePrecedence(Semver.SemVersion left, Semver.SemVersion right) -> int
 static Semver.SemVersion.CompareSortOrder(Semver.SemVersion left, Semver.SemVersion right) -> int
 static Semver.SemVersion.PrecedenceEquals(Semver.SemVersion left, Semver.SemVersion right) -> bool
