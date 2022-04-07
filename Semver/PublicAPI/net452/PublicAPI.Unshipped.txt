@@ -4,6 +4,9 @@ Semver.Comparers.ISemVersionComparer
 Semver.Ranges.Comparers.Npm.NpmParseOptions
 Semver.Ranges.Comparers.Npm.NpmParseOptions.NpmParseOptions() -> void
 Semver.Ranges.Comparers.Npm.NpmParseOptions.NpmParseOptions(bool includePreRelease = false) -> void
+Semver.Ranges.Comparers.Npm.NpmParseOptions.Equals(Semver.Ranges.Comparers.Npm.NpmParseOptions other) -> bool
+override Semver.Ranges.Comparers.Npm.NpmParseOptions.Equals(object obj) -> bool
+override Semver.Ranges.Comparers.Npm.NpmParseOptions.GetHashCode() -> int
 override Semver.Ranges.Comparers.Npm.NpmParseOptions.ToString() -> string
 Semver.Ranges.Comparers.Npm.NpmRange
 Semver.Ranges.Comparers.Npm.NpmRange.Includes(Semver.SemVersion version) -> bool
