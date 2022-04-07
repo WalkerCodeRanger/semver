@@ -56,10 +56,9 @@ namespace Semver.Ranges.Comparers.Npm
 
                         if (comparators.Length > 1)
                         {
-                            // todo: check if another comparator in range is prerelease and matches main version. if not return false
                             foreach (NpmComparator otherComp in comparators)
                             {
-                                if (otherComp == this)
+                                if (ReferenceEquals(otherComp, this))
                                     continue;
 
                                 if (!otherComp.AnyVersion && otherComp.Version.IsPrerelease && otherComp.MainVersionEquals(version))
@@ -72,21 +71,6 @@ namespace Semver.Ranges.Comparers.Npm
 
                         if (!anySuccess)
                             return false;
-                    }
-                }
-                else if (version.IsPrerelease && options.IncludePreRelease)
-                {
-                    if (MainVersionEquals(version))
-                    {
-                        if (Operator == ComparatorOp.GreaterThanOrEqualTo)
-                        {
-                            //return true;
-                        }
-
-                        if (Operator == ComparatorOp.LessThan && !Version.IsPrerelease)
-                        {
-                            return false;
-                        }
                     }
                 }
             }
@@ -133,7 +117,7 @@ namespace Semver.Ranges.Comparers.Npm
 
                 return val;
             }
-            
+
             int compare = version.Major == Version.Major ? 0 : Clamp(version.Major - Version.Major);
 
             if (compare != 0)
@@ -150,32 +134,12 @@ namespace Semver.Ranges.Comparers.Npm
                 return compare;
 
             if ((version.IsPrerelease && Version.IsPrerelease) || (version.IsPrerelease && options.IncludePreRelease))
-                compare = ComparePreRelease(version);
+                compare = Clamp(ComparePreRelease(version));
 
             return compare;
         }
 
         private int ComparePreRelease(SemVersion version)
-        {
-            // No prerelease is > than prerelease
-            if (!version.IsPrerelease && Version.IsPrerelease)
-                return 1;
-
-            if (version.IsPrerelease && !Version.IsPrerelease)
-                return -1;
-
-            if (!Version.IsPrerelease && !version.IsPrerelease)
-                return 0;
-
-            if (Version.IsPrerelease && version.IsPrerelease)
-            {
-                return ComparePreReleaseIdentifiers(version);
-            }
-
-            throw new NotImplementedException(); // Unreachable
-        }
-
-        private int ComparePreReleaseIdentifiers(SemVersion version)
         {
             var xPrereleaseIdentifiers = version.PrereleaseIdentifiers;
             var yPrereleaseIdentifiers = Version.PrereleaseIdentifiers;
@@ -242,15 +206,23 @@ namespace Semver.Ranges.Comparers.Npm
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Operator == other.Operator && Equals(Version, other.Version) && AnyVersion == other.AnyVersion && options.Equals(other.options);
+
+            return
+                Operator == other.Operator &&
+                AnyVersion == other.AnyVersion &&
+                options.Equals(other.options) &&
+                Version.Equals(other.Version);
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((NpmComparator)obj);
+
+            if (obj is NpmComparator comp)
+                return Equals(comp);
+
+            return false;
         }
 
         public override int GetHashCode()
