@@ -10,5 +10,9 @@ namespace Semver.Ranges
         public RangeParseException(string message) : base(message)
         {
         }
+
+        public RangeParseException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

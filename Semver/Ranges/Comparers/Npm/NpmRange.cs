@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Semver.Ranges.Comparers.Npm
 {
@@ -29,7 +30,14 @@ namespace Semver.Ranges.Comparers.Npm
 
         public static NpmRange Parse(string range, NpmParseOptions options)
         {
-            return new RangeParser().ParseRange(range, options);
+            try
+            {
+                return new RangeParser().ParseRange(range, options);
+            }
+            catch (RegexMatchTimeoutException ex)
+            {
+                throw new RangeParseException("Regex match timed out", ex);
+            }
         }
 
         public static bool TryParse(string strRange, out NpmRange range)
@@ -45,6 +53,11 @@ namespace Semver.Ranges.Comparers.Npm
                 return true;
             }
             catch (RangeParseException)
+            {
+                range = null;
+                return false;
+            }
+            catch (RegexMatchTimeoutException)
             {
                 range = null;
                 return false;

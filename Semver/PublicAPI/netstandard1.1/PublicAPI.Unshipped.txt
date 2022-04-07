@@ -12,6 +12,7 @@ Semver.Ranges.Comparers.Npm.NpmRange
 Semver.Ranges.Comparers.Npm.NpmRange.Includes(Semver.SemVersion version) -> bool
 Semver.Ranges.RangeParseException
 Semver.Ranges.RangeParseException.RangeParseException(string message) -> void
+Semver.Ranges.RangeParseException.RangeParseException(string message, System.Exception innerException) -> void
 Semver.SemVersion.ComparePrecedenceTo(Semver.SemVersion other) -> int
 Semver.SemVersion.CompareSortOrderTo(Semver.SemVersion other) -> int
 Semver.SemVersion.PrecedenceEquals(Semver.SemVersion other) -> bool
