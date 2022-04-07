@@ -15,6 +15,8 @@ namespace Semver.Test.NpmSatisfyTestData
     {
         public IEnumerator<object[]> GetEnumerator()
         {
+            var prOptions = new NpmParseOptions(includePreRelease: true);
+            
             yield return new object[] { "1.0.0 - 2.0.0", "2.2.3" };
             yield return new object[] { "1.2.3+asdf - 2.4.3+asdf", "1.2.3-pre.2" };
             yield return new object[] { "1.2.3+asdf - 2.4.3+asdf", "2.4.3-alpha" };
@@ -56,13 +58,13 @@ namespace Semver.Test.NpmSatisfyTestData
             yield return new object[] { "2.3", "2.4.1" };
             yield return new object[] { "~0.0.1", "0.1.0-alpha" };
             yield return new object[] { "~0.0.1", "0.1.0" };
-            yield return new object[] { "~2.4", "2.5.0" }; // >=2.4.0 <2.5.0
+            yield return new object[] { "~2.4", "2.5.0" }; // >=2.4.0 <2.5.0-0
             yield return new object[] { "~2.4", "2.3.9" };
-            yield return new object[] { "~>3.2.1", "3.3.2" }; // >=3.2.1 <3.3.0
-            yield return new object[] { "~>3.2.1", "3.2.0" }; // >=3.2.1 <3.3.0
-            yield return new object[] { "~1", "0.2.3" }; // >=1.0.0 <2.0.0
+            yield return new object[] { "~>3.2.1", "3.3.2" }; // >=3.2.1 <3.3.0-0
+            yield return new object[] { "~>3.2.1", "3.2.0" }; // >=3.2.1 <3.3.0-0
+            yield return new object[] { "~1", "0.2.3" }; // >=1.0.0 <2.0.0-0
             yield return new object[] { "~>1", "2.2.3" };
-            yield return new object[] { "~1.0", "1.1.0" }; // >=1.0.0 <1.1.0
+            yield return new object[] { "~1.0", "1.1.0" }; // >=1.0.0 <1.1.0-0
             yield return new object[] { "<1", "1.0.0" };
             yield return new object[] { ">=1.2", "1.1.1" };
             yield return new object[] { "~v0.5.4-beta", "0.5.4-alpha" };
@@ -78,14 +80,14 @@ namespace Semver.Test.NpmSatisfyTestData
             yield return new object[] { "^1.2.3", "1.2.2" };
             yield return new object[] { "^1.2", "1.1.9" };
 
-            yield return new object[] { "2.x", "3.0.0-pre.0", new NpmParseOptions(includePreRelease: true) };
-            yield return new object[] { "^1.0.0", "1.0.0-rc1", new NpmParseOptions(includePreRelease: true) };
-            yield return new object[] { "^1.0.0", "2.0.0-rc1", new NpmParseOptions(includePreRelease: true) };
-            yield return new object[] { "^1.2.3-rc2", "2.0.0", new NpmParseOptions(includePreRelease: true) };
-            yield return new object[] { "^1.0.0", "2.0.0-rc1", new NpmParseOptions(includePreRelease: true) };
+            yield return new object[] { "2.x", "3.0.0-pre.0", prOptions };
+            yield return new object[] { "^1.0.0", "1.0.0-rc1", prOptions };
+            yield return new object[] { "^1.0.0", "2.0.0-rc1", prOptions };
+            yield return new object[] { "^1.2.3-rc2", "2.0.0", prOptions };
+            yield return new object[] { "^1.0.0", "2.0.0-rc1", prOptions };
             yield return new object[] { "^1.0.0", "2.0.0-rc1" };
 
-            yield return new object[] { "1 - 2", "3.0.0-pre", new NpmParseOptions(includePreRelease: true) };
+            yield return new object[] { "1 - 2", "3.0.0-pre", prOptions };
             yield return new object[] { "1 - 2", "2.0.0-pre" };
             yield return new object[] { "1 - 2", "1.0.0-pre" };
             yield return new object[] { "1.0 - 2", "1.0.0-pre" };
@@ -93,16 +95,16 @@ namespace Semver.Test.NpmSatisfyTestData
             yield return new object[] { "1.1.x", "1.0.0-a" };
             yield return new object[] { "1.1.x", "1.1.0-a" };
             yield return new object[] { "1.1.x", "1.2.0-a" };
-            yield return new object[] { "1.1.x", "1.2.0-a", new NpmParseOptions(includePreRelease: true) };
-            yield return new object[] { "1.1.x", "1.0.0-a", new NpmParseOptions(includePreRelease: true) };
+            yield return new object[] { "1.1.x", "1.2.0-a", prOptions };
+            yield return new object[] { "1.1.x", "1.0.0-a", prOptions };
             yield return new object[] { "1.x", "1.0.0-a" };
             yield return new object[] { "1.x", "1.1.0-a" };
             yield return new object[] { "1.x", "1.2.0-a" };
-            yield return new object[] { "1.x", "0.0.0-a", new NpmParseOptions(includePreRelease: true) };
-            yield return new object[] { "1.x", "2.0.0-a", new NpmParseOptions(includePreRelease: true) };
+            yield return new object[] { "1.x", "0.0.0-a", prOptions };
+            yield return new object[] { "1.x", "2.0.0-a", prOptions };
 
             yield return new object[] { ">=1.0.0 <1.1.0", "1.1.0" };
-            yield return new object[] { ">=1.0.0 <1.1.0", "1.1.0", new NpmParseOptions(includePreRelease: true) };
+            yield return new object[] { ">=1.0.0 <1.1.0", "1.1.0", prOptions };
             yield return new object[] { ">=1.0.0 <1.1.0", "1.1.0-pre" };
             yield return new object[] { ">=1.0.0 <1.1.0-pre", "1.1.0-pre" };
         }
