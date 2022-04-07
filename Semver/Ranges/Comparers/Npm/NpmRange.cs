@@ -96,11 +96,6 @@ namespace Semver.Ranges.Comparers.Npm
                 range = null;
                 return false;
             }
-            catch (RegexMatchTimeoutException)
-            {
-                range = null;
-                return false;
-            }
         }
 
         /// <summary>
