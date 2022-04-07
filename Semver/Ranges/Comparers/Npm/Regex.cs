@@ -13,7 +13,7 @@ namespace Semver.Ranges.Comparers.Npm
 
         private static readonly TimeSpan MatchTimeout = TimeSpan.FromSeconds(1);
 
-        public static readonly Regex Operator = new Regex(@"(?'operator'(?:<=|<|>=|>|\^|~>|~|=){0,1})", CompiledOptions, MatchTimeout);
+        public static readonly Regex Operator = new Regex(@"(?'operator'<=|<|>=|>|\^|~>|~|=)?", CompiledOptions, MatchTimeout);
 
         public static readonly Regex PartialVersion = new Regex(
             @"[vV]?(?'major'x|X|\*|[0-9]\d*)" +
