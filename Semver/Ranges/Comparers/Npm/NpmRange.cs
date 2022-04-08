@@ -11,7 +11,7 @@ namespace Semver.Ranges.Comparers.Npm
     /// A range of versions that can be checked against to see if a <see cref="SemVersion"/> is included.
     /// Uses the same syntax as npm.
     /// </summary>
-    public class NpmRange
+    public class NpmRange : IRange
     {
         internal readonly NpmComparator[][] Ranges;
         private string cachedStringValue;
@@ -98,11 +98,7 @@ namespace Semver.Ranges.Comparers.Npm
             }
         }
 
-        /// <summary>
-        /// Returns whether the specified version is included in this range.
-        /// </summary>
-        /// <param name="version">The version to check if it's included in this range.</param>
-        /// <returns>True if the version is included in this range.</returns>
+        /// <inheritdoc />
         public bool Includes(SemVersion version)
         {
             bool anySuccess = false;

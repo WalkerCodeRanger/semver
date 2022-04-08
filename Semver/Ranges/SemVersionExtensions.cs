@@ -1,6 +1,7 @@
 using System;
+using Semver.Ranges.Comparers.Npm;
 
-namespace Semver.Ranges.Comparers.Npm
+namespace Semver.Ranges
 {
     public static class SemVersionExtensions
     {
@@ -29,16 +30,16 @@ namespace Semver.Ranges.Comparers.Npm
 
             return parsedRange.Includes(version);
         }
-
+        
         /// <summary>
         /// Checks if this version satisfies the specified range.
         /// Uses the same syntax as npm.
         /// </summary>
         /// <param name="version"></param>
-        /// <param name="range">The range to compare with. Can be created from <see cref="NpmRange.Parse(string)"/> or <see cref="NpmRange.TryParse(string,out Semver.Ranges.Comparers.Npm.NpmRange)"/>.</param>
+        /// <param name="range">The range to compare with.</param>
         /// <returns>True if the version satisfies the range.</returns>
         /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
-        public static bool SatisfiesNpm(this SemVersion version, NpmRange range)
+        public static bool Satisfies(this SemVersion version, IRange range)
         {
             if (version == null) throw new ArgumentNullException(nameof(version));
             if (range == null) throw new ArgumentNullException(nameof(range));
