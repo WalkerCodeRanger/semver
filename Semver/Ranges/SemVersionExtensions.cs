@@ -17,10 +17,10 @@ namespace Semver.Ranges
         /// </para>
         /// </summary>
         /// <param name="version"></param>
-        /// <param name="range">The range to compare with. Invalid syntax will always return false.</param>
-        /// <param name="options">Optional range parsing options</param>
+        /// <param name="range">The range to compare with. If the syntax is invalid the method will always return false.</param>
+        /// <param name="options">The options to use when parsing the range.</param>
         /// <returns>True if the version satisfies the range.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if version or range is null</exception>
+        /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
         public static bool SatisfiesNpm(this SemVersion version, string range, NpmParseOptions options = default)
         {
             if (version == null) throw new ArgumentNullException(nameof(version));
