@@ -119,9 +119,9 @@ namespace Semver.Ranges.Comparers.Npm
 
                 if (maxMinor == null || maxPatch == null)
                 {
-                    if (maxMinor == null && maxPatch == null)
+                    if (maxMinor == null && maxPatch == null || maxMinor == null)
                         RoundVersion(VersionRoundingType.ClosestCompatible, ref maxMajor, ref maxMinor, ref maxPatch);
-                    else if (maxPatch == null)
+                    else
                         RoundVersion(VersionRoundingType.ReasonablyClose, ref maxMajor, ref maxMinor, ref maxPatch);
 
                     op = ComparatorOp.LessThan;
@@ -329,12 +329,12 @@ namespace Semver.Ranges.Comparers.Npm
 
             bool changed = false;
 
-            if (minor == null)
+            if (minorNull)
             {
                 minor = 0;
                 patch = 0;
             }
-            else if (patch == null)
+            else if (patchNull)
             {
                 patch = 0;
             }

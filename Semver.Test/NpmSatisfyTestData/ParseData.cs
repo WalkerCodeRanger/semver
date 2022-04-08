@@ -12,6 +12,8 @@ namespace Semver.Test.NpmSatisfyTestData
             
             yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0 <=2.0.0" };
             yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0-0 <2.0.1-0", prOptions };
+            yield return new object[] { "1.x.5 - 2.x.5", ">=1.0.0 <3.0.0-0" };
+            yield return new object[] { "1.x.5 - 2.x.5", ">=1.0.0-0 <3.0.0-0", prOptions };
             yield return new object[] { "1 - 2", ">=1.0.0 <3.0.0-0" };
             yield return new object[] { "1 - 2", ">=1.0.0-0 <3.0.0-0", prOptions };
             yield return new object[] { "1.0 - 2.0", ">=1.0.0 <2.1.0-0" };
@@ -23,6 +25,11 @@ namespace Semver.Test.NpmSatisfyTestData
             yield return new object[] { "2.0.0 - 1.0.0", ">=2.0.0-0 <1.0.1-0", prOptions };
             yield return new object[] { "2.0 - 1.0", ">=2.0.0 <1.1.0-0" };
             yield return new object[] { "2.0 - 1.0", ">=2.0.0-0 <1.1.0-0", prOptions };
+            yield return new object[] { "2.x.5", ">=2.0.0 <3.0.0-0" };
+            yield return new object[] { "2.x.5", ">=2.0.0-0 <3.0.0-0", prOptions };
+            yield return new object[] { "^2.x.5", ">=2.0.0 <3.0.0-0"};
+            yield return new object[] { "~2.x.5", ">=2.0.0 <3.0.0-0"};
+            yield return new object[] { "~2.x.5", ">=2.0.0 <3.0.0-0", prOptions};
             yield return new object[] { "2 - 1", ">=2.0.0 <2.0.0-0" };
             yield return new object[] { "2 - 1", ">=2.0.0-0 <2.0.0-0", prOptions };
             yield return new object[] { ">=*", "*" };
