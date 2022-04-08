@@ -68,8 +68,8 @@ Console.WriteLine($"Prerelease range includes version: {prRange.Includes(version
 // Alternative, but slower since it parses the range on every call
 Console.WriteLine(version.SatisfiesNpm("^1", new NpmParseOptions(includePreRelease: true)));
 
-// Alternative, is just another way to call NpmRange.Includes(version)
-Console.WriteLine(version.SatisfiesNpm(range));
+// Alternative, is just another way to call IRange.Includes(version)
+Console.WriteLine(version.Satisfies(range));
 ```
 
 Outputs:
