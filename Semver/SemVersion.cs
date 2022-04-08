@@ -9,7 +9,6 @@ using System.Security.Permissions;
 #endif
 using System.Text.RegularExpressions;
 using Semver.Comparers;
-using Semver.Ranges.Comparers.Npm;
 using Semver.Utility;
 
 namespace Semver
