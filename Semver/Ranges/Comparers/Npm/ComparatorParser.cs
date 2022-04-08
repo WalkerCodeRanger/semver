@@ -241,12 +241,6 @@ namespace Semver.Ranges.Comparers.Npm
                         op = ComparatorOp.LessThan;
                         prerelease = "0";
                     }
-
-                    /*if ((minor == null || patch == null) && RoundVersion(VersionRoundingType.ClosestCompatible, ref major, ref minor, ref patch))
-                    {
-                        op = ComparatorOp.LessThan;
-                        prerelease = "0";
-                    }*/
                 }
 
                 SemVersion version = SemVersion.ParsedFrom(major.Value, minor.Value, patch.Value, prerelease, metadata);
@@ -388,14 +382,6 @@ namespace Semver.Ranges.Comparers.Npm
                 }
                 case VersionRoundingType.ReasonablyClose:
                 {
-                    // Only increment minor, without exceptions for 0.x or 0.0.x
-                    // Note that this method behaves differently than the behaviour for ~, in that the version number is fully qualified (missing values are zeroed)
-                    // The behaviour for ~1 (--> 2.0.0) is different than ~1.0.0 (--> 1.2.0)
-                    // For clarification, this method does not handle ~1 ranges
-                    // Some examples:
-                    // 1.0.0 -> 1.1.0
-                    // 0.1.0 --> 0.2.0
-                    // 0.0.1 -> 0.1.0
                     minor += 1;
                     patch = 0;
                     changed = true;
