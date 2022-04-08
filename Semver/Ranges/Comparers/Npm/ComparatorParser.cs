@@ -92,11 +92,6 @@ namespace Semver.Ranges.Comparers.Npm
             ParseVersion(match.Groups["minVersion"].Value, out var minMajor, out var minMinor, out var minPatch, out string minPrerelease, out string minMetadata);
             ParseVersion(match.Groups["maxVersion"].Value, out var maxMajor, out var maxMinor, out var maxPatch, out string maxPrerelease, out string maxMetadata);
 
-            if (options.IncludePreRelease && string.IsNullOrEmpty(minPrerelease))
-            {
-                minPrerelease = "0";
-            }
-
             if (minMajor == null)
             {
                 minComparator = new NpmComparator(options);
@@ -104,6 +99,12 @@ namespace Semver.Ranges.Comparers.Npm
             else
             {
                 RoundVersion(VersionRoundingType.Zero, ref minMajor, ref minMinor, ref minPatch);
+
+                if (options.IncludePreRelease && string.IsNullOrEmpty(minPrerelease))
+                {
+                    minPrerelease = "0";
+                }
+                
                 SemVersion minVersion = SemVersion.ParsedFrom(minMajor.Value, minMinor.Value, minPatch.Value, minPrerelease, minMetadata);
                 minComparator = new NpmComparator(ComparatorOp.GreaterThanOrEqualTo, minVersion, options);
             }
@@ -118,17 +119,13 @@ namespace Semver.Ranges.Comparers.Npm
 
                 if (maxMinor == null || maxPatch == null)
                 {
-                    bool changed = false;
-                    
                     if (maxMinor == null && maxPatch == null)
-                        changed = RoundVersion(VersionRoundingType.ClosestCompatible, ref maxMajor, ref maxMinor, ref maxPatch);
+                        RoundVersion(VersionRoundingType.ClosestCompatible, ref maxMajor, ref maxMinor, ref maxPatch);
                     else if (maxPatch == null)
-                        changed = RoundVersion(VersionRoundingType.ReasonablyClose, ref maxMajor, ref maxMinor, ref maxPatch);
+                        RoundVersion(VersionRoundingType.ReasonablyClose, ref maxMajor, ref maxMinor, ref maxPatch);
 
                     op = ComparatorOp.LessThan;
-
-                    if (changed)
-                        maxPrerelease = "0";
+                    maxPrerelease = "0";
                 }
                 else if (options.IncludePreRelease && maxPrerelease != "0")
                 {

@@ -19,6 +19,12 @@ namespace Semver.Test.NpmSatisfyTestData
             yield return new object[] { "1.0.0", "1.0.0" };
             yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0 <=2.0.0" };
             yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0-0 <2.0.1-0", prOptions };
+            yield return new object[] { "2.0.0 - 1.0.0", ">=2.0.0 <=1.0.0" };
+            yield return new object[] { "2.0.0 - 1.0.0", ">=2.0.0-0 <1.0.1-0", prOptions };
+            yield return new object[] { "2.0 - 1.0", ">=2.0.0 <1.1.0-0" };
+            yield return new object[] { "2.0 - 1.0", ">=2.0.0-0 <1.1.0-0", prOptions };
+            yield return new object[] { "2 - 1", ">=2.0.0 <2.0.0-0" };
+            yield return new object[] { "2 - 1", ">=2.0.0-0 <2.0.0-0", prOptions };
             yield return new object[] { ">=*", "*" };
             yield return new object[] { "", "*" };
             yield return new object[] { "*", "*" };

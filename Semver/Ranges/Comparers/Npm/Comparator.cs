@@ -211,7 +211,7 @@ namespace Semver.Ranges.Comparers.Npm
                 Operator == other.Operator &&
                 AnyVersion == other.AnyVersion &&
                 options.Equals(other.options) &&
-                Version == null && other.Version == null || other.Version != null && Version != null && Version.Equals(other.Version);
+                (Version == null && other.Version == null || other.Version != null && Version != null && Version.Equals(other.Version));
         }
 
         public override bool Equals(object obj)
