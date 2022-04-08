@@ -125,6 +125,7 @@ namespace Semver.Test.NpmSatisfyTestData
             yield return new object[] { ">=1 invalid ^2", null };
             yield return new object[] { "v", null };
             yield return new object[] { "* || invalid", null };
+            yield return new object[] { "1.0.0beta", null }; // Unlike npm loose parsing we don't allow prerelease without '-' after version
         }
 
         IEnumerator IEnumerable.GetEnumerator()
