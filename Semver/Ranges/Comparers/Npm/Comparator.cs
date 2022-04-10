@@ -118,6 +118,9 @@ namespace Semver.Ranges.Comparers.Npm
                 return val;
             }
 
+            if (AnyVersion)
+                return 0;
+
             int compare = version.Major == Version.Major ? 0 : Clamp(version.Major - Version.Major);
 
             if (compare != 0)
