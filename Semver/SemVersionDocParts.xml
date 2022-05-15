@@ -73,4 +73,18 @@
             lexically in ASCII sort order.</para>
         </remarks>
     </part>
+    <part id="PrecedenceOrder">
+        <remarks>
+            <para>Precedence order is determined by comparing the major, minor, patch, and prerelease
+            portion in order from left to right. Versions that differ only by build metadata have the
+            same precedence. The major, minor, and patch version numbers are compared numerically. A
+            prerelease version precedes a release version.</para>
+
+            <para>The prerelease portion is compared by comparing each prerelease identifier from
+            left to right. Numeric prerelease identifiers precede alphanumeric identifiers. Numeric
+            identifiers are compared numerically. Alphanumeric identifiers are compared lexically
+            in ASCII sort order. A longer series of prerelease identifiers follows a shorter series
+            if all the preceding identifiers are equal.</para>
+        </remarks>
+    </part>
 </docParts>

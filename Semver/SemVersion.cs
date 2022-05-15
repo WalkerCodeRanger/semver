@@ -1320,6 +1320,37 @@ namespace Semver
         public static ISemVersionComparer PrecedenceComparer { get; } = Comparers.PrecedenceComparer.Instance;
         public static ISemVersionComparer SortOrderComparer { get; } = Comparers.SortOrderComparer.Instance;
 
+        /// <summary>
+        /// Compares two versions and indicates whether this instance precedes, follows, or  in the same
+        /// position as the other in the precedence order. Versions that differ only by build metadata
+        /// have the same precedence.
+        /// </summary>
+        /// <returns>
+        /// An integer that indicates whether this instance precedes, follows, or is in the same
+        /// position as <paramref name="other"/> in the precedence order.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Value</term>
+        ///         <description>Condition</description>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>-1</term>
+        ///         <description>This instance precedes <paramref name="other"/> in the precedence order.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <description>This instance has the same precedence as <paramref name="other"/>.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>1</term>
+        ///         <description>
+        ///             This instance follows <paramref name="other"/> in the precedence order
+        ///             or <paramref name="other"/> is <see langword="null" />.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrecedenceOrder"]/*'/>
         public int ComparePrecedenceTo(SemVersion other) => PrecedenceComparer.Compare(this, other);
         public int CompareSortOrderTo(SemVersion other) => SortOrderComparer.Compare(this, other);
 
@@ -1357,7 +1388,7 @@ namespace Semver
         }
 
         /// <summary>
-        /// Compares two versions and indicates whether the first precedes, follows, or is in the same
+        /// Compares two versions and indicates whether this instance precedes, follows, or is in the same
         /// position as the other in the precedence order. Versions that differ only by build metadata
         /// have the same precedence.
         /// </summary>
@@ -1375,7 +1406,7 @@ namespace Semver
         ///     </item>
         ///     <item>
         ///         <term>Zero</term>
-        ///         <description>This instance is has the same precedence as <paramref name="other"/>.</description>
+        ///         <description>This instance has the same precedence as <paramref name="other"/>.</description>
         ///     </item>
         ///     <item>
         ///         <term>Greater than zero</term>
