@@ -1317,8 +1317,8 @@ namespace Semver
         #endregion
 
         #region Comparison
-        public static readonly ISemVersionComparer PrecedenceComparer = Comparers.PrecedenceComparer.Instance;
-        public static readonly ISemVersionComparer SortOrderComparer = Comparers.SortOrderComparer.Instance;
+        public static ISemVersionComparer PrecedenceComparer { get; } = Comparers.PrecedenceComparer.Instance;
+        public static ISemVersionComparer SortOrderComparer { get; } = Comparers.SortOrderComparer.Instance;
 
         public int ComparePrecedenceTo(SemVersion other) => PrecedenceComparer.Compare(this, other);
         public int CompareSortOrderTo(SemVersion other) => SortOrderComparer.Compare(this, other);

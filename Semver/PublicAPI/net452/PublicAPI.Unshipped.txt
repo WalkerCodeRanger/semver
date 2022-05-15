@@ -2,8 +2,8 @@
 Semver.SemVersion.ComparePrecedenceTo(Semver.SemVersion other) -> int
 Semver.SemVersion.CompareSortOrderTo(Semver.SemVersion other) -> int
 Semver.SemVersion.PrecedenceEquals(Semver.SemVersion other) -> bool
-static readonly Semver.SemVersion.PrecedenceComparer -> Semver.Comparers.ISemVersionComparer
-static readonly Semver.SemVersion.SortOrderComparer -> Semver.Comparers.ISemVersionComparer
 static Semver.SemVersion.ComparePrecedence(Semver.SemVersion left, Semver.SemVersion right) -> int
 static Semver.SemVersion.CompareSortOrder(Semver.SemVersion left, Semver.SemVersion right) -> int
+static Semver.SemVersion.PrecedenceComparer.get -> Semver.Comparers.ISemVersionComparer
 static Semver.SemVersion.PrecedenceEquals(Semver.SemVersion left, Semver.SemVersion right) -> bool
+static Semver.SemVersion.SortOrderComparer.get -> Semver.Comparers.ISemVersionComparer
