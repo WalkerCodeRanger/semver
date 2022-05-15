@@ -10,7 +10,7 @@ namespace Semver.Comparers
     /// <remarks>
     /// This interface provides a type for the <see cref="SemVersion.PrecedenceComparer"/> and
     /// <see cref="SemVersion.SortOrderComparer"/> so that separate properties aren't needed for the
-    /// <see cref="IEqualityComparer{SemVersion}"/> and <see cref="IComparer{SemVersion}"/>.
+    /// <see cref="IEqualityComparer{T}"/> and <see cref="IComparer{T}"/> of <see cref="SemVersion"/>.
     /// </remarks>
     public interface ISemVersionComparer : IEqualityComparer<SemVersion>, IComparer<SemVersion>, IComparer
     {

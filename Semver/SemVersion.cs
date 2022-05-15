@@ -624,7 +624,7 @@ namespace Semver
         ///     </item>
         /// </list>
         /// </returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Method is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static int Compare(SemVersion versionA, SemVersion versionB)
         {
@@ -1331,18 +1331,22 @@ namespace Semver
 
         #region Comparison
         /// <summary>
-        /// A <see cref="IEqualityComparer{SemVersion}"/> and <see cref="IComparer{SemVersion}"/>
+        /// An <see cref="IEqualityComparer{T}"/> and <see cref="IComparer{T}"/>
         /// that compares <see cref="SemVersion"/> by precedence. This can be used for sorting,
         /// binary search, and using <see cref="SemVersion"/> as a dictionary key.
         /// </summary>
+        /// <value>A precedence comparer that implements <see cref="IEqualityComparer{T}"/> and
+        /// <see cref="IComparer{T}"/> for <see cref="SemVersion"/>.</value>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrecedenceOrder"]/*'/>
         public static ISemVersionComparer PrecedenceComparer { get; } = Comparers.PrecedenceComparer.Instance;
 
         /// <summary>
-        /// A <see cref="IEqualityComparer{SemVersion}"/> and <see cref="IComparer{SemVersion}"/>
+        /// An <see cref="IEqualityComparer{T}"/> and <see cref="IComparer{T}"/>
         /// that compares <see cref="SemVersion"/> by sort order. This can be used for sorting,
         /// binary search, and using <see cref="SemVersion"/> as a dictionary key.
         /// </summary>
+        /// <value>A sort order comparer that implements <see cref="IEqualityComparer{T}"/> and
+        /// <see cref="IComparer{T}"/> for <see cref="SemVersion"/>.</value>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         public static ISemVersionComparer SortOrderComparer { get; } = Comparers.SortOrderComparer.Instance;
 
@@ -1489,7 +1493,7 @@ namespace Semver
         /// </summary>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
         /// <exception cref="InvalidCastException">The <paramref name="obj"/> is not a <see cref="SemVersion"/>.</exception>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
         public int CompareTo(object obj) => CompareTo((SemVersion)obj);
 
@@ -1498,7 +1502,7 @@ namespace Semver
         /// equal to the other in the sort order. Note that sort order is more specific than precedence order.
         /// </summary>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
         public int CompareTo(SemVersion other)
         {
@@ -1618,7 +1622,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="left"/> follows <paramref name="right"/>
         /// in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator >(SemVersion left, SemVersion right)
             => Compare(left, right) > 0;
@@ -1628,7 +1632,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="left"/> follows or is equal to
         /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator >=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) > 0;
@@ -1638,7 +1642,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="left"/> precedes <paramref name="right"/>
         /// in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator <(SemVersion left, SemVersion right)
             => Compare(left, right) < 0;
@@ -1648,7 +1652,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="left"/> precedes or is equal to
         /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator <=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) < 0;
