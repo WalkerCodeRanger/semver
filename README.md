@@ -34,10 +34,10 @@ var vNextRc = SemVersion.ParsedFrom(1, 1, 0, "rc.1");
 
 ```csharp
 if (version.ComparePrecedenceTo(vNextRc) == 0)
-    Console.WriteLine($"{version} has the same precedence as {version}");
+    Console.WriteLine($"{version} has the same precedence as {vNextRc}");
 
 if (version.CompareSortOrderTo(vNextRc) > 0)
-    Console.WriteLine($"{version} sorts after {version}");
+    Console.WriteLine($"{version} sorts after {vNextRc}");
 ```
 
 Outputs:
