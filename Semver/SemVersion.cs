@@ -1416,6 +1416,7 @@ namespace Semver
             return CompareComponents(Prerelease, other.Prerelease, true);
         }
 
+        [Obsolete]
         private static int CompareComponents(string a, string b, bool nonEmptyIsLower = false)
         {
             var aEmpty = string.IsNullOrEmpty(a);
