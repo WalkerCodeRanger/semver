@@ -1235,6 +1235,7 @@ namespace Semver
         /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
+        // TODO rename parameters to `left` and `right` to be consistent with ComparePrecedence etc.
         public static bool Equals(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return true;
