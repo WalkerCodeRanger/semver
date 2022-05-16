@@ -25,6 +25,10 @@ namespace Semver.Ranges.Comparers.Npm
             IncludePreRelease = includePreRelease;
         }
 
+        public NpmParseOptions()
+        {
+        }
+
         public override string ToString()
         {
             if (cachedStringValue != null)
