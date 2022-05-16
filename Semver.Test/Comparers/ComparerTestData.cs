@@ -73,9 +73,12 @@ namespace Semver.Test.Comparers
             new SemVersion(1, 2),
             new SemVersion(1, 2, 0, "", "nightly"),
             new SemVersion(1, 2, 1, "0"),
+            new SemVersion(1, 2, 1, "1"),
+            new SemVersion(1, 2, 1, "2"),
+            new SemVersion(1, 2, 1, "10"), // Sorts numeric after 2
             new SemVersion(1, 2, 1, "99"),
             new SemVersion(1, 2, 1, "-"),
-            new SemVersion(1, 2, 1, "-1"),
+            new SemVersion(1, 2, 1, "-1"), // Sorts alphanumeric instead of numeric
             new SemVersion(1, 2, 1, "-a"),
             new SemVersion(1, 2, 1, "0A"),
             new SemVersion(1, 2, 1, "A"),

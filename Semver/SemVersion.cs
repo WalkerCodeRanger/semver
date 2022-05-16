@@ -626,7 +626,7 @@ namespace Semver
         ///     </item>
         /// </list>
         /// </returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Method is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static int Compare(SemVersion versionA, SemVersion versionB)
         {
@@ -1237,6 +1237,7 @@ namespace Semver
         /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
+        // TODO rename parameters to `left` and `right` to be consistent with ComparePrecedence etc.
         public static bool Equals(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return true;
@@ -1245,7 +1246,7 @@ namespace Semver
         }
 
         /// <summary>Determines whether the given object is equal to this version.</summary>
-        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this identifier;
+        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this version;
         /// otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
@@ -1253,7 +1254,7 @@ namespace Semver
             => obj is SemVersion version && Equals(version);
 
         /// <summary>
-        /// Determines whether two versions are equal.
+        /// Determines whether two semantic versions are equal.
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the this version;
         /// otherwise <see langword="false"/>.</returns>
@@ -1274,14 +1275,27 @@ namespace Semver
                 && string.Equals(Metadata, other.Metadata, StringComparison.Ordinal);
         }
 
+        /// <summary>
+        /// Determines whether two semantic versions have the same precedence. Versions that differ
+        /// only by build metadata have the same precedence.
+        /// </summary>
+        /// <param name="other">The semantic version to compare to.</param>
+        /// <returns><see langword="true"/> if the version precedences are equal, otherwise
+        /// <see langword="false"/>.</returns>
         public bool PrecedenceEquals(SemVersion other)
             => PrecedenceComparer.Compare(this, other) == 0;
 
+        /// <summary>
+        /// Determines whether two semantic versions have the same precedence. Versions that differ
+        /// only by build metadata have the same precedence.
+        /// </summary>
+        /// <returns><see langword="true"/> if the version precedences are equal, otherwise
+        /// <see langword="false"/>.</returns>
         public static bool PrecedenceEquals(SemVersion left, SemVersion right)
             => PrecedenceComparer.Compare(left, right) == 0;
 
         /// <summary>
-        /// Returns whether two semantic versions have the same precedence. Versions
+        /// Determines whether two semantic versions have the same precedence. Versions
         /// that differ only by build metadata have the same precedence.
         /// </summary>
         /// <param name="other">The semantic version to compare to.</param>
@@ -1319,15 +1333,159 @@ namespace Semver
         #endregion
 
         #region Comparison
-        public static readonly ISemVersionComparer PrecedenceComparer = Comparers.PrecedenceComparer.Instance;
-        public static readonly ISemVersionComparer SortOrderComparer = Comparers.SortOrderComparer.Instance;
+        /// <summary>
+        /// An <see cref="IEqualityComparer{T}"/> and <see cref="IComparer{T}"/>
+        /// that compares <see cref="SemVersion"/> by precedence. This can be used for sorting,
+        /// binary search, and using <see cref="SemVersion"/> as a dictionary key.
+        /// </summary>
+        /// <value>A precedence comparer that implements <see cref="IEqualityComparer{T}"/> and
+        /// <see cref="IComparer{T}"/> for <see cref="SemVersion"/>.</value>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrecedenceOrder"]/*'/>
+        public static ISemVersionComparer PrecedenceComparer { get; } = Comparers.PrecedenceComparer.Instance;
 
+        /// <summary>
+        /// An <see cref="IEqualityComparer{T}"/> and <see cref="IComparer{T}"/>
+        /// that compares <see cref="SemVersion"/> by sort order. This can be used for sorting,
+        /// binary search, and using <see cref="SemVersion"/> as a dictionary key.
+        /// </summary>
+        /// <value>A sort order comparer that implements <see cref="IEqualityComparer{T}"/> and
+        /// <see cref="IComparer{T}"/> for <see cref="SemVersion"/>.</value>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
+        public static ISemVersionComparer SortOrderComparer { get; } = Comparers.SortOrderComparer.Instance;
+
+        /// <summary>
+        /// Compares two versions and indicates whether this instance precedes, follows, or is in the same
+        /// position as the other in the precedence order. Versions that differ only by build metadata
+        /// have the same precedence.
+        /// </summary>
+        /// <returns>
+        /// An integer that indicates whether this instance precedes, follows, or is in the same
+        /// position as <paramref name="other"/> in the precedence order.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Value</term>
+        ///         <description>Condition</description>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>-1</term>
+        ///         <description>This instance precedes <paramref name="other"/> in the precedence order.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>0</term>
+        ///         <description>This instance has the same precedence as <paramref name="other"/>.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>1</term>
+        ///         <description>
+        ///             This instance follows <paramref name="other"/> in the precedence order
+        ///             or <paramref name="other"/> is <see langword="null" />.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrecedenceOrder"]/*'/>
         public int ComparePrecedenceTo(SemVersion other) => PrecedenceComparer.Compare(this, other);
+
+        /// <summary>
+        /// Compares two versions and indicates whether this instance precedes, follows, or is equal
+        /// to the other in the sort order. Note that sort order is more specific than precedence order.
+        /// </summary>
+        /// <returns>
+        /// An integer that indicates whether this instance precedes, follows, or is equal to the
+        /// other in the sort order.
+        /// <list type="table">
+        /// 	<listheader>
+        /// 		<term>Value</term>
+        /// 		<description>Condition</description>
+        /// 	</listheader>
+        /// 	<item>
+        /// 		<term>-1</term>
+        /// 		<description>This instance precedes the other in the sort order.</description>
+        /// 	</item>
+        /// 	<item>
+        /// 		<term>0</term>
+        /// 		<description>This instance is equal to the other.</description>
+        /// 	</item>
+        /// 	<item>
+        /// 		<term>1</term>
+        /// 		<description>
+        /// 			This instance follows the other in the sort order
+        /// 			or the other is <see langword="null" />.
+        /// 		</description>
+        /// 	</item>
+        /// </list>
+        /// </returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         public int CompareSortOrderTo(SemVersion other) => SortOrderComparer.Compare(this, other);
 
+        /// <summary>
+        /// Compares two versions and indicates whether the first precedes, follows, or is in the same
+        /// position as the second in the precedence order. Versions that differ only by build metadata
+        /// have the same precedence.
+        /// </summary>
+        /// <returns>
+        /// An integer that indicates whether <paramref name="left"/> precedes, follows, or is in the same
+        /// position as <paramref name="right"/> in the precedence order.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Value</term>
+        ///         <description>Condition</description>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>-1</term>
+        ///         <description>
+        ///             <paramref name="left"/> precedes <paramref name="right"/> in the precedence
+        ///             order or <paramref name="left"/> is <see langword="null" />.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>0</term>
+        ///         <description><paramref name="left"/> has the same precedence as <paramref name="right"/>.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>1</term>
+        ///         <description>
+        ///             <paramref name="left"/> follows <paramref name="right"/> in the precedence order
+        ///             or <paramref name="right"/> is <see langword="null" />.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrecedenceOrder"]/*'/>
         public static int ComparePrecedence(SemVersion left, SemVersion right)
             => PrecedenceComparer.Compare(left, right);
 
+        /// <summary>
+        /// Compares two versions and indicates whether the first precedes, follows, or is equal to
+        /// the second in the sort order. Note that sort order is more specific than precedence order.
+        /// </summary>
+        /// <returns>
+        /// An integer that indicates whether <paramref name="left"/> precedes, follows, or is equal
+        /// to <paramref name="right"/> in the sort order.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Value</term>
+        ///         <description>Condition</description>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>-1</term>
+        ///         <description>
+        ///             <paramref name="left"/> precedes <paramref name="right"/> in the sort
+        ///             order or <paramref name="left"/> is <see langword="null" />.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>0</term>
+        ///         <description><paramref name="left"/> is equal to <paramref name="right"/>.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>1</term>
+        ///         <description>
+        ///             <paramref name="left"/> follows <paramref name="right"/> in the sort order
+        ///             or <paramref name="right"/> is <see langword="null" />.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         public static int CompareSortOrder(SemVersion left, SemVersion right)
             => SortOrderComparer.Compare(left, right);
 
@@ -1338,7 +1496,7 @@ namespace Semver
         /// </summary>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
         /// <exception cref="InvalidCastException">The <paramref name="obj"/> is not a <see cref="SemVersion"/>.</exception>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
         public int CompareTo(object obj) => CompareTo((SemVersion)obj);
 
@@ -1347,7 +1505,7 @@ namespace Semver
         /// equal to the other in the sort order. Note that sort order is more specific than precedence order.
         /// </summary>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
         public int CompareTo(SemVersion other)
         {
@@ -1359,7 +1517,7 @@ namespace Semver
         }
 
         /// <summary>
-        /// Compares two versions and indicates whether the first precedes, follows, or is in the same
+        /// Compares two versions and indicates whether this instance precedes, follows, or is in the same
         /// position as the other in the precedence order. Versions that differ only by build metadata
         /// have the same precedence.
         /// </summary>
@@ -1377,7 +1535,7 @@ namespace Semver
         ///     </item>
         ///     <item>
         ///         <term>Zero</term>
-        ///         <description>This instance is has the same precedence as <paramref name="other"/>.</description>
+        ///         <description>This instance has the same precedence as <paramref name="other"/>.</description>
         ///     </item>
         ///     <item>
         ///         <term>Greater than zero</term>
@@ -1418,6 +1576,7 @@ namespace Semver
             return CompareComponents(Prerelease, other.Prerelease, true);
         }
 
+        [Obsolete]
         private static int CompareComponents(string a, string b, bool nonEmptyIsLower = false)
         {
             var aEmpty = string.IsNullOrEmpty(a);
@@ -1466,7 +1625,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="left"/> follows <paramref name="right"/>
         /// in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator >(SemVersion left, SemVersion right)
             => Compare(left, right) > 0;
@@ -1476,7 +1635,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="left"/> follows or is equal to
         /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator >=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) > 0;
@@ -1486,7 +1645,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="left"/> precedes <paramref name="right"/>
         /// in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator <(SemVersion left, SemVersion right)
             => Compare(left, right) < 0;
@@ -1496,7 +1655,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="left"/> precedes or is equal to
         /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="OldSortOrder"]/*'/>
+        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator <=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) < 0;
