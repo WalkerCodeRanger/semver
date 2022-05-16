@@ -1,3 +1,4 @@
+using Semver.Ranges;
 using Semver.Ranges.Comparers.Npm;
 using Semver.Test.NpmSatisfyTestData;
 using Xunit;

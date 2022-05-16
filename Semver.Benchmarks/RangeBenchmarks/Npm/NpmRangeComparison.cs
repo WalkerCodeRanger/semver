@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Semver.Benchmarks.Builders;
+using Semver.Ranges;
 using Semver.Ranges.Comparers.Npm;
 using Semver.Utility;
 

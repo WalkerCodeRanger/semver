@@ -4,8 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Semver.Ranges.Comparers.Npm;
 
-namespace Semver.Ranges.Comparers.Npm
+namespace Semver.Ranges
 {
     /// <summary>
     /// A range of versions that can be checked against to see if a <see cref="SemVersion"/> is included.

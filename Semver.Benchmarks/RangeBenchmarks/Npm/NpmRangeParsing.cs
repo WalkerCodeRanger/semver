@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using Semver.Ranges;
 using Semver.Ranges.Comparers.Npm;
 
 namespace Semver.Benchmarks.RangeBenchmarks.Npm
