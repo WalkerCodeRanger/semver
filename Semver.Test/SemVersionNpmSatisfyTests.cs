@@ -32,7 +32,7 @@ namespace Semver.Test
         public void AllIncludes(string range, string version, NpmParseOptions options = default)
         {
             Assert.True(NpmRange.TryParse(range, options, out var parsedRange), "Failed to parse range");
-            Assert.True(parsedRange.Includes(SemVersion.Parse(version, SemVersionStyles.Strict)), $"{parsedRange} does not include {version}");
+            Assert.True(parsedRange.Contains(SemVersion.Parse(version, SemVersionStyles.Strict)), $"{parsedRange} does not include {version}");
             testOutput.WriteLine($"{parsedRange} includes {version}");
         }
 
@@ -44,7 +44,7 @@ namespace Semver.Test
         public void AllExcludes(string range, string version, NpmParseOptions options = default)
         {
             Assert.True(NpmRange.TryParse(range, options, out var parsedRange), "Failed to parse range");
-            Assert.False(parsedRange.Includes(SemVersion.Parse(version, SemVersionStyles.Strict)), $"{parsedRange} includes {version}");
+            Assert.False(parsedRange.Contains(SemVersion.Parse(version, SemVersionStyles.Strict)), $"{parsedRange} includes {version}");
             testOutput.WriteLine($"{parsedRange} excludes {version}");
         }
     }

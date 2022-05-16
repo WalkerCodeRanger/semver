@@ -28,7 +28,7 @@ namespace Semver.Ranges
             if (!NpmRange.TryParse(range, options, out var parsedRange))
                 return false;
 
-            return parsedRange.Includes(version);
+            return parsedRange.Contains(version);
         }
         
         /// <summary>
@@ -44,7 +44,7 @@ namespace Semver.Ranges
             if (version == null) throw new ArgumentNullException(nameof(version));
             if (range == null) throw new ArgumentNullException(nameof(range));
 
-            return range.Includes(version);
+            return range.Contains(version);
         }
     }
 }

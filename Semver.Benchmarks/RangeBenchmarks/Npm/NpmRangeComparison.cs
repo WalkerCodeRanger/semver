@@ -40,7 +40,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
             
             for (int i = 0; i < ranges.Count; ++i)
             {
-                ranges[i].Includes(version);
+                ranges[i].Contains(version);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
             
             for (int i = 0; i < prereleaseRanges.Count; ++i)
             {
-                prereleaseRanges[i].Includes(version);
+                prereleaseRanges[i].Contains(version);
             }
         }
     }

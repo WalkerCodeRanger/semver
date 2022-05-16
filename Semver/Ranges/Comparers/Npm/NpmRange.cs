@@ -99,7 +99,7 @@ namespace Semver.Ranges.Comparers.Npm
         }
 
         /// <inheritdoc />
-        public bool Includes(SemVersion version)
+        public bool Contains(SemVersion version)
         {
             bool anySuccess = false;
             
