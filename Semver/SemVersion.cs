@@ -9,6 +9,8 @@ using System.Security.Permissions;
 #endif
 using System.Text.RegularExpressions;
 using Semver.Comparers;
+using Semver.Ranges;
+using Semver.Ranges.Comparers.Npm;
 using Semver.Utility;
 
 namespace Semver
@@ -1498,6 +1500,45 @@ namespace Semver
         [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator <=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) < 0;
+        #endregion
+        
+        #region Ranges
+        /// <summary>
+        /// <para>
+        /// Checks if this version satisfies the specified range.
+        /// Uses the same range syntax as npm.
+        /// </para>
+        /// <para>
+        /// Note: It's more optimal to use the static parse methods on <see cref="NpmRange"/>
+        /// if you're gonna be testing multiple versions against the same range
+        /// to avoid having to parse the range multiple times.
+        /// </para>
+        /// </summary>
+        /// <param name="range">The range to compare with. If the syntax is invalid the method will always return false.</param>
+        /// <param name="options">The options to use when parsing the range.</param>
+        /// <returns>True if the version satisfies the range.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
+        public bool SatisfiesNpm(string range, NpmParseOptions options = default)
+        {
+            if (range == null) throw new ArgumentNullException(nameof(range));
+            if (!NpmRange.TryParse(range, options, out var parsedRange))
+                return false;
+
+            return parsedRange.Contains(this);
+        }
+        
+        /// <summary>
+        /// Checks if this version satisfies the specified range.
+        /// Uses the same syntax as npm.
+        /// </summary>
+        /// <param name="range">The range to compare with.</param>
+        /// <returns>True if the version satisfies the range.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
+        public bool Satisfies(ISemVersionRange range)
+        {
+            if (range == null) throw new ArgumentNullException(nameof(range));
+            return range.Contains(this);
+        }
         #endregion
 
         /// <summary>
