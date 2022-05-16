@@ -84,7 +84,7 @@ namespace Semver.Ranges.Comparers.Npm
                 yield break;
             }
 
-            throw new RangeParseException($"Unknown range syntax: {range}");
+            throw new FormatException($"Unknown range syntax: {range}");
         }
 
         private void ParseHyphenRange(Match match, NpmParseOptions options, out NpmComparator minComparator, out NpmComparator maxComparator)

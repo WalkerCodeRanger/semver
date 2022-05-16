@@ -34,7 +34,7 @@ namespace Semver.Ranges
         /// <param name="range">The range to parse.</param>
         /// <returns>The parsed range</returns>
         /// <exception cref="ArgumentNullException">Thrown when range is null.</exception>
-        /// <exception cref="RangeParseException">Thrown when the range has invalid syntax or if regex match timed out.</exception>
+        /// <exception cref="FormatException">Thrown when the range has invalid syntax or if regex match timed out.</exception>
         public static NpmRange Parse(string range)
         {
             return Parse(range, NpmParseOptions.Default);
@@ -47,7 +47,7 @@ namespace Semver.Ranges
         /// <param name="options">The options to use when parsing.</param>
         /// <returns>The parsed range.</returns>
         /// <exception cref="ArgumentNullException">Thrown when range or options is null.</exception>
-        /// <exception cref="RangeParseException">Thrown when the range has invalid syntax or if regex match timed out.</exception>
+        /// <exception cref="FormatException">Thrown when the range has invalid syntax or if regex match timed out.</exception>
         public static NpmRange Parse(string range, NpmParseOptions options)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
@@ -59,7 +59,7 @@ namespace Semver.Ranges
             }
             catch (RegexMatchTimeoutException ex)
             {
-                throw new RangeParseException("Regex match timed out", ex);
+                throw new FormatException("Regex match timed out", ex);
             }
         }
 
@@ -94,7 +94,7 @@ namespace Semver.Ranges
                 range = Parse(strRange, options);
                 return true;
             }
-            catch (RangeParseException)
+            catch (FormatException)
             {
                 range = null;
                 return false;
