@@ -39,7 +39,7 @@ namespace Semver.Ranges
         /// <param name="range">The range to compare with.</param>
         /// <returns>True if the version satisfies the range.</returns>
         /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
-        public static bool Satisfies(this SemVersion version, IRange range)
+        public static bool Satisfies(this SemVersion version, ISemVersionRange range)
         {
             if (version == null) throw new ArgumentNullException(nameof(version));
             if (range == null) throw new ArgumentNullException(nameof(range));

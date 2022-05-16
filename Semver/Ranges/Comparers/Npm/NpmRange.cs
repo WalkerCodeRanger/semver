@@ -11,7 +11,7 @@ namespace Semver.Ranges.Comparers.Npm
     /// A range of versions that can be checked against to see if a <see cref="SemVersion"/> is included.
     /// Uses the same syntax as npm.
     /// </summary>
-    public class NpmRange : IRange
+    public class NpmRange : ISemVersionRange
     {
         internal readonly NpmComparator[][] Ranges;
         private string cachedStringValue;

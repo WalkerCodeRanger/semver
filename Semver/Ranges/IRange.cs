@@ -3,7 +3,7 @@ namespace Semver.Ranges
     /// <summary>
     /// An interface for determining if a <see cref="SemVersion"/> is included in a range of versions.
     /// </summary>
-    public interface IRange
+    public interface ISemVersionRange
     {
         /// <summary>
         /// Returns whether this range contains the specified version.
