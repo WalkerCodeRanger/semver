@@ -37,7 +37,7 @@ namespace Semver.Ranges
         /// <exception cref="RangeParseException">Thrown when the range has invalid syntax or if regex match timed out.</exception>
         public static NpmRange Parse(string range)
         {
-            return Parse(range, default);
+            return Parse(range, NpmParseOptions.Default);
         }
 
         /// <summary>
@@ -46,12 +46,13 @@ namespace Semver.Ranges
         /// <param name="range">The range to parse.</param>
         /// <param name="options">The options to use when parsing.</param>
         /// <returns>The parsed range.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when range is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when range or options is null.</exception>
         /// <exception cref="RangeParseException">Thrown when the range has invalid syntax or if regex match timed out.</exception>
         public static NpmRange Parse(string range, NpmParseOptions options)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
-            
+            if (options == null) throw new ArgumentNullException(nameof(options));
+
             try
             {
                 return new RangeParser().ParseRange(range, options);
@@ -72,7 +73,7 @@ namespace Semver.Ranges
         public static bool TryParse(string strRange, out NpmRange range)
         {
             if (strRange == null) throw new ArgumentNullException(nameof(strRange));
-            return TryParse(strRange, default, out range);
+            return TryParse(strRange, NpmParseOptions.Default, out range);
         }
 
         /// <summary>
@@ -82,11 +83,12 @@ namespace Semver.Ranges
         /// <param name="options">The options to use when parsing.</param>
         /// <param name="range">The parsed range.</param>
         /// <returns>Returns true if the range was parsed successfully.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if strRange is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if strRange or options is null.</exception>
         public static bool TryParse(string strRange, NpmParseOptions options, out NpmRange range)
         {
             if (strRange == null) throw new ArgumentNullException(nameof(strRange));
-            
+            if (options == null) throw new ArgumentNullException(nameof(options));
+
             try
             {
                 range = Parse(strRange, options);

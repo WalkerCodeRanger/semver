@@ -17,8 +17,11 @@ namespace Semver.Test
 
         [Theory]
         [ClassData(typeof(ParseData))]
-        public void ParseTests(string strRange, string expectedRange, NpmParseOptions options = default)
+        public void ParseTests(string strRange, string expectedRange, NpmParseOptions options = null)
         {
+            if (options == null)
+                options = new NpmParseOptions();
+            
             NpmRange.TryParse(strRange, options, out NpmRange range);
             string result = range?.ToString();
 
@@ -30,8 +33,11 @@ namespace Semver.Test
         /// </summary>
         [Theory]
         [ClassData(typeof(IncludeData))]
-        public void AllIncludes(string range, string version, NpmParseOptions options = default)
+        public void AllIncludes(string range, string version, NpmParseOptions options = null)
         {
+            if (options == null)
+                options = NpmParseOptions.Default;
+            
             Assert.True(NpmRange.TryParse(range, options, out var parsedRange), "Failed to parse range");
             Assert.True(parsedRange.Contains(SemVersion.Parse(version, SemVersionStyles.Strict)), $"{parsedRange} does not include {version}");
             testOutput.WriteLine($"{parsedRange} includes {version}");
@@ -42,8 +48,11 @@ namespace Semver.Test
         /// </summary>
         [Theory]
         [ClassData(typeof(ExcludeData))]
-        public void AllExcludes(string range, string version, NpmParseOptions options = default)
+        public void AllExcludes(string range, string version, NpmParseOptions options = null)
         {
+            if (options == null)
+                options = NpmParseOptions.Default;
+
             Assert.True(NpmRange.TryParse(range, options, out var parsedRange), "Failed to parse range");
             Assert.False(parsedRange.Contains(SemVersion.Parse(version, SemVersionStyles.Strict)), $"{parsedRange} includes {version}");
             testOutput.WriteLine($"{parsedRange} excludes {version}");

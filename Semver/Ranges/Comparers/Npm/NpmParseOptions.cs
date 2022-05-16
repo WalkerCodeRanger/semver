@@ -5,32 +5,51 @@ namespace Semver.Ranges.Comparers.Npm
     /// <summary>
     /// The options to use when parsing a range with npm syntax.
     /// </summary>
-    public readonly struct NpmParseOptions : IEquatable<NpmParseOptions>
+    public class NpmParseOptions : IEquatable<NpmParseOptions>
     {
+        /// <summary>
+        /// Gets the default parsing options.
+        /// </summary>
+        public static readonly NpmParseOptions Default = new NpmParseOptions();
+        
         /// <summary>
         /// Gets if non-explicitly selected prerelease versions should be included.
         /// </summary>
         public readonly bool IncludePreRelease;
         
-        private readonly string stringValue;
+        private string cachedStringValue;
 
         /// <param name="includePreRelease">True if non-explicitly selected prerelease versions should be included.</param>
         public NpmParseOptions(bool includePreRelease = false)
         {
             IncludePreRelease = includePreRelease;
-            stringValue = $"{{ IncludePreRelease: {IncludePreRelease} }}";
         }
 
-        public override string ToString() => stringValue;
+        public override string ToString()
+        {
+            if (cachedStringValue != null)
+                return cachedStringValue;
+
+            cachedStringValue = $"{{ IncludePreRelease: {IncludePreRelease} }}";
+            return cachedStringValue;
+        }
 
         public bool Equals(NpmParseOptions other)
         {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
             return IncludePreRelease == other.IncludePreRelease;
         }
 
         public override bool Equals(object obj)
         {
-            return obj is NpmParseOptions other && Equals(other);
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            
+            if (obj is NpmParseOptions opts)
+                return Equals(opts);
+
+            return false;
         }
 
         public override int GetHashCode()
