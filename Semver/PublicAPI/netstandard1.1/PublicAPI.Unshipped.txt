@@ -1,4 +1,4 @@
-﻿override Semver.Ranges.Comparers.Npm.NpmRange.ToString() -> string
+﻿override Semver.Ranges.NpmRange.ToString() -> string
 readonly Semver.Ranges.Comparers.Npm.NpmParseOptions.IncludePreRelease -> bool
 Semver.Comparers.ISemVersionComparer
 Semver.Ranges.Comparers.Npm.NpmParseOptions
@@ -8,25 +8,22 @@ Semver.Ranges.Comparers.Npm.NpmParseOptions.Equals(Semver.Ranges.Comparers.Npm.N
 override Semver.Ranges.Comparers.Npm.NpmParseOptions.Equals(object obj) -> bool
 override Semver.Ranges.Comparers.Npm.NpmParseOptions.GetHashCode() -> int
 override Semver.Ranges.Comparers.Npm.NpmParseOptions.ToString() -> string
-Semver.Ranges.Comparers.Npm.NpmRange
-Semver.Ranges.Comparers.Npm.NpmRange.Includes(Semver.SemVersion version) -> bool
-Semver.Ranges.IRange
-Semver.Ranges.IRange.Includes(Semver.SemVersion version) -> bool
-Semver.Ranges.SemVersionExtensions
-Semver.Ranges.RangeParseException
-Semver.Ranges.RangeParseException.RangeParseException(string message) -> void
-Semver.Ranges.RangeParseException.RangeParseException(string message, System.Exception innerException) -> void
+Semver.Ranges.NpmRange
+Semver.Ranges.NpmRange.Contains(Semver.SemVersion version) -> bool
+Semver.Ranges.ISemVersionRange
+Semver.Ranges.ISemVersionRange.Contains(Semver.SemVersion version) -> bool
 Semver.SemVersion.ComparePrecedenceTo(Semver.SemVersion other) -> int
 Semver.SemVersion.CompareSortOrderTo(Semver.SemVersion other) -> int
 Semver.SemVersion.PrecedenceEquals(Semver.SemVersion other) -> bool
+Semver.SemVersion.Satisfies(Semver.Ranges.ISemVersionRange range) -> bool
+Semver.SemVersion.SatisfiesNpm(string range, Semver.Ranges.Comparers.Npm.NpmParseOptions options = null) -> bool
+static readonly Semver.Ranges.Comparers.Npm.NpmParseOptions.Default -> Semver.Ranges.Comparers.Npm.NpmParseOptions
 static readonly Semver.SemVersion.PrecedenceComparer -> Semver.Comparers.ISemVersionComparer
 static readonly Semver.SemVersion.SortOrderComparer -> Semver.Comparers.ISemVersionComparer
-static Semver.Ranges.Comparers.Npm.NpmRange.Parse(string range) -> Semver.Ranges.Comparers.Npm.NpmRange
-static Semver.Ranges.Comparers.Npm.NpmRange.Parse(string range, Semver.Ranges.Comparers.Npm.NpmParseOptions options) -> Semver.Ranges.Comparers.Npm.NpmRange
-static Semver.Ranges.Comparers.Npm.NpmRange.TryParse(string strRange, out Semver.Ranges.Comparers.Npm.NpmRange range) -> bool
-static Semver.Ranges.Comparers.Npm.NpmRange.TryParse(string strRange, Semver.Ranges.Comparers.Npm.NpmParseOptions options, out Semver.Ranges.Comparers.Npm.NpmRange range) -> bool
-static Semver.Ranges.SemVersionExtensions.Satisfies(this Semver.SemVersion version, Semver.Ranges.IRange range) -> bool
-static Semver.Ranges.SemVersionExtensions.SatisfiesNpm(this Semver.SemVersion version, string range, Semver.Ranges.Comparers.Npm.NpmParseOptions options = default(Semver.Ranges.Comparers.Npm.NpmParseOptions)) -> bool
+static Semver.Ranges.NpmRange.Parse(string range) -> Semver.Ranges.NpmRange
+static Semver.Ranges.NpmRange.Parse(string range, Semver.Ranges.Comparers.Npm.NpmParseOptions options) -> Semver.Ranges.NpmRange
+static Semver.Ranges.NpmRange.TryParse(string strRange, out Semver.Ranges.NpmRange range) -> bool
+static Semver.Ranges.NpmRange.TryParse(string strRange, Semver.Ranges.Comparers.Npm.NpmParseOptions options, out Semver.Ranges.NpmRange range) -> bool
 static Semver.SemVersion.ComparePrecedence(Semver.SemVersion left, Semver.SemVersion right) -> int
 static Semver.SemVersion.CompareSortOrder(Semver.SemVersion left, Semver.SemVersion right) -> int
 static Semver.SemVersion.PrecedenceEquals(Semver.SemVersion left, Semver.SemVersion right) -> bool
