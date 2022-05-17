@@ -20,8 +20,8 @@ namespace Semver.Test
         public void ParseTests(string strRange, string expectedRange, NpmParseOptions options = null)
         {
             if (options == null)
-                options = new NpmParseOptions();
-            
+                options = NpmParseOptions.Default;
+
             NpmRange.TryParse(strRange, options, out NpmRange range);
             string result = range?.ToString();
 
