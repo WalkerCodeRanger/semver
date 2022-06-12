@@ -20,20 +20,31 @@ Install-Package semver
 ## Parsing
 
 ```csharp
-var version = SemVersion.Parse("1.1.0-rc.1+nightly.2345", SemVersionStyles.Strict);
+var version = SemVersion.Parse("1.1.0-rc.1+e471d15", SemVersionStyles.Strict);
 ```
 
 ## Constructing
 
 ```csharp
 var v1 = new SemVersion(1, 0);
+var vNextRc = SemVersion.ParsedFrom(1, 1, 0, "rc.1");
 ```
 
 ## Comparing
 
 ```csharp
-if (version < v1)
-    Console.WriteLine($"Initial development version {version}!");
+if (version.ComparePrecedenceTo(vNextRc) == 0)
+    Console.WriteLine($"{version} has the same precedence as {vNextRc}");
+
+if (version.CompareSortOrderTo(vNextRc) > 0)
+    Console.WriteLine($"{version} sorts after {vNextRc}");
+```
+
+Outputs:
+
+```text
+1.1.0-rc.1+e471d15 has the same precedence as 1.1.0-rc.1
+1.1.0-rc.1+e471d15 sorts after 1.1.0-rc.1
 ```
 
 ## Manipulating
