@@ -58,15 +58,15 @@ namespace Semver.Comparers
             comparison = x.Patch.CompareTo(y.Patch);
             if (comparison != 0) return comparison;
 
-            var xPrereleaseIdentifiers = x.PrereleaseIdentifiers;
-            var yPrereleaseIdentifiers = y.PrereleaseIdentifiers;
-
             // Release are higher precedence than prerelease
-            var xIsRelease = xPrereleaseIdentifiers.Count == 0;
-            var yIsRelease = yPrereleaseIdentifiers.Count == 0;
+            var xIsRelease = x.IsRelease;
+            var yIsRelease = y.IsRelease;
             if (xIsRelease && yIsRelease) return 0;
             if (xIsRelease) return 1;
             if (yIsRelease) return -1;
+
+            var xPrereleaseIdentifiers = x.PrereleaseIdentifiers;
+            var yPrereleaseIdentifiers = y.PrereleaseIdentifiers;
 
             var minLength = Math.Min(xPrereleaseIdentifiers.Count, yPrereleaseIdentifiers.Count);
             for (int i = 0; i < minLength; i++)
