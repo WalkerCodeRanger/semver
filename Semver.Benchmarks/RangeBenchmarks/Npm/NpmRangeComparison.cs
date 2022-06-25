@@ -4,7 +4,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Semver.Benchmarks.Builders;
 using Semver.Ranges;
-using Semver.Ranges.Comparers.Npm;
 using Semver.Utility;
 
 namespace Semver.Benchmarks.RangeBenchmarks.Npm
@@ -38,7 +37,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
         public void Parse()
         {
             var version = new SemVersion(1, 0, 0);
-            
+
             for (int i = 0; i < ranges.Count; ++i)
             {
                 ranges[i].Contains(version);
@@ -49,7 +48,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
         public void ParsePrerelease()
         {
             var version = new SemVersion(1, 0, 0);
-            
+
             for (int i = 0; i < prereleaseRanges.Count; ++i)
             {
                 prereleaseRanges[i].Contains(version);

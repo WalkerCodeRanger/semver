@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Semver.Ranges;
-using Semver.Ranges.Comparers.Npm;
 
 namespace Semver.Benchmarks.RangeBenchmarks.Npm
 {
@@ -13,7 +12,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
     {
         protected const int NumRanges = 1000;
         private readonly IReadOnlyList<string> ranges;
-        
+
         protected abstract IReadOnlyList<string> GetRanges();
 
         protected NpmRangeParsing()
@@ -27,7 +26,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
         public void Parse(bool prerelease)
         {
             var options = new NpmParseOptions(includePreRelease: prerelease);
-            
+
             for (int i = 0; i < ranges.Count; ++i)
             {
                 NpmRange.Parse(ranges[i], options);
