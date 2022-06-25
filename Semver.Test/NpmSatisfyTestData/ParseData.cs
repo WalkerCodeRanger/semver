@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Semver.Ranges.Comparers.Npm;
+using Semver.Ranges;
 
 namespace Semver.Test.NpmSatisfyTestData
 {
@@ -9,7 +9,7 @@ namespace Semver.Test.NpmSatisfyTestData
         public IEnumerator<object[]> GetEnumerator()
         {
             var prOptions = new NpmParseOptions(includePreRelease: true);
-            
+
             yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0 <=2.0.0" };
             yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0-0 <2.0.1-0", prOptions };
             yield return new object[] { "1.x.5 - 2.x.5", ">=1.0.0 <3.0.0-0" };
@@ -27,9 +27,9 @@ namespace Semver.Test.NpmSatisfyTestData
             yield return new object[] { "2.0 - 1.0", ">=2.0.0-0 <1.1.0-0", prOptions };
             yield return new object[] { "2.x.5", ">=2.0.0 <3.0.0-0" };
             yield return new object[] { "2.x.5", ">=2.0.0-0 <3.0.0-0", prOptions };
-            yield return new object[] { "^2.x.5", ">=2.0.0 <3.0.0-0"};
-            yield return new object[] { "~2.x.5", ">=2.0.0 <3.0.0-0"};
-            yield return new object[] { "~2.x.5", ">=2.0.0 <3.0.0-0", prOptions};
+            yield return new object[] { "^2.x.5", ">=2.0.0 <3.0.0-0" };
+            yield return new object[] { "~2.x.5", ">=2.0.0 <3.0.0-0" };
+            yield return new object[] { "~2.x.5", ">=2.0.0 <3.0.0-0", prOptions };
             yield return new object[] { "2 - 1", ">=2.0.0 <2.0.0-0" };
             yield return new object[] { "2 - 1", ">=2.0.0-0 <2.0.0-0", prOptions };
             yield return new object[] { ">=*", "*" };
@@ -120,7 +120,7 @@ namespace Semver.Test.NpmSatisfyTestData
             yield return new object[] { "vx", "*" };
             yield return new object[] { "v*", "*" };
             yield return new object[] { "V*", "*" };
-            
+
             // Invalid ranges
             yield return new object[] { ">=1 invalid ^2", null };
             yield return new object[] { "v", null };

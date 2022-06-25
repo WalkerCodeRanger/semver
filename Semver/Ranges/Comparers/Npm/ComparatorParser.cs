@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Semver.Ranges.Comparers.Npm
@@ -73,21 +72,21 @@ namespace Semver.Ranges.Comparers.Npm
                 MatchCollection operatorRanges = RangeRegex.OperatorRange.Matches(range);
                 foreach (Match rangeMatch in operatorRanges)
                 {
-                    IEnumerable<NpmComparator> comps = ParseOperatorRange(rangeMatch, options);
+                    var comps = ParseOperatorRange(rangeMatch, options);
 
                     foreach (var comp in comps)
                     {
                         yield return comp;
                     }
                 }
-                
+
                 yield break;
             }
 
             throw new FormatException($"Unknown range syntax: {range}");
         }
 
-        private void ParseHyphenRange(Match match, NpmParseOptions options, out NpmComparator minComparator, out NpmComparator maxComparator)
+        private static void ParseHyphenRange(Match match, NpmParseOptions options, out NpmComparator minComparator, out NpmComparator maxComparator)
         {
             ParseVersion(match.Groups["minVersion"].Value, out var minMajor, out var minMinor, out var minPatch, out string minPrerelease, out string minMetadata);
             ParseVersion(match.Groups["maxVersion"].Value, out var maxMajor, out var maxMinor, out var maxPatch, out string maxPrerelease, out string maxMetadata);
@@ -104,8 +103,8 @@ namespace Semver.Ranges.Comparers.Npm
                 {
                     minPrerelease = "0";
                 }
-                
-                SemVersion minVersion = SemVersion.ParsedFrom(minMajor.Value, minMinor.Value, minPatch.Value, minPrerelease, minMetadata);
+
+                var minVersion = SemVersion.ParsedFrom(minMajor.Value, minMinor.Value, minPatch.Value, minPrerelease, minMetadata);
                 minComparator = new NpmComparator(ComparatorOp.GreaterThanOrEqualTo, minVersion, options);
             }
 
@@ -133,13 +132,13 @@ namespace Semver.Ranges.Comparers.Npm
                     maxPrerelease = "0";
                     op = ComparatorOp.LessThan;
                 }
-                
+
                 if (options.IncludePreRelease && string.IsNullOrEmpty(maxPrerelease))
                 {
                     maxPrerelease = "0";
                 }
 
-                SemVersion maxVersion = SemVersion.ParsedFrom(maxMajor.Value, maxMinor.Value, maxPatch.Value, maxPrerelease, maxMetadata);
+                var maxVersion = SemVersion.ParsedFrom(maxMajor.Value, maxMinor.Value, maxPatch.Value, maxPrerelease, maxMetadata);
                 maxComparator = new NpmComparator(op, maxVersion, options);
             }
         }
@@ -160,7 +159,7 @@ namespace Semver.Ranges.Comparers.Npm
                     yield return new NpmComparator(ComparatorOp.LessThan, ZeroVersionWithPrerelease, options);
                     yield break;
                 }
-                
+
                 yield return new NpmComparator(options);
                 yield break;
             }
@@ -177,7 +176,7 @@ namespace Semver.Ranges.Comparers.Npm
                 if (op == ComparatorOp.GreaterThan)
                 {
                     bool minorOrPatchNull = minor == null || patch == null;
-                    
+
                     if (minor == null)
                         RoundVersion(VersionRoundingType.ClosestCompatible, ref major, ref minor, ref patch);
                     else if (patch == null)
@@ -216,7 +215,7 @@ namespace Semver.Ranges.Comparers.Npm
                 if (op == ComparatorOp.LessThan)
                 {
                     bool minorOrPatchNull = minor == null || patch == null;
-                    
+
                     RoundVersion(VersionRoundingType.Zero, ref major, ref minor, ref patch);
 
                     if (minorOrPatchNull)
@@ -289,13 +288,13 @@ namespace Semver.Ranges.Comparers.Npm
             }
         }
 
-        private void ParseVersion(string version, out int? major, out int? minor, out int? patch, out string prerelease, out string metadata)
+        private static void ParseVersion(string version, out int? major, out int? minor, out int? patch, out string prerelease, out string metadata)
         {
             var match = RangeRegex.PartialVersion.Match(version);
             ParseVersion(match, out major, out minor, out patch, out prerelease, out metadata);
         }
 
-        private void ParseVersion(Match match, out int? major, out int? minor, out int? patch, out string prerelease, out string metadata)
+        private static void ParseVersion(Match match, out int? major, out int? minor, out int? patch, out string prerelease, out string metadata)
         {
             major = TryParseInt(match.Groups["major"].Value);
             minor = TryParseInt(match.Groups["minor"].Value);
@@ -304,7 +303,7 @@ namespace Semver.Ranges.Comparers.Npm
             metadata = match.Groups["metadata"].Value;
         }
 
-        private bool RoundVersion(VersionRoundingType roundingType, ref int? major, ref int? minor, ref int? patch)
+        private static bool RoundVersion(VersionRoundingType roundingType, ref int? major, ref int? minor, ref int? patch)
         {
             if (major == null)
                 throw new ArgumentException("Major can not be null");
@@ -356,7 +355,7 @@ namespace Semver.Ranges.Comparers.Npm
                             changed = true;
                             break;
                         }
-                        
+
                         if (major == 0 && minor == 0) // 0.0.1 --> 0.0.2
                         {
                             patch += 1;
@@ -372,7 +371,7 @@ namespace Semver.Ranges.Comparers.Npm
                             break;
                         }
                     }
-                    
+
                     major += 1;
                     minor = 0;
                     patch = 0;

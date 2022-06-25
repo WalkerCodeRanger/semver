@@ -1,7 +1,5 @@
 using System;
-using System.Linq;
 using System.Text;
-using Semver.Comparers;
 
 namespace Semver.Ranges.Comparers.Npm
 {
@@ -20,7 +18,7 @@ namespace Semver.Ranges.Comparers.Npm
         {
             if (@operator == ComparatorOp.ReasonablyClose || @operator == ComparatorOp.CompatibleWith)
                 throw new ArgumentException("Invalid operator (ReasonablyClose and CompatibleWith are invalid uses in this context)");
-            
+
             Operator = @operator;
             Version = version;
             this.options = options;
@@ -125,7 +123,7 @@ namespace Semver.Ranges.Comparers.Npm
 
             if (compare != 0)
                 return compare;
-            
+
             compare = version.Minor == Version.Minor ? 0 : Clamp(version.Minor - Version.Minor);
 
             if (compare != 0)

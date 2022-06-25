@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using Semver.Ranges.Comparers.Npm;
+using Semver.Ranges;
 
 namespace Semver.Test.NpmSatisfyTestData
 {
@@ -16,7 +16,7 @@ namespace Semver.Test.NpmSatisfyTestData
         public IEnumerator<object[]> GetEnumerator()
         {
             var prOptions = new NpmParseOptions(includePreRelease: true);
-            
+
             yield return new object[] { "1.0.0 - 2.0.0", "1.2.3" };
             yield return new object[] { "1.0.0 - 2.0.0", "1.2.3" };
             yield return new object[] { "^1.2.3+build", "1.2.3" };
