@@ -106,39 +106,23 @@ namespace Semver.Ranges.Comparers.Npm
 
         public int Compare(SemVersion version)
         {
-            int Clamp(int val)
-            {
-                if (val < -1)
-                    return -1;
-
-                if (val > 1)
-                    return 1;
-
-                return val;
-            }
-
             if (AnyVersion)
                 return 0;
 
-            int compare = version.Major == Version.Major ? 0 : Clamp(version.Major - Version.Major);
+            int comparison = version.Major.CompareTo(Version.Major);
+            if (comparison != 0) return comparison;
 
-            if (compare != 0)
-                return compare;
+            comparison = version.Minor.CompareTo(Version.Minor);
+            if (comparison != 0) return comparison;
 
-            compare = version.Minor == Version.Minor ? 0 : Clamp(version.Minor - Version.Minor);
+            comparison = version.Patch.CompareTo(Version.Patch);
+            if (comparison != 0) return comparison;
 
-            if (compare != 0)
-                return compare;
+            if ((version.IsPrerelease && Version.IsPrerelease)
+                || (version.IsPrerelease && options.IncludePreRelease))
+                comparison = Math.Sign(ComparePreRelease(version));
 
-            compare = version.Patch == Version.Patch ? 0 : Clamp(version.Patch - Version.Patch);
-
-            if (compare != 0)
-                return compare;
-
-            if ((version.IsPrerelease && Version.IsPrerelease) || (version.IsPrerelease && options.IncludePreRelease))
-                compare = Clamp(ComparePreRelease(version));
-
-            return compare;
+            return comparison;
         }
 
         private int ComparePreRelease(SemVersion version)
@@ -191,9 +175,7 @@ namespace Semver.Ranges.Comparers.Npm
 
             var builder = new StringBuilder();
             if (AnyVersion)
-            {
                 builder.Append('*');
-            }
             else
             {
                 builder.Append(ComparatorParser.OperatorsReverse[Operator]);

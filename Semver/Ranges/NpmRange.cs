@@ -33,10 +33,7 @@ namespace Semver.Ranges
         /// <returns>The parsed range</returns>
         /// <exception cref="ArgumentNullException">Thrown when range is null.</exception>
         /// <exception cref="FormatException">Thrown when the range has invalid syntax or if regex match timed out.</exception>
-        public static NpmRange Parse(string range)
-        {
-            return Parse(range, NpmParseOptions.Default);
-        }
+        public static NpmRange Parse(string range) => Parse(range, NpmParseOptions.Default);
 
         /// <summary>
         ///

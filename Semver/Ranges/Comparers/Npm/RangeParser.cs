@@ -94,10 +94,7 @@ namespace Semver.Ranges.Comparers.Npm
             var comparators = ranges.Select(comps => comps.ToArray()).ToArray();
             foreach (var comps in comparators)
             {
-                foreach (var comp in comps)
-                {
-                    comp.SetRangeComparators(comps);
-                }
+                foreach (var comp in comps) comp.SetRangeComparators(comps);
             }
 
             return new NpmRange(comparators);

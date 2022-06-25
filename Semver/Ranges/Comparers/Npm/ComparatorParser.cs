@@ -50,13 +50,13 @@ namespace Semver.Ranges.Comparers.Npm
 
         public static IEnumerable<NpmComparator> ParseComparators(string range, NpmParseOptions options)
         {
-            if (range == string.Empty) // Empty ranges imply *
+            if (range.Length == 0) // Empty ranges imply *
             {
                 yield return new NpmComparator(options);
                 yield break;
             }
 
-            Match hyphenMatch = RangeRegex.HyphenRange.Match(range);
+            var hyphenMatch = RangeRegex.HyphenRange.Match(range);
             if (hyphenMatch.Success)
             {
                 ParseHyphenRange(hyphenMatch, options, out var minComp, out var maxComp);
@@ -69,15 +69,13 @@ namespace Semver.Ranges.Comparers.Npm
 
             if (RangeRegex.OperatorRangeTest.IsMatch(range))
             {
-                MatchCollection operatorRanges = RangeRegex.OperatorRange.Matches(range);
+                var operatorRanges = RangeRegex.OperatorRange.Matches(range);
                 foreach (Match rangeMatch in operatorRanges)
                 {
                     var comps = ParseOperatorRange(rangeMatch, options);
 
                     foreach (var comp in comps)
-                    {
                         yield return comp;
-                    }
                 }
 
                 yield break;
@@ -92,29 +90,23 @@ namespace Semver.Ranges.Comparers.Npm
             ParseVersion(match.Groups["maxVersion"].Value, out var maxMajor, out var maxMinor, out var maxPatch, out string maxPrerelease, out string maxMetadata);
 
             if (minMajor == null)
-            {
                 minComparator = new NpmComparator(options);
-            }
             else
             {
                 RoundVersion(VersionRoundingType.Zero, ref minMajor, ref minMinor, ref minPatch);
 
                 if (options.IncludePreRelease && string.IsNullOrEmpty(minPrerelease))
-                {
                     minPrerelease = "0";
-                }
 
                 var minVersion = SemVersion.ParsedFrom(minMajor.Value, minMinor.Value, minPatch.Value, minPrerelease, minMetadata);
                 minComparator = new NpmComparator(ComparatorOp.GreaterThanOrEqualTo, minVersion, options);
             }
 
             if (maxMajor == null)
-            {
                 maxComparator = new NpmComparator(options);
-            }
             else
             {
-                ComparatorOp op = ComparatorOp.LessThanOrEqualTo;
+                var op = ComparatorOp.LessThanOrEqualTo;
 
                 if (maxMinor == null || maxPatch == null)
                 {
@@ -134,9 +126,7 @@ namespace Semver.Ranges.Comparers.Npm
                 }
 
                 if (options.IncludePreRelease && string.IsNullOrEmpty(maxPrerelease))
-                {
                     maxPrerelease = "0";
-                }
 
                 var maxVersion = SemVersion.ParsedFrom(maxMajor.Value, maxMinor.Value, maxPatch.Value, maxPrerelease, maxMetadata);
                 maxComparator = new NpmComparator(op, maxVersion, options);
@@ -205,7 +195,7 @@ namespace Semver.Ranges.Comparers.Npm
                     }
                 }
 
-                SemVersion version = SemVersion.ParsedFrom(major.Value, minor.Value, patch.Value, prerelease, metadata);
+                var version = SemVersion.ParsedFrom(major.Value, minor.Value, patch.Value, prerelease, metadata);
                 yield return new NpmComparator(op, version, options);
                 yield break;
             }
@@ -229,20 +219,16 @@ namespace Semver.Ranges.Comparers.Npm
                     if (minor == null || patch == null)
                     {
                         if (minor == null)
-                        {
                             RoundVersion(VersionRoundingType.ClosestCompatible, ref major, ref minor, ref patch);
-                        }
                         else
-                        {
                             RoundVersion(VersionRoundingType.ReasonablyClose, ref major, ref minor, ref patch);
-                        }
 
                         op = ComparatorOp.LessThan;
                         prerelease = "0";
                     }
                 }
 
-                SemVersion version = SemVersion.ParsedFrom(major.Value, minor.Value, patch.Value, prerelease, metadata);
+                var version = SemVersion.ParsedFrom(major.Value, minor.Value, patch.Value, prerelease, metadata);
                 yield return new NpmComparator(op, version, options);
                 yield break;
             }
