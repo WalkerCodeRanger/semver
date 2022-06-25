@@ -65,29 +65,3 @@ Current: 1.1.0-rc.1+nightly.2345
 Prerelease: rc.1
 Next release version is: 1.1.0
 ```
-
-## Range checking (using NPM syntax)
-
-```csharp
-var range = NpmRange.Parse("^1");
-var prRange = NpmRange.Parse("^1", new NpmParseOptions(includePreRelease: true));
-Console.WriteLine($"Range: {range}");
-Console.WriteLine($"Prerelease range: {prRange}");
-Console.WriteLine($"Range includes version: {range.Includes(version)}");
-Console.WriteLine($"Prerelease range includes version: {prRange.Includes(version)}");
-
-// Alternative, but slower since it parses the range on every call
-Console.WriteLine(version.SatisfiesNpm("^1", new NpmParseOptions(includePreRelease: true)));
-
-// Alternative, is just another way to call IRange.Includes(version)
-Console.WriteLine(version.Satisfies(range));
-```
-
-Outputs:
-
-```text
-Range: >=1.0.0 <2.0.0-0
-Prerelease range: >=1.0.0-0 <2.0.0-0
-Range includes version: False
-Prerelease range includes version: True
-```
