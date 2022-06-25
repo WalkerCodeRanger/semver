@@ -8,7 +8,7 @@ namespace Semver.Ranges.Comparers.Npm
     {
         internal static readonly string[] OrSeparator = { "||" };
 
-        public NpmRange ParseRange(string range, NpmParseOptions options)
+        public static NpmRange ParseRange(string range, NpmParseOptions options)
         {
             string[] strComps = range.Split(OrSeparator, StringSplitOptions.None);
 
@@ -25,7 +25,7 @@ namespace Semver.Ranges.Comparers.Npm
 
             var ranges = strComps.Select(strComp =>
             {
-                var compsEnumerable = new ComparatorParser().ParseComparators(strComp.Trim(), options);
+                var compsEnumerable = ComparatorParser.ParseComparators(strComp.Trim(), options);
                 List<NpmComparator> comps = new List<NpmComparator>();
 
                 foreach (NpmComparator comp in compsEnumerable)

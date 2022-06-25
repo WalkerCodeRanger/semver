@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using Semver.Utility;
 
 namespace Semver.Ranges.Comparers.Npm
 {
@@ -205,7 +206,7 @@ namespace Semver.Ranges.Comparers.Npm
 
         public bool Equals(NpmComparator other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
             return
@@ -217,7 +218,7 @@ namespace Semver.Ranges.Comparers.Npm
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
 
             if (obj is NpmComparator comp)
@@ -227,26 +228,6 @@ namespace Semver.Ranges.Comparers.Npm
         }
 
         public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = (int)Operator;
-                hashCode = (hashCode * 397) ^ (Version != null ? Version.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ AnyVersion.GetHashCode();
-                hashCode = (hashCode * 397) ^ options.GetHashCode();
-                return hashCode;
-            }
-        }
-    }
-
-    internal enum ComparatorOp
-    {
-        LessThan,
-        GreaterThan,
-        LessThanOrEqualTo,
-        GreaterThanOrEqualTo,
-        Equals,
-        CompatibleWith,
-        ReasonablyClose
+            => CombinedHashCode.Create(Operator, Version, AnyVersion, options);
     }
 }

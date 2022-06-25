@@ -26,6 +26,16 @@ namespace Semver.Utility
             return new CombinedHashCode(hash);
         }
 
+        public static CombinedHashCode Create<T1, T2, T3, T4>(T1 value1, T2 value2, T3 value3, T4 value4)
+        {
+            var hash = RandomSeed;
+            hash = CombineValue(hash, value1);
+            hash = CombineValue(hash, value2);
+            hash = CombineValue(hash, value3);
+            hash = CombineValue(hash, value4);
+            return new CombinedHashCode(hash);
+        }
+
         public static CombinedHashCode Create<T1, T2, T3, T4, T5>(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5)
         {
             var hash = RandomSeed;

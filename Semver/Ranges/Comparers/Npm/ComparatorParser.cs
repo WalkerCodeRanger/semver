@@ -48,7 +48,7 @@ namespace Semver.Ranges.Comparers.Npm
             }
         }
 
-        public IEnumerable<NpmComparator> ParseComparators(string range, NpmParseOptions options)
+        public static IEnumerable<NpmComparator> ParseComparators(string range, NpmParseOptions options)
         {
             if (range == string.Empty) // Empty ranges imply *
             {
@@ -143,7 +143,7 @@ namespace Semver.Ranges.Comparers.Npm
             }
         }
 
-        private IEnumerable<NpmComparator> ParseOperatorRange(Match match, NpmParseOptions options)
+        private static IEnumerable<NpmComparator> ParseOperatorRange(Match match, NpmParseOptions options)
         {
             string strOperator = match.Groups["operator"].Value;
 

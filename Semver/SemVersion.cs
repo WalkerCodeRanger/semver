@@ -1660,7 +1660,7 @@ namespace Semver
         public static bool operator <=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) < 0;
         #endregion
-        
+
         #region Ranges
         /// <summary>
         /// <para>
@@ -1685,7 +1685,7 @@ namespace Semver
 
             return parsedRange.Contains(this);
         }
-        
+
         /// <summary>
         /// Checks if this version satisfies the specified range.
         /// Uses the same syntax as npm.

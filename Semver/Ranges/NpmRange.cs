@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using Semver.Ranges.Comparers.Npm;
 
@@ -25,7 +23,7 @@ namespace Semver.Ranges
                 Ranges = comparators.ToArray();
 
             if (Ranges.Length == 0)
-                throw new ArgumentException("There must be atleast one comparator in the range");
+                throw new ArgumentException("There must be at least one comparator in the range");
         }
 
         /// <summary>
@@ -41,7 +39,7 @@ namespace Semver.Ranges
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="range">The range to parse.</param>
         /// <param name="options">The options to use when parsing.</param>
@@ -55,7 +53,7 @@ namespace Semver.Ranges
 
             try
             {
-                return new RangeParser().ParseRange(range, options);
+                return RangeParser.ParseRange(range, options);
             }
             catch (RegexMatchTimeoutException ex)
             {
@@ -105,7 +103,7 @@ namespace Semver.Ranges
         public bool Contains(SemVersion version)
         {
             bool anySuccess = false;
-            
+
             foreach (NpmComparator[] comps in Ranges)
             {
                 // All comparators in range must succeed
@@ -141,7 +139,7 @@ namespace Semver.Ranges
                 return cachedStringValue;
 
             cachedStringValue = string.Join($" {RangeParser.OrSeparator[0]} ", Ranges.Select(comps => string.Join(" ", comps.Select(comp => comp.ToString()))));
-            
+
             return cachedStringValue;
         }
     }
