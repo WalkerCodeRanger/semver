@@ -57,7 +57,7 @@ namespace Semver.Ranges.Comparers.Npm
                 yield break;
             }
 
-            Match hyphenMatch = Rgx.HyphenRange.Match(range);
+            Match hyphenMatch = RangeRegex.HyphenRange.Match(range);
             if (hyphenMatch.Success)
             {
                 ParseHyphenRange(hyphenMatch, options, out var minComp, out var maxComp);
@@ -68,9 +68,9 @@ namespace Semver.Ranges.Comparers.Npm
                 yield break;
             }
 
-            if (Rgx.OperatorRangeTest.IsMatch(range))
+            if (RangeRegex.OperatorRangeTest.IsMatch(range))
             {
-                MatchCollection operatorRanges = Rgx.OperatorRange.Matches(range);
+                MatchCollection operatorRanges = RangeRegex.OperatorRange.Matches(range);
                 foreach (Match rangeMatch in operatorRanges)
                 {
                     IEnumerable<NpmComparator> comps = ParseOperatorRange(rangeMatch, options);
@@ -291,7 +291,7 @@ namespace Semver.Ranges.Comparers.Npm
 
         private void ParseVersion(string version, out int? major, out int? minor, out int? patch, out string prerelease, out string metadata)
         {
-            var match = Rgx.PartialVersion.Match(version);
+            var match = RangeRegex.PartialVersion.Match(version);
             ParseVersion(match, out major, out minor, out patch, out prerelease, out metadata);
         }
 

@@ -3,13 +3,13 @@ using System.Text.RegularExpressions;
 
 namespace Semver.Ranges.Comparers.Npm
 {
-    internal static class Rgx
+    internal static class RangeRegex
     {
-        #if COMPILED_REGEX
-        private static readonly RegexOptions CompiledOptions = RegexOptions.Compiled;
-        #else
-        private static readonly RegexOptions CompiledOptions = RegexOptions.None;
-        #endif
+#if COMPILED_REGEX
+        private const RegexOptions CompiledOptions = RegexOptions.Compiled;
+#else
+        private const RegexOptions CompiledOptions = RegexOptions.None;
+#endif
 
         private static readonly TimeSpan MatchTimeout = TimeSpan.FromSeconds(1);
 
