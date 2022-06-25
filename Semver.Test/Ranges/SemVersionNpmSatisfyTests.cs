@@ -1,10 +1,9 @@
 using Semver.Ranges;
-using Semver.Ranges.Comparers.Npm;
-using Semver.Test.NpmSatisfyTestData;
+using Semver.Test.Ranges.NpmSatisfyTestData;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Semver.Test
+namespace Semver.Test.Ranges
 {
     public class SemVersionNpmSatisfyTests
     {
@@ -37,7 +36,7 @@ namespace Semver.Test
         {
             if (options == null)
                 options = NpmParseOptions.Default;
-            
+
             Assert.True(NpmRange.TryParse(range, options, out var parsedRange), "Failed to parse range");
             Assert.True(parsedRange.Contains(SemVersion.Parse(version, SemVersionStyles.Strict)), $"{parsedRange} does not include {version}");
             testOutput.WriteLine($"{parsedRange} includes {version}");

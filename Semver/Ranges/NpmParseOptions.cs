@@ -1,4 +1,5 @@
 using System;
+using Semver.Utility;
 
 namespace Semver.Ranges
 {
@@ -56,9 +57,6 @@ namespace Semver.Ranges
             return false;
         }
 
-        public override int GetHashCode()
-        {
-            return IncludePreRelease.GetHashCode();
-        }
+        public override int GetHashCode() => CombinedHashCode.Create(IncludePreRelease);
     }
 }
