@@ -25,7 +25,7 @@ namespace Semver.Ranges.Comparers.Npm
             { ">=", ComparatorOp.GreaterThanOrEqualTo },
             { "^", ComparatorOp.CompatibleWith },
             { "~", ComparatorOp.ReasonablyClose },
-            { "~>", ComparatorOp.ReasonablyClose },
+            { "~>", ComparatorOp.ReasonablyClose }, // TODO should the `~>` synonym for `~` be supported?
             { "", ComparatorOp.Equals }, // Equals is implied when there's no operator prefix and all numbers are defined
             { "=", ComparatorOp.Equals },
         };

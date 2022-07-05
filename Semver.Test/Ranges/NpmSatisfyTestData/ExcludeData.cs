@@ -60,6 +60,7 @@ namespace Semver.Test.Ranges.NpmSatisfyTestData
             yield return new object[] { "~0.0.1", "0.1.0" };
             yield return new object[] { "~2.4", "2.5.0" }; // >=2.4.0 <2.5.0-0
             yield return new object[] { "~2.4", "2.3.9" };
+            // TODO should the `~>` synonym for `~` be supported?
             yield return new object[] { "~>3.2.1", "3.3.2" }; // >=3.2.1 <3.3.0-0
             yield return new object[] { "~>3.2.1", "3.2.0" }; // >=3.2.1 <3.3.0-0
             yield return new object[] { "~1", "0.2.3" }; // >=1.0.0 <2.0.0-0
