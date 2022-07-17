@@ -5,6 +5,7 @@ namespace Semver.Ranges
     internal class SemVersionRange
     {
         internal static readonly SemVersion MinVersion = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
+        internal static readonly SemVersion MinReleaseVersion = new SemVersion(0, 0, 0);
         internal static readonly SemVersion MaxVersion = new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue);
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace Semver.Ranges
                    || End.IsPrerelease && version.MajorMinorPatchEquals(End);
         }
 
-        // TODO this isn't quite intersect
+        // TODO Test. Is this correct? Should it be included?
         public SemVersionRange Intersect(SemVersionRange range)
         {
             var includeAllPrerelease = IncludeAllPrerelease && range.IncludeAllPrerelease;
@@ -116,6 +117,17 @@ namespace Semver.Ranges
             var comparison = SemVersion.ComparePrecedence(start.Version, end.Version);
             if (comparison > 0) return true;
             if (comparison == 0) return !(start.Inclusive && end.Inclusive);
+
+            // else start < end
+
+            if (start.Version is null)
+            {
+                if (end.Inclusive) return false;
+                // A range like "<0.0.0" is empty if prerelease isn't allowed and
+                // "<0.0.0-0" is empty even it if isn't
+                return end.Version == MinVersion
+                       || (!includeAllPrerelease && end.Version == MinReleaseVersion);
+            }
 
             // A range like ">1.0.0 <1.0.1" is still empty if prerelease isn't allowed.
             // If prerelease is allowed, there is always an infinite number of versions in the range
