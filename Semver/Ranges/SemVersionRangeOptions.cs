@@ -2,6 +2,7 @@
 
 namespace Semver.Ranges
 {
+    // TODO make these match SemVersionStyles values?
     [Flags]
     internal enum SemVersionRangeOptions
     {
