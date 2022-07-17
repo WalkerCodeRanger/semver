@@ -1293,6 +1293,17 @@ namespace Semver
         public static bool PrecedenceEquals(SemVersion left, SemVersion right)
             => PrecedenceComparer.Compare(left, right) == 0;
 
+        internal bool MajorMinorPatchEquals(SemVersion other)
+        {
+            if (other is null) return false;
+
+            if (ReferenceEquals(this, other)) return true;
+
+            return Major == other.Major
+                   && Minor == other.Minor
+                   && Patch == other.Patch;
+        }
+
         /// <summary>
         /// Determines whether two semantic versions have the same precedence. Versions
         /// that differ only by build metadata have the same precedence.
@@ -1673,13 +1684,13 @@ namespace Semver
         /// </para>
         /// </summary>
         /// <param name="range">The range to compare with. If the syntax is invalid the method will always return false.</param>
-        /// <param name="options">The options to use when parsing the range.</param>
+        /// <param name="includeAllPrerelease"></param>
         /// <returns>True if the version satisfies the range.</returns>
         /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
-        public bool SatisfiesNpm(string range, NpmParseOptions options = default)
+        public bool SatisfiesNpm(string range, bool includeAllPrerelease = false)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
-            if (!NpmRange.TryParse(range, options, out var parsedRange))
+            if (!NpmRange.TryParse(range, includeAllPrerelease, out var parsedRange))
                 return false;
 
             return parsedRange.Contains(this);
@@ -1692,7 +1703,7 @@ namespace Semver
         /// <param name="range">The range to compare with.</param>
         /// <returns>True if the version satisfies the range.</returns>
         /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
-        public bool Satisfies(ISemVersionRange range)
+        public bool Satisfies(SemVersionRangeSet range)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
             return range.Contains(this);

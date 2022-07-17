@@ -10,7 +10,7 @@ namespace Semver.Ranges
     /// A range of versions that can be checked against to see if a <see cref="SemVersion"/> is included.
     /// Uses the same syntax as npm.
     /// </summary>
-    public class NpmRange : ISemVersionRange
+    internal class NpmRange : SemVersionRangeSet
     {
         internal readonly NpmComparator[][] Ranges;
         private string cachedStringValue;
@@ -33,24 +33,23 @@ namespace Semver.Ranges
         /// <returns>The parsed range</returns>
         /// <exception cref="ArgumentNullException">Thrown when range is null.</exception>
         /// <exception cref="FormatException">Thrown when the range has invalid syntax or if regex match timed out.</exception>
-        public static NpmRange Parse(string range) => Parse(range, NpmParseOptions.Default);
+        public static NpmRange Parse(string range) => Parse(range, false);
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="range">The range to parse.</param>
-        /// <param name="options">The options to use when parsing.</param>
+        /// <param name="includeAllPrerelease"></param>
         /// <returns>The parsed range.</returns>
         /// <exception cref="ArgumentNullException">Thrown when range or options is null.</exception>
         /// <exception cref="FormatException">Thrown when the range has invalid syntax or if regex match timed out.</exception>
-        public static NpmRange Parse(string range, NpmParseOptions options)
+        public static NpmRange Parse(string range, bool includeAllPrerelease)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
-            if (options == null) throw new ArgumentNullException(nameof(options));
 
             try
             {
-                return RangeParser.ParseRange(range, options);
+                return RangeParser.ParseRange(range, includeAllPrerelease);
             }
             catch (RegexMatchTimeoutException ex)
             {
@@ -68,25 +67,24 @@ namespace Semver.Ranges
         public static bool TryParse(string strRange, out NpmRange range)
         {
             if (strRange == null) throw new ArgumentNullException(nameof(strRange));
-            return TryParse(strRange, NpmParseOptions.Default, out range);
+            return TryParse(strRange, false, out range);
         }
 
         /// <summary>
         /// Tries to parse the range with the given options and returns true if successful.
         /// </summary>
         /// <param name="strRange">The range to parse.</param>
-        /// <param name="options">The options to use when parsing.</param>
+        /// <param name="includeAllPrerelease"></param>
         /// <param name="range">The parsed range.</param>
         /// <returns>Returns true if the range was parsed successfully.</returns>
         /// <exception cref="ArgumentNullException">Thrown if strRange or options is null.</exception>
-        public static bool TryParse(string strRange, NpmParseOptions options, out NpmRange range)
+        public static bool TryParse(string strRange, bool includeAllPrerelease, out NpmRange range)
         {
             if (strRange == null) throw new ArgumentNullException(nameof(strRange));
-            if (options == null) throw new ArgumentNullException(nameof(options));
 
             try
             {
-                range = Parse(strRange, options);
+                range = Parse(strRange, includeAllPrerelease);
                 return true;
             }
             catch (FormatException)
@@ -97,7 +95,7 @@ namespace Semver.Ranges
         }
 
         /// <inheritdoc />
-        public bool Contains(SemVersion version)
+        public override bool Contains(SemVersion version)
         {
             bool anySuccess = false;
 
