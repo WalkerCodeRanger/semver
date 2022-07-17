@@ -74,7 +74,7 @@ namespace Semver.Ranges.Comparers.Npm
             }
 
             if (AnyVersion)
-                return true;
+                return !version.IsPrerelease || includeAllPrerelease;
 
             int comparison = Compare(version);
             bool result;
