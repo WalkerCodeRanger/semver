@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Semver.Ranges
@@ -23,6 +24,8 @@ namespace Semver.Ranges
 #if DEBUG
             if (version is null && inclusive)
                 throw new ArgumentException("Cannot be inclusive of start without start value.", nameof(inclusive));
+            if (version?.MetadataIdentifiers.Any() ?? false)
+                throw new ArgumentException("Cannot have metadata", nameof(version));
 #endif
             Version = version;
             Inclusive = inclusive;
@@ -45,11 +48,6 @@ namespace Semver.Ranges
                 // If the versions are equal, then non-inclusive will be max
                 return new LeftBoundedRange(Version, Inclusive && other.Inclusive);
             return this;
-        }
-
-        public bool Overlaps(RightBoundedRange end)
-        {
-            throw new NotImplementedException();
         }
     }
 }

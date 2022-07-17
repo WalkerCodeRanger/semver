@@ -55,7 +55,7 @@ namespace Semver.Ranges
             var start = new LeftBoundedRange(startVersion, startInclusive);
             var end = new RightBoundedRange(endVersion, endInclusive);
             // Always return the same empty range
-            if (!start.Overlaps(end)) return Empty;
+            if (IsEmpty(start, end, includeAllPrerelease)) return Empty;
             return new SemVersionRange(start, end, includeAllPrerelease);
         }
 
@@ -94,8 +94,28 @@ namespace Semver.Ranges
             var includeAllPrerelease = IncludeAllPrerelease && range.IncludeAllPrerelease;
             var newStart = start.Max(range.start);
             var newEnd = end.Min(range.end);
-            if (!start.Overlaps(end)) return Empty;
+            // Always return the same empty range
+            if (IsEmpty(newStart, newEnd, includeAllPrerelease)) return Empty;
             return new SemVersionRange(newStart, newEnd, includeAllPrerelease);
+        }
+
+        private static bool IsEmpty(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)
+        {
+            var comparison = SemVersion.ComparePrecedence(start.Version, end.Version);
+            if (comparison > 0) return true;
+            if (comparison == 0) return !(start.Inclusive && end.Inclusive);
+
+            // A range like ">1.0.0 <1.0.1" is still empty if prerelease isn't allowed.
+            // If prerelease is allowed, there is always an infinite number of versions in the range
+            // (e.g. ">1.0.0-0 <1.0.1-0" contains "1.0.0-0.between").
+            if (start.Inclusive || end.Inclusive
+                || includeAllPrerelease || start.Version.IsPrerelease || end.Version.IsPrerelease)
+                return false;
+
+            return start.Version.Major == end.Version.Major
+                   && start.Version.Minor == end.Version.Minor
+                   // Subtract instead of add to avoid overflow
+                   && start.Version.Patch == end.Version.Patch - 1;
         }
     }
 }

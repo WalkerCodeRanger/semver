@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Semver.Ranges
@@ -20,6 +21,8 @@ namespace Semver.Ranges
         {
 #if DEBUG
             if (version is null) throw new ArgumentNullException(nameof(version));
+            if (version.MetadataIdentifiers.Any())
+                throw new ArgumentException("Cannot have metadata", nameof(version));
 #endif
             Version = version;
             Inclusive = inclusive;
