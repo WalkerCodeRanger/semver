@@ -1,8 +1,7 @@
 using Semver.Ranges.Npm;
-using Semver.Test.Ranges.NpmSatisfyTestData;
 using Xunit;
 
-namespace Semver.Test.Ranges
+namespace Semver.Test.Ranges.NpmSatisfyTestData
 {
     public class SemVersionNpmSatisfyTests
     {
