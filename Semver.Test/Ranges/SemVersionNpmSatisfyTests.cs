@@ -1,4 +1,4 @@
-using Semver.Ranges;
+using Semver.Ranges.Npm;
 using Semver.Test.Ranges.NpmSatisfyTestData;
 using Xunit;
 

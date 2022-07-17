@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Semver.Ranges.Comparers.Npm
+namespace Semver.Ranges.Npm
 {
     internal class RangeParser
     {

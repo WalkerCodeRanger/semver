@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Semver.Benchmarks.Builders;
-using Semver.Ranges;
+using Semver.Ranges.Npm;
 using Semver.Utility;
 
 namespace Semver.Benchmarks.RangeBenchmarks.Npm

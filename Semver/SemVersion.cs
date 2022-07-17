@@ -10,6 +10,7 @@ using System.Security.Permissions;
 using System.Text.RegularExpressions;
 using Semver.Comparers;
 using Semver.Ranges;
+using Semver.Ranges.Npm;
 using Semver.Utility;
 
 namespace Semver

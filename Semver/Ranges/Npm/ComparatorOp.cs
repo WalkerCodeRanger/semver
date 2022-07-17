@@ -1,4 +1,4 @@
-namespace Semver.Ranges.Comparers.Npm
+namespace Semver.Ranges.Npm
 {
     internal enum ComparatorOp
     {

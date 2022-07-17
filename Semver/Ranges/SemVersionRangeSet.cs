@@ -1,3 +1,5 @@
+using Semver.Ranges.Npm;
+
 namespace Semver.Ranges
 {
     /// <summary>

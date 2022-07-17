@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Semver.Ranges.Comparers.Npm
+namespace Semver.Ranges.Npm
 {
     internal class ComparatorParser
     {

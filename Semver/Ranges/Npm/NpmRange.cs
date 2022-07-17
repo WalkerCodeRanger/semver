@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Semver.Ranges.Comparers.Npm;
 
-namespace Semver.Ranges
+namespace Semver.Ranges.Npm
 {
     /// <summary>
     /// A range of versions that can be checked against to see if a <see cref="SemVersion"/> is included.

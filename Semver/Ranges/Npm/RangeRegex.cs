@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace Semver.Ranges.Comparers.Npm
+namespace Semver.Ranges.Npm
 {
     internal static class RangeRegex
     {

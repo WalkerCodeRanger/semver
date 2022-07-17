@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using Semver.Utility;
 
-namespace Semver.Ranges.Comparers.Npm
+namespace Semver.Ranges.Npm
 {
     internal class NpmComparator : IEquatable<NpmComparator>
     {
