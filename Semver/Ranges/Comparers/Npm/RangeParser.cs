@@ -8,7 +8,7 @@ namespace Semver.Ranges.Comparers.Npm
     {
         internal static readonly string[] OrSeparator = { "||" };
 
-        public static NpmRange ParseRange(string range, NpmParseOptions options)
+        public static NpmRange ParseRange(string range, bool includeAllPrerelease)
         {
             string[] strComps = range.Split(OrSeparator, StringSplitOptions.None);
 
@@ -18,14 +18,14 @@ namespace Semver.Ranges.Comparers.Npm
                 {
                     new[]
                     {
-                        new NpmComparator(options)
+                        new NpmComparator(includeAllPrerelease)
                     }
                 });
             }
 
             var ranges = strComps.Select(strComp =>
             {
-                var compsEnumerable = ComparatorParser.ParseComparators(strComp.Trim(), options);
+                var compsEnumerable = ComparatorParser.ParseComparators(strComp.Trim(), includeAllPrerelease);
                 List<NpmComparator> comps = new List<NpmComparator>();
 
                 foreach (NpmComparator comp in compsEnumerable)

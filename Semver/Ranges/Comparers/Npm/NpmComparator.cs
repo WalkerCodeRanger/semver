@@ -10,28 +10,27 @@ namespace Semver.Ranges.Comparers.Npm
         public readonly SemVersion Version;
         public readonly bool AnyVersion;
 
-        private readonly NpmParseOptions options;
-
+        private readonly bool includeAllPrerelease;
         private NpmComparator[] comparators; // The other comparators in the same AND range
         private string cachedStringValue;
 
-        public NpmComparator(ComparatorOp @operator, SemVersion version, NpmParseOptions options)
+        public NpmComparator(ComparatorOp @operator, SemVersion version, bool includeAllPrerelease)
         {
             if (@operator == ComparatorOp.ReasonablyClose || @operator == ComparatorOp.CompatibleWith)
                 throw new ArgumentException("Invalid operator (ReasonablyClose and CompatibleWith are invalid uses in this context)");
 
             Operator = @operator;
             Version = version;
-            this.options = options;
+            this.includeAllPrerelease = includeAllPrerelease;
         }
 
         /// <summary>
         /// Any version will match when using this constructor
         /// </summary>
-        public NpmComparator(NpmParseOptions options)
+        public NpmComparator(bool includeAllPrerelease)
         {
             AnyVersion = true;
-            this.options = options;
+            this.includeAllPrerelease = includeAllPrerelease;
         }
 
         internal void SetRangeComparators(NpmComparator[] comparators)
@@ -47,7 +46,7 @@ namespace Semver.Ranges.Comparers.Npm
             // c) another comparator in range is prerelease and matches main version
             if (!AnyVersion)
             {
-                if (version.IsPrerelease && !options.IncludePreRelease)
+                if (version.IsPrerelease && !includeAllPrerelease)
                 {
                     if (!Version.IsPrerelease || !MainVersionEquals(version))
                     {
@@ -119,7 +118,7 @@ namespace Semver.Ranges.Comparers.Npm
             if (comparison != 0) return comparison;
 
             if ((version.IsPrerelease && Version.IsPrerelease)
-                || (version.IsPrerelease && options.IncludePreRelease))
+                || (version.IsPrerelease && includeAllPrerelease))
                 comparison = Math.Sign(ComparePreRelease(version));
 
             return comparison;
@@ -150,7 +149,7 @@ namespace Semver.Ranges.Comparers.Npm
         private bool MainVersionEquals(SemVersion version)
         {
             // Not equal if this comparator is * and version is prerelease but options does not include pre-releases
-            if (AnyVersion && version.IsPrerelease && !options.IncludePreRelease)
+            if (AnyVersion && version.IsPrerelease && !includeAllPrerelease)
                 return false;
 
             if (AnyVersion)
@@ -191,11 +190,10 @@ namespace Semver.Ranges.Comparers.Npm
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return
-                Operator == other.Operator &&
-                AnyVersion == other.AnyVersion &&
-                options.Equals(other.options) &&
-                (Version == null && other.Version == null || other.Version != null && Version != null && Version.Equals(other.Version));
+            return Operator == other.Operator
+                && AnyVersion == other.AnyVersion
+                && includeAllPrerelease == other.includeAllPrerelease
+                && (Version == null && other.Version == null || other.Version != null && Version != null && Version.Equals(other.Version));
         }
 
         public override bool Equals(object obj)
@@ -210,6 +208,6 @@ namespace Semver.Ranges.Comparers.Npm
         }
 
         public override int GetHashCode()
-            => CombinedHashCode.Create(Operator, Version, AnyVersion, options);
+            => CombinedHashCode.Create(Operator, Version, AnyVersion, includeAllPrerelease);
     }
 }

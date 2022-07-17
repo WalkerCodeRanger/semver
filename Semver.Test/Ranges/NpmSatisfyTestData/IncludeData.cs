@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Semver.Ranges;
 
 namespace Semver.Test.Ranges.NpmSatisfyTestData
 {
@@ -8,22 +7,20 @@ namespace Semver.Test.Ranges.NpmSatisfyTestData
     /// All values should be parseable ranges and versions
     /// First argument is a range
     /// Second argument is a fully qualified version
-    /// Third argument is optional, and is <see cref="NpmParseOptions"/>
+    /// Third argument is optional, and is <see cref="NpmRangeOptions"/>
     /// Versions should be included by the range
     /// </summary>
     public class IncludeData : IEnumerable<object[]>
     {
         public IEnumerator<object[]> GetEnumerator()
         {
-            var prOptions = new NpmParseOptions(includePreRelease: true);
-
             yield return new object[] { "1.0.0 - 2.0.0", "1.2.3" };
             yield return new object[] { "1.0.0 - 2.0.0", "1.2.3" };
             yield return new object[] { "^1.2.3+build", "1.2.3" };
             yield return new object[] { "^1.2.3+build", "1.3.0" };
             yield return new object[] { "1.2.3-pre+asdf - 2.4.3-pre+asdf", "1.2.3" };
-            yield return new object[] { "1.2.3-pre+asdf - 2.4.3-pre+asdf", "1.2.3-pre.2", prOptions };
-            yield return new object[] { "1.2.3-pre+asdf - 2.4.3-pre+asdf", "2.4.3-alpha", prOptions };
+            yield return new object[] { "1.2.3-pre+asdf - 2.4.3-pre+asdf", "1.2.3-pre.2", true };
+            yield return new object[] { "1.2.3-pre+asdf - 2.4.3-pre+asdf", "2.4.3-alpha", true };
             yield return new object[] { "1.2.3+asdf - 2.4.3+asdf", "1.2.3" };
             yield return new object[] { "1.0.0", "1.0.0" };
             yield return new object[] { ">=*", "0.2.4" };
@@ -116,22 +113,22 @@ namespace Semver.Test.Ranges.NpmSatisfyTestData
             yield return new object[] { "1.0.0 - x", "1.9.7" };
             yield return new object[] { "1.x - x", "1.9.7" };
             yield return new object[] { "<=7.x", "7.9.9" };
-            yield return new object[] { "2.x", "2.0.0-pre.0", prOptions };
-            yield return new object[] { "2.x", "2.1.0-pre.0", prOptions };
-            yield return new object[] { "1.1.x", "1.1.0-a", prOptions };
-            yield return new object[] { "1.1.x", "1.1.1-a", prOptions };
-            yield return new object[] { "*", "1.0.0-rc1", prOptions };
-            yield return new object[] { "^1.0.0-0", "1.0.1-rc1", prOptions };
-            yield return new object[] { "^1.0.0-rc2", "1.0.1-rc1", prOptions };
-            yield return new object[] { "^1.0.0", "1.0.1-rc1", prOptions };
-            yield return new object[] { "^1.0.0", "1.1.0-rc1", prOptions };
-            yield return new object[] { "1 - 2", "2.0.0-pre", prOptions };
-            yield return new object[] { "1 - 2", "1.0.0-pre", prOptions };
-            yield return new object[] { "1.0 - 2", "1.0.0-pre", prOptions };
-            yield return new object[] { "=0.7.x", "0.7.0-asdf", prOptions };
-            yield return new object[] { ">=0.7.x", "0.7.0-asdf", prOptions };
-            yield return new object[] { "<=0.7.x", "0.7.0-asdf", prOptions };
-            yield return new object[] { ">=1.0.0 <=1.1.0", "1.1.0-pre", prOptions };
+            yield return new object[] { "2.x", "2.0.0-pre.0", true };
+            yield return new object[] { "2.x", "2.1.0-pre.0", true };
+            yield return new object[] { "1.1.x", "1.1.0-a", true };
+            yield return new object[] { "1.1.x", "1.1.1-a", true };
+            yield return new object[] { "*", "1.0.0-rc1", true };
+            yield return new object[] { "^1.0.0-0", "1.0.1-rc1", true };
+            yield return new object[] { "^1.0.0-rc2", "1.0.1-rc1", true };
+            yield return new object[] { "^1.0.0", "1.0.1-rc1", true };
+            yield return new object[] { "^1.0.0", "1.1.0-rc1", true };
+            yield return new object[] { "1 - 2", "2.0.0-pre", true };
+            yield return new object[] { "1 - 2", "1.0.0-pre", true };
+            yield return new object[] { "1.0 - 2", "1.0.0-pre", true };
+            yield return new object[] { "=0.7.x", "0.7.0-asdf", true };
+            yield return new object[] { ">=0.7.x", "0.7.0-asdf", true };
+            yield return new object[] { "<=0.7.x", "0.7.0-asdf", true };
+            yield return new object[] { ">=1.0.0 <=1.1.0", "1.1.0-pre", true };
         }
 
         IEnumerator IEnumerable.GetEnumerator()

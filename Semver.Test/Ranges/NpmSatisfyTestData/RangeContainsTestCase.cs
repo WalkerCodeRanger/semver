@@ -5,11 +5,11 @@ namespace Semver.Test.Ranges.NpmSatisfyTestData
     /// <summary>
     /// An individual test case for a range test
     /// </summary>
-    public class RangeContainsTestCase
+    internal class RangeContainsTestCase
     {
-        public RangeContainsTestCase(string range, string version, NpmParseOptions options = null)
+        public RangeContainsTestCase(string range, string version, bool includeAllPrerelease = false)
         {
-            Range = NpmRange.Parse(range, options ?? NpmParseOptions.Default);
+            Range = NpmRange.Parse(range, includeAllPrerelease);
             Version = SemVersion.Parse(version, SemVersionStyles.Strict);
         }
 

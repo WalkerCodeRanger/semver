@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Semver.Ranges;
 
 namespace Semver.Test.Ranges.NpmSatisfyTestData
 {
@@ -8,37 +7,35 @@ namespace Semver.Test.Ranges.NpmSatisfyTestData
     {
         public IEnumerator<object[]> GetEnumerator()
         {
-            var prOptions = new NpmParseOptions(includePreRelease: true);
-
             yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0 <=2.0.0" };
-            yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0-0 <2.0.1-0", prOptions };
+            yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0-0 <2.0.1-0", true };
             yield return new object[] { "1.x.5 - 2.x.5", ">=1.0.0 <3.0.0-0" };
-            yield return new object[] { "1.x.5 - 2.x.5", ">=1.0.0-0 <3.0.0-0", prOptions };
+            yield return new object[] { "1.x.5 - 2.x.5", ">=1.0.0-0 <3.0.0-0", true };
             yield return new object[] { "1 - 2", ">=1.0.0 <3.0.0-0" };
-            yield return new object[] { "1 - 2", ">=1.0.0-0 <3.0.0-0", prOptions };
+            yield return new object[] { "1 - 2", ">=1.0.0-0 <3.0.0-0", true };
             yield return new object[] { "1.0 - 2.0", ">=1.0.0 <2.1.0-0" };
-            yield return new object[] { "1.0 - 2.0", ">=1.0.0-0 <2.1.0-0", prOptions };
+            yield return new object[] { "1.0 - 2.0", ">=1.0.0-0 <2.1.0-0", true };
             yield return new object[] { "1.0.0", "1.0.0" };
             yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0 <=2.0.0" };
-            yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0-0 <2.0.1-0", prOptions };
+            yield return new object[] { "1.0.0 - 2.0.0", ">=1.0.0-0 <2.0.1-0", true };
             yield return new object[] { "2.0.0 - 1.0.0", ">=2.0.0 <=1.0.0" };
-            yield return new object[] { "2.0.0 - 1.0.0", ">=2.0.0-0 <1.0.1-0", prOptions };
+            yield return new object[] { "2.0.0 - 1.0.0", ">=2.0.0-0 <1.0.1-0", true };
             yield return new object[] { "2.0 - 1.0", ">=2.0.0 <1.1.0-0" };
-            yield return new object[] { "2.0 - 1.0", ">=2.0.0-0 <1.1.0-0", prOptions };
+            yield return new object[] { "2.0 - 1.0", ">=2.0.0-0 <1.1.0-0", true };
             yield return new object[] { "2.x.5", ">=2.0.0 <3.0.0-0" };
-            yield return new object[] { "2.x.5", ">=2.0.0-0 <3.0.0-0", prOptions };
+            yield return new object[] { "2.x.5", ">=2.0.0-0 <3.0.0-0", true };
             yield return new object[] { "^2.x.5", ">=2.0.0 <3.0.0-0" };
             yield return new object[] { "~2.x.5", ">=2.0.0 <3.0.0-0" };
-            yield return new object[] { "~2.x.5", ">=2.0.0 <3.0.0-0", prOptions };
+            yield return new object[] { "~2.x.5", ">=2.0.0 <3.0.0-0", true };
             yield return new object[] { "2 - 1", ">=2.0.0 <2.0.0-0" };
-            yield return new object[] { "2 - 1", ">=2.0.0-0 <2.0.0-0", prOptions };
+            yield return new object[] { "2 - 1", ">=2.0.0-0 <2.0.0-0", true };
             yield return new object[] { ">=*", "*" };
             yield return new object[] { "", "*" };
             yield return new object[] { "*", "*" };
             yield return new object[] { "*", "*" };
             yield return new object[] { ">=1.0.0", ">=1.0.0" };
-            yield return new object[] { ">=1.0.0", ">=1.0.0", prOptions };
-            yield return new object[] { ">1.0.0", ">1.0.0", prOptions };
+            yield return new object[] { ">=1.0.0", ">=1.0.0", true };
+            yield return new object[] { ">1.0.0", ">1.0.0", true };
             yield return new object[] { ">1.0.0", ">1.0.0" };
             yield return new object[] { "<=2.0.0", "<=2.0.0" };
             yield return new object[] { "<=2", "<3.0.0-0" };
@@ -113,9 +110,9 @@ namespace Semver.Test.Ranges.NpmSatisfyTestData
             yield return new object[] { "<x <* || >* 2.x", "<0.0.0-0" };
             yield return new object[] { ">x 2.x || * || <x", "*" };
             yield return new object[] { ">=09090", ">=9090.0.0" };
-            yield return new object[] { ">=09090", ">=9090.0.0-0", prOptions };
+            yield return new object[] { ">=09090", ">=9090.0.0-0", true };
             yield return new object[] { ">09090", ">=9091.0.0" };
-            yield return new object[] { ">09090", ">=9091.0.0-0", prOptions };
+            yield return new object[] { ">09090", ">=9091.0.0-0", true };
             yield return new object[] { "v1.0.0", "1.0.0" };
             yield return new object[] { "vx", "*" };
             yield return new object[] { "v*", "*" };

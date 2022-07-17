@@ -25,12 +25,8 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
         [Arguments(true)]
         public void Parse(bool prerelease)
         {
-            var options = new NpmParseOptions(includePreRelease: prerelease);
-
-            for (int i = 0; i < ranges.Count; ++i)
-            {
-                NpmRange.Parse(ranges[i], options);
-            }
+            foreach (var range in ranges)
+                NpmRange.Parse(range, prerelease);
         }
     }
 }

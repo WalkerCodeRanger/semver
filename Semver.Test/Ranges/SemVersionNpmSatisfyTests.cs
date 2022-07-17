@@ -16,12 +16,9 @@ namespace Semver.Test.Ranges
 
         [Theory]
         [ClassData(typeof(ParseData))]
-        public void ParseTests(string strRange, string expectedRange, NpmParseOptions options = null)
+        public void ParseTests(string strRange, string expectedRange, bool includeAllPrerelease = false)
         {
-            if (options == null)
-                options = NpmParseOptions.Default;
-
-            NpmRange.TryParse(strRange, options, out NpmRange range);
+            NpmRange.TryParse(strRange, includeAllPrerelease, out NpmRange range);
             string result = range?.ToString();
 
             Assert.Equal(expectedRange, result);
@@ -32,12 +29,9 @@ namespace Semver.Test.Ranges
         /// </summary>
         [Theory]
         [ClassData(typeof(IncludeData))]
-        public void AllIncludes(string range, string version, NpmParseOptions options = null)
+        public void AllIncludes(string range, string version, bool includeAllPrerelease = false)
         {
-            if (options == null)
-                options = NpmParseOptions.Default;
-
-            Assert.True(NpmRange.TryParse(range, options, out var parsedRange), "Failed to parse range");
+            Assert.True(NpmRange.TryParse(range, includeAllPrerelease, out var parsedRange), "Failed to parse range");
             Assert.True(parsedRange.Contains(SemVersion.Parse(version, SemVersionStyles.Strict)), $"{parsedRange} does not include {version}");
             testOutput.WriteLine($"{parsedRange} includes {version}");
         }
@@ -47,12 +41,9 @@ namespace Semver.Test.Ranges
         /// </summary>
         [Theory]
         [ClassData(typeof(ExcludeData))]
-        public void AllExcludes(string range, string version, NpmParseOptions options = null)
+        public void AllExcludes(string range, string version, bool includeAllPrerelease = false)
         {
-            if (options == null)
-                options = NpmParseOptions.Default;
-
-            Assert.True(NpmRange.TryParse(range, options, out var parsedRange), "Failed to parse range");
+            Assert.True(NpmRange.TryParse(range, includeAllPrerelease, out var parsedRange), "Failed to parse range");
             Assert.False(parsedRange.Contains(SemVersion.Parse(version, SemVersionStyles.Strict)), $"{parsedRange} includes {version}");
             testOutput.WriteLine($"{parsedRange} excludes {version}");
         }
