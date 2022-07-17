@@ -5,12 +5,12 @@ namespace Semver.Test.Ranges.Npm
 {
 
     /// <summary>
-    /// Test cases taken directly from the NPM project for versions ranges.
+    /// Test cases taken directly from the npm project for versions ranges.
     /// </summary>
     public class NodeSemverTests
     {
         /// <summary>
-        /// NPM version range includes cases from https://github.com/npm/node-semver/blob/main/test/fixtures/range-include.js
+        /// npm version range includes cases from https://github.com/npm/node-semver/blob/main/test/fixtures/range-include.js
         /// </summary>
         /// <remarks>The loose option is not supported, so loose test cases have been removed if
         /// they otherwise duplicate other test cases or modified to not require the loose option.</remarks>
@@ -139,7 +139,7 @@ namespace Semver.Test.Ranges.Npm
             };
 
         /// <summary>
-        /// NPM version range excludes cases from https://github.com/npm/node-semver/blob/main/test/fixtures/range-exclude.js
+        /// npm version range excludes cases from https://github.com/npm/node-semver/blob/main/test/fixtures/range-exclude.js
         /// </summary>
         /// <remarks>The loose option is not supported, so loose test cases have been removed if
         /// they otherwise duplicate other test cases or modified to not require the loose option.</remarks>

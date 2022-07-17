@@ -11,6 +11,7 @@ namespace Semver.Ranges
         //AllowLowerV = 1 << 2,
         //AllowUpperV = 1 << 3,
         //AllowV = AllowLowerV | AllowUpperV,
-        //Loose = AllowLeadingZeros | AllowV,
+        //AllowMetadata = 1 << 4,
+        //Loose = AllowLeadingZeros | AllowV | AllowMetadata,
     }
 }
