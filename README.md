@@ -69,17 +69,17 @@ Next release version is: 1.1.0
 ## Range checking (using NPM syntax)
 
 ```csharp
-var range = NpmRange.Parse("^1");
-var prRange = NpmRange.Parse("^1", new NpmParseOptions(includePreRelease: true));
+var range = SemVersionRangeSet.ParseNpm("^1");
+var prereleaseRange = SemVersionRangeSet.ParseNpm("^1", includeAllPrerelease: true);
 Console.WriteLine($"Range: {range}");
-Console.WriteLine($"Prerelease range: {prRange}");
-Console.WriteLine($"Range includes version: {range.Includes(version)}");
-Console.WriteLine($"Prerelease range includes version: {prRange.Includes(version)}");
+Console.WriteLine($"Prerelease range: {prereleaseRange}");
+Console.WriteLine($"Range includes version: {range.Contains(version)}");
+Console.WriteLine($"Prerelease range includes version: {prereleaseRange.Contains(version)}");
 
 // Alternative, but slower since it parses the range on every call
-Console.WriteLine(version.SatisfiesNpm("^1", new NpmParseOptions(includePreRelease: true)));
+Console.WriteLine(version.SatisfiesNpm("^1", includeAllPrerelease: true));
 
-// Alternative, is just another way to call IRange.Includes(version)
+// Alternative, is just another way to call SemVersionRangeSet.Contains(version)
 Console.WriteLine(version.Satisfies(range));
 ```
 
