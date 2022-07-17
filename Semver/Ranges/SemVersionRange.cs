@@ -7,8 +7,20 @@ namespace Semver.Ranges
         internal static readonly SemVersion MinVersion = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
         internal static readonly SemVersion MaxVersion = new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue);
 
+        /// <summary>
+        /// A standard representation for the empty range that contains no versions.
+        /// </summary>
+        /// <remarks><para>There are an infinite number of ways to represent the empty range. Any range
+        /// where the start is greater than the end or where start equals end but one is not
+        /// inclusive would be empty.
+        /// See https://en.wikipedia.org/wiki/Interval_(mathematics)#Classification_of_intervals</para>
+        ///
+        /// <para>Since all <see cref="SemVersionRange"/> objects have a <see cref="Start"/> and
+        /// <see cref="End"/>, the only unique empty version is the one whose start is the max
+        /// version and end is the min version</para>
+        /// </remarks>
         public static readonly SemVersionRange Empty
-            = new SemVersionRange(LeftBoundedRange.Unbounded,
+            = new SemVersionRange(new LeftBoundedRange(MaxVersion, false),
                 new RightBoundedRange(MinVersion, false), false);
         public static readonly SemVersionRange AllRelease = AtMost(MaxVersion);
         public static readonly SemVersionRange All = AtMost(MaxVersion, true);
