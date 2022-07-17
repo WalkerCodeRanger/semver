@@ -4,22 +4,22 @@ namespace Semver.Ranges
 {
     internal class SemVersionRange
     {
-        private static readonly SemVersion LowestVersion = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
-        private static readonly SemVersion HighestVersion = new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue);
+        internal static readonly SemVersion MinVersion = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
+        internal static readonly SemVersion MaxVersion = new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue);
 
         public static readonly SemVersionRange Empty
-            = new SemVersionRange(new LeftBoundedRange(null, false),
-                new RightBoundedRange(LowestVersion, false), false);
-        public static readonly SemVersionRange AllRelease = AtMost(HighestVersion);
-        public static readonly SemVersionRange All = AtMost(HighestVersion, true);
+            = new SemVersionRange(LeftBoundedRange.Unbounded,
+                new RightBoundedRange(MinVersion, false), false);
+        public static readonly SemVersionRange AllRelease = AtMost(MaxVersion);
+        public static readonly SemVersionRange All = AtMost(MaxVersion, true);
 
         public static SemVersionRange GreaterThan(SemVersion version, bool includeAllPrerelease = false)
             => Create(version ?? throw new ArgumentNullException(nameof(version)), false,
-                HighestVersion, true, includeAllPrerelease);
+                MaxVersion, true, includeAllPrerelease);
 
         public static SemVersionRange AtLeast(SemVersion version, bool includeAllPrerelease = false)
             => Create(version ?? throw new ArgumentNullException(nameof(version)), true,
-                HighestVersion, true, includeAllPrerelease);
+                MaxVersion, true, includeAllPrerelease);
 
         public static SemVersionRange LessThan(SemVersion version, bool includeAllPrerelease = false)
             => Create(null, false,
