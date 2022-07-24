@@ -1672,19 +1672,17 @@ namespace Semver
 
         #region Ranges
         /// <summary>
-        /// <para>
-        /// Checks if this version satisfies the specified range.
-        /// Uses the same range syntax as npm.
-        /// </para>
-        /// <para>
-        /// Note: It's more optimal to use the static parse methods on <see cref="NpmRangeSet"/>
-        /// if you're gonna be testing multiple versions against the same range
-        /// to avoid having to parse the range multiple times.
-        /// </para>
+        /// Checks if this version is in the given range. Uses the same range syntax as npm.
         /// </summary>
+        /// <remarks>
+        /// It's more optimal to use the static parse methods on <see cref="NpmRangeSet"/>
+        /// if you're going to be testing multiple versions against the same range
+        /// to avoid having to parse the range multiple times.
+        /// </remarks>
         /// <param name="range">The range to compare with. If the syntax is invalid the method will always return false.</param>
         /// <param name="includeAllPrerelease"></param>
-        /// <returns>True if the version satisfies the range.</returns>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
         public bool SatisfiesNpm(string range, bool includeAllPrerelease = false)
         {
@@ -1696,16 +1694,31 @@ namespace Semver
         }
 
         /// <summary>
-        /// Checks if this version satisfies the specified range.
-        /// Uses the same syntax as npm.
+        /// Checks if this version is in the given range.
         /// </summary>
         /// <param name="range">The range to compare with.</param>
-        /// <returns>True if the version satisfies the range.</returns>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
         public bool Satisfies(SemVersionRangeSet range)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
             return range.Contains(this);
+        }
+
+        /// <summary>
+        /// Checks if this version satisfies the predicate. Typically this is called with a
+        /// <see cref="SemVersionRange"/> or <see cref="UnbrokenSemVersionRange"/>
+        /// </summary>
+        /// <param name="predicate">The predicate to evaluate. Commonly a
+        /// <see cref="SemVersionRange"/> or <see cref="UnbrokenSemVersionRange"/>.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
+        internal bool Satisfies(Predicate<SemVersion> predicate)
+        {
+            if (predicate is null) throw new ArgumentNullException(nameof(predicate));
+            return predicate(this);
         }
         #endregion
 

@@ -108,6 +108,9 @@ namespace Semver.Ranges
             return new UnbrokenSemVersionRange(newStart, newEnd, includeAllPrerelease);
         }
 
+        public static implicit operator Predicate<SemVersion>(UnbrokenSemVersionRange range)
+            => range.Contains;
+
         private static bool IsEmpty(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)
         {
             var comparison = SemVersion.ComparePrecedence(start.Version, end.Version);
