@@ -18,7 +18,7 @@ namespace Semver.Ranges
         ///
         /// <para>Since all <see cref="SemVersionRange"/> objects have a <see cref="Start"/> and
         /// <see cref="End"/>, the only unique empty version is the one whose start is the max
-        /// version and end is the min version</para>
+        /// version and end is the min version.</para>
         /// </remarks>
         public static readonly SemVersionRange Empty
             = new SemVersionRange(new LeftBoundedRange(MaxVersion, false),
