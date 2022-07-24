@@ -25,18 +25,18 @@ namespace Semver.Ranges
         public abstract bool Contains(SemVersion version);
 
         public static SemVersionRangeSet ParseNpm(string range, bool includeAllPrerelease = false)
-            => NpmRange.Parse(range, includeAllPrerelease);
+            => NpmRangeSet.Parse(range, includeAllPrerelease);
 
         public static bool TryParseNpm(string range, bool includeAllPrerelease, out SemVersionRangeSet ranges)
         {
-            var success = NpmRange.TryParse(range, includeAllPrerelease, out var npmRange);
+            var success = NpmRangeSet.TryParse(range, includeAllPrerelease, out var npmRange);
             ranges = npmRange;
             return success;
         }
 
         public static bool TryParseNpm(string range, out SemVersionRangeSet ranges)
         {
-            var success = NpmRange.TryParse(range, false, out var npmRange);
+            var success = NpmRangeSet.TryParse(range, false, out var npmRange);
             ranges = npmRange;
             return success;
         }

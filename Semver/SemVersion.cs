@@ -1679,7 +1679,7 @@ namespace Semver
         /// Uses the same range syntax as npm.
         /// </para>
         /// <para>
-        /// Note: It's more optimal to use the static parse methods on <see cref="NpmRange"/>
+        /// Note: It's more optimal to use the static parse methods on <see cref="NpmRangeSet"/>
         /// if you're gonna be testing multiple versions against the same range
         /// to avoid having to parse the range multiple times.
         /// </para>
@@ -1691,7 +1691,7 @@ namespace Semver
         public bool SatisfiesNpm(string range, bool includeAllPrerelease = false)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
-            if (!NpmRange.TryParse(range, includeAllPrerelease, out var parsedRange))
+            if (!NpmRangeSet.TryParse(range, includeAllPrerelease, out var parsedRange))
                 return false;
 
             return parsedRange.Contains(this);

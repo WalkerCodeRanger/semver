@@ -8,13 +8,13 @@ namespace Semver.Ranges.Npm
     {
         internal static readonly string[] OrSeparator = { "||" };
 
-        public static NpmRange ParseRange(string range, bool includeAllPrerelease)
+        public static NpmRangeSet ParseRange(string range, bool includeAllPrerelease)
         {
             string[] strComps = range.Split(OrSeparator, StringSplitOptions.None);
 
             if (strComps.All(string.IsNullOrWhiteSpace))
             {
-                return new NpmRange(new[]
+                return new NpmRangeSet(new[]
                 {
                     new[]
                     {
@@ -97,7 +97,7 @@ namespace Semver.Ranges.Npm
                 foreach (var comp in comps) comp.SetRangeComparators(comps);
             }
 
-            return new NpmRange(comparators);
+            return new NpmRangeSet(comparators);
         }
     }
 }

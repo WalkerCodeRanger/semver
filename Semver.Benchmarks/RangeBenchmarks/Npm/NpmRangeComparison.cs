@@ -14,17 +14,17 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
     public class NpmRangeComparison
     {
         private const int NumRanges = 1000;
-        private readonly IReadOnlyList<NpmRange> ranges;
-        private readonly IReadOnlyList<NpmRange> prereleaseRanges;
+        private readonly IReadOnlyList<NpmRangeSet> ranges;
+        private readonly IReadOnlyList<NpmRangeSet> prereleaseRanges;
 
         public NpmRangeComparison()
         {
             var random = new Random();
 
-            NpmRange CreateRange(bool includePrerelease)
+            NpmRangeSet CreateRange(bool includePrerelease)
             {
                 string strRange = random.RandomPartialVersion(prependOperator: true);
-                NpmRange range = NpmRange.Parse(strRange, includePrerelease);
+                NpmRangeSet range = NpmRangeSet.Parse(strRange, includePrerelease);
 
                 return range;
             }
