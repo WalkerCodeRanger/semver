@@ -13,6 +13,8 @@ namespace Semver.Ranges
     /// the whole range but rather only around specific prerelease versions where they have been
     /// opted into.
     /// </remarks>
+    // NOTE: This won't implement IReadOnlySet<T> from .NET 5 so perhaps it is better than it not
+    // be named "Set"
     public abstract class SemVersionRangeSet
     {
         private protected SemVersionRangeSet() { }
