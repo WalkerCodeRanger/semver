@@ -10,12 +10,12 @@ namespace Semver.Ranges
     /// A right-bounded range forms the upper limit for a version range.
     /// </summary>
     /// <remarks>An "unbounded" right-bounded range is represented by an inclusive upper bound of
-    /// <see cref="SemVersionRange.MaxVersion"/>.</remarks>
+    /// <see cref="UnbrokenSemVersionRange.MaxVersion"/>.</remarks>
     [StructLayout(LayoutKind.Auto)]
     internal readonly struct RightBoundedRange
     {
         public static readonly RightBoundedRange Unbounded
-            = new RightBoundedRange(SemVersionRange.MaxVersion, true);
+            = new RightBoundedRange(UnbrokenSemVersionRange.MaxVersion, true);
 
         public RightBoundedRange(SemVersion version, bool inclusive)
         {

@@ -2,7 +2,7 @@
 
 namespace Semver.Ranges
 {
-    internal class SemVersionRange
+    internal class UnbrokenSemVersionRange
     {
         internal static readonly SemVersion MinVersion = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
         internal static readonly SemVersion MinReleaseVersion = new SemVersion(0, 0, 0);
@@ -16,49 +16,49 @@ namespace Semver.Ranges
         /// inclusive would be empty.
         /// See https://en.wikipedia.org/wiki/Interval_(mathematics)#Classification_of_intervals</para>
         ///
-        /// <para>Since all <see cref="SemVersionRange"/> objects have a <see cref="Start"/> and
+        /// <para>Since all <see cref="UnbrokenSemVersionRange"/> objects have a <see cref="Start"/> and
         /// <see cref="End"/>, the only unique empty version is the one whose start is the max
         /// version and end is the min version.</para>
         /// </remarks>
-        public static readonly SemVersionRange Empty
-            = new SemVersionRange(new LeftBoundedRange(MaxVersion, false),
+        public static readonly UnbrokenSemVersionRange Empty
+            = new UnbrokenSemVersionRange(new LeftBoundedRange(MaxVersion, false),
                 new RightBoundedRange(MinVersion, false), false);
-        public static readonly SemVersionRange AllRelease = AtMost(MaxVersion);
-        public static readonly SemVersionRange All = AtMost(MaxVersion, true);
+        public static readonly UnbrokenSemVersionRange AllRelease = AtMost(MaxVersion);
+        public static readonly UnbrokenSemVersionRange All = AtMost(MaxVersion, true);
 
-        public static SemVersionRange GreaterThan(SemVersion version, bool includeAllPrerelease = false)
+        public static UnbrokenSemVersionRange GreaterThan(SemVersion version, bool includeAllPrerelease = false)
             => Create(version ?? throw new ArgumentNullException(nameof(version)), false,
                 MaxVersion, true, includeAllPrerelease);
 
-        public static SemVersionRange AtLeast(SemVersion version, bool includeAllPrerelease = false)
+        public static UnbrokenSemVersionRange AtLeast(SemVersion version, bool includeAllPrerelease = false)
             => Create(version ?? throw new ArgumentNullException(nameof(version)), true,
                 MaxVersion, true, includeAllPrerelease);
 
-        public static SemVersionRange LessThan(SemVersion version, bool includeAllPrerelease = false)
+        public static UnbrokenSemVersionRange LessThan(SemVersion version, bool includeAllPrerelease = false)
             => Create(null, false,
                 version ?? throw new ArgumentNullException(nameof(version)), false, includeAllPrerelease);
 
-        public static SemVersionRange AtMost(SemVersion version, bool includeAllPrerelease = false)
+        public static UnbrokenSemVersionRange AtMost(SemVersion version, bool includeAllPrerelease = false)
             => Create(null, false,
                 version ?? throw new ArgumentNullException(nameof(version)), true, includeAllPrerelease);
 
-        public static SemVersionRange Inclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
+        public static UnbrokenSemVersionRange Inclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(start ?? throw new ArgumentNullException(nameof(start)), true,
                 end ?? throw new ArgumentNullException(nameof(end)), true, includeAllPrerelease);
 
-        public static SemVersionRange InclusiveOfStart(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
+        public static UnbrokenSemVersionRange InclusiveOfStart(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(start ?? throw new ArgumentNullException(nameof(start)), true,
                 end ?? throw new ArgumentNullException(nameof(end)), false, includeAllPrerelease);
 
-        public static SemVersionRange InclusiveOfEnd(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
+        public static UnbrokenSemVersionRange InclusiveOfEnd(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(start ?? throw new ArgumentNullException(nameof(start)), false,
                 end ?? throw new ArgumentNullException(nameof(end)), true, includeAllPrerelease);
 
-        public static SemVersionRange Exclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
+        public static UnbrokenSemVersionRange Exclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(start ?? throw new ArgumentNullException(nameof(start)), false,
                 end ?? throw new ArgumentNullException(nameof(end)), false, includeAllPrerelease);
 
-        private static SemVersionRange Create(
+        private static UnbrokenSemVersionRange Create(
             SemVersion startVersion,
             bool startInclusive,
             SemVersion endVersion,
@@ -69,10 +69,10 @@ namespace Semver.Ranges
             var end = new RightBoundedRange(endVersion, endInclusive);
             // Always return the same empty range
             if (IsEmpty(start, end, includeAllPrerelease)) return Empty;
-            return new SemVersionRange(start, end, includeAllPrerelease);
+            return new UnbrokenSemVersionRange(start, end, includeAllPrerelease);
         }
 
-        private SemVersionRange(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)
+        private UnbrokenSemVersionRange(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)
         {
             this.start = start;
             this.end = end;
@@ -102,14 +102,14 @@ namespace Semver.Ranges
         }
 
         // TODO Test. Is this correct? Should it be included?
-        public SemVersionRange Intersect(SemVersionRange range)
+        public UnbrokenSemVersionRange Intersect(UnbrokenSemVersionRange range)
         {
             var includeAllPrerelease = IncludeAllPrerelease && range.IncludeAllPrerelease;
             var newStart = start.Max(range.start);
             var newEnd = end.Min(range.end);
             // Always return the same empty range
             if (IsEmpty(newStart, newEnd, includeAllPrerelease)) return Empty;
-            return new SemVersionRange(newStart, newEnd, includeAllPrerelease);
+            return new UnbrokenSemVersionRange(newStart, newEnd, includeAllPrerelease);
         }
 
         private static bool IsEmpty(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)

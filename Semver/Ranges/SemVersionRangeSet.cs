@@ -15,6 +15,9 @@ namespace Semver.Ranges
     /// </remarks>
     // NOTE: This won't implement IReadOnlySet<T> from .NET 5 so perhaps it is better than it not
     // be named "Set"
+    // NOTE: this type was introduced for the alpha release. But a different naming scheme has since
+    // been decided and the new class to use is SemVersionRange. This is being kept for now for
+    // compatibility with the alpha release.
     public abstract class SemVersionRangeSet
     {
         private protected SemVersionRangeSet() { }
