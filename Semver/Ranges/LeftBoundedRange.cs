@@ -12,7 +12,7 @@ namespace Semver.Ranges
     /// <remarks>An "unbounded" left-bounded range is represented by a lower bound of
     /// <see langword="null"/> since <see langword="null"/> compares as less than all versions.
     /// However, it does not allow such ranges to be inclusive because a range cannot contain null.
-    /// The <see cref="UnbrokenSemVersionRange.MinVersion"/> (i.e. <c>0.0.0-0</c>) cannot be used instead
+    /// The <see cref="SemVersion.Min"/> (i.e. <c>0.0.0-0</c>) cannot be used instead
     /// because it would be inclusive of prerelease.</remarks>
     [StructLayout(LayoutKind.Auto)]
     internal readonly struct LeftBoundedRange

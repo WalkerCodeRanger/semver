@@ -12,28 +12,28 @@ namespace Semver.Test.Ranges
         [Fact]
         public void MinVersionIsZeroWithZeroPrerelease()
         {
-            Assert.Equal(SemVersion.Parse("0.0.0-0", SemVersionStyles.Strict), UnbrokenSemVersionRange.MinVersion);
+            Assert.Equal(SemVersion.Parse("0.0.0-0", SemVersionStyles.Strict), SemVersion.Min);
         }
 
         [Fact]
         public void MinReleaseVersionIsZero()
         {
-            Assert.Equal(new SemVersion(0), UnbrokenSemVersionRange.MinReleaseVersion);
+            Assert.Equal(new SemVersion(0), SemVersion.MinRelease);
         }
 
         [Fact]
         public void MaxVersionIsIntMax()
         {
-            Assert.Equal(new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue), UnbrokenSemVersionRange.MaxVersion);
+            Assert.Equal(new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue), SemVersion.Max);
         }
 
         [Fact]
         public void EmptyIsMaximallyEmpty()
         {
             var empty = UnbrokenSemVersionRange.Empty;
-            Assert.Equal(UnbrokenSemVersionRange.MaxVersion, empty.Start);
+            Assert.Equal(SemVersion.Max, empty.Start);
             Assert.False(empty.StartInclusive, "Start Inclusive");
-            Assert.Equal(UnbrokenSemVersionRange.MinVersion, empty.End);
+            Assert.Equal(SemVersion.Min, empty.End);
             Assert.False(empty.EndInclusive, "End Inclusive");
             Assert.False(empty.IncludeAllPrerelease, "Include All Prerelease");
         }
@@ -62,7 +62,7 @@ namespace Semver.Test.Ranges
             var allRelease = UnbrokenSemVersionRange.AllRelease;
             Assert.Null(allRelease.Start);
             Assert.False(allRelease.StartInclusive, "Start Inclusive");
-            Assert.Equal(UnbrokenSemVersionRange.MaxVersion, allRelease.End);
+            Assert.Equal(SemVersion.Max, allRelease.End);
             Assert.True(allRelease.EndInclusive, "End Inclusive");
             Assert.False(allRelease.IncludeAllPrerelease, "Include All Prerelease");
         }
@@ -81,7 +81,7 @@ namespace Semver.Test.Ranges
             var all = UnbrokenSemVersionRange.All;
             Assert.Null(all.Start);
             Assert.False(all.StartInclusive, "Start Inclusive");
-            Assert.Equal(UnbrokenSemVersionRange.MaxVersion, all.End);
+            Assert.Equal(SemVersion.Max, all.End);
             Assert.True(all.EndInclusive, "End Inclusive");
             Assert.True(all.IncludeAllPrerelease, "Include All Prerelease");
         }
@@ -655,7 +655,7 @@ namespace Semver.Test.Ranges
         [Fact]
         public void LessThanMinReleaseVersionEmpty()
         {
-            var range = UnbrokenSemVersionRange.LessThan(UnbrokenSemVersionRange.MinReleaseVersion);
+            var range = UnbrokenSemVersionRange.LessThan(SemVersion.MinRelease);
             Assert.Equal(UnbrokenSemVersionRange.Empty, range);
         }
 
@@ -665,7 +665,7 @@ namespace Semver.Test.Ranges
         [InlineData("0.0.0", false)]
         public void LessThanMinReleaseVersionIncludingPrereleaseContains(string version, bool expected)
         {
-            var range = UnbrokenSemVersionRange.LessThan(UnbrokenSemVersionRange.MinReleaseVersion,
+            var range = UnbrokenSemVersionRange.LessThan(SemVersion.MinRelease,
                             includeAllPrerelease: true);
             var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
             Assert.Equal(expected, range.Contains(semVersion));
@@ -674,7 +674,7 @@ namespace Semver.Test.Ranges
         [Fact]
         public void LessThanMinVersionEmpty()
         {
-            var range = UnbrokenSemVersionRange.LessThan(UnbrokenSemVersionRange.MinVersion,
+            var range = UnbrokenSemVersionRange.LessThan(SemVersion.Min,
                             includeAllPrerelease: true);
             Assert.Equal(UnbrokenSemVersionRange.Empty, range);
         }
@@ -712,7 +712,7 @@ namespace Semver.Test.Ranges
         [Fact]
         public void ExclusiveAtMaxEmpty()
         {
-            var range = UnbrokenSemVersionRange.Exclusive(UnbrokenSemVersionRange.MaxVersion, UnbrokenSemVersionRange.MaxVersion);
+            var range = UnbrokenSemVersionRange.Exclusive(SemVersion.Max, SemVersion.Max);
             Assert.Equal(UnbrokenSemVersionRange.Empty, range);
         }
     }

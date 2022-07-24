@@ -4,10 +4,6 @@ namespace Semver.Ranges
 {
     internal class UnbrokenSemVersionRange
     {
-        internal static readonly SemVersion MinVersion = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
-        internal static readonly SemVersion MinReleaseVersion = new SemVersion(0, 0, 0);
-        internal static readonly SemVersion MaxVersion = new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue);
-
         /// <summary>
         /// A standard representation for the empty range that contains no versions.
         /// </summary>
@@ -21,18 +17,18 @@ namespace Semver.Ranges
         /// version and end is the min version.</para>
         /// </remarks>
         public static readonly UnbrokenSemVersionRange Empty
-            = new UnbrokenSemVersionRange(new LeftBoundedRange(MaxVersion, false),
-                new RightBoundedRange(MinVersion, false), false);
-        public static readonly UnbrokenSemVersionRange AllRelease = AtMost(MaxVersion);
-        public static readonly UnbrokenSemVersionRange All = AtMost(MaxVersion, true);
+            = new UnbrokenSemVersionRange(new LeftBoundedRange(SemVersion.Max, false),
+                new RightBoundedRange(SemVersion.Min, false), false);
+        public static readonly UnbrokenSemVersionRange AllRelease = AtMost(SemVersion.Max);
+        public static readonly UnbrokenSemVersionRange All = AtMost(SemVersion.Max, true);
 
         public static UnbrokenSemVersionRange GreaterThan(SemVersion version, bool includeAllPrerelease = false)
             => Create(version ?? throw new ArgumentNullException(nameof(version)), false,
-                MaxVersion, true, includeAllPrerelease);
+                SemVersion.Max, true, includeAllPrerelease);
 
         public static UnbrokenSemVersionRange AtLeast(SemVersion version, bool includeAllPrerelease = false)
             => Create(version ?? throw new ArgumentNullException(nameof(version)), true,
-                MaxVersion, true, includeAllPrerelease);
+                SemVersion.Max, true, includeAllPrerelease);
 
         public static UnbrokenSemVersionRange LessThan(SemVersion version, bool includeAllPrerelease = false)
             => Create(null, false,
@@ -125,8 +121,8 @@ namespace Semver.Ranges
                 if (end.Inclusive) return false;
                 // A range like "<0.0.0" is empty if prerelease isn't allowed and
                 // "<0.0.0-0" is empty even it if isn't
-                return end.Version == MinVersion
-                       || (!includeAllPrerelease && end.Version == MinReleaseVersion);
+                return end.Version == SemVersion.Min
+                       || (!includeAllPrerelease && end.Version == SemVersion.MinRelease);
             }
 
             // A range like ">1.0.0 <1.0.1" is still empty if prerelease isn't allowed.

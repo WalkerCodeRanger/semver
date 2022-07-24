@@ -26,6 +26,10 @@ namespace Semver
     public sealed class SemVersion : IComparable<SemVersion>, IComparable, IEquatable<SemVersion>
 #endif
     {
+        internal static readonly SemVersion Min = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
+        internal static readonly SemVersion MinRelease = new SemVersion(0, 0, 0);
+        internal static readonly SemVersion Max = new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue);
+
         internal const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
         private const string InvalidMajorVersionMessage = "Major version must be greater than or equal to zero.";
         private const string InvalidMinorVersionMessage = "Minor version must be greater than or equal to zero.";
