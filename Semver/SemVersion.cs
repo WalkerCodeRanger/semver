@@ -34,15 +34,7 @@ namespace Semver
         private const string MetadataIdentifierIsDefaultMessage = "Metadata identifier cannot be default/null.";
         internal const int MaxVersionLength = 1024;
 
-        /// <remarks>
-        /// This exception is used with the <see cref="SemVersionParser.Parse"/>
-        /// method to indicate parse failure without constructing a new exception.
-        /// This exception should never be thrown or exposed outside of this
-        /// package.
-        /// </remarks>
-        private static readonly Exception ParseFailedException = new Exception("Parse Failed");
-
-        private static readonly Regex ParseEx =
+        private static readonly Regex ParseRegex =
             new Regex(@"^(?<major>\d+)" +
                 @"(?>\.(?<minor>\d+))?" +
                 @"(?>\.(?<patch>\d+))?" +
@@ -497,7 +489,7 @@ namespace Semver
         [Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
         public static SemVersion Parse(string version, bool strict = false)
         {
-            var match = ParseEx.Match(version);
+            var match = ParseRegex.Match(version);
             if (!match.Success)
                 throw new ArgumentException($"Invalid version '{version}'.", nameof(version));
 
@@ -540,11 +532,13 @@ namespace Semver
             out SemVersion semver, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
-            var exception = SemVersionParser.Parse(version, style, ParseFailedException, maxLength, out semver);
+            var exception = SemVersionParser.Parse(version, style, Parsing.FailedException, maxLength, out semver);
 
+#if DEBUG
             // This check ensures that ParseVersion doesn't construct an exception, but always returns ParseFailedException
-            if (exception != null && exception != ParseFailedException)
-                throw new InvalidOperationException($"{nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(ParseFailedException)}", exception);
+            if (exception != null && exception != Parsing.FailedException)
+                throw new InvalidOperationException($"{nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}", exception);
+#endif
 
             return exception is null;
         }
@@ -566,7 +560,7 @@ namespace Semver
             semver = null;
             if (version is null) return false;
 
-            var match = ParseEx.Match(version);
+            var match = ParseRegex.Match(version);
             if (!match.Success) return false;
 
             if (!int.TryParse(match.Groups["major"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var major))
