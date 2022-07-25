@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Semver.Utility;
 
 namespace Semver.Ranges
@@ -42,8 +43,17 @@ namespace Semver.Ranges
         public static SemVersionRange Exclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(UnbrokenSemVersionRange.Exclusive(start, end, includeAllPrerelease));
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static SemVersionRange Create(UnbrokenSemVersionRange range)
             => UnbrokenSemVersionRange.Empty.Equals(range) ? Empty : new SemVersionRange(range);
+
+        /// <remarks>Ownership of the <paramref name="ranges"/> list must be given to this method.
+        /// The list will be mutated and used as the basis of an immutable list. It must not still
+        /// be referenced by the caller.</remarks>
+        internal static SemVersionRange Create(List<UnbrokenSemVersionRange> ranges)
+        {
+            throw new NotImplementedException();
+        }
 
         private readonly IReadOnlyList<UnbrokenSemVersionRange> ranges;
 

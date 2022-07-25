@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Semver.Utility
 {
@@ -88,5 +89,9 @@ namespace Semver.Utility
 
             return value.Substring(start);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static StringSegment Slice(this string value, int offset, int length)
+            => new StringSegment(value, offset, length);
     }
 }
