@@ -53,7 +53,8 @@ namespace Semver.Ranges
         {
         }
 
-        public SemVersionRange(UnbrokenSemVersionRange range)
+        /// <remarks>Parameter validation is not performed. The unbroken range must not be empty.</remarks>
+        private SemVersionRange(UnbrokenSemVersionRange range)
             : this(new List<UnbrokenSemVersionRange>(1) { range }.AsReadOnly())
         {
         }
