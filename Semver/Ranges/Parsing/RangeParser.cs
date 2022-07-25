@@ -2,7 +2,7 @@
 
 namespace Semver.Ranges.Parsing
 {
-    internal static class RangeSetParser
+    internal static class RangeParser
     {
         public static Exception Parse(
             string version,
