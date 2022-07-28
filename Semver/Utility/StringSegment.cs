@@ -31,8 +31,21 @@ namespace Semver.Utility
 
         public int Length { get; }
 
+        public StringSegment TrimSpaces()
+        {
+            var start = offset;
+            var end = offset + Length - 1;
+
+            while (start <= end && source[start] == ' ') start++;
+            while (start < end && source[end] == ' ') end--;
+
+            return new StringSegment(source, start, end + 1 - start);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator StringSegment(string value)
             => new StringSegment(value, 0, value.Length);
+
+        public override string ToString() => source.Substring(offset, Length);
     }
 }
