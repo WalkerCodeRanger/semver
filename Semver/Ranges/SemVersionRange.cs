@@ -21,6 +21,7 @@ namespace Semver.Ranges
 
         public static SemVersionRange Equals(SemVersion version)
             => Create(UnbrokenSemVersionRange.Equals(version));
+
         public static SemVersionRange GreaterThan(SemVersion version, bool includeAllPrerelease = false)
             => Create(UnbrokenSemVersionRange.GreaterThan(version, includeAllPrerelease));
 

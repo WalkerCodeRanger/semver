@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using Semver.Test.Builders;
 using Xunit;
 
 namespace Semver.Test
@@ -110,7 +111,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.FromVersion(null));
 
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
 

@@ -335,7 +335,7 @@ namespace Semver.Test
             Invalid("1.2.3.length100.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test", PrereleasePrefixedByDotMessage),
             Invalid("1.2.3.length101.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.test.tests", PrereleasePrefixedByDotMessage),
 
-            Invalid<ArgumentNullException>(null, "Value cannot be null."));
+            Invalid<ArgumentNullException>(null, ExceptionMessages.NotNull));
 
         [Fact]
         public void CanConstructParsingTestCases()

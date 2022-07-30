@@ -241,7 +241,7 @@ namespace Semver.Test
             var ex = Assert.Throws<ArgumentNullException>(() => new SemVersion(null));
 #pragma warning restore 618
 
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
         #endregion

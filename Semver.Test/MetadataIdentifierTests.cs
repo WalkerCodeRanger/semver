@@ -1,4 +1,5 @@
 ﻿using System;
+using Semver.Test.Builders;
 using Xunit;
 
 namespace Semver.Test
@@ -40,7 +41,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => new MetadataIdentifier(null));
 
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("value", ex.ParamName);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using Semver.Ranges;
+using Semver.Test.Builders;
 using Xunit;
 
 namespace Semver.Test.Ranges
@@ -102,7 +103,9 @@ namespace Semver.Test.Ranges
         [Fact]
         public void EqualsNullVersion()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => UnbrokenSemVersionRange.Equals(null));
+            var ex = Assert.Throws<ArgumentNullException>(
+                () => UnbrokenSemVersionRange.Equals(null));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
 
@@ -154,7 +157,9 @@ namespace Semver.Test.Ranges
         [Fact]
         public void GreaterThanNullVersion()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => UnbrokenSemVersionRange.GreaterThan(null));
+            var ex = Assert.Throws<ArgumentNullException>(
+                () => UnbrokenSemVersionRange.GreaterThan(null));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
 
@@ -228,7 +233,9 @@ namespace Semver.Test.Ranges
         [Fact]
         public void AtLeastNullVersion()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => UnbrokenSemVersionRange.AtLeast(null));
+            var ex = Assert.Throws<ArgumentNullException>(
+                () => UnbrokenSemVersionRange.AtLeast(null));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
 
@@ -301,7 +308,9 @@ namespace Semver.Test.Ranges
         [Fact]
         public void LessThanNullVersion()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => UnbrokenSemVersionRange.LessThan(null));
+            var ex = Assert.Throws<ArgumentNullException>(
+                () => UnbrokenSemVersionRange.LessThan(null));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
 
@@ -375,7 +384,9 @@ namespace Semver.Test.Ranges
         [Fact]
         public void AtMostNullVersion()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => UnbrokenSemVersionRange.AtMost(null));
+            var ex = Assert.Throws<ArgumentNullException>(
+                () => UnbrokenSemVersionRange.AtMost(null));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
 
@@ -450,6 +461,7 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentNullException>(
                 () => UnbrokenSemVersionRange.Inclusive(null, FakeVersion));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
 
@@ -467,6 +479,7 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentNullException>(
                 () => UnbrokenSemVersionRange.Inclusive(FakeVersion, null));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
 
@@ -566,14 +579,15 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentNullException>(
                 () => UnbrokenSemVersionRange.InclusiveOfStart(null, FakeVersion));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
 
         [Fact]
         public void InclusiveOfStartMetadataStartVersion()
         {
-            var ex = Assert.Throws<ArgumentException>(() =>
-                UnbrokenSemVersionRange.InclusiveOfStart(VersionWithMetadata, FakeVersion));
+            var ex = Assert.Throws<ArgumentException>(()
+                => UnbrokenSemVersionRange.InclusiveOfStart(VersionWithMetadata, FakeVersion));
             Assert.StartsWith(InvalidMetadataMessage, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
@@ -583,14 +597,15 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentNullException>(
                 () => UnbrokenSemVersionRange.InclusiveOfStart(FakeVersion, null));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
 
         [Fact]
         public void InclusiveOfStartMetadataEndVersion()
         {
-            var ex = Assert.Throws<ArgumentException>(() =>
-                UnbrokenSemVersionRange.InclusiveOfStart(FakeVersion, VersionWithMetadata));
+            var ex = Assert.Throws<ArgumentException>(()
+                => UnbrokenSemVersionRange.InclusiveOfStart(FakeVersion, VersionWithMetadata));
             Assert.StartsWith(InvalidMetadataMessage, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
@@ -682,14 +697,15 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentNullException>(
                 () => UnbrokenSemVersionRange.InclusiveOfEnd(null, FakeVersion));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
 
         [Fact]
         public void InclusiveOfEndMetadataStartVersion()
         {
-            var ex = Assert.Throws<ArgumentException>(() =>
-                UnbrokenSemVersionRange.InclusiveOfEnd(VersionWithMetadata, FakeVersion));
+            var ex = Assert.Throws<ArgumentException>(()
+                => UnbrokenSemVersionRange.InclusiveOfEnd(VersionWithMetadata, FakeVersion));
             Assert.StartsWith(InvalidMetadataMessage, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
@@ -699,14 +715,15 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentNullException>(
                 () => UnbrokenSemVersionRange.InclusiveOfEnd(FakeVersion, null));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
 
         [Fact]
         public void InclusiveOfEndMetadataEndVersion()
         {
-            var ex = Assert.Throws<ArgumentException>(() =>
-                UnbrokenSemVersionRange.InclusiveOfEnd(FakeVersion, VersionWithMetadata));
+            var ex = Assert.Throws<ArgumentException>(()
+                => UnbrokenSemVersionRange.InclusiveOfEnd(FakeVersion, VersionWithMetadata));
             Assert.StartsWith(InvalidMetadataMessage, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
@@ -798,14 +815,15 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentNullException>(
                 () => UnbrokenSemVersionRange.Exclusive(null, FakeVersion));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
 
         [Fact]
         public void ExclusiveMetadataStartVersion()
         {
-            var ex = Assert.Throws<ArgumentException>(() =>
-                UnbrokenSemVersionRange.Exclusive(VersionWithMetadata, FakeVersion));
+            var ex = Assert.Throws<ArgumentException>(()
+                => UnbrokenSemVersionRange.Exclusive(VersionWithMetadata, FakeVersion));
             Assert.StartsWith(InvalidMetadataMessage, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
@@ -815,14 +833,15 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentNullException>(
                 () => UnbrokenSemVersionRange.Exclusive(FakeVersion, null));
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
 
         [Fact]
         public void ExclusiveMetadataEndVersion()
         {
-            var ex = Assert.Throws<ArgumentException>(() =>
-                UnbrokenSemVersionRange.Exclusive(FakeVersion, VersionWithMetadata));
+            var ex = Assert.Throws<ArgumentException>(()
+                => UnbrokenSemVersionRange.Exclusive(FakeVersion, VersionWithMetadata));
             Assert.StartsWith(InvalidMetadataMessage, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
