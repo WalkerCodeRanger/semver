@@ -1687,9 +1687,10 @@ namespace Semver
         public bool SatisfiesNpm(string range, bool includeAllPrerelease = false)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
+#pragma warning disable 618
             if (!NpmRangeSet.TryParse(range, includeAllPrerelease, out var parsedRange))
                 return false;
-
+#pragma warning restore 618
             return parsedRange.Contains(this);
         }
 
@@ -1700,6 +1701,7 @@ namespace Semver
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
+        [Obsolete("For alpha version only, removed in release")]
         public bool Satisfies(SemVersionRangeSet range)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));

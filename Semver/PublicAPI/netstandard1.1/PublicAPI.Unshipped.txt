@@ -34,6 +34,7 @@ static readonly Semver.Ranges.UnbrokenSemVersionRange.AllRelease -> Semver.Range
 static readonly Semver.Ranges.UnbrokenSemVersionRange.Empty -> Semver.Ranges.UnbrokenSemVersionRange
 static Semver.Ranges.SemVersionRange.AtLeast(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.AtMost(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
+static Semver.Ranges.SemVersionRange.Equals(Semver.SemVersion version) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.Exclusive(Semver.SemVersion start, Semver.SemVersion end, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.GreaterThan(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.implicit operator System.Predicate<Semver.SemVersion>(Semver.Ranges.SemVersionRange range) -> System.Predicate<Semver.SemVersion>

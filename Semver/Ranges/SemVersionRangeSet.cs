@@ -1,3 +1,4 @@
+using System;
 using Semver.Ranges.Npm;
 
 namespace Semver.Ranges
@@ -18,6 +19,7 @@ namespace Semver.Ranges
     // NOTE: this type was introduced for the alpha release. But a different naming scheme has since
     // been decided and the new class to use is SemVersionRange. This is being kept for now for
     // compatibility with the alpha release.
+    [Obsolete("For alpha version only, removed in release")]
     public abstract class SemVersionRangeSet
     {
         private protected SemVersionRangeSet() { }

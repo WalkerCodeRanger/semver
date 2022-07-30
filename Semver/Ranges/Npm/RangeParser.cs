@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Semver.Ranges.Npm
 {
+    [Obsolete("For alpha version only, removed in release")]
     internal class RangeParser
     {
         internal static readonly string[] OrSeparator = { "||" };

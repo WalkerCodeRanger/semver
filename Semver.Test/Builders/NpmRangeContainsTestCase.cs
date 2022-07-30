@@ -34,7 +34,9 @@ namespace Semver.Test.Builders
 
         public void Assert()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             var rangeSet = SemVersionRangeSet.ParseNpm(Range, IncludeAllPrerelease);
+#pragma warning restore CS0618 // Type or member is obsolete
             if (VersionIncluded)
                 Xunit.Assert.True(rangeSet.Contains(Version), $"{ToRangeString()} should include {Version}");
             else

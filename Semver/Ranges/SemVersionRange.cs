@@ -19,6 +19,8 @@ namespace Semver.Ranges
         public static readonly SemVersionRange AllRelease = new SemVersionRange(UnbrokenSemVersionRange.AllRelease);
         public static readonly SemVersionRange All = new SemVersionRange(UnbrokenSemVersionRange.All);
 
+        public static SemVersionRange Equals(SemVersion version)
+            => Create(UnbrokenSemVersionRange.Equals(version));
         public static SemVersionRange GreaterThan(SemVersion version, bool includeAllPrerelease = false)
             => Create(UnbrokenSemVersionRange.GreaterThan(version, includeAllPrerelease));
 
