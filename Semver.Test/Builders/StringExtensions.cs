@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Semver.Test.Builders
 {
-    internal static class StringExtensions
+    public static class StringExtensions
     {
         /// <summary>
         /// Split a string on a character, but if the string is empty, return no

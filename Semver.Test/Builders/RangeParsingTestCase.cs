@@ -3,7 +3,7 @@ using Semver.Ranges;
 
 namespace Semver.Test.Builders
 {
-    internal class RangeParsingTestCase
+    public class RangeParsingTestCase
     {
         public static RangeParsingTestCase Valid(
             string range,

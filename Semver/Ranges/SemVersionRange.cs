@@ -12,7 +12,7 @@ namespace Semver.Ranges
     /// some prerelease versions between included release versions. For a range that cannot have
     /// gaps see the <see cref="UnbrokenSemVersionRange"/> class.
     /// </summary>
-    internal class SemVersionRange : IReadOnlyList<UnbrokenSemVersionRange>
+    public class SemVersionRange : IReadOnlyList<UnbrokenSemVersionRange>
     {
         public static readonly SemVersionRange Empty = new SemVersionRange(ReadOnlyList<UnbrokenSemVersionRange>.Empty);
 

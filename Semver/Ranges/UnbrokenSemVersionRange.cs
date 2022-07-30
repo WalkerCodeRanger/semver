@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Semver.Ranges
 {
-    internal class UnbrokenSemVersionRange
+    public class UnbrokenSemVersionRange
     {
         /// <summary>
         /// A standard representation for the empty range that contains no versions.

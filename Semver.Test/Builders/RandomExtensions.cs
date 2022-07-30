@@ -2,7 +2,7 @@
 
 namespace Semver.Test.Builders
 {
-    internal static class RandomExtensions
+    public static class RandomExtensions
     {
         public static bool NextBool(this Random random)
         {
