@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Semver.Utility;
 
 namespace Semver.Ranges.Parsing
@@ -79,6 +80,91 @@ namespace Semver.Ranges.Parsing
             Exception ex,
             out UnbrokenSemVersionRange unbrokenRange)
         {
+            segment = segment.TrimEndSpaces();
+            var start = LeftBoundedRange.Unbounded;
+            var end = RightBoundedRange.Unbounded;
+            foreach (var comparison in SplitComparisons(segment))
+            {
+                var exception = ParseComparison(comparison, options, ex, ref start, ref end);
+                if (exception != null)
+                {
+                    unbrokenRange = null;
+                    return exception;
+                }
+            }
+
+            // TODO this make empty mean *, is that what we want?
+
+            unbrokenRange = UnbrokenSemVersionRange.Create(start, end,
+                options.HasOption(SemVersionRangeOptions.IncludeAllPrerelease));
+            return null;
+        }
+
+        private static IEnumerable<StringSegment> SplitComparisons(StringSegment segment)
+        {
+            var start = 0;
+            var end = 0;
+            while (end < segment.Length)
+            {
+                // Skip leading spaces
+                while (end < segment.Length && segment[end] == ' ') start = end += 1;
+
+                // Skip operators
+                while (end < segment.Length && IsOperatorChar(segment[end])) end++;
+
+                // Skip spaces after operators
+                while (end < segment.Length && segment[end] == ' ') end += 1;
+
+                // Now find the next space or operator
+                while (end < segment.Length && !IsOperatorOrSpaceChar(segment[end])) end++;
+
+                yield return segment.Subsegment(start, end - start);
+                start = end;
+            }
+
+            if (start < end)
+                // TODO not sure if this case can be hit
+                yield return segment.Subsegment(start, end - start);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsOperatorChar(char c)
+            => c == '=' || c == '<' || c == '>' || c == '~' || c == '^';
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsOperatorOrSpaceChar(char c) => c == ' ' || IsOperatorChar(c);
+
+        private static bool IsVersionChar(char c)
+            => c.IsAlphaOrHyphen() || c == '.' || c == '*';
+
+        /// <remarks>The segment must be trimmed before calling this method.</remarks>
+        private static Exception ParseComparison(
+            StringSegment segment,
+            SemVersionRangeOptions options,
+            Exception exception,
+            ref LeftBoundedRange leftBound,
+            ref RightBoundedRange rightBound)
+        {
+#if DEBUG
+            if (segment.IsEmpty) throw new ArgumentException("Cannot be empty", nameof(segment));
+#endif
+            var firstChar = segment[0];
+            var isOrEqual = segment.Length >= 2 && segment[1] == '=';
+
+            //switch (firstChar)
+            //{
+            //    case '=':
+            //        var versionSegment = segment.Subsegment(1);
+            //        // TODO parse version
+            //        break;
+            //    case '>':
+            //    case '<':
+            //    case '~':
+            //    case '^':
+            //    default: // implied =
+            //        var version
+            //}
+
             throw new NotImplementedException();
         }
     }

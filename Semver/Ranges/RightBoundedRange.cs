@@ -20,9 +20,9 @@ namespace Semver.Ranges
         public RightBoundedRange(SemVersion version, bool inclusive)
         {
 #if DEBUG
-            if (version is null) throw new ArgumentNullException(nameof(version));
+            if (version is null) throw new ArgumentNullException(nameof(version), "DEBUG: Value cannot be null.");
             if (version.MetadataIdentifiers.Any())
-                throw new ArgumentException("Cannot have metadata", nameof(version));
+                throw new ArgumentException("DEBUG: Cannot have metadata.", nameof(version));
 #endif
             Version = version;
             Inclusive = inclusive;

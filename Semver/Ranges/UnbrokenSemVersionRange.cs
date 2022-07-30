@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Semver.Ranges
 {
@@ -22,37 +23,36 @@ namespace Semver.Ranges
         public static readonly UnbrokenSemVersionRange AllRelease = AtMost(SemVersion.Max);
         public static readonly UnbrokenSemVersionRange All = AtMost(SemVersion.Max, true);
 
+        public static UnbrokenSemVersionRange Equals(SemVersion version)
+            => Create(Validate(version, nameof(version)), true, version, true, false);
+
         public static UnbrokenSemVersionRange GreaterThan(SemVersion version, bool includeAllPrerelease = false)
-            => Create(version ?? throw new ArgumentNullException(nameof(version)), false,
-                SemVersion.Max, true, includeAllPrerelease);
+            => Create(Validate(version, nameof(version)), false, SemVersion.Max, true, includeAllPrerelease);
 
         public static UnbrokenSemVersionRange AtLeast(SemVersion version, bool includeAllPrerelease = false)
-            => Create(version ?? throw new ArgumentNullException(nameof(version)), true,
-                SemVersion.Max, true, includeAllPrerelease);
+            => Create(Validate(version, nameof(version)), true, SemVersion.Max, true, includeAllPrerelease);
 
         public static UnbrokenSemVersionRange LessThan(SemVersion version, bool includeAllPrerelease = false)
-            => Create(null, false,
-                version ?? throw new ArgumentNullException(nameof(version)), false, includeAllPrerelease);
+            => Create(null, false, Validate(version, nameof(version)), false, includeAllPrerelease);
 
         public static UnbrokenSemVersionRange AtMost(SemVersion version, bool includeAllPrerelease = false)
-            => Create(null, false,
-                version ?? throw new ArgumentNullException(nameof(version)), true, includeAllPrerelease);
+            => Create(null, false, Validate(version, nameof(version)), true, includeAllPrerelease);
 
         public static UnbrokenSemVersionRange Inclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
-            => Create(start ?? throw new ArgumentNullException(nameof(start)), true,
-                end ?? throw new ArgumentNullException(nameof(end)), true, includeAllPrerelease);
+            => Create(Validate(start, nameof(start)), true,
+                Validate(end, nameof(end)), true, includeAllPrerelease);
 
         public static UnbrokenSemVersionRange InclusiveOfStart(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
-            => Create(start ?? throw new ArgumentNullException(nameof(start)), true,
-                end ?? throw new ArgumentNullException(nameof(end)), false, includeAllPrerelease);
+            => Create(Validate(start, nameof(start)), true,
+                Validate(end, nameof(end)), false, includeAllPrerelease);
 
         public static UnbrokenSemVersionRange InclusiveOfEnd(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
-            => Create(start ?? throw new ArgumentNullException(nameof(start)), false,
-                end ?? throw new ArgumentNullException(nameof(end)), true, includeAllPrerelease);
+            => Create(Validate(start, nameof(start)), false,
+                Validate(end, nameof(end)), true, includeAllPrerelease);
 
         public static UnbrokenSemVersionRange Exclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
-            => Create(start ?? throw new ArgumentNullException(nameof(start)), false,
-                end ?? throw new ArgumentNullException(nameof(end)), false, includeAllPrerelease);
+            => Create(Validate(start, nameof(start)), false,
+                Validate(end, nameof(end)), false, includeAllPrerelease);
 
         private static UnbrokenSemVersionRange Create(
             SemVersion startVersion,
@@ -63,6 +63,16 @@ namespace Semver.Ranges
         {
             var start = new LeftBoundedRange(startVersion, startInclusive);
             var end = new RightBoundedRange(endVersion, endInclusive);
+            // Always return the same empty range
+            if (IsEmpty(start, end, includeAllPrerelease)) return Empty;
+            return new UnbrokenSemVersionRange(start, end, includeAllPrerelease);
+        }
+
+        internal static UnbrokenSemVersionRange Create(
+            LeftBoundedRange start,
+            RightBoundedRange end,
+            bool includeAllPrerelease)
+        {
             // Always return the same empty range
             if (IsEmpty(start, end, includeAllPrerelease)) return Empty;
             return new UnbrokenSemVersionRange(start, end, includeAllPrerelease);
@@ -97,19 +107,10 @@ namespace Semver.Ranges
                    || End.IsPrerelease && version.MajorMinorPatchEquals(End);
         }
 
-        // TODO Test. Is this correct? Should it be included?
-        public UnbrokenSemVersionRange Intersect(UnbrokenSemVersionRange range)
-        {
-            var includeAllPrerelease = IncludeAllPrerelease && range.IncludeAllPrerelease;
-            var newStart = start.Max(range.start);
-            var newEnd = end.Min(range.end);
-            // Always return the same empty range
-            if (IsEmpty(newStart, newEnd, includeAllPrerelease)) return Empty;
-            return new UnbrokenSemVersionRange(newStart, newEnd, includeAllPrerelease);
-        }
-
         public static implicit operator Predicate<SemVersion>(UnbrokenSemVersionRange range)
             => range.Contains;
+
+        // TODO implement ToString()
 
         private static bool IsEmpty(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)
         {
@@ -140,5 +141,14 @@ namespace Semver.Ranges
                    // Subtract instead of add to avoid overflow
                    && start.Version.Patch == end.Version.Patch - 1;
         }
+
+        private static SemVersion Validate(SemVersion version, string paramName)
+        {
+            if (version is null) throw new ArgumentNullException(paramName);
+            if (version.MetadataIdentifiers.Any()) throw new ArgumentException(InvalidMetadataMessage, paramName);
+            return version;
+        }
+
+        private const string InvalidMetadataMessage = "Cannot have metadata.";
     }
 }

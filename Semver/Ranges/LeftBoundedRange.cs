@@ -23,9 +23,9 @@ namespace Semver.Ranges
         {
 #if DEBUG
             if (version is null && inclusive)
-                throw new ArgumentException("Cannot be inclusive of start without start value.", nameof(inclusive));
+                throw new ArgumentException("DEBUG: Cannot be inclusive of start without start value.", nameof(inclusive));
             if (version?.MetadataIdentifiers.Any() ?? false)
-                throw new ArgumentException("Cannot have metadata", nameof(version));
+                throw new ArgumentException("DEBUG: Cannot have metadata.", nameof(version));
 #endif
             Version = version;
             Inclusive = inclusive;

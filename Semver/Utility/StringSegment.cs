@@ -16,13 +16,15 @@ namespace Semver.Utility
         public StringSegment(string source, int offset, int length)
         {
 #if DEBUG
+            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), offset, "DEBUG: Cannot be negative.");
             if (offset > source.Length)
                 throw new ArgumentOutOfRangeException(nameof(offset), offset,
-                    $"Must be <= length of {length}. String:\r\n{source}");
+                    $"DEBUG: Must be <= length of {length}. String:\r\n{source}");
 
+            if (length < 0) throw new ArgumentOutOfRangeException(nameof(length), length, "DEBUG: Cannot be negative.");
             if (offset + length > source.Length)
                 throw new ArgumentOutOfRangeException(nameof(length), length,
-                    $"When added to offset of {offset}, must be <= length of {length}. String:\r\n{source}");
+                    $"DEBUG: When added to offset of {offset}, must be <= length of {length}. String:\r\n{source}");
 #endif
             this.source = source;
             this.offset = offset;
@@ -31,21 +33,75 @@ namespace Semver.Utility
 
         public int Length { get; }
 
-        public StringSegment TrimSpaces()
+        public bool IsEmpty => Length == 0;
+
+        public char this[int i]
+        {
+            get
+            {
+#if DEBUG
+                ValidateIndex(i, nameof(i));
+#endif
+                return source[offset + i];
+            }
+        }
+
+        public StringSegment TrimStartSpaces()
         {
             var start = offset;
             var end = offset + Length - 1;
 
             while (start <= end && source[start] == ' ') start++;
-            while (start < end && source[end] == ' ') end--;
 
             return new StringSegment(source, start, end + 1 - start);
+        }
+
+        public StringSegment TrimEndSpaces()
+        {
+            var end = offset + Length - 1;
+
+            while (offset <= end && source[end] == ' ') end--;
+
+            return new StringSegment(source, offset, end + 1 - offset);
+        }
+
+        public StringSegment Subsegment(int start, int length)
+        {
+#if DEBUG
+            ValidateIndex(start, nameof(start));
+            ValidateLength(start, length, nameof(length));
+#endif
+            return new StringSegment(source, offset + start, length);
+        }
+
+        internal StringSegment Subsegment(int start)
+        {
+#if DEBUG
+            ValidateIndex(start, nameof(start));
+#endif
+            return new StringSegment(source, offset + start, Length - start);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator StringSegment(string value)
             => new StringSegment(value, 0, value.Length);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => source.Substring(offset, Length);
+
+#if DEBUG
+        private void ValidateIndex(int i, string paramName)
+        {
+            if (i < 0) throw new ArgumentOutOfRangeException(paramName, i, "DEBUG: Cannot be negative.");
+            if (i >= Length) throw new ArgumentOutOfRangeException(paramName, i, $"DEBUG: Cannot be >= length {Length}.");
+        }
+
+        private void ValidateLength(int start, int length, string paramName)
+        {
+            if (length < 0) throw new ArgumentOutOfRangeException(paramName, length, "DEBUG: Cannot be negative.");
+            if (start + length > Length) throw new ArgumentOutOfRangeException(paramName, length,
+                $"DEBUG: When added to offset of {start}, must be <= length of {Length}.");
+        }
+#endif
     }
 }
