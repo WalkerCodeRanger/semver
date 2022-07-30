@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
+using Semver.Utility;
 
 namespace Semver.Ranges
 {
-    public class UnbrokenSemVersionRange
+    public class UnbrokenSemVersionRange : IEquatable<UnbrokenSemVersionRange>
     {
         /// <summary>
         /// A standard representation for the empty range that contains no versions.
@@ -109,6 +110,29 @@ namespace Semver.Ranges
 
         public static implicit operator Predicate<SemVersion>(UnbrokenSemVersionRange range)
             => range.Contains;
+
+        #region Equality
+        public bool Equals(UnbrokenSemVersionRange other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return start.Equals(other.start)
+                   && end.Equals(other.end)
+                   && IncludeAllPrerelease == other.IncludeAllPrerelease;
+        }
+
+        public override bool Equals(object obj)
+            => obj is UnbrokenSemVersionRange other && Equals(other);
+
+        public override int GetHashCode()
+            => CombinedHashCode.Create(start, end, IncludeAllPrerelease);
+
+        public static bool operator ==(UnbrokenSemVersionRange left, UnbrokenSemVersionRange right)
+            => Equals(left, right);
+
+        public static bool operator !=(UnbrokenSemVersionRange left, UnbrokenSemVersionRange right)
+            => !Equals(left, right);
+        #endregion
 
         // TODO implement ToString()
 

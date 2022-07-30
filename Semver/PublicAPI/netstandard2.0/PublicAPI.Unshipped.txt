@@ -1,4 +1,6 @@
 ﻿abstract Semver.Ranges.SemVersionRangeSet.Contains(Semver.SemVersion version) -> bool
+override Semver.Ranges.UnbrokenSemVersionRange.Equals(object obj) -> bool
+override Semver.Ranges.UnbrokenSemVersionRange.GetHashCode() -> int
 Semver.Ranges.SemVersionRange
 Semver.Ranges.SemVersionRange.Contains(Semver.SemVersion version) -> bool
 Semver.Ranges.SemVersionRange.Count.get -> int
@@ -21,6 +23,7 @@ Semver.Ranges.UnbrokenSemVersionRange
 Semver.Ranges.UnbrokenSemVersionRange.Contains(Semver.SemVersion version) -> bool
 Semver.Ranges.UnbrokenSemVersionRange.End.get -> Semver.SemVersion
 Semver.Ranges.UnbrokenSemVersionRange.EndInclusive.get -> bool
+Semver.Ranges.UnbrokenSemVersionRange.Equals(Semver.Ranges.UnbrokenSemVersionRange other) -> bool
 Semver.Ranges.UnbrokenSemVersionRange.IncludeAllPrerelease.get -> bool
 Semver.Ranges.UnbrokenSemVersionRange.Start.get -> Semver.SemVersion
 Semver.Ranges.UnbrokenSemVersionRange.StartInclusive.get -> bool
@@ -55,3 +58,5 @@ static Semver.Ranges.UnbrokenSemVersionRange.Inclusive(Semver.SemVersion start, 
 static Semver.Ranges.UnbrokenSemVersionRange.InclusiveOfEnd(Semver.SemVersion start, Semver.SemVersion end, bool includeAllPrerelease = false) -> Semver.Ranges.UnbrokenSemVersionRange
 static Semver.Ranges.UnbrokenSemVersionRange.InclusiveOfStart(Semver.SemVersion start, Semver.SemVersion end, bool includeAllPrerelease = false) -> Semver.Ranges.UnbrokenSemVersionRange
 static Semver.Ranges.UnbrokenSemVersionRange.LessThan(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.UnbrokenSemVersionRange
+static Semver.Ranges.UnbrokenSemVersionRange.operator !=(Semver.Ranges.UnbrokenSemVersionRange left, Semver.Ranges.UnbrokenSemVersionRange right) -> bool
+static Semver.Ranges.UnbrokenSemVersionRange.operator ==(Semver.Ranges.UnbrokenSemVersionRange left, Semver.Ranges.UnbrokenSemVersionRange right) -> bool

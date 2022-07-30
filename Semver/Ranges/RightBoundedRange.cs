@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Semver.Utility;
 
 namespace Semver.Ranges
 {
@@ -12,7 +13,7 @@ namespace Semver.Ranges
     /// <remarks>An "unbounded" right-bounded range is represented by an inclusive upper bound of
     /// <see cref="SemVersion.Max"/>.</remarks>
     [StructLayout(LayoutKind.Auto)]
-    internal readonly struct RightBoundedRange
+    internal readonly struct RightBoundedRange : IEquatable<RightBoundedRange>
     {
         public static readonly RightBoundedRange Unbounded
             = new RightBoundedRange(SemVersion.Max, true);
@@ -46,5 +47,22 @@ namespace Semver.Ranges
                 return new RightBoundedRange(Version, Inclusive && other.Inclusive);
             return other;
         }
+
+        #region Equality
+        public bool Equals(RightBoundedRange other)
+            => Equals(Version, other.Version) && Inclusive == other.Inclusive;
+
+        public override bool Equals(object obj)
+            => obj is RightBoundedRange other && Equals(other);
+
+        public override int GetHashCode()
+            => CombinedHashCode.Create(Version, Inclusive);
+
+        public static bool operator ==(RightBoundedRange left, RightBoundedRange right)
+            => left.Equals(right);
+
+        public static bool operator !=(RightBoundedRange left, RightBoundedRange right)
+            => !left.Equals(right);
+        #endregion
     }
 }

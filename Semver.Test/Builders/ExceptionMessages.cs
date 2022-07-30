@@ -12,5 +12,7 @@ namespace Semver.Test.Builders
         /// that an <see cref="ArgumentNullException"/> will be included in the release rather than
         /// is just coming from the debug exception checking.</remarks>
         public const string NotNull = "Value cannot be null.";
+
+        public const string NoMetadata = "Cannot have metadata.";
     }
 }

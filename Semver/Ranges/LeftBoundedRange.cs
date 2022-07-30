@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Semver.Utility;
 
 namespace Semver.Ranges
 {
@@ -15,7 +16,7 @@ namespace Semver.Ranges
     /// The <see cref="SemVersion.Min"/> (i.e. <c>0.0.0-0</c>) cannot be used instead
     /// because it would be inclusive of prerelease.</remarks>
     [StructLayout(LayoutKind.Auto)]
-    internal readonly struct LeftBoundedRange
+    internal readonly struct LeftBoundedRange : IEquatable<LeftBoundedRange>
     {
         public static readonly LeftBoundedRange Unbounded = new LeftBoundedRange(null, false);
 
@@ -49,5 +50,22 @@ namespace Semver.Ranges
                 return new LeftBoundedRange(Version, Inclusive && other.Inclusive);
             return this;
         }
+
+        #region Equality
+        public bool Equals(LeftBoundedRange other)
+            => Equals(Version, other.Version) && Inclusive == other.Inclusive;
+
+        public override bool Equals(object obj)
+            => obj is LeftBoundedRange other && Equals(other);
+
+        public override int GetHashCode()
+            => CombinedHashCode.Create(Version, Inclusive);
+
+        public static bool operator ==(LeftBoundedRange left, LeftBoundedRange right)
+            => left.Equals(right);
+
+        public static bool operator !=(LeftBoundedRange left, LeftBoundedRange right)
+            => !left.Equals(right);
+        #endregion
     }
 }
