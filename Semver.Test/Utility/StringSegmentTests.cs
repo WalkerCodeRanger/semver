@@ -38,5 +38,14 @@ namespace Semver.Test.Utility
 
             Assert.Equal(expected, trimmed.ToString());
         }
+
+        [Fact]
+        public void IndexOf()
+        {
+            var segment = " ^  Hello^World!".Slice(3, 10);
+            Assert.Equal(6, segment.IndexOf('^', 0, 10));
+            Assert.Equal(6, segment.IndexOf('^', 3, 5));
+            Assert.Equal(-1, segment.IndexOf('^', 3, 2));
+        }
     }
 }

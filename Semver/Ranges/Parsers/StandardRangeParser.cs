@@ -135,9 +135,6 @@ namespace Semver.Ranges.Parsers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsOperatorOrSpaceChar(char c) => c == ' ' || IsOperatorChar(c);
 
-        private static bool IsVersionChar(char c)
-            => c.IsAlphaOrHyphen() || c == '.' || c == '*';
-
         /// <remarks>The segment must be trimmed before calling this method.</remarks>
         private static Exception ParseComparison(
             StringSegment segment,
@@ -157,8 +154,7 @@ namespace Semver.Ranges.Parsers
             {
                 case '=':
                     var version = segment.Subsegment(1);
-                    // TODO support passing a segment
-                    var exception = SemVersionParser.Parse(version.ToString(), options.ToStyles(), ex, maxLength, out var semver);
+                    var exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
                     if (exception != null) return exception;
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                     rightBound = rightBound.Min(new RightBoundedRange(semver, true));

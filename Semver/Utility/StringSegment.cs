@@ -16,6 +16,7 @@ namespace Semver.Utility
         public StringSegment(string source, int offset, int length)
         {
 #if DEBUG
+            if (source is null) throw new ArgumentNullException(nameof(source), "DEBUG: Value cannot be null.");
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), offset, "DEBUG: Cannot be negative.");
             if (offset > source.Length)
                 throw new ArgumentOutOfRangeException(nameof(offset), offset,
@@ -74,12 +75,22 @@ namespace Semver.Utility
             return new StringSegment(source, offset + start, length);
         }
 
-        internal StringSegment Subsegment(int start)
+        public StringSegment Subsegment(int start)
         {
 #if DEBUG
             ValidateIndex(start, nameof(start));
 #endif
             return new StringSegment(source, offset + start, Length - start);
+        }
+
+        public int IndexOf(char value, int startIndex, int count)
+        {
+#if DEBUG
+            ValidateIndex(startIndex, nameof(startIndex));
+            ValidateLength(startIndex, count, nameof(count));
+#endif
+            var i = source.IndexOf(value, offset + startIndex, count);
+            return i < 0 ? i : i - offset;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -93,7 +104,7 @@ namespace Semver.Utility
         private void ValidateIndex(int i, string paramName)
         {
             if (i < 0) throw new ArgumentOutOfRangeException(paramName, i, "DEBUG: Cannot be negative.");
-            if (i >= Length) throw new ArgumentOutOfRangeException(paramName, i, $"DEBUG: Cannot be >= length {Length}.");
+            if (i > Length) throw new ArgumentOutOfRangeException(paramName, i, $"DEBUG: Cannot be > length {Length}.");
         }
 
         private void ValidateLength(int start, int length, string paramName)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Semver.Ranges;
 using Semver.Utility;
 
 namespace Semver
@@ -58,6 +59,35 @@ namespace Semver
                 throw new ArgumentException("DEBUG: " + SemVersion.InvalidSemVersionStylesMessage, nameof(style));
 #endif
 
+            if (version != null) return Parse((StringSegment)version, style, ex, maxLength, out semver);
+            semver = null;
+            return ex ?? new ArgumentNullException(nameof(version));
+        }
+
+        /// <summary>
+        /// An internal method that is used when parsing versions from ranges. Because this is
+        /// called by both
+        /// <see cref="SemVersionRange.Parse(string,SemVersionRangeOptions,int)"/> and
+        /// <see cref="SemVersionRange.TryParse(string,SemVersionRangeOptions,out SemVersionRange,int)"/>
+        /// it does not throw exceptions, but instead returns the exception that should be thrown
+        /// by the parse method. For performance when used from try parse, all exception construction
+        /// and message formatting can be avoided by passing in an exception which will be returned
+        /// when parsing fails.
+        /// </summary>
+        /// <remarks>This does not validate the <paramref name="style"/> or <paramref name="maxLength"/>
+        /// parameter values. That must be done in the calling method.</remarks>
+        public static Exception Parse(
+            StringSegment version,
+            SemVersionStyles style,
+            Exception ex,
+            int maxLength,
+            out SemVersion semver)
+        {
+#if DEBUG
+            if (!style.IsValid())
+                throw new ArgumentException("DEBUG: " + SemVersion.InvalidSemVersionStylesMessage, nameof(style));
+#endif
+
             // Assign null once so it doesn't have to be done any time parse fails
             semver = null;
 
@@ -65,11 +95,10 @@ namespace Semver
             // is short circuiting to avoid constructing exceptions and exception messages
             // when a non-null exception is passed in.
 
-            if (version is null) return ex ?? new ArgumentNullException(nameof(version));
-
             if (version.Length == 0) return ex ?? new FormatException(EmptyVersionMessage);
 
-            if (version.Length > maxLength) return ex ?? NewFormatException(TooLongVersionMessage, LimitLength(version), maxLength);
+            if (version.Length > maxLength)
+                return ex ?? NewFormatException(TooLongVersionMessage, LimitLength(version), maxLength);
 
             // This code does two things to help provide good error messages:
             // 1. It breaks the version number into segments and then parses those segments
@@ -139,7 +168,8 @@ namespace Semver
             if (i < version.Length && version[i] == '-')
             {
                 i += 1;
-                parseEx = ParsePrerelease(version, ref i, startOfMetadata, allowLeadingZeros, ex, out prerelease, out prereleaseIdentifiers);
+                parseEx = ParsePrerelease(version, ref i, startOfMetadata, allowLeadingZeros, ex,
+                            out prerelease, out prereleaseIdentifiers);
                 if (parseEx != null) return parseEx;
             }
             else
@@ -179,13 +209,13 @@ namespace Semver
         }
 
         private static Exception ParseLeadingWhitespace(
-            string version,
+            StringSegment version,
             SemVersionStyles style,
             Exception ex,
             ref int i)
         {
             // Skip leading whitespace
-            while (i < version.Length && char.IsWhiteSpace(version, i)) i += 1;
+            while (i < version.Length && char.IsWhiteSpace(version[i])) i += 1;
 
             // Error if all whitespace
             if (i == version.Length)
@@ -198,7 +228,7 @@ namespace Semver
             return null;
         }
 
-        private static Exception ParseLeadingV(string version, SemVersionStyles style, Exception ex, ref int i)
+        private static Exception ParseLeadingV(StringSegment version, SemVersionStyles style, Exception ex, ref int i)
         {
             // This is safe because the check for all whitespace ensures there is at least one more char
             var leadChar = version[i];
@@ -219,16 +249,16 @@ namespace Semver
             return null;
         }
 
-        private static int StartOfTrailingWhitespace(string version)
+        private static int StartOfTrailingWhitespace(StringSegment version)
         {
             var i = version.Length - 1;
-            while (i > 0 && char.IsWhiteSpace(version, i)) i -= 1;
+            while (i > 0 && char.IsWhiteSpace(version[i])) i -= 1;
             return i + 1; // add one for the non-whitespace char that was found
         }
 
         private static Exception ParseVersionNumber(
             string kind,
-            string version,
+            StringSegment version,
             ref int i,
             int startOfNext,
             bool allowLeadingZero,
@@ -273,7 +303,7 @@ namespace Semver
                 }
             }
 
-            var numberString = version.Substring(start, i - start);
+            var numberString = version.Subsegment(start, i - start).ToString();
             if (!int.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
                 // Parsing validated this as a string of digits possibly proceeded by zero so the only
                 // possible issue is a numeric overflow for `int`
@@ -284,7 +314,7 @@ namespace Semver
         }
 
         private static Exception ParsePrerelease(
-            string version,
+            StringSegment version,
             ref int i,
             int startOfNext,
             bool allowLeadingZero,
@@ -320,7 +350,7 @@ namespace Semver
                 if (s == i)
                     return ex ?? NewFormatException(MissingPrereleaseIdentifierMessage, LimitLength(version));
 
-                var identifier = version.Substring(s, i - s);
+                var identifier = version.Subsegment(s, i - s).ToString();
                 if (!isNumeric)
                     identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, null));
                 else
@@ -345,20 +375,20 @@ namespace Semver
 
             // If there are leading zeros, reconstruct the string from the identifiers, otherwise just take a substring
             prerelease = hasLeadingZeros
-                ? string.Join(".", identifiers) : version.Substring(startOfPrerelease, startOfNext - startOfPrerelease);
+                ? string.Join(".", identifiers) : version.Subsegment(startOfPrerelease, startOfNext - startOfPrerelease).ToString();
 
             return null;
         }
 
         private static Exception ParseMetadata(
-            string version,
+            StringSegment version,
             ref int i,
             int startOfNext,
             Exception ex,
             out string metadata,
             out IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
-            metadata = version.Substring(i, startOfNext - i);
+            metadata = version.Subsegment(i, startOfNext - i).ToString();
             var identifiers = new List<MetadataIdentifier>();
             metadataIdentifiers = identifiers.AsReadOnly();
             i -= 1; // Back up so we are before the start of the first identifier
@@ -380,7 +410,7 @@ namespace Semver
                 if (s == i)
                     return ex ?? NewFormatException(MissingMetadataIdentifierMessage, LimitLength(version));
 
-                var identifier = version.Substring(s, i - s);
+                var identifier = version.Subsegment(s, i - s).ToString();
                 identifiers.Add(MetadataIdentifier.CreateUnsafe(identifier));
 
             } while (i < startOfNext && version[i] == '.');
@@ -394,12 +424,12 @@ namespace Semver
 
         private const int VersionDisplayLimit = 100;
 
-        private static string LimitLength(string version)
+        private static string LimitLength(StringSegment version)
         {
             if (version.Length > VersionDisplayLimit)
-                version = version.Substring(0, VersionDisplayLimit - 3) + "...";
+                version = version.Subsegment(0, VersionDisplayLimit - 3) + "...";
 
-            return version;
+            return version.ToString();
         }
     }
 }
