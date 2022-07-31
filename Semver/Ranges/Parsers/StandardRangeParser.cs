@@ -18,7 +18,7 @@ namespace Semver.Ranges.Parsers
             if (!options.IsValid())
                 throw new ArgumentException("DEBUG: " + SemVersionRange.InvalidOptionsMessage, nameof(options));
             if (maxLength < 0)
-                throw new ArgumentOutOfRangeException("DEBUG: " + SemVersionRange.InvalidMaxLengthMessage, nameof(maxLength));
+                throw new ArgumentOutOfRangeException(nameof(maxLength), "DEBUG: " + SemVersionRange.InvalidMaxLengthMessage);
 #endif
 
             // Assign null once so it doesn't have to be done any time parse fails
@@ -46,7 +46,7 @@ namespace Semver.Ranges.Parsers
 
             // TODO sort ranges
             // TODO combine ranges
-            semverRange = new SemVersionRange(unbrokenRanges.AsReadOnly());
+            semverRange = SemVersionRange.Create(unbrokenRanges);
             return null;
         }
 

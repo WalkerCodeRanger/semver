@@ -5,8 +5,6 @@ Semver.Ranges.SemVersionRange
 Semver.Ranges.SemVersionRange.Contains(Semver.SemVersion version) -> bool
 Semver.Ranges.SemVersionRange.Count.get -> int
 Semver.Ranges.SemVersionRange.GetEnumerator() -> System.Collections.Generic.IEnumerator<Semver.Ranges.UnbrokenSemVersionRange>
-Semver.Ranges.SemVersionRange.SemVersionRange(params Semver.Ranges.UnbrokenSemVersionRange[] ranges) -> void
-Semver.Ranges.SemVersionRange.SemVersionRange(System.Collections.Generic.IEnumerable<Semver.Ranges.UnbrokenSemVersionRange> ranges) -> void
 Semver.Ranges.SemVersionRange.this[int index].get -> Semver.Ranges.UnbrokenSemVersionRange
 Semver.Ranges.SemVersionRangeOptions
 Semver.Ranges.SemVersionRangeOptions.AllowLeadingZeros = 1 -> Semver.Ranges.SemVersionRangeOptions
@@ -38,6 +36,8 @@ static readonly Semver.Ranges.UnbrokenSemVersionRange.AllRelease -> Semver.Range
 static readonly Semver.Ranges.UnbrokenSemVersionRange.Empty -> Semver.Ranges.UnbrokenSemVersionRange
 static Semver.Ranges.SemVersionRange.AtLeast(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.AtMost(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
+static Semver.Ranges.SemVersionRange.Create(params Semver.Ranges.UnbrokenSemVersionRange[] ranges) -> Semver.Ranges.SemVersionRange
+static Semver.Ranges.SemVersionRange.Create(System.Collections.Generic.IEnumerable<Semver.Ranges.UnbrokenSemVersionRange> ranges) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.Equals(Semver.SemVersion version) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.Exclusive(Semver.SemVersion start, Semver.SemVersion end, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.GreaterThan(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange

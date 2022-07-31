@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Semver.Ranges;
 using Semver.Test.Builders;
 using Xunit;
@@ -434,6 +436,42 @@ namespace Semver.Test.Ranges
         {
             var range = SemVersionRange.Exclusive(SemVersion.Max, SemVersion.Max, includeAllPrerelease);
             Assert.Same(SemVersionRange.Empty, range);
+        }
+
+        [Fact]
+        public void CreateEnumerableEmpty()
+        {
+            var range = SemVersionRange.Create(Enumerable.Empty<UnbrokenSemVersionRange>());
+
+            Assert.Same(SemVersionRange.Empty, range);
+        }
+
+        [Fact]
+        public void CreateNullEnumerable()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(()
+                => SemVersionRange.Create((IEnumerable<UnbrokenSemVersionRange>)null));
+
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
+            Assert.Equal("ranges", ex.ParamName);
+        }
+
+        [Fact]
+        public void CreateParamsEmpty()
+        {
+            var range = SemVersionRange.Create();
+
+            Assert.Same(SemVersionRange.Empty, range);
+        }
+
+        [Fact]
+        public void CreateNullArray()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(() =>
+                SemVersionRange.Create((UnbrokenSemVersionRange[])null));
+
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
+            Assert.Equal("ranges", ex.ParamName);
         }
     }
 }

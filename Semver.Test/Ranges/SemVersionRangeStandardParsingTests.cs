@@ -34,6 +34,8 @@ namespace Semver.Test.Ranges
             Valid("=   1.2.3", Equals("1.2.3")),
             Valid(" =   1.2.3 ", Equals("1.2.3")),
             Valid("=1.2.3 || =4.5.6", Equals("1.2.3"), Equals("4.5.6")),
+            // Shows sorting of ranges
+            Valid("=4.5.6||=1.2.3", Equals("1.2.3"), Equals("4.5.6")),
             Valid(">1.2.3", GreaterThan("1.2.3")),
             Valid("  >1.2.3   ", GreaterThan("1.2.3")),
             Valid(">   1.2.3", GreaterThan("1.2.3")),
@@ -159,10 +161,10 @@ namespace Semver.Test.Ranges
             string range,
             UnbrokenSemVersionRange expected,
             int maxLength = SemVersionRange.MaxRangeLength)
-            => RangeParsingTestCase.Valid(range, Strict, maxLength, new SemVersionRange(expected));
+            => RangeParsingTestCase.Valid(range, Strict, maxLength, SemVersionRange.Create(expected));
 
         internal static RangeParsingTestCase Valid(string range, params UnbrokenSemVersionRange[] expectedRanges)
-            => RangeParsingTestCase.Valid(range, Strict, SemVersionRange.MaxRangeLength, new SemVersionRange(expectedRanges));
+            => RangeParsingTestCase.Valid(range, Strict, SemVersionRange.MaxRangeLength, SemVersionRange.Create(expectedRanges));
 
         internal static RangeParsingTestCase Valid(string range, SemVersionRangeOptions options, SemVersionRange expected,
             int maxLength = SemVersionRange.MaxRangeLength)

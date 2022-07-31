@@ -24,10 +24,8 @@ namespace Semver.Comparers
         }
 
         public int GetHashCode(SemVersion v)
-        {
             // Using v.Prerelease handles leading zero so "01" != "1"
-            return CombinedHashCode.Create(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-        }
+            => CombinedHashCode.Create(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
 
         public override int Compare(SemVersion x, SemVersion y)
         {

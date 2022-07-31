@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Semver.Comparers;
 using Semver.Ranges.Parsers;
 using Semver.Utility;
 
@@ -60,24 +61,21 @@ namespace Semver.Ranges
         /// be referenced by the caller.</remarks>
         internal static SemVersionRange Create(List<UnbrokenSemVersionRange> ranges)
         {
-            throw new NotImplementedException();
+#if DEBUG
+            if (ranges is null) throw new ArgumentNullException(nameof(ranges), "DEBUG: Value cannot be null.");
+#endif
+            ranges.Sort(UnbrokenSemVersionRangeComparer.Instance);
+            if (ranges.Count == 0) return Empty;
+            return new SemVersionRange(ranges.AsReadOnly());
         }
+
+        public static SemVersionRange Create(IEnumerable<UnbrokenSemVersionRange> ranges)
+            => Create((ranges ?? throw new ArgumentNullException(nameof(ranges))).ToList());
+
+        public static SemVersionRange Create(params UnbrokenSemVersionRange[] ranges)
+            => Create((ranges ?? throw new ArgumentNullException(nameof(ranges))).ToList());
 
         private readonly IReadOnlyList<UnbrokenSemVersionRange> ranges;
-
-        // TODO what about empty?
-        public SemVersionRange(IEnumerable<UnbrokenSemVersionRange> ranges)
-            // TODO order ranges and combine
-            : this(ranges.ToReadOnlyList())
-        {
-        }
-
-        // TODO what about empty?
-        public SemVersionRange(params UnbrokenSemVersionRange[] ranges)
-            // TODO order ranges and combine
-            : this(ranges.ToReadOnlyList())
-        {
-        }
 
         /// <remarks>Parameter validation is not performed. The unbroken range must not be empty.</remarks>
         private SemVersionRange(UnbrokenSemVersionRange range)
