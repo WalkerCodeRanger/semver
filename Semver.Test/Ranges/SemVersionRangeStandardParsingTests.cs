@@ -7,7 +7,7 @@ using static Semver.Ranges.SemVersionRangeOptions;
 
 namespace Semver.Test.Ranges
 {
-    public class SemVersionRangeParsingTests
+    public class SemVersionRangeStandardParsingTests
     {
         private const string InvalidSemVersionRangeOptionsMessageStart = "An invalid SemVersionRangeOptions value was used.";
         private const string InvalidMaxLengthMessageStart = "Must not be negative.";
