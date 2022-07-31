@@ -32,6 +32,26 @@ namespace Semver.Test.Ranges
             Valid("=   1.2.3", Equals("1.2.3")),
             Valid(" =   1.2.3 ", Equals("1.2.3")),
             Valid("=1.2.3 || =4.5.6", Equals("1.2.3"), Equals("4.5.6")),
+            Valid(">1.2.3", GreaterThan("1.2.3")),
+            Valid("  >1.2.3   ", GreaterThan("1.2.3")),
+            Valid(">   1.2.3", GreaterThan("1.2.3")),
+            Valid(" >   1.2.3 ", GreaterThan("1.2.3")),
+            //Valid(">1.2.3 || >4.5.6", GreaterThan("1.2.3")),
+            Valid(">=1.2.3", AtLeast("1.2.3")),
+            Valid("  >=1.2.3   ", AtLeast("1.2.3")),
+            Valid(">=   1.2.3", AtLeast("1.2.3")),
+            Valid(" >=   1.2.3 ", AtLeast("1.2.3")),
+            //Valid(">=1.2.3 || >=4.5.6", AtLeast("1.2.3")),
+            Valid("<1.2.3", LessThan("1.2.3")),
+            Valid("  <1.2.3   ", LessThan("1.2.3")),
+            Valid("<   1.2.3", LessThan("1.2.3")),
+            Valid(" <   1.2.3 ", LessThan("1.2.3")),
+            //Valid("<1.2.3 || <4.5.6", LessThan("4.5.6")),
+            Valid("<=1.2.3", AtMost("1.2.3")),
+            Valid("  <=1.2.3   ", AtMost("1.2.3")),
+            Valid("<=   1.2.3", AtMost("1.2.3")),
+            Valid(" <=   1.2.3 ", AtMost("1.2.3")),
+            //Valid("<=1.2.3 || <=4.5.6", AtMost("4.5.6")),
         };
 
         [Theory]
@@ -133,5 +153,17 @@ namespace Semver.Test.Ranges
 
         internal static UnbrokenSemVersionRange Equals(string version)
             => UnbrokenSemVersionRange.Equals(SemVersion.Parse(version, SemVersionStyles.Strict));
+
+        internal static UnbrokenSemVersionRange GreaterThan(string version)
+            => UnbrokenSemVersionRange.GreaterThan(SemVersion.Parse(version, SemVersionStyles.Strict));
+
+        internal static UnbrokenSemVersionRange AtLeast(string version)
+            => UnbrokenSemVersionRange.AtLeast(SemVersion.Parse(version, SemVersionStyles.Strict));
+
+        internal static UnbrokenSemVersionRange LessThan(string version)
+            => UnbrokenSemVersionRange.LessThan(SemVersion.Parse(version, SemVersionStyles.Strict));
+
+        internal static UnbrokenSemVersionRange AtMost(string version)
+            => UnbrokenSemVersionRange.AtMost(SemVersion.Parse(version, SemVersionStyles.Strict));
     }
 }

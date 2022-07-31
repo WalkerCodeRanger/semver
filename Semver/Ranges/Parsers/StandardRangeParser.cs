@@ -163,23 +163,43 @@ namespace Semver.Ranges.Parsers
 #if DEBUG
             if (segment.IsEmpty) throw new ArgumentException("Cannot be empty", nameof(segment));
 #endif
+            // TODO identify the operator and report invalid operators
+            // TODO Also report invalid chars?
+
             var firstChar = segment[0];
             var isOrEqual = segment.Length >= 2 && segment[1] == '=';
 
             switch (firstChar)
             {
                 case '=':
+                {
                     var version = segment.Subsegment(1);
                     var exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
                     if (exception != null) return exception;
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                     rightBound = rightBound.Min(new RightBoundedRange(semver, true));
                     return null;
+                }
                 case '>':
+                {
+                    var version = segment.Subsegment(isOrEqual ? 2 : 1);
+                    var exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
+                    if (exception != null) return exception;
+                    leftBound = leftBound.Max(new LeftBoundedRange(semver, isOrEqual));
+                    return null;
+                }
                 case '<':
+                {
+                    var version = segment.Subsegment(isOrEqual ? 2 : 1);
+                    var exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
+                    if (exception != null) return exception;
+                    rightBound = rightBound.Min(new RightBoundedRange(semver, isOrEqual));
+                    return null;
+                }
                 case '~':
                 case '^':
-                default: // implied =
+                    throw new NotImplementedException();
+                default: // implied = (supports wildcard *)
                     throw new NotImplementedException();
             }
         }
