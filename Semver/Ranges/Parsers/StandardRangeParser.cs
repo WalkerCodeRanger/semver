@@ -18,7 +18,7 @@ namespace Semver.Ranges.Parsers
             var unbrokenRanges = new List<UnbrokenSemVersionRange>(CountSplitOnOrOperator(range));
             foreach (var segment in SplitOnOrOperator(range))
             {
-                var exception = ParseUnbrokenRange(segment, options, ex, out var unbrokenRange);
+                var exception = ParseUnbrokenRange(segment, options, ex, maxLength, out var unbrokenRange);
                 if (exception is null)
                     unbrokenRanges.Add(unbrokenRange);
                 else
@@ -78,6 +78,7 @@ namespace Semver.Ranges.Parsers
             StringSegment segment,
             SemVersionRangeOptions options,
             Exception ex,
+            int maxLength,
             out UnbrokenSemVersionRange unbrokenRange)
         {
             segment = segment.TrimEndSpaces();
@@ -85,7 +86,7 @@ namespace Semver.Ranges.Parsers
             var end = RightBoundedRange.Unbounded;
             foreach (var comparison in SplitComparisons(segment))
             {
-                var exception = ParseComparison(comparison, options, ex, ref start, ref end);
+                var exception = ParseComparison(comparison, options, ex, maxLength, ref start, ref end);
                 if (exception != null)
                 {
                     unbrokenRange = null;
@@ -141,7 +142,8 @@ namespace Semver.Ranges.Parsers
         private static Exception ParseComparison(
             StringSegment segment,
             SemVersionRangeOptions options,
-            Exception exception,
+            Exception ex,
+            int maxLength,
             ref LeftBoundedRange leftBound,
             ref RightBoundedRange rightBound)
         {
@@ -151,21 +153,23 @@ namespace Semver.Ranges.Parsers
             var firstChar = segment[0];
             var isOrEqual = segment.Length >= 2 && segment[1] == '=';
 
-            //switch (firstChar)
-            //{
-            //    case '=':
-            //        var versionSegment = segment.Subsegment(1);
-            //        // TODO parse version
-            //        break;
-            //    case '>':
-            //    case '<':
-            //    case '~':
-            //    case '^':
-            //    default: // implied =
-            //        var version
-            //}
-
-            throw new NotImplementedException();
+            switch (firstChar)
+            {
+                case '=':
+                    var version = segment.Subsegment(1);
+                    // TODO support passing a segment
+                    var exception = SemVersionParser.Parse(version.ToString(), options.ToStyles(), ex, maxLength, out var semver);
+                    if (exception != null) return exception;
+                    leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
+                    rightBound = rightBound.Min(new RightBoundedRange(semver, true));
+                    return null;
+                case '>':
+                case '<':
+                case '~':
+                case '^':
+                default: // implied =
+                    throw new NotImplementedException();
+            }
         }
     }
 }
