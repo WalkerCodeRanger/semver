@@ -52,6 +52,8 @@ namespace Semver.Test.Ranges
             Valid("<=   1.2.3", AtMost("1.2.3")),
             Valid(" <=   1.2.3 ", AtMost("1.2.3")),
             //Valid("<=1.2.3 || <=4.5.6", AtMost("4.5.6")),
+
+            Invalid<ArgumentNullException>(null, ExceptionMessages.NotNull),
         };
 
         [Theory]
@@ -150,6 +152,9 @@ namespace Semver.Test.Ranges
 
         internal static RangeParsingTestCase Valid(string range, SemVersionRangeOptions options, SemVersionRange expected)
             => RangeParsingTestCase.Valid(range, options, 2048, expected);
+
+        internal static RangeParsingTestCase Invalid<T>(string range, string exceptionMessage)
+            => RangeParsingTestCase.Invalid(range, Strict, 2048, typeof(T), exceptionMessage);
 
         internal static UnbrokenSemVersionRange Equals(string version)
             => UnbrokenSemVersionRange.Equals(SemVersion.Parse(version, SemVersionStyles.Strict));

@@ -20,7 +20,15 @@ namespace Semver.Ranges.Parsers
             if (maxLength < 0)
                 throw new ArgumentOutOfRangeException("DEBUG: " + SemVersionRange.InvalidMaxLengthMessage, nameof(maxLength));
 #endif
-            // TODO check range for null
+
+            // Assign null once so it doesn't have to be done any time parse fails
+            semverRange = null;
+
+            // Note: this method relies on the fact that the null coalescing operator `??`
+            // is short circuiting to avoid constructing exceptions and exception messages
+            // when a non-null exception is passed in.
+
+            if (range is null) return ex ?? new ArgumentNullException(nameof(range));
             // TODO check max length
 
             var unbrokenRanges = new List<UnbrokenSemVersionRange>(CountSplitOnOrOperator(range));
