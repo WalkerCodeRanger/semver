@@ -57,6 +57,9 @@ namespace Semver
 #if DEBUG
             if (!style.IsValid())
                 throw new ArgumentException("DEBUG: " + SemVersion.InvalidSemVersionStylesMessage, nameof(style));
+            // TODO include in v3.0.0 for issue #72
+            //if(maxLength < 0)
+            //    throw new ArgumentOutOfRangeException("DEBUG: " + SemVersion.InvalidMaxLengthMessage, nameof(maxLength));
 #endif
 
             if (version != null) return Parse((StringSegment)version, style, ex, maxLength, out semver);
@@ -86,6 +89,9 @@ namespace Semver
 #if DEBUG
             if (!style.IsValid())
                 throw new ArgumentException("DEBUG: " + SemVersion.InvalidSemVersionStylesMessage, nameof(style));
+            // TODO include in v3.0.0 for issue #72
+            //if(maxLength < 0)
+            //    throw new ArgumentOutOfRangeException("DEBUG: " + SemVersion.InvalidMaxLengthMessage, nameof(maxLength));
 #endif
 
             // Assign null once so it doesn't have to be done any time parse fails

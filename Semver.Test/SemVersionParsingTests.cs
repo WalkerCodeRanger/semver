@@ -54,6 +54,12 @@ namespace Semver.Test
             SemVersionStylesExtensions.AllowAll + 1,
         };
 
+        public static readonly TheoryData<int> InvalidMaxLength = new TheoryData<int>()
+        {
+            -1,
+            int.MinValue,
+        };
+
         public static readonly TheoryData<ParsingTestCase> ParsingTestCases = ExpandTestCases(
             // version numbers given with the link in the spec to a regex for semver versions
             Valid("0.0.4", 0, 0, 4),
@@ -366,6 +372,16 @@ namespace Semver.Test
         }
 
         [Theory]
+        [MemberData(nameof(InvalidMaxLength))]
+        public void ParseWithInvalidMaxLength(int maxLength)
+        {
+            // TODO change in v3.0.0 for issue #72
+            var ex = Assert.Throws<FormatException>(() => SemVersion.Parse("ignored", Strict, maxLength));
+
+            Assert.Equal(string.Format(TooLongVersionMessage, "ignored", maxLength), ex.Message);
+        }
+
+        [Theory]
         [MemberData(nameof(ParsingTestCases))]
         public void ParseWithStyleParsesCorrectly(ParsingTestCase testCase)
         {
@@ -403,6 +419,17 @@ namespace Semver.Test
 
             Assert.StartsWith(InvalidSemVersionStylesMessageStart, ex.Message);
             Assert.Equal("style", ex.ParamName);
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidMaxLength))]
+        public void TryParseWithInvalidMaxLength(int maxLength)
+        {
+            // TODO change in v3.0.0 for issue #72
+            var result = SemVersion.TryParse("1.2.3", Strict, out var version, maxLength);
+
+            Assert.False(result);
+            Assert.Null(version);
         }
 
         [Theory]
