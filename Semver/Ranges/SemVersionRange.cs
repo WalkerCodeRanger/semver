@@ -14,7 +14,7 @@ namespace Semver.Ranges
     /// some prerelease versions between included release versions. For a range that cannot have
     /// gaps see the <see cref="UnbrokenSemVersionRange"/> class.
     /// </summary>
-    public class SemVersionRange : IReadOnlyList<UnbrokenSemVersionRange>
+    public sealed class SemVersionRange : IReadOnlyList<UnbrokenSemVersionRange>
     {
         internal const int MaxRangeLength = 2048;
         internal const string InvalidOptionsMessage = "An invalid SemVersionRangeOptions value was used.";
@@ -64,8 +64,12 @@ namespace Semver.Ranges
 #if DEBUG
             if (ranges is null) throw new ArgumentNullException(nameof(ranges), "DEBUG: Value cannot be null.");
 #endif
-            ranges.Sort(UnbrokenSemVersionRangeComparer.Instance);
+            // Remove empty ranges and see if the result is empty
+            ranges.RemoveAll(range => UnbrokenSemVersionRange.Empty.Equals(range));
             if (ranges.Count == 0) return Empty;
+
+            // Sort ranges for good display
+            ranges.Sort(UnbrokenSemVersionRangeComparer.Instance);
             return new SemVersionRange(ranges.AsReadOnly());
         }
 

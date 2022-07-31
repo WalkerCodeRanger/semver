@@ -3,7 +3,7 @@ using Semver.Ranges;
 
 namespace Semver.Comparers
 {
-    internal class UnbrokenSemVersionRangeComparer : Comparer<UnbrokenSemVersionRange>
+    internal sealed class UnbrokenSemVersionRangeComparer : Comparer<UnbrokenSemVersionRange>
     {
         #region Singleton
         public static readonly UnbrokenSemVersionRangeComparer Instance = new UnbrokenSemVersionRangeComparer();

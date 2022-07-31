@@ -4,7 +4,7 @@ using Semver.Utility;
 
 namespace Semver.Comparers
 {
-    internal class SortOrderComparer : Comparer<SemVersion>, ISemVersionComparer
+    internal sealed class SortOrderComparer : Comparer<SemVersion>, ISemVersionComparer
     {
         #region Singleton
         public static readonly ISemVersionComparer Instance = new SortOrderComparer();

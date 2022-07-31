@@ -4,7 +4,7 @@ using Semver.Utility;
 
 namespace Semver.Ranges
 {
-    public class UnbrokenSemVersionRange : IEquatable<UnbrokenSemVersionRange>
+    public sealed class UnbrokenSemVersionRange : IEquatable<UnbrokenSemVersionRange>
     {
         /// <summary>
         /// A standard representation for the empty range that contains no versions.

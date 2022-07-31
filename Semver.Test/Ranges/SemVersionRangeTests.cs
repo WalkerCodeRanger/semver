@@ -457,6 +457,14 @@ namespace Semver.Test.Ranges
         }
 
         [Fact]
+        public void CreateEnumerableOfEmptyUnbrokenRange()
+        {
+            var range = SemVersionRange.Create(new[] { UnbrokenSemVersionRange.Empty }.AsEnumerable());
+
+            Assert.Same(SemVersionRange.Empty, range);
+        }
+
+        [Fact]
         public void CreateParamsEmpty()
         {
             var range = SemVersionRange.Create();
@@ -472,6 +480,14 @@ namespace Semver.Test.Ranges
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("ranges", ex.ParamName);
+        }
+
+        [Fact]
+        public void CreatePramsOfEmptyUnbrokenRange()
+        {
+            var range = SemVersionRange.Create(UnbrokenSemVersionRange.Empty);
+
+            Assert.Same(SemVersionRange.Empty, range);
         }
     }
 }
