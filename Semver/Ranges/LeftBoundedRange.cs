@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Semver.Comparers;
 using Semver.Utility;
 
 namespace Semver.Ranges
@@ -73,6 +74,13 @@ namespace Semver.Ranges
             var comparison = SemVersion.PrecedenceComparer.Compare(Version, other.Version);
             if (comparison != 0) return comparison;
             return Inclusive && other.Inclusive ? 0 : 1;
+        }
+
+        public int CompareTo(LeftBoundedRange other)
+        {
+            var comparison = PrecedenceComparer.Instance.Compare(Version, other.Version);
+            if (comparison != 0) return comparison;
+            return -Inclusive.CompareTo(other.Inclusive);
         }
     }
 }

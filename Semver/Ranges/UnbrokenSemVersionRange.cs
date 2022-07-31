@@ -144,6 +144,64 @@ namespace Semver.Ranges
                    && other.LeftBound.CompareTo(RightBound) <= 0;
         }
 
+        /// <summary>
+        /// Whether this range contains the other. For this to be the case, it must contain all the
+        /// versions accounting for which prerelease versions are in each range.
+        /// </summary>
+        internal bool Contains(UnbrokenSemVersionRange other)
+        {
+            // It contains prerelease we don't
+            // TODO what if those prerelease were covered by our ends?
+            if (other.IncludeAllPrerelease && !IncludeAllPrerelease) return false;
+
+            // If our bounds don't contain the other bounds, there is no containment
+            if (LeftBound.CompareTo(other.LeftBound) > 0
+                || other.RightBound.CompareTo(RightBound) > 0) return false;
+
+            // Our bounds contain the other bounds, but that doesn't mean it contains if there
+            // are prerelease versions that are being missed.
+
+            // If we contain all prerelease versions, it is safe
+            if (IncludeAllPrerelease) return true;
+
+            // Make sure we include prerelease at the start
+            if (other.Start.IsPrerelease)
+            {
+                if (!Start.IsPrerelease
+                    || !Start.MajorMinorPatchEquals(other.Start)) return false;
+            }
+
+            // Make sure we include prerelease at the end
+            if (other.End.IsPrerelease)
+            {
+                if (!Start.IsPrerelease
+                    || !End.MajorMinorPatchEquals(other.End)) return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Try to union this range with the other. This is a complex operation because it must
+        /// account for
+        /// </summary>
+        internal bool TryUnion(UnbrokenSemVersionRange other, out UnbrokenSemVersionRange union)
+        {
+            if (this.Contains(other))
+            {
+                union = this;
+                return true;
+            }
+
+            if (other.Contains(this))
+            {
+                union = other;
+                return true;
+            }
+
+            throw new NotImplementedException();
+        }
+
         private static bool IsEmpty(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)
         {
             var comparison = SemVersion.ComparePrecedence(start.Version, end.Version);
