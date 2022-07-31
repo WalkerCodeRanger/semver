@@ -14,7 +14,10 @@ namespace Semver.Comparers
         public override int Compare(UnbrokenSemVersionRange x, UnbrokenSemVersionRange y)
         {
             var comparison = Compare(x.LeftBound, y.LeftBound);
-            return comparison != 0 ? comparison : Compare(x.RightBound, y.RightBound);
+            if (comparison != 0) return comparison;
+            comparison = Compare(x.RightBound, y.RightBound);
+            if (comparison != 0) return comparison;
+            return x.IncludeAllPrerelease.CompareTo(y.IncludeAllPrerelease);
         }
 
         private static int Compare(LeftBoundedRange x, LeftBoundedRange y)
