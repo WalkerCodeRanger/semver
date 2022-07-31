@@ -79,27 +79,28 @@ namespace Semver.Ranges
             return new UnbrokenSemVersionRange(start, end, includeAllPrerelease);
         }
 
-        private UnbrokenSemVersionRange(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)
+        private UnbrokenSemVersionRange(LeftBoundedRange leftBound, RightBoundedRange rightBound, bool includeAllPrerelease)
         {
-            this.start = start;
-            this.end = end;
+            LeftBound = leftBound;
+            RightBound = rightBound;
             IncludeAllPrerelease = includeAllPrerelease;
         }
 
-        private readonly LeftBoundedRange start;
-        private readonly RightBoundedRange end;
+        internal readonly LeftBoundedRange LeftBound;
+        internal readonly RightBoundedRange RightBound;
 
-        public SemVersion Start => start.Version;
-        public bool StartInclusive => start.Inclusive;
-        public SemVersion End => end.Version;
-        public bool EndInclusive => end.Inclusive;
+
+        public SemVersion Start => LeftBound.Version;
+        public bool StartInclusive => LeftBound.Inclusive;
+        public SemVersion End => RightBound.Version;
+        public bool EndInclusive => RightBound.Inclusive;
         public bool IncludeAllPrerelease { get; }
 
         public bool Contains(SemVersion version)
         {
             if (version is null) throw new ArgumentNullException(nameof(version));
 
-            if (!start.Contains(version) || !end.Contains(version)) return false;
+            if (!LeftBound.Contains(version) || !RightBound.Contains(version)) return false;
 
             if (IncludeAllPrerelease || !version.IsPrerelease) return true;
 
@@ -116,8 +117,8 @@ namespace Semver.Ranges
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return start.Equals(other.start)
-                   && end.Equals(other.end)
+            return LeftBound.Equals(other.LeftBound)
+                   && RightBound.Equals(other.RightBound)
                    && IncludeAllPrerelease == other.IncludeAllPrerelease;
         }
 
@@ -125,7 +126,7 @@ namespace Semver.Ranges
             => obj is UnbrokenSemVersionRange other && Equals(other);
 
         public override int GetHashCode()
-            => CombinedHashCode.Create(start, end, IncludeAllPrerelease);
+            => CombinedHashCode.Create(LeftBound, RightBound, IncludeAllPrerelease);
 
         public static bool operator ==(UnbrokenSemVersionRange left, UnbrokenSemVersionRange right)
             => Equals(left, right);
