@@ -2,6 +2,8 @@
 using System.Globalization;
 using Semver.Ranges;
 using Semver.Test.Builders;
+using Semver.Test.Helpers;
+using Semver.Test.TestCases;
 using Xunit;
 using static Semver.Ranges.SemVersionRangeOptions;
 

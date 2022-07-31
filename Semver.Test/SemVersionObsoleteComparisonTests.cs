@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Semver.Test.Comparers;
+using Semver.Test.Builders;
+using Semver.Test.Helpers;
+using Semver.Utility;
 using Xunit;
 
 namespace Semver.Test
@@ -91,7 +92,7 @@ namespace Semver.Test
         }.AsReadOnly();
 
         public static readonly IReadOnlyList<(SemVersion, SemVersion)> VersionPairs
-            = ComparerTestData.AllPairs(VersionsInSortOrder).ToList().AsReadOnly();
+            = VersionsInSortOrder.AllPairs().ToReadOnlyList();
 
         #region Equals
         [Fact]

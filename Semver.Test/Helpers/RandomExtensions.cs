@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Semver.Test.Builders
+namespace Semver.Test.Helpers
 {
     public static class RandomExtensions
     {

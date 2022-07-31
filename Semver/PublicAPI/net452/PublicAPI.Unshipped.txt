@@ -1,6 +1,7 @@
 ﻿abstract Semver.Ranges.SemVersionRangeSet.Contains(Semver.SemVersion version) -> bool
 override Semver.Ranges.UnbrokenSemVersionRange.Equals(object obj) -> bool
 override Semver.Ranges.UnbrokenSemVersionRange.GetHashCode() -> int
+override Semver.Ranges.UnbrokenSemVersionRange.ToString() -> string
 Semver.Ranges.SemVersionRange
 Semver.Ranges.SemVersionRange.Contains(Semver.SemVersion version) -> bool
 Semver.Ranges.SemVersionRange.Count.get -> int

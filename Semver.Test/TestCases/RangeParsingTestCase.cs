@@ -1,7 +1,7 @@
 ﻿using System;
 using Semver.Ranges;
 
-namespace Semver.Test.Builders
+namespace Semver.Test.TestCases
 {
     public class RangeParsingTestCase
     {

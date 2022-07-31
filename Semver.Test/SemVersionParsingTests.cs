@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Semver.Test.Builders;
+using Semver.Test.Helpers;
+using Semver.Test.TestCases;
 using Xunit;
 using static Semver.SemVersionStyles;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Semver.Test.Builders
+namespace Semver.Test.Helpers
 {
     public static class ExceptionMessages
     {

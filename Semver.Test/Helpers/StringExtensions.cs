@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Semver.Test.Builders
+namespace Semver.Test.Helpers
 {
     public static class StringExtensions
     {

@@ -1,4 +1,5 @@
 ﻿using Semver.Test.Builders;
+using Semver.Test.TestCases;
 using Xunit;
 
 namespace Semver.Test.Ranges.Npm

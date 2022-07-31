@@ -88,7 +88,7 @@ namespace Semver.Ranges
 
         internal readonly LeftBoundedRange LeftBound;
         internal readonly RightBoundedRange RightBound;
-
+        private string toStringCache;
 
         public SemVersion Start => LeftBound.Version;
         public bool StartInclusive => LeftBound.Inclusive;
@@ -135,7 +135,34 @@ namespace Semver.Ranges
             => !Equals(left, right);
         #endregion
 
-        // TODO implement ToString()
+        public override string ToString()
+        {
+            if (toStringCache is null)
+            {
+                if (this == Empty) toStringCache = "<0.0.0";
+                else
+                {
+                    var leftUnbounded = LeftBound == LeftBoundedRange.Unbounded;
+                    var rightUnbounded = RightBound == RightBoundedRange.Unbounded;
+                    if (leftUnbounded && rightUnbounded)
+                        toStringCache = IncludeAllPrerelease ? "*-*" : "*";
+                    else
+                    {
+                        string range;
+                        if (leftUnbounded)
+                            range = RightBound.ToString();
+                        else if (rightUnbounded)
+                            range = LeftBound.ToString();
+                        else
+                            range = $"{LeftBound} {RightBound}";
+
+                        toStringCache = IncludeAllPrerelease ? "*-* " + range : range;
+                    }
+                }
+            }
+
+            return toStringCache;
+        }
 
         internal bool Overlaps(UnbrokenSemVersionRange other)
         {
@@ -150,6 +177,9 @@ namespace Semver.Ranges
         /// </summary>
         internal bool Contains(UnbrokenSemVersionRange other)
         {
+            // The empty set is a subset of every other set, even itself
+            if (other == Empty) return true;
+
             // It contains prerelease we don't
             // TODO what if those prerelease were covered by our ends?
             if (other.IncludeAllPrerelease && !IncludeAllPrerelease) return false;
@@ -165,16 +195,16 @@ namespace Semver.Ranges
             if (IncludeAllPrerelease) return true;
 
             // Make sure we include prerelease at the start
-            if (other.Start.IsPrerelease)
+            if (other.Start?.IsPrerelease ?? false)
             {
-                if (!Start.IsPrerelease
+                if (!(Start?.IsPrerelease ?? false)
                     || !Start.MajorMinorPatchEquals(other.Start)) return false;
             }
 
             // Make sure we include prerelease at the end
             if (other.End.IsPrerelease)
             {
-                if (!Start.IsPrerelease
+                if (!(End?.IsPrerelease ?? false)
                     || !End.MajorMinorPatchEquals(other.End)) return false;
             }
 

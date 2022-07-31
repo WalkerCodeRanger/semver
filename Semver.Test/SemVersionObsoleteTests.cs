@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using Semver.Test.Builders;
+using Semver.Test.Helpers;
 using Xunit;
 
 namespace Semver.Test

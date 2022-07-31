@@ -1,7 +1,8 @@
 ﻿using System;
 using Semver.Ranges;
-using Semver.Test.Builders;
+using Semver.Test.Helpers;
 using Xunit;
+using static Semver.Test.Builders.UnbrokenSemVersionRangeBuilder;
 
 namespace Semver.Test.Ranges
 {
@@ -992,6 +993,38 @@ namespace Semver.Test.Ranges
         {
             var range = UnbrokenSemVersionRange.Exclusive(SemVersion.Max, SemVersion.Max, includeAllPrerelease);
             Assert.Same(UnbrokenSemVersionRange.Empty, range);
+        }
+
+        public static readonly TheoryData<UnbrokenSemVersionRange, string> ToStringTestCases = new TheoryData<UnbrokenSemVersionRange, string>()
+        {
+            {All, "*-*"},
+            {AllRelease, "*"},
+            {Empty, "<0.0.0"},
+            {Inclusive("1.2.3", "4.5.6"), ">=1.2.3 <=4.5.6"},
+            {Inclusive("1.2.3", "4.5.6", true), "*-* >=1.2.3 <=4.5.6"},
+            {Inclusive("1.2.3-alpha", "4.5.6-rc"), ">=1.2.3-alpha <=4.5.6-rc"},
+            {Inclusive("1.2.3-alpha", "4.5.6-rc", true), "*-* >=1.2.3-alpha <=4.5.6-rc"},
+            {InclusiveOfStart("1.2.3", "4.5.6"), ">=1.2.3 <4.5.6"},
+            {InclusiveOfStart("1.2.3", "4.5.6", true), "*-* >=1.2.3 <4.5.6"},
+            {InclusiveOfEnd("1.2.3", "4.5.6"), ">1.2.3 <=4.5.6"},
+            {InclusiveOfEnd("1.2.3", "4.5.6", true), "*-* >1.2.3 <=4.5.6"},
+            {Exclusive("1.2.3", "4.5.6"), ">1.2.3 <4.5.6"},
+            {Exclusive("1.2.3", "4.5.6", true), "*-* >1.2.3 <4.5.6"},
+            {GreaterThan("1.2.3"), ">1.2.3"},
+            {GreaterThan("1.2.3", true), "*-* >1.2.3"},
+            {AtLeast("1.2.3"), ">=1.2.3"},
+            {AtLeast("1.2.3", true), "*-* >=1.2.3"},
+            {LessThan("1.2.3"), "<1.2.3"},
+            {LessThan("1.2.3", true), "*-* <1.2.3"},
+            {AtMost("1.2.3"), "<=1.2.3"},
+            {AtMost("1.2.3", true), "*-* <=1.2.3"},
+        };
+
+        [Theory]
+        [MemberData(nameof(ToStringTestCases))]
+        public void ToStringCorrect(UnbrokenSemVersionRange range, string expected)
+        {
+            Assert.Equal(expected, range.ToString());
         }
     }
 }

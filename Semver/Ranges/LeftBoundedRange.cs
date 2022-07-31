@@ -82,5 +82,7 @@ namespace Semver.Ranges
             if (comparison != 0) return comparison;
             return -Inclusive.CompareTo(other.Inclusive);
         }
+
+        public override string ToString() => (Inclusive ? ">=" : ">") + (Version?.ToString() ?? "null");
     }
 }

@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Semver.Test.Builders;
+using Semver.Test.Helpers;
 using Xunit;
 
 namespace Semver.Test

@@ -1,6 +1,6 @@
 ﻿using Semver.Ranges;
 
-namespace Semver.Test.Builders
+namespace Semver.Test.TestCases
 {
     /// <summary>
     /// An individual test case for a range test
