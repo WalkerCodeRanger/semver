@@ -16,6 +16,8 @@ namespace Semver.Ranges
     public class SemVersionRange : IReadOnlyList<UnbrokenSemVersionRange>
     {
         internal const int MaxRangeLength = 2048;
+        internal const string InvalidOptionsMessage = "An invalid SemVersionRangeOptions value was used.";
+        internal const string InvalidMaxLengthMessage = "Must not be negative.";
 
         public static readonly SemVersionRange Empty = new SemVersionRange(ReadOnlyList<UnbrokenSemVersionRange>.Empty);
 
@@ -103,7 +105,11 @@ namespace Semver.Ranges
             int maxLength = MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
-            // TODO validate options
+            if (!options.IsValid())
+                throw new ArgumentException(InvalidOptionsMessage, nameof(options));
+            if (maxLength < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
+
             var ex = StandardRangeParser.Parse(range, options, null, maxLength, out var semverRange);
             if (ex != null) throw ex;
             return semverRange;
@@ -124,7 +130,10 @@ namespace Semver.Ranges
             int maxLength = MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
-            // TODO validate options
+            if (!options.IsValid()) throw new ArgumentException(InvalidOptionsMessage, nameof(options));
+            if (maxLength < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
+
             var exception = StandardRangeParser.Parse(range, options, Parsing.FailedException, maxLength, out semverRange);
 
 #if DEBUG

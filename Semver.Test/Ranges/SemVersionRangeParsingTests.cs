@@ -2,11 +2,29 @@
 using Semver.Ranges;
 using Semver.Test.Builders;
 using Xunit;
+using static Semver.Ranges.SemVersionRangeOptions;
 
 namespace Semver.Test.Ranges
 {
     public class SemVersionRangeParsingTests
     {
+        private const string InvalidSemVersionRangeOptionsMessageStart = "An invalid SemVersionRangeOptions value was used.";
+        private const string InvalidMaxLengthMessageStart = "Must not be negative.";
+
+        public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
+        {
+            // Optional minor flag without optional patch flag
+            OptionalMinorPatch & ~OptionalPatch,
+            // Next unused bit flag
+            SemVersionRangeOptionsExtensions.AllFlags + 1,
+        };
+
+        public static readonly TheoryData<int> InvalidMaxLength = new TheoryData<int>()
+        {
+            -1,
+            int.MinValue,
+        };
+
         public static readonly TheoryData<RangeParsingTestCase> ParsingTestCases = new TheoryData<RangeParsingTestCase>()
         {
             Valid("=1.2.3", Equals("1.2.3")),
@@ -15,6 +33,27 @@ namespace Semver.Test.Ranges
             Valid(" =   1.2.3 ", Equals("1.2.3")),
             Valid("=1.2.3 || =4.5.6", Equals("1.2.3"), Equals("4.5.6")),
         };
+
+        [Theory]
+        [MemberData(nameof(InvalidSemVersionRangeOptions))]
+        public void ParseWithInvalidOptions(SemVersionRangeOptions options)
+        {
+            var ex = Assert.Throws<ArgumentException>(() => SemVersionRange.Parse("ignored", options));
+
+            Assert.StartsWith(InvalidSemVersionRangeOptionsMessageStart, ex.Message);
+            Assert.Equal("options", ex.ParamName);
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidMaxLength))]
+        public void ParseWithInvalidMaxLength(int maxLength)
+        {
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => SemVersionRange.Parse("ignored", Strict, maxLength));
+
+            Assert.StartsWith(InvalidMaxLengthMessageStart, ex.Message);
+            Assert.Equal("maxLength", ex.ParamName);
+            Assert.Equal(maxLength, ex.ActualValue);
+        }
 
         [Theory]
         [MemberData(nameof(ParsingTestCases))]
@@ -43,6 +82,28 @@ namespace Semver.Test.Ranges
         }
 
         [Theory]
+        [MemberData(nameof(InvalidSemVersionRangeOptions))]
+        public void TryParseWithInvalidOptions(SemVersionRangeOptions options)
+        {
+            var ex = Assert.Throws<ArgumentException>(() => SemVersionRange.TryParse("ignored", options, out _));
+
+            Assert.StartsWith(InvalidSemVersionRangeOptionsMessageStart, ex.Message);
+            Assert.Equal("options", ex.ParamName);
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidMaxLength))]
+        public void TryParseWithInvalidMaxLength(int maxLength)
+        {
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
+                SemVersionRange.TryParse("ignored", Strict, out _, maxLength));
+
+            Assert.StartsWith(InvalidMaxLengthMessageStart, ex.Message);
+            Assert.Equal("maxLength", ex.ParamName);
+            Assert.Equal(maxLength, ex.ActualValue);
+        }
+
+        [Theory]
         [MemberData(nameof(ParsingTestCases))]
         public void TryParseWithOptionsParsesCorrectly(RangeParsingTestCase testCase)
         {
@@ -59,14 +120,13 @@ namespace Semver.Test.Ranges
         }
 
         internal static RangeParsingTestCase Valid(string range, SemVersionRange expected)
-            => RangeParsingTestCase.Valid(range, SemVersionRangeOptions.Strict, 2048, expected);
+            => RangeParsingTestCase.Valid(range, Strict, 2048, expected);
 
-        internal static RangeParsingTestCase Valid(string range, UnbrokenSemVersionRange expected) =>
-            RangeParsingTestCase.Valid(range, SemVersionRangeOptions.Strict, 2048, new SemVersionRange(expected));
+        internal static RangeParsingTestCase Valid(string range, UnbrokenSemVersionRange expected)
+            => RangeParsingTestCase.Valid(range, Strict, 2048, new SemVersionRange(expected));
 
-        internal static RangeParsingTestCase Valid(string range, params UnbrokenSemVersionRange[] expectedRanges) =>
-            RangeParsingTestCase.Valid(range, SemVersionRangeOptions.Strict, 2048, new SemVersionRange(expectedRanges));
-
+        internal static RangeParsingTestCase Valid(string range, params UnbrokenSemVersionRange[] expectedRanges)
+            => RangeParsingTestCase.Valid(range, Strict, 2048, new SemVersionRange(expectedRanges));
 
         internal static RangeParsingTestCase Valid(string range, SemVersionRangeOptions options, SemVersionRange expected)
             => RangeParsingTestCase.Valid(range, options, 2048, expected);

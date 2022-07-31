@@ -14,7 +14,15 @@ namespace Semver.Ranges.Parsers
             int maxLength,
             out SemVersionRange semverRange)
         {
+#if DEBUG
+            if (!options.IsValid())
+                throw new ArgumentException("DEBUG: " + SemVersionRange.InvalidOptionsMessage, nameof(options));
+            if (maxLength < 0)
+                throw new ArgumentOutOfRangeException("DEBUG: " + SemVersionRange.InvalidMaxLengthMessage, nameof(maxLength));
+#endif
+            // TODO check range for null
             // TODO check max length
+
             var unbrokenRanges = new List<UnbrokenSemVersionRange>(CountSplitOnOrOperator(range));
             foreach (var segment in SplitOnOrOperator(range))
             {
@@ -36,6 +44,10 @@ namespace Semver.Ranges.Parsers
 
         public static int CountSplitOnOrOperator(string range)
         {
+#if DEBUG
+            if (range is null) throw new ArgumentNullException(nameof(range), "DEBUG: Value cannot be null.");
+#endif
+
             int count = 1; // Always one more item than there are separators
             bool possiblyInSeparator = false;
             for (int i = 0; i < range.Length; i++)
@@ -55,6 +67,10 @@ namespace Semver.Ranges.Parsers
 
         public static IEnumerable<StringSegment> SplitOnOrOperator(string range)
         {
+#if DEBUG
+            if (range is null) throw new ArgumentNullException(nameof(range), "DEBUG: Value cannot be null.");
+#endif
+
             var possiblyInSeparator = false;
             int start = 0;
             for (int i = 0; i < range.Length; i++)
