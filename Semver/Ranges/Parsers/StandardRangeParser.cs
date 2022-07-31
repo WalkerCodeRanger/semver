@@ -118,7 +118,7 @@ namespace Semver.Ranges.Parsers
                 }
             }
 
-            // TODO this make empty mean *, is that what we want?
+            // TODO this makes empty mean *, is that what we want?
 
             unbrokenRange = UnbrokenSemVersionRange.Create(start, end,
                 options.HasOption(SemVersionRangeOptions.IncludeAllPrerelease));

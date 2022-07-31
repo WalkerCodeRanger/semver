@@ -149,20 +149,30 @@ namespace Semver.Test.Ranges
                 Assert.Null(semverRange);
         }
 
-        internal static RangeParsingTestCase Valid(string range, SemVersionRange expected)
-            => RangeParsingTestCase.Valid(range, Strict, 2048, expected);
+        internal static RangeParsingTestCase Valid(
+            string range,
+            SemVersionRange expected,
+            int maxLength = SemVersionRange.MaxRangeLength)
+            => RangeParsingTestCase.Valid(range, Strict, maxLength, expected);
 
-        internal static RangeParsingTestCase Valid(string range, UnbrokenSemVersionRange expected)
-            => RangeParsingTestCase.Valid(range, Strict, 2048, new SemVersionRange(expected));
+        internal static RangeParsingTestCase Valid(
+            string range,
+            UnbrokenSemVersionRange expected,
+            int maxLength = SemVersionRange.MaxRangeLength)
+            => RangeParsingTestCase.Valid(range, Strict, maxLength, new SemVersionRange(expected));
 
         internal static RangeParsingTestCase Valid(string range, params UnbrokenSemVersionRange[] expectedRanges)
-            => RangeParsingTestCase.Valid(range, Strict, 2048, new SemVersionRange(expectedRanges));
+            => RangeParsingTestCase.Valid(range, Strict, SemVersionRange.MaxRangeLength, new SemVersionRange(expectedRanges));
 
-        internal static RangeParsingTestCase Valid(string range, SemVersionRangeOptions options, SemVersionRange expected)
-            => RangeParsingTestCase.Valid(range, options, 2048, expected);
+        internal static RangeParsingTestCase Valid(string range, SemVersionRangeOptions options, SemVersionRange expected,
+            int maxLength = SemVersionRange.MaxRangeLength)
+            => RangeParsingTestCase.Valid(range, options, maxLength, expected);
 
-        internal static RangeParsingTestCase Invalid<T>(string range, string exceptionMessage)
-            => RangeParsingTestCase.Invalid(range, Strict, 2048, typeof(T), exceptionMessage);
+        internal static RangeParsingTestCase Invalid<T>(
+            string range,
+            string exceptionMessage,
+            int maxLength = SemVersionRange.MaxRangeLength)
+            => RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(T), exceptionMessage);
 
         private static RangeParsingTestCase Invalid(
             string range,
