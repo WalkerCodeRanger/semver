@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Semver.Ranges.Parsers;
 using Semver.Utility;
 
 namespace Semver.Ranges
@@ -14,6 +15,8 @@ namespace Semver.Ranges
     /// </summary>
     public class SemVersionRange : IReadOnlyList<UnbrokenSemVersionRange>
     {
+        internal const int MaxRangeLength = 2048;
+
         public static readonly SemVersionRange Empty = new SemVersionRange(ReadOnlyList<UnbrokenSemVersionRange>.Empty);
 
         public static readonly SemVersionRange AllRelease = new SemVersionRange(UnbrokenSemVersionRange.AllRelease);
@@ -83,6 +86,58 @@ namespace Semver.Ranges
 
         public static implicit operator Predicate<SemVersion>(SemVersionRange range)
             => range.Contains;
+
+        #region Parsing
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static SemVersionRange Parse(
+            string range,
+            SemVersionRangeOptions options,
+            int maxLength = MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+        {
+            // TODO validate options
+            var ex = StandardRangeParser.Parse(range, options, null, maxLength, out var semverRange);
+            if (ex != null) throw ex;
+            return semverRange;
+        }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static SemVersionRange Parse(
+            string range,
+            int maxLength = MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => Parse(range, SemVersionRangeOptions.Strict, maxLength);
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParse(
+            string range,
+            SemVersionRangeOptions options,
+            out SemVersionRange semverRange,
+            int maxLength = MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+        {
+            // TODO validate options
+            var exception = StandardRangeParser.Parse(range, options, Parsing.FailedException, maxLength, out semverRange);
+
+#if DEBUG
+            // This check ensures that StandardRangeParser.Parse doesn't construct an exception, but always returns ParseFailedException
+            if (exception != null && exception != Parsing.FailedException)
+                throw new InvalidOperationException(
+                    $"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}",
+                    exception);
+#endif
+
+            return exception is null;
+        }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParse(
+            string range,
+            out SemVersionRange semverRange,
+            int maxLength = MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => TryParse(range, SemVersionRangeOptions.Strict, out semverRange, maxLength);
+        #endregion
 
         #region IReadOnlyList<UnbrokenSemVersionRange>
         public int Count => ranges.Count;

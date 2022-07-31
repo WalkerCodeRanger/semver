@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
 
-namespace Semver.Ranges.Parsing
+namespace Semver.Ranges.Parsers
 {
-    internal static class RangeParser
+    internal static class StandardRangeParser
     {
         public static Exception Parse(
             string range,

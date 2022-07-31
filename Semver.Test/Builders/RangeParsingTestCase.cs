@@ -8,37 +8,46 @@ namespace Semver.Test.Builders
         public static RangeParsingTestCase Valid(
             string range,
             SemVersionRangeOptions options,
+            int maxLength,
             SemVersionRange expected)
-            => new RangeParsingTestCase(range, options, expected);
+            => new RangeParsingTestCase(range, options, maxLength, expected);
 
         public static RangeParsingTestCase Invalid(
             string range,
             SemVersionRangeOptions options,
+            int maxLength,
             Type exceptionType,
             string exceptionMessage)
-            => new RangeParsingTestCase(range, options, exceptionType, exceptionMessage);
+            => new RangeParsingTestCase(range, options, maxLength, exceptionType, exceptionMessage);
 
-        private RangeParsingTestCase(string range, SemVersionRangeOptions options, SemVersionRange expected)
+        private RangeParsingTestCase(string range, SemVersionRangeOptions options, int maxLength, SemVersionRange expected)
         {
             Range = range;
             Options = options;
+            MaxLength = maxLength;
+            IsValid = true;
             ExpectedRange = expected;
         }
 
         public RangeParsingTestCase(
             string range,
             SemVersionRangeOptions options,
+            int maxLength,
             Type exceptionType,
             string exceptionMessage)
         {
             Range = range;
             Options = options;
+            MaxLength = maxLength;
+            IsValid = false;
             ExceptionType = exceptionType;
             ExceptionMessage = exceptionMessage;
         }
 
         public string Range { get; }
         public SemVersionRangeOptions Options { get; }
+        public int MaxLength { get; }
+        public bool IsValid { get; }
 
         #region Valid Values
         public SemVersionRange ExpectedRange { get; }

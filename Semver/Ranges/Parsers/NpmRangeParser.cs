@@ -1,4 +1,4 @@
-﻿namespace Semver.Ranges.Parsing
+﻿namespace Semver.Ranges.Parsers
 {
     internal static class NpmRangeParser
     {

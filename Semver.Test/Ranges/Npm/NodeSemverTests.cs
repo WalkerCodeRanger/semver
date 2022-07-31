@@ -246,16 +246,16 @@ namespace Semver.Test.Ranges.Npm
 
         [Theory]
         [MemberData(nameof(IncludesCases))]
-        public void RangeIncludes(NpmRangeContainsTestCase @case)
+        public void RangeIncludes(NpmRangeContainsTestCase testCase)
         {
-            @case.Assert();
+            testCase.Assert();
         }
 
         [Theory]
         [MemberData(nameof(ExcludeCases))]
-        public void RangeExcludes(NpmRangeContainsTestCase @case)
+        public void RangeExcludes(NpmRangeContainsTestCase testCase)
         {
-            @case.Assert();
+            testCase.Assert();
         }
 
         private static NpmRangeContainsTestCase Includes(string range, string version, bool includeAllPrerelease = false)

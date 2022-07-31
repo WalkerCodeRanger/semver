@@ -539,9 +539,9 @@ namespace Semver
             var exception = SemVersionParser.Parse(version, style, Parsing.FailedException, maxLength, out semver);
 
 #if DEBUG
-            // This check ensures that ParseVersion doesn't construct an exception, but always returns ParseFailedException
+            // This check ensures that SemVersionParser.Parse doesn't construct an exception, but always returns ParseFailedException
             if (exception != null && exception != Parsing.FailedException)
-                throw new InvalidOperationException($"{nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}", exception);
+                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}", exception);
 #endif
 
             return exception is null;

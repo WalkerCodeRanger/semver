@@ -45,6 +45,10 @@ static Semver.Ranges.SemVersionRange.Inclusive(Semver.SemVersion start, Semver.S
 static Semver.Ranges.SemVersionRange.InclusiveOfEnd(Semver.SemVersion start, Semver.SemVersion end, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.InclusiveOfStart(Semver.SemVersion start, Semver.SemVersion end, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.LessThan(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
+static Semver.Ranges.SemVersionRange.Parse(string range, int maxLength = 2048) -> Semver.Ranges.SemVersionRange
+static Semver.Ranges.SemVersionRange.Parse(string range, Semver.Ranges.SemVersionRangeOptions options, int maxLength = 2048) -> Semver.Ranges.SemVersionRange
+static Semver.Ranges.SemVersionRange.TryParse(string range, out Semver.Ranges.SemVersionRange semverRange, int maxLength = 2048) -> bool
+static Semver.Ranges.SemVersionRange.TryParse(string range, Semver.Ranges.SemVersionRangeOptions options, out Semver.Ranges.SemVersionRange semverRange, int maxLength = 2048) -> bool
 static Semver.Ranges.SemVersionRangeSet.ParseNpm(string range, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRangeSet
 static Semver.Ranges.SemVersionRangeSet.TryParseNpm(string range, bool includeAllPrerelease, out Semver.Ranges.SemVersionRangeSet ranges) -> bool
 static Semver.Ranges.SemVersionRangeSet.TryParseNpm(string range, out Semver.Ranges.SemVersionRangeSet ranges) -> bool

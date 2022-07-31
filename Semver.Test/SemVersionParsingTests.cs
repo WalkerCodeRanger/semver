@@ -413,16 +413,11 @@ namespace Semver.Test
 
             var result = SemVersion.TryParse(testCase.Version, testCase.Styles, out var version, testCase.MaxLength);
 
+            Assert.Equal(testCase.IsValid, result);
             if (testCase.IsValid)
-            {
-                Assert.True(result);
                 AssertVersionEqual(version, testCase);
-            }
             else
-            {
-                Assert.False(result);
                 Assert.Null(version);
-            }
         }
 
         /// <summary>
