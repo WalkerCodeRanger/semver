@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Semver.Ranges;
 using Semver.Test.Builders;
 using Xunit;
@@ -10,6 +11,7 @@ namespace Semver.Test.Ranges
     {
         private const string InvalidSemVersionRangeOptionsMessageStart = "An invalid SemVersionRangeOptions value was used.";
         private const string InvalidMaxLengthMessageStart = "Must not be negative.";
+        private const string TooLongRangeMessage = "Exceeded maximum length of {1} for '{0}'.";
 
         public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
         {
@@ -53,6 +55,9 @@ namespace Semver.Test.Ranges
             Valid(" <=   1.2.3 ", AtMost("1.2.3")),
             //Valid("<=1.2.3 || <=4.5.6", AtMost("4.5.6")),
 
+            // Longer than max length
+            Invalid("=1.0.0", TooLongRangeMessage, "2", maxLength: 2),
+
             Invalid<ArgumentNullException>(null, ExceptionMessages.NotNull),
         };
 
@@ -93,13 +98,16 @@ namespace Semver.Test.Ranges
                 var ex = Assert.Throws(testCase.ExceptionType,
                     () => SemVersionRange.Parse(testCase.Range, testCase.Options, testCase.MaxLength));
 
+                var expected = string.Format(CultureInfo.InvariantCulture,
+                    testCase.ExceptionMessageFormat, testCase.Range.LimitLength());
+
                 if (ex is ArgumentException argumentException)
                 {
-                    Assert.StartsWith(testCase.ExceptionMessage, argumentException.Message);
+                    Assert.StartsWith(expected, argumentException.Message);
                     Assert.Equal("range", argumentException.ParamName);
                 }
                 else
-                    Assert.Equal(testCase.ExceptionMessage, ex.Message);
+                    Assert.Equal(expected, ex.Message);
             }
         }
 
@@ -155,6 +163,16 @@ namespace Semver.Test.Ranges
 
         internal static RangeParsingTestCase Invalid<T>(string range, string exceptionMessage)
             => RangeParsingTestCase.Invalid(range, Strict, 2048, typeof(T), exceptionMessage);
+
+        private static RangeParsingTestCase Invalid(
+            string range,
+            string exceptionMessage = "",
+            string exceptionValue = null,
+            int maxLength = SemVersionRange.MaxRangeLength)
+        {
+            exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);
+            return RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(FormatException), exceptionMessage);
+        }
 
         internal static UnbrokenSemVersionRange Equals(string version)
             => UnbrokenSemVersionRange.Equals(SemVersion.Parse(version, SemVersionStyles.Strict));

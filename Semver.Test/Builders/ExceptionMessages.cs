@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Semver.Test.Builders
 {
@@ -14,5 +15,17 @@ namespace Semver.Test.Builders
         public const string NotNull = "Value cannot be null.";
 
         public const string NoMetadata = "Cannot have metadata.";
+
+        public static string InjectValue(string format, string value)
+        {
+            try
+            {
+                return string.Format(CultureInfo.InvariantCulture, format, "{0}", value);
+            }
+            catch (FormatException ex)
+            {
+                throw new FormatException($"Could not inject '{value}' into '{format}'", ex);
+            }
+        }
     }
 }

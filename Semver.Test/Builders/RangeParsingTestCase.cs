@@ -34,14 +34,14 @@ namespace Semver.Test.Builders
             SemVersionRangeOptions options,
             int maxLength,
             Type exceptionType,
-            string exceptionMessage)
+            string exceptionMessageFormat)
         {
             Range = range;
             Options = options;
             MaxLength = maxLength;
             IsValid = false;
             ExceptionType = exceptionType;
-            ExceptionMessage = exceptionMessage;
+            ExceptionMessageFormat = exceptionMessageFormat;
         }
 
         public string Range { get; }
@@ -55,7 +55,7 @@ namespace Semver.Test.Builders
 
         #region Invalid Values
         public Type ExceptionType { get; }
-        public string ExceptionMessage { get; }
+        public string ExceptionMessageFormat { get; }
         #endregion
 
         public override string ToString()

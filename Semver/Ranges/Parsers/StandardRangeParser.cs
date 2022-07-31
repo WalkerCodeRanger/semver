@@ -29,7 +29,7 @@ namespace Semver.Ranges.Parsers
             // when a non-null exception is passed in.
 
             if (range is null) return ex ?? new ArgumentNullException(nameof(range));
-            // TODO check max length
+            if (range.Length > maxLength) return ex ?? RangeError.NewTooLongException(range, maxLength);
 
             var unbrokenRanges = new List<UnbrokenSemVersionRange>(CountSplitOnOrOperator(range));
             foreach (var segment in SplitOnOrOperator(range))

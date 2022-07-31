@@ -19,7 +19,7 @@ namespace Semver.Test
         private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace.";
         private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace.";
         private const string EmptyVersionMessage = "Empty string is not a valid version.";
-        private const string TooLongVersionMessage = "Exceeded maximum length of {1} in '{0}'.";
+        private const string TooLongVersionMessage = "Exceeded maximum length of {1} for '{0}'.";
         private const string AllWhitespaceVersionMessage = "Whitespace is not a valid version.";
         private const string LeadingLowerVMessage = "Leading 'v' in '{0}'.";
         private const string LeadingUpperVMessage = "Leading 'V' in '{0}'.";
@@ -399,7 +399,7 @@ namespace Semver.Test
                     () => SemVersion.Parse(testCase.Version, testCase.Styles, testCase.MaxLength));
 
                 var expected = string.Format(CultureInfo.InvariantCulture,
-                    testCase.ExceptionMessageFormat, LimitLength(testCase.Version));
+                    testCase.ExceptionMessageFormat, testCase.Version.LimitLength());
 
                 if (ex is ArgumentException argumentException)
                 {
@@ -675,7 +675,7 @@ namespace Semver.Test
             int maxLength = SemVersion.MaxVersionLength)
             where T : Exception
         {
-            exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
+            exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);
             return ParsingTestCase.Invalid(version, requiredStyles, typeof(T), exceptionMessage, maxLength);
         }
 
@@ -686,7 +686,7 @@ namespace Semver.Test
             string exceptionValue = null,
             int maxLength = SemVersion.MaxVersionLength)
         {
-            exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
+            exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);
             return ParsingTestCase.Invalid(version, requiredStyles, typeof(FormatException),
                 exceptionMessage, maxLength);
         }
@@ -698,7 +698,7 @@ namespace Semver.Test
             int maxLength = SemVersion.MaxVersionLength)
             where T : Exception
         {
-            exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
+            exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);
             return ParsingTestCase.Invalid(version, Strict, typeof(T), exceptionMessage, maxLength);
         }
 
@@ -708,7 +708,7 @@ namespace Semver.Test
             string exceptionValue = null,
             int maxLength = SemVersion.MaxVersionLength)
         {
-            exceptionMessage = InjectValue(exceptionMessage, exceptionValue);
+            exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);
             return ParsingTestCase.Invalid(version, Strict, typeof(FormatException),
                 exceptionMessage, maxLength);
         }
@@ -718,27 +718,5 @@ namespace Semver.Test
 
         public static IEnumerable<MetadataIdentifier> Meta(params string[] identifiers)
             => identifiers.Select(MetadataIdentifier.CreateUnsafe);
-
-        private static string InjectValue(string format, string value)
-        {
-            try
-            {
-                return string.Format(CultureInfo.InvariantCulture, format, "{0}", value);
-            }
-            catch (FormatException ex)
-            {
-                throw new FormatException($"Could not inject '{value}' into '{format}'", ex);
-            }
-        }
-
-        private const int VersionDisplayLimit = 100;
-
-        private static string LimitLength(string version)
-        {
-            if (version?.Length > VersionDisplayLimit)
-                version = version.Substring(0, VersionDisplayLimit - 3) + "...";
-
-            return version;
-        }
     }
 }

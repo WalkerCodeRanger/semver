@@ -17,7 +17,7 @@ namespace Semver
         private const string LeadingWhitespaceMessage = "Version '{0}' has leading whitespace.";
         private const string TrailingWhitespaceMessage = "Version '{0}' has trailing whitespace.";
         private const string EmptyVersionMessage = "Empty string is not a valid version.";
-        private const string TooLongVersionMessage = "Exceeded maximum length of {1} in '{0}'.";
+        private const string TooLongVersionMessage = "Exceeded maximum length of {1} for '{0}'.";
         private const string AllWhitespaceVersionMessage = "Whitespace is not a valid version.";
         private const string LeadingLowerVMessage = "Leading 'v' in '{0}'.";
         private const string LeadingUpperVMessage = "Leading 'V' in '{0}'.";
