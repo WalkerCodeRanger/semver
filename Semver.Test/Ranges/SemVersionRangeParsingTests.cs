@@ -9,7 +9,11 @@ namespace Semver.Test.Ranges
     {
         public static readonly TheoryData<RangeParsingTestCase> ParsingTestCases = new TheoryData<RangeParsingTestCase>()
         {
-            Valid("=1.2.3", SemVersionRange.Equals(new SemVersion(1,2,3))),
+            Valid("=1.2.3", Equals("1.2.3")),
+            Valid("  =1.2.3   ", Equals("1.2.3")),
+            Valid("=   1.2.3", Equals("1.2.3")),
+            Valid(" =   1.2.3 ", Equals("1.2.3")),
+            Valid("=1.2.3 || =4.5.6", Equals("1.2.3"), Equals("4.5.6")),
         };
 
         [Theory]
@@ -57,7 +61,17 @@ namespace Semver.Test.Ranges
         internal static RangeParsingTestCase Valid(string range, SemVersionRange expected)
             => RangeParsingTestCase.Valid(range, SemVersionRangeOptions.Strict, 2048, expected);
 
+        internal static RangeParsingTestCase Valid(string range, UnbrokenSemVersionRange expected) =>
+            RangeParsingTestCase.Valid(range, SemVersionRangeOptions.Strict, 2048, new SemVersionRange(expected));
+
+        internal static RangeParsingTestCase Valid(string range, params UnbrokenSemVersionRange[] expectedRanges) =>
+            RangeParsingTestCase.Valid(range, SemVersionRangeOptions.Strict, 2048, new SemVersionRange(expectedRanges));
+
+
         internal static RangeParsingTestCase Valid(string range, SemVersionRangeOptions options, SemVersionRange expected)
             => RangeParsingTestCase.Valid(range, options, 2048, expected);
+
+        internal static UnbrokenSemVersionRange Equals(string version)
+            => UnbrokenSemVersionRange.Equals(SemVersion.Parse(version, SemVersionStyles.Strict));
     }
 }

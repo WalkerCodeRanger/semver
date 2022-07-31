@@ -63,7 +63,15 @@ namespace Semver.Ranges
 
         private readonly IReadOnlyList<UnbrokenSemVersionRange> ranges;
 
+        // TODO what about empty?
         public SemVersionRange(IEnumerable<UnbrokenSemVersionRange> ranges)
+            // TODO order ranges and combine
+            : this(ranges.ToReadOnlyList())
+        {
+        }
+
+        // TODO what about empty?
+        public SemVersionRange(params UnbrokenSemVersionRange[] ranges)
             // TODO order ranges and combine
             : this(ranges.ToReadOnlyList())
         {

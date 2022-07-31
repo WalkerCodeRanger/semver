@@ -5,6 +5,7 @@ Semver.Ranges.SemVersionRange
 Semver.Ranges.SemVersionRange.Contains(Semver.SemVersion version) -> bool
 Semver.Ranges.SemVersionRange.Count.get -> int
 Semver.Ranges.SemVersionRange.GetEnumerator() -> System.Collections.Generic.IEnumerator<Semver.Ranges.UnbrokenSemVersionRange>
+Semver.Ranges.SemVersionRange.SemVersionRange(params Semver.Ranges.UnbrokenSemVersionRange[] ranges) -> void
 Semver.Ranges.SemVersionRange.SemVersionRange(System.Collections.Generic.IEnumerable<Semver.Ranges.UnbrokenSemVersionRange> ranges) -> void
 Semver.Ranges.SemVersionRange.this[int index].get -> Semver.Ranges.UnbrokenSemVersionRange
 Semver.Ranges.SemVersionRangeOptions
