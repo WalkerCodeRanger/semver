@@ -137,6 +137,13 @@ namespace Semver.Ranges
 
         // TODO implement ToString()
 
+        internal bool Overlaps(UnbrokenSemVersionRange other)
+        {
+            // see https://stackoverflow.com/a/3269471/268898
+            return LeftBound.CompareTo(other.RightBound) <= 0
+                   && other.LeftBound.CompareTo(RightBound) <= 0;
+        }
+
         private static bool IsEmpty(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)
         {
             var comparison = SemVersion.ComparePrecedence(start.Version, end.Version);

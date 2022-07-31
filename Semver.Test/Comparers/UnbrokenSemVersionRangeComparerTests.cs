@@ -14,8 +14,7 @@ namespace Semver.Test.Comparers
             var inclusive = UnbrokenSemVersionRange.AtLeast(new SemVersion(1, 2, 3));
             var exclusive = UnbrokenSemVersionRange.GreaterThan(new SemVersion(1, 2, 3));
 
-            Assert.Equal(-1, Comparer.Compare(inclusive, exclusive));
-            Assert.Equal(1, Comparer.Compare(exclusive, inclusive));
+            AssertInOrder(inclusive, exclusive);
         }
 
         [Fact]
@@ -24,8 +23,7 @@ namespace Semver.Test.Comparers
             var inclusive = UnbrokenSemVersionRange.AtMost(new SemVersion(1, 2, 3));
             var exclusive = UnbrokenSemVersionRange.LessThan(new SemVersion(1, 2, 3));
 
-            Assert.Equal(-1, Comparer.Compare(exclusive, inclusive));
-            Assert.Equal(1, Comparer.Compare(inclusive, exclusive));
+            AssertInOrder(exclusive, inclusive);
         }
 
         [Fact]
@@ -36,8 +34,13 @@ namespace Semver.Test.Comparers
             var release = UnbrokenSemVersionRange.Inclusive(start, end, false);
             var prerelease = UnbrokenSemVersionRange.Inclusive(start, end, true);
 
-            Assert.Equal(-1, Comparer.Compare(release, prerelease));
-            Assert.Equal(1, Comparer.Compare(prerelease, release));
+            AssertInOrder(release, prerelease);
+        }
+
+        private static void AssertInOrder(UnbrokenSemVersionRange left, UnbrokenSemVersionRange right)
+        {
+            Assert.Equal(-1, Comparer.Compare(left, right));
+            Assert.Equal(1, Comparer.Compare(right, left));
         }
     }
 }

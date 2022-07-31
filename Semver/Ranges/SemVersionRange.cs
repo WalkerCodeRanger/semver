@@ -68,8 +68,14 @@ namespace Semver.Ranges
             ranges.RemoveAll(range => UnbrokenSemVersionRange.Empty.Equals(range));
             if (ranges.Count == 0) return Empty;
 
-            // Sort ranges for good display
+
+            // Sort and merge ranges
             ranges.Sort(UnbrokenSemVersionRangeComparer.Instance);
+            for (var i = 0; i < ranges.Count - 1; i++)
+            {
+
+            }
+
             return new SemVersionRange(ranges.AsReadOnly());
         }
 

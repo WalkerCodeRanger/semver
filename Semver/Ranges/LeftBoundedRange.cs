@@ -67,5 +67,12 @@ namespace Semver.Ranges
         public static bool operator !=(LeftBoundedRange left, LeftBoundedRange right)
             => !left.Equals(right);
         #endregion
+
+        public int CompareTo(RightBoundedRange other)
+        {
+            var comparison = SemVersion.PrecedenceComparer.Compare(Version, other.Version);
+            if (comparison != 0) return comparison;
+            return Inclusive && other.Inclusive ? 0 : 1;
+        }
     }
 }
