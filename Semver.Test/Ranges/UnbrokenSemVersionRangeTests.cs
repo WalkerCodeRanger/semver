@@ -999,7 +999,9 @@ namespace Semver.Test.Ranges
         {
             {All, "*-*"},
             {AllRelease, "*"},
-            {Empty, "<0.0.0"},
+            {Empty, "<0.0.0-0"},
+            {EqualsVersion("1.2.3"), "1.2.3"},
+            {EqualsVersion("1.2.3-rc"), "1.2.3-rc"},
             {Inclusive("1.2.3", "4.5.6"), ">=1.2.3 <=4.5.6"},
             {Inclusive("1.2.3", "4.5.6", true), "*-* >=1.2.3 <=4.5.6"},
             {Inclusive("1.2.3-alpha", "4.5.6-rc"), ">=1.2.3-alpha <=4.5.6-rc"},
@@ -1018,6 +1020,13 @@ namespace Semver.Test.Ranges
             {LessThan("1.2.3", true), "*-* <1.2.3"},
             {AtMost("1.2.3"), "<=1.2.3"},
             {AtMost("1.2.3", true), "*-* <=1.2.3"},
+            // Wildcard ranges
+            {InclusiveOfStart("2.1.0", "2.2.0-0"), "2.1.*"},
+            {InclusiveOfStart("4.2.0-0", "4.3.0-0", true), "4.2.*-*"},
+            {InclusiveOfStart("4.2.0", "4.3.0-0", true), "*-* 4.2.*"},
+            {InclusiveOfStart("3.0.0", "4.0.0-0"), "3.*"},
+            {InclusiveOfStart("5.0.0-0", "6.0.0-0", true), "5.*-*"},
+            {InclusiveOfStart("5.0.0", "6.0.0-0", true), "*-* 5.*"},
         };
 
         [Theory]

@@ -8,6 +8,9 @@ namespace Semver.Test.Builders
         public static readonly UnbrokenSemVersionRange All = UnbrokenSemVersionRange.All;
         public static readonly UnbrokenSemVersionRange AllRelease = UnbrokenSemVersionRange.AllRelease;
 
+        public static UnbrokenSemVersionRange EqualsVersion(string version)
+            => UnbrokenSemVersionRange.Equals(SemVersion.Parse(version, SemVersionStyles.Strict));
+
         public static UnbrokenSemVersionRange Inclusive(string start, string end, bool includeAllPrerelease = false)
             => UnbrokenSemVersionRange.Inclusive(SemVersion.Parse(start, SemVersionStyles.Strict),
                 SemVersion.Parse(end, SemVersionStyles.Strict), includeAllPrerelease);

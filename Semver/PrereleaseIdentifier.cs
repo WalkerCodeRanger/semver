@@ -35,6 +35,8 @@ namespace Semver
     /// </remarks>
     public readonly struct PrereleaseIdentifier : IEquatable<PrereleaseIdentifier>, IComparable<PrereleaseIdentifier>, IComparable
     {
+        internal static readonly PrereleaseIdentifier Zero = new PrereleaseIdentifier(0);
+
         /// <summary>
         /// The string value of the prerelease identifier even if it is a numeric identifier.
         /// </summary>

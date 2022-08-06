@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Semver.Utility;
 
 namespace Semver.Ranges
@@ -39,6 +40,7 @@ namespace Semver.Ranges
         public static UnbrokenSemVersionRange AtMost(SemVersion version, bool includeAllPrerelease = false)
             => Create(null, false, Validate(version, nameof(version)), true, includeAllPrerelease);
 
+        // TODO start == end with includeAllPrerelease == true should be same as Equals(start)
         public static UnbrokenSemVersionRange Inclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(Validate(start, nameof(start)), true,
                 Validate(end, nameof(end)), true, includeAllPrerelease);
@@ -55,6 +57,7 @@ namespace Semver.Ranges
             => Create(Validate(start, nameof(start)), false,
                 Validate(end, nameof(end)), false, includeAllPrerelease);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static UnbrokenSemVersionRange Create(
             SemVersion startVersion,
             bool startInclusive,
@@ -64,9 +67,7 @@ namespace Semver.Ranges
         {
             var start = new LeftBoundedRange(startVersion, startInclusive);
             var end = new RightBoundedRange(endVersion, endInclusive);
-            // Always return the same empty range
-            if (IsEmpty(start, end, includeAllPrerelease)) return Empty;
-            return new UnbrokenSemVersionRange(start, end, includeAllPrerelease);
+            return Create(start, end, includeAllPrerelease);
         }
 
         internal static UnbrokenSemVersionRange Create(
@@ -136,33 +137,62 @@ namespace Semver.Ranges
         #endregion
 
         public override string ToString()
-        {
-            if (toStringCache is null)
-            {
-                if (this == Empty) toStringCache = "<0.0.0";
-                else
-                {
-                    var leftUnbounded = LeftBound == LeftBoundedRange.Unbounded;
-                    var rightUnbounded = RightBound == RightBoundedRange.Unbounded;
-                    if (leftUnbounded && rightUnbounded)
-                        toStringCache = IncludeAllPrerelease ? "*-*" : "*";
-                    else
-                    {
-                        string range;
-                        if (leftUnbounded)
-                            range = RightBound.ToString();
-                        else if (rightUnbounded)
-                            range = LeftBound.ToString();
-                        else
-                            range = $"{LeftBound} {RightBound}";
+            => toStringCache ?? (toStringCache = ToStringInternal());
 
-                        toStringCache = IncludeAllPrerelease ? "*-* " + range : range;
-                    }
-                }
+        private string ToStringInternal()
+        {
+            if (this == Empty)
+                // Must combine with including prerelease and still be empty
+                return "<0.0.0-0";
+
+            // Simple Equals ranges
+            if (LeftBound.Inclusive && RightBound.Inclusive && SemVersion.Equals(Start, End))
+                return Start.ToString();
+
+            // All versions ranges
+            var leftUnbounded = LeftBound == LeftBoundedRange.Unbounded;
+            var rightUnbounded = RightBound == RightBoundedRange.Unbounded;
+            if (leftUnbounded && rightUnbounded)
+                return IncludeAllPrerelease ? "*-*" : "*";
+
+            // Wildcard Ranges like 2.*, 2.3.*, and 2.*-*
+            if (LeftBound.Inclusive && !RightBound.Inclusive
+                && Start.Patch == 0 && End.Patch == 0
+                && (!Start.IsPrerelease || PrereleaseIsZero(Start))
+                && PrereleaseIsZero(End))
+            {
+                string wildcardRange;
+
+                if (Start.Major == End.Major && Start.Minor == End.Minor - 1)
+                    // Wildcard patch
+                    wildcardRange = $"{Start.Major}.{Start.Minor}.*";
+                else if (Start.Major == End.Major - 1 && Start.Minor == 0 && End.Minor == 0)
+                    // Wildcard minor
+                    wildcardRange = $"{Start.Major}.*";
+                else
+                    goto standard;
+
+                if (!IncludeAllPrerelease) return wildcardRange;
+
+                return PrereleaseIsZero(Start) ? wildcardRange + "-*" : "*-* " + wildcardRange;
             }
 
-            return toStringCache;
+        // Standard ranges expressed by the bounds
+        standard:
+            string range;
+            if (leftUnbounded)
+                range = RightBound.ToString();
+            else if (rightUnbounded)
+                range = LeftBound.ToString();
+            else
+                range = $"{LeftBound} {RightBound}";
+
+            return IncludeAllPrerelease ? "*-* " + range : range;
         }
+
+        private static bool PrereleaseIsZero(SemVersion version)
+            => version.PrereleaseIdentifiers.Count == 1
+               && version.PrereleaseIdentifiers[0] == PrereleaseIdentifier.Zero;
 
         internal bool Overlaps(UnbrokenSemVersionRange other)
         {
