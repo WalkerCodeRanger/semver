@@ -575,6 +575,14 @@ namespace Semver.Test.Ranges
         }
 
         [Fact]
+        public void InclusiveIncludingAllPrereleaseEquals()
+        {
+            var range = UnbrokenSemVersionRange.Inclusive(FakeVersion, FakeVersion, true);
+
+            Assert.Equal(UnbrokenSemVersionRange.Equals(FakeVersion), range);
+        }
+
+        [Fact]
         public void InclusiveOfStartNullStartVersion()
         {
             var ex = Assert.Throws<ArgumentNullException>(
@@ -1006,6 +1014,7 @@ namespace Semver.Test.Ranges
             {Inclusive("1.2.3", "4.5.6", true), "*-* >=1.2.3 <=4.5.6"},
             {Inclusive("1.2.3-alpha", "4.5.6-rc"), ">=1.2.3-alpha <=4.5.6-rc"},
             {Inclusive("1.2.3-alpha", "4.5.6-rc", true), "*-* >=1.2.3-alpha <=4.5.6-rc"},
+            {Inclusive("1.2.3", "1.2.3", true), "1.2.3"},
             {InclusiveOfStart("1.2.3", "4.5.6"), ">=1.2.3 <4.5.6"},
             {InclusiveOfStart("1.2.3", "4.5.6", true), "*-* >=1.2.3 <4.5.6"},
             {InclusiveOfEnd("1.2.3", "4.5.6"), ">1.2.3 <=4.5.6"},

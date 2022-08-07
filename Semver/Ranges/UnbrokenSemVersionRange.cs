@@ -77,6 +77,8 @@ namespace Semver.Ranges
         {
             // Always return the same empty range
             if (IsEmpty(start, end, includeAllPrerelease)) return Empty;
+            // Equals ranges never include all prerelease
+            if (start.Version == end.Version) includeAllPrerelease = false;
             return new UnbrokenSemVersionRange(start, end, includeAllPrerelease);
         }
 
@@ -147,7 +149,13 @@ namespace Semver.Ranges
 
             // Simple Equals ranges
             if (LeftBound.Inclusive && RightBound.Inclusive && SemVersion.Equals(Start, End))
+            {
+#if DEBUG
+                if (IncludeAllPrerelease)
+                    throw new InvalidOperationException("DEBUG: Equals range includes all prerelease");
+#endif
                 return Start.ToString();
+            }
 
             // All versions ranges
             var leftUnbounded = LeftBound == LeftBoundedRange.Unbounded;

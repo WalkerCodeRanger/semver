@@ -44,8 +44,6 @@ namespace Semver.Ranges.Parsers
                 }
             }
 
-            // TODO sort ranges
-            // TODO combine ranges
             semverRange = SemVersionRange.Create(unbrokenRanges);
             return null;
         }

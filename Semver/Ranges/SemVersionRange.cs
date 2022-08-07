@@ -68,9 +68,9 @@ namespace Semver.Ranges
             ranges.RemoveAll(range => UnbrokenSemVersionRange.Empty.Equals(range));
             if (ranges.Count == 0) return Empty;
 
-
             // Sort and merge ranges
             ranges.Sort(UnbrokenSemVersionRangeComparer.Instance);
+            // TODO combine ranges
             for (var i = 0; i < ranges.Count - 1; i++)
             {
 
