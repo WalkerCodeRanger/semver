@@ -57,54 +57,35 @@ namespace Semver.Ranges.Parsers
             int maxLength,
             out UnbrokenSemVersionRange unbrokenRange)
         {
-            segment = segment.TrimEndSpaces();
+            // Assign null once so it doesn't have to be done any time parse fails
+            unbrokenRange = null;
+
+            // Parse off leading whitespace
+            var exception = ParseWhitespace(ref segment, ex);
+            if (exception != null) return exception;
+
+            // Reject empty string ranges
+            if (segment.IsEmpty) return ex ?? RangeError.MissingComparison(segment.Offset, segment.Source);
+
             var start = LeftBoundedRange.Unbounded;
             var end = RightBoundedRange.Unbounded;
             var includeAllPrerelease = options.HasOption(SemVersionRangeOptions.IncludeAllPrerelease);
-            foreach (var comparison in SplitComparisons(segment))
+            while (!segment.IsEmpty)
             {
-                var exception = ParseComparison(comparison, options, ref includeAllPrerelease, ex, maxLength, ref start, ref end);
-                if (exception != null)
-                {
-                    unbrokenRange = null;
-                    return exception;
-                }
+                exception = ParseComparison(ref segment, options, ref includeAllPrerelease, ex, maxLength, ref start, ref end);
+                if (exception != null) return exception;
             }
 
-            // TODO this makes empty mean *, is that what we want?
             unbrokenRange = UnbrokenSemVersionRange.Create(start, end, includeAllPrerelease);
             return null;
         }
 
-        private static IEnumerable<StringSegment> SplitComparisons(StringSegment segment)
-        {
-            var start = 0;
-            var end = 0;
-            while (end < segment.Length)
-            {
-                // Skip leading spaces
-                while (end < segment.Length && segment[end] == ' ') start = end += 1;
-
-                // Skip operators
-                while (end < segment.Length && IsPossibleOperatorChar(segment[end])) end++;
-
-                // Skip spaces after operators
-                while (end < segment.Length && segment[end] == ' ') end += 1;
-
-                // Now find the next space or operator
-                while (end < segment.Length && !IsPossibleOperatorOrSpaceChar(segment[end])) end++;
-
-                yield return segment.Subsegment(start, end - start);
-                start = end;
-            }
-
-            if (start < end)
-                // TODO not sure if this case can be hit
-                yield return segment.Subsegment(start, end - start);
-        }
-
+        /// <summary>
+        /// Parse a comparison from the beginning of the segment.
+        /// </summary>
+        /// <remarks>Must have leading whitespace removed. Will consume trailing whitespace.</remarks>
         private static Exception ParseComparison(
-            StringSegment segment,
+            ref StringSegment segment,
             SemVersionRangeOptions options,
             ref bool includeAllPrerelease,
             Exception ex,
@@ -115,16 +96,16 @@ namespace Semver.Ranges.Parsers
 #if DEBUG
             if (segment.IsEmpty) throw new ArgumentException("Cannot be empty", nameof(segment));
 #endif
-            var exception = ParseWhitespace(ref segment, ex);
-            if (exception != null) return exception;
-
-            exception = ParseOperator(ref segment, ex, out var @operator);
+            var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;
 
             exception = ParseWhitespace(ref segment, ex);
             if (exception != null) return exception;
 
-            exception = SemVersionParser.Parse(segment, options.ToStyles(), ex, maxLength, out var semver);
+            exception = ParseVersion(ref segment, options, ex, maxLength, out var semver);
+            if (exception != null) return exception;
+
+            exception = ParseWhitespace(ref segment, ex);
             if (exception != null) return exception;
 
             switch (@operator)
@@ -147,8 +128,12 @@ namespace Semver.Ranges.Parsers
                     return null;
                 case StandardOperator.Caret:
                 case StandardOperator.Tilde:
-                case StandardOperator.None: // implied = (supports wildcard *)
                     throw new NotImplementedException();
+                case StandardOperator.None: // implied = (supports wildcard *)
+                    // TODO support wildcards
+                    leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
+                    rightBound = rightBound.Min(new RightBoundedRange(semver, true));
+                    return null;
                 default:
                     // This code should be unreachable
                     throw new ArgumentException($"DEBUG: Invalid {nameof(StandardOperator)} value {@operator}");

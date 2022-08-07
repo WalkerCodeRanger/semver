@@ -11,6 +11,8 @@ namespace Semver.Ranges.Parsers
         private const string InvalidOperatorMessage = "Invalid operator '{0}'.";
         private const string InvalidWhitespaceMessage
             = "Invalid whitespace character at {0} in '{1}'. Only the ASCII space character is allowed.";
+        private const string MissingComparisonMessage
+            = "Range is missing a comparison or limit at {0} in '{1}'";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FormatException NewTooLongException(string range, int maxLength)
@@ -23,6 +25,10 @@ namespace Semver.Ranges.Parsers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception InvalidWhitespace(int position, string range)
             => NewFormatException(InvalidWhitespaceMessage, position, LimitLength(range));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Exception MissingComparison(int position, string range) =>
+            NewFormatException(MissingComparisonMessage, position, LimitLength(range));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static FormatException NewFormatException(string messageTemplate, params object[] args)

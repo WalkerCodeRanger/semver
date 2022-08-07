@@ -18,6 +18,8 @@ namespace Semver.Test.Ranges
         private const string InvalidOperatorMessage = "Invalid operator '{1}'.";
         private const string InvalidWhitespaceMessage =
             "Invalid whitespace character at {1} in '{0}'. Only the ASCII space character is allowed.";
+        private const string MissingComparisonMessage
+            = "Range is missing a comparison or limit at {1} in '{0}'";
 
         public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
         {
@@ -37,6 +39,11 @@ namespace Semver.Test.Ranges
         {
             //Valid("*", AllRelease),
             //Valid("*-*", All),
+            Valid("1.2.3", EqualsVersion("1.2.3")),
+            Valid("  1.2.3   ", EqualsVersion("1.2.3")),
+            Valid("   1.2.3", EqualsVersion("1.2.3")),
+            Valid("1.2.3  ", EqualsVersion("1.2.3")),
+            Valid("1.2.3 || 4.5.6", EqualsVersion("1.2.3"), EqualsVersion("4.5.6")),
             Valid("=1.2.3", EqualsVersion("1.2.3")),
             Valid("  =1.2.3   ", EqualsVersion("1.2.3")),
             Valid("=   1.2.3", EqualsVersion("1.2.3")),
@@ -66,9 +73,16 @@ namespace Semver.Test.Ranges
             //Valid("<=1.2.3 || <=4.5.6", AtMost("4.5.6")),
             //Valid("*-* >=2.0.0-0", AtLeast("2.0.0-0", true)),
 
+            // Missing Comparison
+            Invalid("", MissingComparisonMessage, "0"),
+            Invalid("   ", MissingComparisonMessage, "3"),
+            Invalid("1.2.3||", MissingComparisonMessage, "7"),
+
             // Invalid Whitespace
+            Invalid("  \t", InvalidWhitespaceMessage, "2"),
             Invalid("\t=1.2.3", InvalidWhitespaceMessage, "0"),
             Invalid("=\t1.2.3", InvalidWhitespaceMessage, "1"),
+            Invalid("=1.2.3\t", InvalidWhitespaceMessage, "6"),
 
             // Invalid Operator
             Invalid("~>1.2.3", InvalidOperatorMessage, "~>"),
