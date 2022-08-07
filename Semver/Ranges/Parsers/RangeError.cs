@@ -13,6 +13,8 @@ namespace Semver.Ranges.Parsers
             = "Invalid whitespace character at {0} in '{1}'. Only the ASCII space character is allowed.";
         private const string MissingComparisonMessage
             = "Range is missing a comparison or limit at {0} in '{1}'";
+        private const string MaxVersionMessage =
+            "Cannot construct range from version '{0}' because version number cannot be incremented beyond max value.";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FormatException NewTooLongException(string range, int maxLength)
@@ -29,6 +31,10 @@ namespace Semver.Ranges.Parsers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception MissingComparison(int position, string range) =>
             NewFormatException(MissingComparisonMessage, position, LimitLength(range));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Exception MaxVersion(SemVersion version)
+            => NewFormatException(MaxVersionMessage, LimitLength(version.ToString()));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static FormatException NewFormatException(string messageTemplate, params object[] args)

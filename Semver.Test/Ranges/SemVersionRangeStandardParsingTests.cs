@@ -20,6 +20,8 @@ namespace Semver.Test.Ranges
             "Invalid whitespace character at {1} in '{0}'. Only the ASCII space character is allowed.";
         private const string MissingComparisonMessage
             = "Range is missing a comparison or limit at {1} in '{0}'";
+        private const string MaxVersionMessage
+            = "Cannot construct range from version '{1}' because version number cannot be incremented beyond max value.";
 
         public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
         {
@@ -72,6 +74,10 @@ namespace Semver.Test.Ranges
             Valid(" <=   1.2.3 ", AtMost("1.2.3")),
             //Valid("<=1.2.3 || <=4.5.6", AtMost("4.5.6")),
             //Valid("*-* >=2.0.0-0", AtLeast("2.0.0-0", true)),
+            Valid("~1.2.3", InclusiveOfStart("1.2.3", "1.2.4-0")),
+
+            // Already at max version
+            Invalid("~1.2.2147483647", MaxVersionMessage, "1.2.2147483647"),
 
             // Missing Comparison
             Invalid("", MissingComparisonMessage, "0"),

@@ -163,30 +163,45 @@ namespace Semver.Ranges
             if (leftUnbounded && rightUnbounded)
                 return IncludeAllPrerelease ? "*-*" : "*";
 
-            // Wildcard Ranges like 2.*, 2.3.*, and 2.*-*
-            if (LeftBound.Inclusive && !RightBound.Inclusive
-                && Start.Patch == 0 && End.Patch == 0
-                && (!Start.IsPrerelease || PrereleaseIsZero(Start))
-                && PrereleaseIsZero(End))
+            if (LeftBound.Inclusive && !RightBound.Inclusive)
             {
-                string wildcardRange;
+                // Wildcard Ranges like 2.*, 2.3.*, and 2.*-*
+                if (Start.Patch == 0 && End.Patch == 0
+                    && (!Start.IsPrerelease || PrereleaseIsZero(Start))
+                    && PrereleaseIsZero(End))
+                {
+                    string wildcardRange;
 
-                if (Start.Major == End.Major && Start.Minor == End.Minor - 1)
-                    // Wildcard patch
-                    wildcardRange = $"{Start.Major}.{Start.Minor}.*";
-                else if (Start.Major == End.Major - 1 && Start.Minor == 0 && End.Minor == 0)
-                    // Wildcard minor
-                    wildcardRange = $"{Start.Major}.*";
-                else
-                    goto standard;
+                    // Subtract instead of add to avoid overflow
+                    if (Start.Major == End.Major && Start.Minor == End.Minor - 1)
+                        // Wildcard patch
+                        wildcardRange = $"{Start.Major}.{Start.Minor}.*";
+                    // Subtract instead of add to avoid overflow
+                    else if (Start.Major == End.Major - 1 && Start.Minor == 0 && End.Minor == 0)
+                        // Wildcard minor
+                        wildcardRange = $"{Start.Major}.*";
+                    else
+                        goto tilde;
 
-                if (!IncludeAllPrerelease) return wildcardRange;
+                    if (!IncludeAllPrerelease) return wildcardRange;
 
-                return PrereleaseIsZero(Start) ? wildcardRange + "-*" : "*-* " + wildcardRange;
+                    return PrereleaseIsZero(Start) ? wildcardRange + "-*" : "*-* " + wildcardRange;
+                }
+
+            tilde:
+                // Tilde ranges like ~1.2.3, and ~1.2.3-rc
+                if (Start.Major == End.Major
+                    && Start.Minor == End.Minor
+                    // Subtract instead of add to avoid overflow
+                    && Start.Patch == End.Patch - 1
+                    && PrereleaseIsZero(End))
+                {
+                    var version = Start.ToString();
+                    // TODO does this mean these ranges should never or always include prerelease?
+                    return (IncludeAllPrerelease && !Start.IsPrerelease ? "*-* ~" : "~") + version;
+                }
             }
 
-        // Standard ranges expressed by the bounds
-        standard:
             string range;
             if (leftUnbounded)
                 range = RightBound.ToString();
