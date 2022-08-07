@@ -45,7 +45,7 @@ namespace Semver.Test.Ranges
             Valid("  >1.2.3   ", GreaterThan("1.2.3")),
             Valid(">   1.2.3", GreaterThan("1.2.3")),
             Valid(" >   1.2.3 ", GreaterThan("1.2.3")),
-            //Valid(">1.2.3 || >4.5.6", GreaterThan("1.2.3")),
+            //Valid(">1.2.3 || >4.5.6", GreaterThan("4.5.6")),
             Valid(">=1.2.3", AtLeast("1.2.3")),
             Valid("  >=1.2.3   ", AtLeast("1.2.3")),
             Valid(">=   1.2.3", AtLeast("1.2.3")),
