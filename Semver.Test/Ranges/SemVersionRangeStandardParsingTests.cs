@@ -5,6 +5,7 @@ using Semver.Test.Helpers;
 using Semver.Test.TestCases;
 using Xunit;
 using static Semver.Ranges.SemVersionRangeOptions;
+using static Semver.Test.Builders.UnbrokenSemVersionRangeBuilder;
 
 namespace Semver.Test.Ranges
 {
@@ -13,6 +14,7 @@ namespace Semver.Test.Ranges
         private const string InvalidSemVersionRangeOptionsMessageStart = "An invalid SemVersionRangeOptions value was used.";
         private const string InvalidMaxLengthMessageStart = "Must not be negative.";
         private const string TooLongRangeMessage = "Exceeded maximum length of {1} for '{0}'.";
+        private const string InvalidOperatorMessage = "Invalid operator '{1}'.";
 
         public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
         {
@@ -30,13 +32,15 @@ namespace Semver.Test.Ranges
 
         public static readonly TheoryData<RangeParsingTestCase> ParsingTestCases = new TheoryData<RangeParsingTestCase>()
         {
-            Valid("=1.2.3", Equals("1.2.3")),
-            Valid("  =1.2.3   ", Equals("1.2.3")),
-            Valid("=   1.2.3", Equals("1.2.3")),
-            Valid(" =   1.2.3 ", Equals("1.2.3")),
-            Valid("=1.2.3 || =4.5.6", Equals("1.2.3"), Equals("4.5.6")),
+            //Valid("*", AllRelease),
+            //Valid("*-*", All),
+            Valid("=1.2.3", EqualsVersion("1.2.3")),
+            Valid("  =1.2.3   ", EqualsVersion("1.2.3")),
+            Valid("=   1.2.3", EqualsVersion("1.2.3")),
+            Valid(" =   1.2.3 ", EqualsVersion("1.2.3")),
+            Valid("=1.2.3 || =4.5.6", EqualsVersion("1.2.3"), EqualsVersion("4.5.6")),
             // Shows sorting of ranges
-            Valid("=4.5.6||=1.2.3", Equals("1.2.3"), Equals("4.5.6")),
+            Valid("=4.5.6||=1.2.3", EqualsVersion("1.2.3"), EqualsVersion("4.5.6")),
             Valid(">1.2.3", GreaterThan("1.2.3")),
             Valid("  >1.2.3   ", GreaterThan("1.2.3")),
             Valid(">   1.2.3", GreaterThan("1.2.3")),
@@ -57,6 +61,14 @@ namespace Semver.Test.Ranges
             Valid("<=   1.2.3", AtMost("1.2.3")),
             Valid(" <=   1.2.3 ", AtMost("1.2.3")),
             //Valid("<=1.2.3 || <=4.5.6", AtMost("4.5.6")),
+            //Valid("*-* >=2.0.0-0", AtLeast("2.0.0-0", true)),
+
+            // Invalid Operator
+            Invalid("~>1.2.3", InvalidOperatorMessage, "~>"),
+            Invalid("==1.2.3", InvalidOperatorMessage, "=="),
+            Invalid("=1.2.3|4.5.6", InvalidOperatorMessage, "|"),
+            Invalid("@&%1.2.3", InvalidOperatorMessage, "@&%"),
+            Invalid("≥1.2.3", InvalidOperatorMessage, "≥"),
 
             // Longer than max length
             Invalid("=1.0.0", TooLongRangeMessage, "2", maxLength: 2),
@@ -186,20 +198,5 @@ namespace Semver.Test.Ranges
             exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);
             return RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(FormatException), exceptionMessage);
         }
-
-        internal static UnbrokenSemVersionRange Equals(string version)
-            => UnbrokenSemVersionRange.Equals(SemVersion.Parse(version, SemVersionStyles.Strict));
-
-        internal static UnbrokenSemVersionRange GreaterThan(string version)
-            => UnbrokenSemVersionRange.GreaterThan(SemVersion.Parse(version, SemVersionStyles.Strict));
-
-        internal static UnbrokenSemVersionRange AtLeast(string version)
-            => UnbrokenSemVersionRange.AtLeast(SemVersion.Parse(version, SemVersionStyles.Strict));
-
-        internal static UnbrokenSemVersionRange LessThan(string version)
-            => UnbrokenSemVersionRange.LessThan(SemVersion.Parse(version, SemVersionStyles.Strict));
-
-        internal static UnbrokenSemVersionRange AtMost(string version)
-            => UnbrokenSemVersionRange.AtMost(SemVersion.Parse(version, SemVersionStyles.Strict));
     }
 }

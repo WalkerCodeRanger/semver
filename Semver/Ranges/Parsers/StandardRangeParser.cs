@@ -108,9 +108,10 @@ namespace Semver.Ranges.Parsers
             segment = segment.TrimEndSpaces();
             var start = LeftBoundedRange.Unbounded;
             var end = RightBoundedRange.Unbounded;
+            var includeAllPrerelease = options.HasOption(SemVersionRangeOptions.IncludeAllPrerelease);
             foreach (var comparison in SplitComparisons(segment))
             {
-                var exception = ParseComparison(comparison, options, ex, maxLength, ref start, ref end);
+                var exception = ParseComparison(comparison, options, ref includeAllPrerelease, ex, maxLength, ref start, ref end);
                 if (exception != null)
                 {
                     unbrokenRange = null;
@@ -119,9 +120,7 @@ namespace Semver.Ranges.Parsers
             }
 
             // TODO this makes empty mean *, is that what we want?
-
-            unbrokenRange = UnbrokenSemVersionRange.Create(start, end,
-                options.HasOption(SemVersionRangeOptions.IncludeAllPrerelease));
+            unbrokenRange = UnbrokenSemVersionRange.Create(start, end, includeAllPrerelease);
             return null;
         }
 
@@ -135,13 +134,13 @@ namespace Semver.Ranges.Parsers
                 while (end < segment.Length && segment[end] == ' ') start = end += 1;
 
                 // Skip operators
-                while (end < segment.Length && IsOperatorChar(segment[end])) end++;
+                while (end < segment.Length && IsPossibleOperatorChar(segment[end])) end++;
 
                 // Skip spaces after operators
                 while (end < segment.Length && segment[end] == ' ') end += 1;
 
                 // Now find the next space or operator
-                while (end < segment.Length && !IsOperatorOrSpaceChar(segment[end])) end++;
+                while (end < segment.Length && !IsPossibleOperatorOrSpaceChar(segment[end])) end++;
 
                 yield return segment.Subsegment(start, end - start);
                 start = end;
@@ -153,16 +152,19 @@ namespace Semver.Ranges.Parsers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsOperatorChar(char c)
-            => c == '=' || c == '<' || c == '>' || c == '~' || c == '^';
+        internal static bool IsPossibleOperatorChar(char c)
+            => c == '=' || c == '<' || c == '>' || c == '~' || c == '^'
+               || (char.IsPunctuation(c) && !char.IsWhiteSpace(c) && c != '*' && c != '.')
+               || (char.IsSymbol(c) && c != '*');
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsOperatorOrSpaceChar(char c) => c == ' ' || IsOperatorChar(c);
+        private static bool IsPossibleOperatorOrSpaceChar(char c) => c == ' ' || IsPossibleOperatorChar(c);
 
         /// <remarks>The segment must be trimmed before calling this method.</remarks>
         private static Exception ParseComparison(
             StringSegment segment,
             SemVersionRangeOptions options,
+            ref bool includeAllPrerelease,
             Exception ex,
             int maxLength,
             ref LeftBoundedRange leftBound,
@@ -171,44 +173,96 @@ namespace Semver.Ranges.Parsers
 #if DEBUG
             if (segment.IsEmpty) throw new ArgumentException("Cannot be empty", nameof(segment));
 #endif
-            // TODO identify the operator and report invalid operators
-            // TODO Also report invalid chars?
+            var exception = ParseOperator(segment, ex, out var @operator);
+            if (exception != null) return exception;
 
-            var firstChar = segment[0];
-            var isOrEqual = segment.Length >= 2 && segment[1] == '=';
-
-            switch (firstChar)
+            switch (@operator)
             {
-                case '=':
+                case StandardOperator.Equals:
                 {
                     var version = segment.Subsegment(1);
-                    var exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
+                    exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
                     if (exception != null) return exception;
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                     rightBound = rightBound.Min(new RightBoundedRange(semver, true));
                     return null;
                 }
-                case '>':
+                case StandardOperator.GreaterThan:
+                case StandardOperator.GreaterThanOrEqual:
                 {
+                    var isOrEqual = @operator == StandardOperator.GreaterThanOrEqual;
                     var version = segment.Subsegment(isOrEqual ? 2 : 1);
-                    var exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
+                    exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
                     if (exception != null) return exception;
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, isOrEqual));
                     return null;
                 }
-                case '<':
+                case StandardOperator.LessThan:
+                case StandardOperator.LessThanOrEqual:
                 {
+                    var isOrEqual = @operator == StandardOperator.LessThanOrEqual;
                     var version = segment.Subsegment(isOrEqual ? 2 : 1);
-                    var exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
+                    exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
                     if (exception != null) return exception;
                     rightBound = rightBound.Min(new RightBoundedRange(semver, isOrEqual));
                     return null;
                 }
-                case '~':
-                case '^':
+                case StandardOperator.Caret:
+                case StandardOperator.Tilde:
+                case StandardOperator.None: // implied = (supports wildcard *)
                     throw new NotImplementedException();
-                default: // implied = (supports wildcard *)
-                    throw new NotImplementedException();
+                default:
+                    // This code should be unreachable
+                    throw new ArgumentException($"DEBUG: Invalid {nameof(StandardOperator)} value {@operator}");
+            }
+        }
+
+        private static Exception ParseOperator(
+            StringSegment segment, Exception ex, out StandardOperator @operator)
+        {
+            var end = 0;
+            while (end < segment.Length && IsPossibleOperatorChar(segment[end])) end++;
+            var opSegment = segment.Subsegment(0, end);
+
+            if (opSegment.Length == 0)
+            {
+                @operator = StandardOperator.None;
+                return null;
+            }
+
+            // Assign invalid once so it doesn't have to be done any time parse fails
+            @operator = 0;
+            if (opSegment.Length > 2
+                || (opSegment.Length == 2 && opSegment[1]!='='))
+                return ex ?? RangeError.InvalidOperator(opSegment.ToString());
+
+            var firstChar = opSegment[0];
+            var isOrEqual = opSegment.Length == 2; // Already checked for other second char
+            switch (firstChar)
+            {
+                case '=' when !isOrEqual:
+                    @operator = StandardOperator.Equals;
+                    return null;
+                case '<' when isOrEqual:
+                    @operator = StandardOperator.LessThanOrEqual;
+                    return null;
+                case '<':
+                    @operator = StandardOperator.LessThan;
+                    return null;
+                case '>' when isOrEqual:
+                    @operator = StandardOperator.GreaterThanOrEqual;
+                    return null;
+                case '>':
+                    @operator = StandardOperator.GreaterThan;
+                    return null;
+                case '~' when !isOrEqual:
+                    @operator = StandardOperator.Tilde;
+                    return null;
+                case '^' when !isOrEqual:
+                    @operator = StandardOperator.Caret;
+                    return null;
+                default:
+                    return ex ?? RangeError.InvalidOperator(opSegment.ToString());
             }
         }
     }
