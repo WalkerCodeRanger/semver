@@ -1037,10 +1037,12 @@ namespace Semver.Test.Ranges
             {InclusiveOfStart("5.0.0-0", "6.0.0-0", true), "5.*-*"},
             {InclusiveOfStart("5.0.0", "6.0.0-0", true), "*-* 5.*"},
             // Tilde ranges
-            {InclusiveOfStart("2.1.3", "2.1.4-0"), "~2.1.3"},
-            {InclusiveOfStart("2.1.3", "2.1.4-0", true), "*-* ~2.1.3"},
-            {InclusiveOfStart("2.1.3-rc", "2.1.4-0"), "~2.1.3-rc"},
-            {InclusiveOfStart("2.1.3-rc", "2.1.4-0", true), "~2.1.3-rc"},
+            {InclusiveOfStart("2.1.3", "2.2.0-0"), "~2.1.3"},
+            {InclusiveOfStart("2.1.3", "2.2.0-0", true), "*-* ~2.1.3"},
+            {InclusiveOfStart("2.1.3-rc", "2.2.0-0"), "~2.1.3-rc"},
+            {InclusiveOfStart("2.1.3-rc", "2.2.0-0", true), "*-* ~2.1.3-rc"},
+            {InclusiveOfStart("2.1.0-rc", "2.2.0-0"), "~2.1.0-rc"},
+            {InclusiveOfStart("2.1.0-rc", "2.2.0-0", true), "*-* ~2.1.0-rc"},
         };
 
         [Theory]

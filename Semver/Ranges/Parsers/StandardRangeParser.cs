@@ -128,9 +128,9 @@ namespace Semver.Ranges.Parsers
                     throw new NotImplementedException();
                 case StandardOperator.Tilde:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                    if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
                     rightBound = rightBound.Min(new RightBoundedRange(
-                        semver.With(patch: semver.Patch + 1, prerelease: PrereleaseIdentifiers.Zero),
+                        semver.With(minor: semver.Minor + 1, patch: 0, prerelease: PrereleaseIdentifiers.Zero),
                         false));
                     return null;
                 case StandardOperator.None: // implied = (supports wildcard *)

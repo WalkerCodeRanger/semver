@@ -80,10 +80,10 @@ namespace Semver.Test.Ranges
             Valid("<=1.2.3 <=4.5.6", AtMost("1.2.3")),
             //Valid("<=1.2.3 || <=4.5.6", AtMost("4.5.6")),
             //Valid("*-* >=2.0.0-0", AtLeast("2.0.0-0", true)),
-            Valid("~1.2.3", InclusiveOfStart("1.2.3", "1.2.4-0")),
+            Valid("~1.2.3", InclusiveOfStart("1.2.3", "1.3.0-0")),
 
             // Already at max version
-            Invalid("~1.2.2147483647", MaxVersionMessage, "1.2.2147483647"),
+            Invalid("~1.2147483647.3", MaxVersionMessage, "1.2147483647.3"),
 
             // Missing Comparison
             Invalid("", MissingComparisonMessage, "0"),

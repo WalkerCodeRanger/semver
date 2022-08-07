@@ -191,15 +191,10 @@ namespace Semver.Ranges
             tilde:
                 // Tilde ranges like ~1.2.3, and ~1.2.3-rc
                 if (Start.Major == End.Major
-                    && Start.Minor == End.Minor
                     // Subtract instead of add to avoid overflow
-                    && Start.Patch == End.Patch - 1
-                    && PrereleaseIsZero(End))
-                {
-                    var version = Start.ToString();
-                    // TODO does this mean these ranges should never or always include prerelease?
-                    return (IncludeAllPrerelease && !Start.IsPrerelease ? "*-* ~" : "~") + version;
-                }
+                    && Start.Minor == End.Minor - 1
+                    && End.Patch == 0 && PrereleaseIsZero(End))
+                    return (IncludeAllPrerelease ? "*-* ~" : "~") + Start.ToString();
             }
 
             string range;
