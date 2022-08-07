@@ -103,7 +103,6 @@ namespace Semver.Ranges.Parsers
                 yield return segment.Subsegment(start, end - start);
         }
 
-        /// <remarks>The segment must be trimmed before calling this method.</remarks>
         private static Exception ParseComparison(
             StringSegment segment,
             SemVersionRangeOptions options,
@@ -116,11 +115,16 @@ namespace Semver.Ranges.Parsers
 #if DEBUG
             if (segment.IsEmpty) throw new ArgumentException("Cannot be empty", nameof(segment));
 #endif
-            var exception = ParseOperator(segment, ex, out var @operator);
+            var exception = ParseWhitespace(ref segment, ex);
             if (exception != null) return exception;
 
-            var version = segment.Subsegment(@operator.StringLength()).TrimStartSpaces();
-            exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
+            exception = ParseOperator(ref segment, ex, out var @operator);
+            if (exception != null) return exception;
+
+            exception = ParseWhitespace(ref segment, ex);
+            if (exception != null) return exception;
+
+            exception = SemVersionParser.Parse(segment, options.ToStyles(), ex, maxLength, out var semver);
             if (exception != null) return exception;
 
             switch (@operator)
@@ -152,11 +156,12 @@ namespace Semver.Ranges.Parsers
         }
 
         private static Exception ParseOperator(
-            StringSegment segment, Exception ex, out StandardOperator @operator)
+            ref StringSegment segment, Exception ex, out StandardOperator @operator)
         {
             var end = 0;
             while (end < segment.Length && IsPossibleOperatorChar(segment[end])) end++;
             var opSegment = segment.Subsegment(0, end);
+            segment = segment.Subsegment(end);
 
             if (opSegment.Length == 0)
             {
@@ -167,11 +172,11 @@ namespace Semver.Ranges.Parsers
             // Assign invalid once so it doesn't have to be done any time parse fails
             @operator = 0;
             if (opSegment.Length > 2
-                || (opSegment.Length == 2 && opSegment[1]!='='))
+                || (opSegment.Length == 2 && opSegment[1] != '='))
                 return ex ?? RangeError.InvalidOperator(opSegment.ToString());
 
             var firstChar = opSegment[0];
-            var isOrEqual = opSegment.Length == 2; // Already checked for other second char
+            var isOrEqual = opSegment.Length == 2; // Already checked for second char != '='
             switch (firstChar)
             {
                 case '=' when !isOrEqual:

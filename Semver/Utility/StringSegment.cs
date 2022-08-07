@@ -10,8 +10,7 @@ namespace Semver.Utility
     [StructLayout(LayoutKind.Auto)]
     internal readonly struct StringSegment
     {
-        private readonly string source;
-        private readonly int offset;
+
 
         public StringSegment(string source, int offset, int length)
         {
@@ -27,12 +26,14 @@ namespace Semver.Utility
                 throw new ArgumentOutOfRangeException(nameof(length), length,
                     $"DEBUG: When added to offset of {offset}, must be <= length of {length}. String:\r\n{source}");
 #endif
-            this.source = source;
-            this.offset = offset;
+            Source = source;
+            Offset = offset;
             Length = length;
         }
 
-        public int Length { get; }
+        public readonly string Source;
+        public readonly int Offset;
+        public readonly int Length;
 
         public bool IsEmpty => Length == 0;
 
@@ -43,27 +44,27 @@ namespace Semver.Utility
 #if DEBUG
                 ValidateIndex(i, nameof(i));
 #endif
-                return source[offset + i];
+                return Source[Offset + i];
             }
         }
 
         public StringSegment TrimStartSpaces()
         {
-            var start = offset;
-            var end = offset + Length - 1;
+            var start = Offset;
+            var end = Offset + Length - 1;
 
-            while (start <= end && source[start] == ' ') start++;
+            while (start <= end && Source[start] == ' ') start++;
 
-            return new StringSegment(source, start, end + 1 - start);
+            return new StringSegment(Source, start, end + 1 - start);
         }
 
         public StringSegment TrimEndSpaces()
         {
-            var end = offset + Length - 1;
+            var end = Offset + Length - 1;
 
-            while (offset <= end && source[end] == ' ') end--;
+            while (Offset <= end && Source[end] == ' ') end--;
 
-            return new StringSegment(source, offset, end + 1 - offset);
+            return new StringSegment(Source, Offset, end + 1 - Offset);
         }
 
         public StringSegment Subsegment(int start, int length)
@@ -72,7 +73,7 @@ namespace Semver.Utility
             ValidateIndex(start, nameof(start));
             ValidateLength(start, length, nameof(length));
 #endif
-            return new StringSegment(source, offset + start, length);
+            return new StringSegment(Source, Offset + start, length);
         }
 
         public StringSegment Subsegment(int start)
@@ -80,7 +81,7 @@ namespace Semver.Utility
 #if DEBUG
             ValidateIndex(start, nameof(start));
 #endif
-            return new StringSegment(source, offset + start, Length - start);
+            return new StringSegment(Source, Offset + start, Length - start);
         }
 
         public int IndexOf(char value, int startIndex, int count)
@@ -89,8 +90,8 @@ namespace Semver.Utility
             ValidateIndex(startIndex, nameof(startIndex));
             ValidateLength(startIndex, count, nameof(count));
 #endif
-            var i = source.IndexOf(value, offset + startIndex, count);
-            return i < 0 ? i : i - offset;
+            var i = Source.IndexOf(value, Offset + startIndex, count);
+            return i < 0 ? i : i - Offset;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -98,7 +99,7 @@ namespace Semver.Utility
             => new StringSegment(value, 0, value.Length);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override string ToString() => source.Substring(offset, Length);
+        public override string ToString() => Source.Substring(Offset, Length);
 
 #if DEBUG
         private void ValidateIndex(int i, string paramName)

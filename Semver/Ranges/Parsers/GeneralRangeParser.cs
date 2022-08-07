@@ -63,5 +63,17 @@ namespace Semver.Ranges.Parsers
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsPossibleOperatorOrSpaceChar(char c) => c == ' ' || IsPossibleOperatorChar(c);
+
+        /// <summary>
+        /// Parse optional whitespace from the beginning of the segment.
+        /// </summary>
+        public static Exception ParseWhitespace(ref StringSegment segment, Exception ex)
+        {
+            segment = segment.TrimStartSpaces();
+
+            if (segment.Length > 0 && char.IsWhiteSpace(segment[0]))
+                return ex ?? RangeError.InvalidWhitespace(segment.Offset, segment.Source);
+            return null;
+        }
     }
 }

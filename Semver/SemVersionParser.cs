@@ -263,7 +263,7 @@ namespace Semver
         }
 
         private static Exception ParseVersionNumber(
-            string kind,
+            string kind, // i.e. Major, Minor, or Patch
             StringSegment version,
             ref int i,
             int startOfNext,

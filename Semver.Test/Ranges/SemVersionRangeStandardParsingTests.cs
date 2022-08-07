@@ -11,10 +11,13 @@ namespace Semver.Test.Ranges
 {
     public class SemVersionRangeStandardParsingTests
     {
-        private const string InvalidSemVersionRangeOptionsMessageStart = "An invalid SemVersionRangeOptions value was used.";
+        private const string InvalidSemVersionRangeOptionsMessageStart
+            = "An invalid SemVersionRangeOptions value was used.";
         private const string InvalidMaxLengthMessageStart = "Must not be negative.";
         private const string TooLongRangeMessage = "Exceeded maximum length of {1} for '{0}'.";
         private const string InvalidOperatorMessage = "Invalid operator '{1}'.";
+        private const string InvalidWhitespaceMessage =
+            "Invalid whitespace character at {1} in '{0}'. Only the ASCII space character is allowed.";
 
         public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
         {
@@ -64,8 +67,8 @@ namespace Semver.Test.Ranges
             //Valid("*-* >=2.0.0-0", AtLeast("2.0.0-0", true)),
 
             // Invalid Whitespace
-            //Invalid("\t=1.2.3", ""),
-            //Invalid("=\t1.2.3", ""),
+            Invalid("\t=1.2.3", InvalidWhitespaceMessage, "0"),
+            Invalid("=\t1.2.3", InvalidWhitespaceMessage, "1"),
 
             // Invalid Operator
             Invalid("~>1.2.3", InvalidOperatorMessage, "~>"),
