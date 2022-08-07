@@ -63,6 +63,10 @@ namespace Semver.Test.Ranges
             //Valid("<=1.2.3 || <=4.5.6", AtMost("4.5.6")),
             //Valid("*-* >=2.0.0-0", AtLeast("2.0.0-0", true)),
 
+            // Invalid Whitespace
+            //Invalid("\t=1.2.3", ""),
+            //Invalid("=\t1.2.3", ""),
+
             // Invalid Operator
             Invalid("~>1.2.3", InvalidOperatorMessage, "~>"),
             Invalid("==1.2.3", InvalidOperatorMessage, "=="),

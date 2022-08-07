@@ -176,37 +176,28 @@ namespace Semver.Ranges.Parsers
             var exception = ParseOperator(segment, ex, out var @operator);
             if (exception != null) return exception;
 
+            var version = segment.Subsegment(@operator.StringLength()).TrimStartSpaces();
+            exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
+            if (exception != null) return exception;
+
             switch (@operator)
             {
                 case StandardOperator.Equals:
-                {
-                    var version = segment.Subsegment(1);
-                    exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
-                    if (exception != null) return exception;
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                     rightBound = rightBound.Min(new RightBoundedRange(semver, true));
                     return null;
-                }
                 case StandardOperator.GreaterThan:
+                    leftBound = leftBound.Max(new LeftBoundedRange(semver, false));
+                    return null;
                 case StandardOperator.GreaterThanOrEqual:
-                {
-                    var isOrEqual = @operator == StandardOperator.GreaterThanOrEqual;
-                    var version = segment.Subsegment(isOrEqual ? 2 : 1);
-                    exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
-                    if (exception != null) return exception;
-                    leftBound = leftBound.Max(new LeftBoundedRange(semver, isOrEqual));
+                    leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                     return null;
-                }
                 case StandardOperator.LessThan:
-                case StandardOperator.LessThanOrEqual:
-                {
-                    var isOrEqual = @operator == StandardOperator.LessThanOrEqual;
-                    var version = segment.Subsegment(isOrEqual ? 2 : 1);
-                    exception = SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out var semver);
-                    if (exception != null) return exception;
-                    rightBound = rightBound.Min(new RightBoundedRange(semver, isOrEqual));
+                    rightBound = rightBound.Min(new RightBoundedRange(semver, false));
                     return null;
-                }
+                case StandardOperator.LessThanOrEqual:
+                    rightBound = rightBound.Min(new RightBoundedRange(semver, true));
+                    return null;
                 case StandardOperator.Caret:
                 case StandardOperator.Tilde:
                 case StandardOperator.None: // implied = (supports wildcard *)

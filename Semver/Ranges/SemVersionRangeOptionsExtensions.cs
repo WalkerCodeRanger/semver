@@ -33,6 +33,6 @@ namespace Semver.Ranges
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static SemVersionStyles ToStyles(this SemVersionRangeOptions options)
-            => (SemVersionStyles)(options & OptionsThatAreStyles) | SemVersionStyles.AllowLeadingWhitespace;
+            => (SemVersionStyles)(options & OptionsThatAreStyles);
     }
 }

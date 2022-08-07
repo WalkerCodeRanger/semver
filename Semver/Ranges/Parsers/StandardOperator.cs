@@ -1,4 +1,4 @@
-﻿namespace Semver.Ranges
+﻿namespace Semver.Ranges.Parsers
 {
     internal enum StandardOperator
     {
