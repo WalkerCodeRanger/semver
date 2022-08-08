@@ -1036,6 +1036,9 @@ namespace Semver.Test.Ranges
             {InclusiveOfStart("3.0.0", "4.0.0-0"), "3.*"},
             {InclusiveOfStart("5.0.0-0", "6.0.0-0", true), "5.*-*"},
             {InclusiveOfStart("5.0.0", "6.0.0-0", true), "*-* 5.*"},
+            // Wildcard ranges preferred to tilde or caret
+            {InclusiveOfStart("0.1.0", "0.2.0-0"), "0.1.*"},
+            {InclusiveOfStart("0.1.0", "0.2.0-0", true), "*-* 0.1.*"},
             // Tilde ranges
             {InclusiveOfStart("2.1.3", "2.2.0-0"), "~2.1.3"},
             {InclusiveOfStart("2.1.3", "2.2.0-0", true), "*-* ~2.1.3"},
@@ -1043,6 +1046,27 @@ namespace Semver.Test.Ranges
             {InclusiveOfStart("2.1.3-rc", "2.2.0-0", true), "*-* ~2.1.3-rc"},
             {InclusiveOfStart("2.1.0-rc", "2.2.0-0"), "~2.1.0-rc"},
             {InclusiveOfStart("2.1.0-rc", "2.2.0-0", true), "*-* ~2.1.0-rc"},
+            {InclusiveOfStart("2.0.5", "2.1.0-0"), "~2.0.5"},
+            {InclusiveOfStart("2.0.5", "2.1.0-0", true), "*-* ~2.0.5"},
+            // Tilde ranges are preferred to caret
+            {InclusiveOfStart("0.1.3", "0.2.0-0"), "~0.1.3"},
+            {InclusiveOfStart("0.1.3", "0.2.0-0", true), "*-* ~0.1.3"},
+            {InclusiveOfStart("0.1.3-rc", "0.2.0-0"), "~0.1.3-rc"},
+            {InclusiveOfStart("0.1.3-rc", "0.2.0-0", true), "*-* ~0.1.3-rc"},
+            {InclusiveOfStart("0.1.0-rc", "0.2.0-0"), "~0.1.0-rc"},
+            {InclusiveOfStart("0.1.0-rc", "0.2.0-0", true), "*-* ~0.1.0-rc"},
+            // Caret ranges starting with major
+            {InclusiveOfStart("2.1.3", "3.0.0-0"), "^2.1.3"},
+            {InclusiveOfStart("2.1.3", "3.0.0-0", true), "*-* ^2.1.3"},
+            {InclusiveOfStart("2.1.3-rc", "3.0.0-0"), "^2.1.3-rc"},
+            {InclusiveOfStart("2.1.3-rc", "3.0.0-0", true), "*-* ^2.1.3-rc"},
+            {InclusiveOfStart("2.0.0-rc", "3.0.0-0"), "^2.0.0-rc"},
+            {InclusiveOfStart("2.0.0-rc", "3.0.0-0", true), "*-* ^2.0.0-rc"},
+            // Caret ranges starting with patch
+            {InclusiveOfStart("0.0.3", "0.0.4-0"), "^0.0.3"},
+            {InclusiveOfStart("0.0.3", "0.0.4-0", true), "*-* ^0.0.3"},
+            {InclusiveOfStart("0.0.3-rc", "0.0.4-0"), "^0.0.3-rc"},
+            {InclusiveOfStart("0.0.3-rc", "0.0.4-0", true), "*-* ^0.0.3-rc"},
         };
 
         [Theory]

@@ -125,7 +125,29 @@ namespace Semver.Ranges.Parsers
                     rightBound = rightBound.Min(new RightBoundedRange(semver, true));
                     return null;
                 case StandardOperator.Caret:
-                    throw new NotImplementedException();
+                    leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
+                    int major = 0, minor = 0, patch = 0;
+                    if (semver.Major != 0)
+                    {
+                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                        major = semver.Major + 1;
+                    }
+                    else if (semver.Minor != 0)
+                    {
+                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                        minor = semver.Minor + 1;
+                    }
+                    else
+                    {
+                        if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                        patch = semver.Patch + 1;
+                    }
+
+                    rightBound = rightBound.Min(new RightBoundedRange(new SemVersion(
+                                    major, minor, patch,
+                                    "0", PrereleaseIdentifiers.Zero, "",
+                                    ReadOnlyList<MetadataIdentifier>.Empty), false));
+                    return null;
                 case StandardOperator.Tilde:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                     if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);

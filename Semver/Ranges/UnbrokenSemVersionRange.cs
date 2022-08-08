@@ -163,12 +163,11 @@ namespace Semver.Ranges
             if (leftUnbounded && rightUnbounded)
                 return IncludeAllPrerelease ? "*-*" : "*";
 
-            if (LeftBound.Inclusive && !RightBound.Inclusive)
+            if (LeftBound.Inclusive && !RightBound.Inclusive && PrereleaseIsZero(End))
             {
                 // Wildcard Ranges like 2.*, 2.3.*, and 2.*-*
                 if (Start.Patch == 0 && End.Patch == 0
-                    && (!Start.IsPrerelease || PrereleaseIsZero(Start))
-                    && PrereleaseIsZero(End))
+                    && (!Start.IsPrerelease || PrereleaseIsZero(Start)))
                 {
                     string wildcardRange;
 
@@ -193,8 +192,37 @@ namespace Semver.Ranges
                 if (Start.Major == End.Major
                     // Subtract instead of add to avoid overflow
                     && Start.Minor == End.Minor - 1
-                    && End.Patch == 0 && PrereleaseIsZero(End))
-                    return (IncludeAllPrerelease ? "*-* ~" : "~") + Start.ToString();
+                    && End.Patch == 0)
+                    return (IncludeAllPrerelease ? "*-* ~" : "~") + Start;
+
+                if (Start.Major != 0)
+                {
+                    // Caret ranges like ^1.2.3 and ^1.2.3-rc
+                    // Subtract instead of add to avoid overflow
+                    if (Start.Major == End.Major - 1
+                        && End.Minor == 0 && End.Patch == 0)
+                        return (IncludeAllPrerelease ? "*-* ^" : "^") + Start;
+                }
+                else if (End.Major == 0)
+                {
+                    // Start.Major == 0 and End.Major == 0
+                    if (Start.Minor != 0)
+                    {
+                        // Caret ranges like ^0.1.2 and ^0.2.3-rc
+                        // Subtract instead of add to avoid overflow
+                        if (Start.Minor == End.Minor - 1
+                            && End.Patch == 0)
+                            return (IncludeAllPrerelease ? "*-* ^" : "^") + Start;
+                    }
+                    else if (End.Minor == 0)
+                    {
+                        // Start.Minor == 0 and End.Minor == 0
+
+                        // Caret ranges like ^0.0.2 and ^0.0.2-rc
+                        if (Start.Patch == End.Patch - 1)
+                            return (IncludeAllPrerelease ? "*-* ^" : "^") + Start;
+                    }
+                }
             }
 
             string range;

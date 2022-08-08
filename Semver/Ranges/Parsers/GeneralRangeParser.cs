@@ -58,12 +58,12 @@ namespace Semver.Ranges.Parsers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsPossibleOperatorChar(char c)
             => c == '=' || c == '<' || c == '>' || c == '~' || c == '^'
-               || (char.IsPunctuation(c) && !char.IsWhiteSpace(c) && c != '*' && c != '.')
+               || (char.IsPunctuation(c) && !char.IsWhiteSpace(c) && c != '*')
                || (char.IsSymbol(c) && c != '*');
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPossibleOperatorOrWhitespace(char c)
-            => char.IsWhiteSpace(c) || IsPossibleOperatorChar(c);
+        public static bool IsPossibleVersionChar(char c)
+            => !char.IsWhiteSpace(c) && (!IsPossibleOperatorChar(c) || c == '-' || c == '.');
 
         /// <summary>
         /// Parse optional whitespace from the beginning of the segment.
@@ -85,7 +85,7 @@ namespace Semver.Ranges.Parsers
             // The SemVersionParser assumes there is nothing following the version number. To reuse
             // its parsing, the appropriate end must be found.
             var end = 0;
-            while (end < segment.Length && !IsPossibleOperatorOrWhitespace(segment[end])) end++;
+            while (end < segment.Length && IsPossibleVersionChar(segment[end])) end++;
             var version = segment.Subsegment(0, end);
             segment = segment.Subsegment(end);
 
