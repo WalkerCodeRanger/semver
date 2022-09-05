@@ -25,17 +25,35 @@ namespace Semver.Benchmarks
 
         protected abstract IReadOnlyList<string> CreateVersions();
 
+        [Params(true, false)]
+        public bool Strict { get; set; }
+
+        private SemVersionStyles currentStyles;
+        private Previous.SemVersionStyles previousStyles;
+
+        /// <summary>
+        /// Construct the <see cref="SemVersionStyles"/> for for parsing.
+        /// </summary>
+        /// <remarks>Having <see cref="SemVersionStyles"/> as actual parameter values to benchmarks
+        /// causes compile errors when running those benchmarks. Whatever Benchmark.NET is doing
+        /// doesn't understand the alias for previous version.</remarks>
+        [GlobalSetup]
+        public void SetupStyles()
+        {
+            currentStyles = Strict ? SemVersionStyles.Strict : SemVersionStyles.Any;
+            previousStyles = Strict ? Previous.SemVersionStyles.Strict : Previous.SemVersionStyles.Any;
+        }
+
+
         [Benchmark(OperationsPerInvoke = VersionCount)]
-        [Arguments(true)]
-        [Arguments(false)]
-        public long RegExParse_Previous(bool strict)
+        public long RegExParse_Previous()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                var version = Previous.SemVersion.Parse(versions[i], strict);
+                var version = Previous.SemVersion.Parse(versions[i], Strict);
 #pragma warning restore CS0618 // Type or member is obsolete
                 accumulator += version.Major;
             }
@@ -44,16 +62,14 @@ namespace Semver.Benchmarks
         }
 
         [Benchmark(OperationsPerInvoke = VersionCount)]
-        [Arguments(true)]
-        [Arguments(false)]
-        public long RegExTryParse_Previous(bool strict)
+        public long RegExTryParse_Previous()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                Previous.SemVersion.TryParse(versions[i], out var version, strict);
+                Previous.SemVersion.TryParse(versions[i], out var version, Strict);
 #pragma warning restore CS0618 // Type or member is obsolete
                 accumulator += version.Major;
             }
@@ -62,16 +78,14 @@ namespace Semver.Benchmarks
         }
 
         [Benchmark(OperationsPerInvoke = VersionCount)]
-        [Arguments(true)]
-        [Arguments(false)]
-        public long RegExParse_Current(bool strict)
+        public long RegExParse_Current()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                var version = SemVersion.Parse(versions[i], strict);
+                var version = SemVersion.Parse(versions[i], Strict);
 #pragma warning restore CS0618 // Type or member is obsolete
                 accumulator += version.Major;
             }
@@ -80,16 +94,14 @@ namespace Semver.Benchmarks
         }
 
         [Benchmark(OperationsPerInvoke = VersionCount)]
-        [Arguments(true)]
-        [Arguments(false)]
-        public long RegExTryParse_Current(bool strict)
+        public long RegExTryParse_Current()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                SemVersion.TryParse(versions[i], out var version, strict);
+                SemVersion.TryParse(versions[i], out var version, Strict);
 #pragma warning restore CS0618 // Type or member is obsolete
                 accumulator += version.Major;
             }
@@ -97,16 +109,15 @@ namespace Semver.Benchmarks
             return accumulator;
         }
 
+
         [Benchmark(OperationsPerInvoke = VersionCount)]
-        [Arguments(Previous.SemVersionStyles.Strict)]
-        [Arguments(Previous.SemVersionStyles.Any)]
-        public long Parse_Previous(Previous.SemVersionStyles style)
+        public long Parse_Previous()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
-                var version = Previous.SemVersion.Parse(versions[i], style, maxLength: int.MaxValue);
+                var version = Previous.SemVersion.Parse(versions[i], previousStyles, maxLength: int.MaxValue);
                 accumulator += version.Major;
             }
 
@@ -114,32 +125,13 @@ namespace Semver.Benchmarks
         }
 
         [Benchmark(OperationsPerInvoke = VersionCount)]
-        [Arguments(Previous.SemVersionStyles.Strict)]
-        [Arguments(Previous.SemVersionStyles.Any)]
-        public long TryParse_Previous(Previous.SemVersionStyles style)
+        public long TryParse_Previous()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
-                Previous.SemVersion.TryParse(versions[i], style, out var version, maxLength: int.MaxValue);
-                accumulator += version.Major;
-            }
-
-            return accumulator;
-        }
-
-
-        [Benchmark(OperationsPerInvoke = VersionCount)]
-        [Arguments(SemVersionStyles.Strict)]
-        [Arguments(SemVersionStyles.Any)]
-        public long Parse_Current(SemVersionStyles style)
-        {
-            // The accumulator ensures the versions aren't dead code with minimal overhead
-            long accumulator = 0;
-            for (int i = 0; i < VersionCount; i++)
-            {
-                var version = SemVersion.Parse(versions[i], style, maxLength: int.MaxValue);
+                Previous.SemVersion.TryParse(versions[i], previousStyles, out var version, maxLength: int.MaxValue);
                 accumulator += version.Major;
             }
 
@@ -147,15 +139,27 @@ namespace Semver.Benchmarks
         }
 
         [Benchmark(OperationsPerInvoke = VersionCount)]
-        [Arguments(SemVersionStyles.Strict)]
-        [Arguments(SemVersionStyles.Any)]
-        public long TryParse_Current(SemVersionStyles style)
+        public long Parse_Current()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
-                SemVersion.TryParse(versions[i], style, out var version, maxLength: int.MaxValue);
+                var version = SemVersion.Parse(versions[i], currentStyles, maxLength: int.MaxValue);
+                accumulator += version.Major;
+            }
+
+            return accumulator;
+        }
+
+        [Benchmark(OperationsPerInvoke = VersionCount)]
+        public long TryParse_Current()
+        {
+            // The accumulator ensures the versions aren't dead code with minimal overhead
+            long accumulator = 0;
+            for (int i = 0; i < VersionCount; i++)
+            {
+                SemVersion.TryParse(versions[i], currentStyles, out var version, maxLength: int.MaxValue);
                 accumulator += version.Major;
             }
 

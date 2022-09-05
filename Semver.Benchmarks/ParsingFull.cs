@@ -12,8 +12,7 @@ namespace Semver.Benchmarks
         protected override IReadOnlyList<string> CreateVersions()
         {
             var random = new Random(Seed);
-            return Enumerables.Generate(VersionCount,
-                                      () => random.VersionString())
+            return Enumerables.Generate(VersionCount, () => random.VersionString())
                 .ToReadOnlyList();
         }
     }
