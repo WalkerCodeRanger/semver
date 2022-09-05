@@ -110,7 +110,7 @@ namespace Semver.Benchmarks
         }
 
 
-        [Benchmark(OperationsPerInvoke = VersionCount)]
+        [Benchmark(OperationsPerInvoke = VersionCount, Baseline = true)]
         public long Parse_Previous()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
