@@ -11,7 +11,7 @@
       <PackageReference Include="BenchmarkDotNet">
         <Version>0.13.1</Version>
       </PackageReference>
-      <PackageReference Include="semver" Version="2.1.0">
+      <PackageReference Include="semver" Version="2.2.0">
         <Aliases>previous</Aliases>
       </PackageReference>
     </ItemGroup>
