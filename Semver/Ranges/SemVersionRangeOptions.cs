@@ -44,7 +44,7 @@ namespace Semver.Ranges
         OptionalMinorPatch = 1 << 6 | OptionalPatch,
         #endregion
 
-        #region Useing values of SemVersionStyles that do not apply to ranges
+        #region Using values of SemVersionStyles that do not apply to ranges
         IncludeAllPrerelease = 1 << 1,
         AllowMetadata = 1 << 2,
         #endregion

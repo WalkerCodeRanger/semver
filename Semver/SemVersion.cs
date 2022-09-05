@@ -1721,7 +1721,8 @@ namespace Semver
         /// <see cref="SemVersionRange"/> or <see cref="UnbrokenSemVersionRange"/>.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="predicate"/> is
+        /// <see langword="null"/>.</exception>
         internal bool Satisfies(Predicate<SemVersion> predicate)
         {
             if (predicate is null) throw new ArgumentNullException(nameof(predicate));

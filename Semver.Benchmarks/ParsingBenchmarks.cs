@@ -98,6 +98,39 @@ namespace Semver.Benchmarks
         }
 
         [Benchmark(OperationsPerInvoke = VersionCount)]
+        [Arguments(Previous.SemVersionStyles.Strict)]
+        [Arguments(Previous.SemVersionStyles.Any)]
+        public long Parse_Previous(Previous.SemVersionStyles style)
+        {
+            // The accumulator ensures the versions aren't dead code with minimal overhead
+            long accumulator = 0;
+            for (int i = 0; i < VersionCount; i++)
+            {
+                var version = Previous.SemVersion.Parse(versions[i], style, maxLength: int.MaxValue);
+                accumulator += version.Major;
+            }
+
+            return accumulator;
+        }
+
+        [Benchmark(OperationsPerInvoke = VersionCount)]
+        [Arguments(Previous.SemVersionStyles.Strict)]
+        [Arguments(Previous.SemVersionStyles.Any)]
+        public long TryParse_Previous(Previous.SemVersionStyles style)
+        {
+            // The accumulator ensures the versions aren't dead code with minimal overhead
+            long accumulator = 0;
+            for (int i = 0; i < VersionCount; i++)
+            {
+                Previous.SemVersion.TryParse(versions[i], style, out var version, maxLength: int.MaxValue);
+                accumulator += version.Major;
+            }
+
+            return accumulator;
+        }
+
+
+        [Benchmark(OperationsPerInvoke = VersionCount)]
         [Arguments(SemVersionStyles.Strict)]
         [Arguments(SemVersionStyles.Any)]
         public long Parse_Current(SemVersionStyles style)

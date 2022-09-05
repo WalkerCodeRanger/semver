@@ -10,8 +10,6 @@ namespace Semver.Utility
     [StructLayout(LayoutKind.Auto)]
     internal readonly struct StringSegment
     {
-
-
         public StringSegment(string source, int offset, int length)
         {
 #if DEBUG

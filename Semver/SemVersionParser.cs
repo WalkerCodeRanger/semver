@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Semver.Ranges;
+using Semver.Ranges.Parsers;
 using Semver.Utility;
 
 namespace Semver
@@ -62,7 +63,8 @@ namespace Semver
             //    throw new ArgumentOutOfRangeException("DEBUG: " + SemVersion.InvalidMaxLengthMessage, nameof(maxLength));
 #endif
 
-            if (version != null) return Parse((StringSegment)version, style, ex, maxLength, out semver);
+            if (version != null)
+                return Parse(version, style, SemVersionParsingOptions.None, ex, maxLength, out semver, out _);
             semver = null;
             return ex ?? new ArgumentNullException(nameof(version));
         }
@@ -82,9 +84,11 @@ namespace Semver
         public static Exception Parse(
             StringSegment version,
             SemVersionStyles style,
+            SemVersionParsingOptions options,
             Exception ex,
             int maxLength,
-            out SemVersion semver)
+            out SemVersion semver,
+            out WildcardVersion wildcardVersion)
         {
 #if DEBUG
             if (!style.IsValid())
@@ -94,8 +98,9 @@ namespace Semver
             //    throw new ArgumentOutOfRangeException("DEBUG: " + SemVersion.InvalidMaxLengthMessage, nameof(maxLength));
 #endif
 
-            // Assign null once so it doesn't have to be done any time parse fails
+            // Assign once so it doesn't have to be done any time parse fails
             semver = null;
+            wildcardVersion = WildcardVersion.None;
 
             // Note: this method relies on the fact that the null coalescing operator `??`
             // is short circuiting to avoid constructing exceptions and exception messages
@@ -131,18 +136,20 @@ namespace Semver
             var allowLeadingZeros = style.HasStyle(SemVersionStyles.AllowLeadingZeros);
 
             // Parse major version
-            parseEx = ParseVersionNumber("Major", version, ref i, startOfPrerelease, allowLeadingZeros, ex, out var major);
+            parseEx = ParseVersionNumber("Major", version, ref i, startOfPrerelease, allowLeadingZeros, options, ex, out var major, out var majorIsWildcard);
             if (parseEx != null) return parseEx;
+            if (majorIsWildcard) wildcardVersion |= WildcardVersion.MajorWildcard;
 
             // Parse minor version
             var minor = 0;
             if (i < version.Length && version[i] == '.')
             {
                 i += 1;
-                parseEx = ParseVersionNumber("Minor", version, ref i, startOfPrerelease, allowLeadingZeros, ex, out minor);
+                parseEx = ParseVersionNumber("Minor", version, ref i, startOfPrerelease, allowLeadingZeros, options, ex, out minor, out var minorIsWildcard);
                 if (parseEx != null) return parseEx;
+                if (minorIsWildcard) wildcardVersion |= WildcardVersion.MinorWildcard;
             }
-            else if (!style.HasStyle(SemVersionStyles.OptionalMinorPatch))
+            else if (!style.HasStyle(SemVersionStyles.OptionalMinorPatch) && !majorIsWildcard)
                 return ex ?? NewFormatException(MissingMinorMessage, LimitLength(version));
 
             // Parse patch version
@@ -150,8 +157,9 @@ namespace Semver
             if (i < version.Length && version[i] == '.')
             {
                 i += 1;
-                parseEx = ParseVersionNumber("Patch", version, ref i, startOfPrerelease, allowLeadingZeros, ex, out patch);
+                parseEx = ParseVersionNumber("Patch", version, ref i, startOfPrerelease, allowLeadingZeros, options, ex, out patch, out var patchIsWildcard);
                 if (parseEx != null) return parseEx;
+                if (patchIsWildcard) wildcardVersion |= WildcardVersion.MinorWildcard;
             }
             else if (!style.HasStyle(SemVersionStyles.OptionalPatch))
                 return ex ?? NewFormatException(MissingPatchMessage, LimitLength(version));
@@ -268,55 +276,76 @@ namespace Semver
             ref int i,
             int startOfNext,
             bool allowLeadingZero,
+            SemVersionParsingOptions options,
             Exception ex,
-            out int number)
+            out int number,
+            out bool isWildcard)
         {
             var end = version.IndexOf('.', i, startOfNext - i);
             if (end < 0) end = startOfNext;
 
-            var start = i;
-
-            // Skip leading zeros
-            while (i < end && version[i] == '0') i += 1;
-
-            var startOfNonZeroDigits = i;
-
-            while (i < end && version[i].IsDigit())
+            if (options.AllowWildcardMajorMinorPatch && i < end && options.IsWildcard(version[i]))
+            {
+                number = 0;
+                isWildcard = true;
                 i += 1;
+                if (i < end)
+                {
+                    // TODO this error message should be changed
+                    return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage,
+                        LimitLength(version), kind, version[i]);
+                }
 
-            // If there are unprocessed characters, then it is an invalid char for this segment
-            if (i < end)
-            {
-                number = 0;
-                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, LimitLength(version), kind, version[i]);
+                return null;
             }
-
-            if (start == i)
+            else
             {
-                number = 0;
-                return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, LimitLength(version), kind);
-            }
+                isWildcard = false;
+                var start = i;
 
-            if (!allowLeadingZero)
-            {
-                // Since it isn't missing, if there are no non-zero digits, it must be zero
-                var isZero = startOfNonZeroDigits == i;
-                var maxLeadingZeros = isZero ? 1 : 0;
-                if (startOfNonZeroDigits - start > maxLeadingZeros)
+                // Skip leading zeros
+                while (i < end && version[i] == '0') i += 1;
+
+                var startOfNonZeroDigits = i;
+
+                while (i < end && version[i].IsDigit()) i += 1;
+
+                // If there are unprocessed characters, then it is an invalid char for this segment
+                if (i < end)
                 {
                     number = 0;
-                    return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage, LimitLength(version), kind);
+                    return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, LimitLength(version),
+                        kind, version[i]);
                 }
+
+                if (start == i)
+                {
+                    number = 0;
+                    return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, LimitLength(version), kind);
+                }
+
+                if (!allowLeadingZero)
+                {
+                    // Since it isn't missing, if there are no non-zero digits, it must be zero
+                    var isZero = startOfNonZeroDigits == i;
+                    var maxLeadingZeros = isZero ? 1 : 0;
+                    if (startOfNonZeroDigits - start > maxLeadingZeros)
+                    {
+                        number = 0;
+                        return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage, LimitLength(version),
+                            kind);
+                    }
+                }
+
+                var numberString = version.Subsegment(start, i - start).ToString();
+                if (!int.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
+                    // Parsing validated this as a string of digits possibly proceeded by zero so the only
+                    // possible issue is a numeric overflow for `int`
+                    return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
+                        MajorMinorOrPatchOverflowMessage, LimitLength(version), kind, numberString));
+
+                return null;
             }
-
-            var numberString = version.Subsegment(start, i - start).ToString();
-            if (!int.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
-                // Parsing validated this as a string of digits possibly proceeded by zero so the only
-                // possible issue is a numeric overflow for `int`
-                return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
-                    MajorMinorOrPatchOverflowMessage, LimitLength(version), kind, numberString));
-
-            return null;
         }
 
         private static Exception ParsePrerelease(

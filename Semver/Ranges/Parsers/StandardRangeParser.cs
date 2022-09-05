@@ -9,14 +9,14 @@ namespace Semver.Ranges.Parsers
     {
         public static Exception Parse(
             string range,
-            SemVersionRangeOptions options,
+            SemVersionRangeOptions rangeOptions,
             Exception ex,
             int maxLength,
             out SemVersionRange semverRange)
         {
 #if DEBUG
-            if (!options.IsValid())
-                throw new ArgumentException("DEBUG: " + SemVersionRange.InvalidOptionsMessage, nameof(options));
+            if (!rangeOptions.IsValid())
+                throw new ArgumentException("DEBUG: " + SemVersionRange.InvalidOptionsMessage, nameof(rangeOptions));
             if (maxLength < 0)
                 throw new ArgumentOutOfRangeException(nameof(maxLength), "DEBUG: " + SemVersionRange.InvalidMaxLengthMessage);
 #endif
@@ -34,7 +34,7 @@ namespace Semver.Ranges.Parsers
             var unbrokenRanges = new List<UnbrokenSemVersionRange>(CountSplitOnOrOperator(range));
             foreach (var segment in SplitOnOrOperator(range))
             {
-                var exception = ParseUnbrokenRange(segment, options, ex, maxLength, out var unbrokenRange);
+                var exception = ParseUnbrokenRange(segment, rangeOptions, ex, maxLength, out var unbrokenRange);
                 if (exception is null)
                     unbrokenRanges.Add(unbrokenRange);
                 else
@@ -50,7 +50,7 @@ namespace Semver.Ranges.Parsers
 
         private static Exception ParseUnbrokenRange(
             StringSegment segment,
-            SemVersionRangeOptions options,
+            SemVersionRangeOptions rangeOptions,
             Exception ex,
             int maxLength,
             out UnbrokenSemVersionRange unbrokenRange)
@@ -67,10 +67,10 @@ namespace Semver.Ranges.Parsers
 
             var start = LeftBoundedRange.Unbounded;
             var end = RightBoundedRange.Unbounded;
-            var includeAllPrerelease = options.HasOption(SemVersionRangeOptions.IncludeAllPrerelease);
+            var includeAllPrerelease = rangeOptions.HasOption(SemVersionRangeOptions.IncludeAllPrerelease);
             while (!segment.IsEmpty)
             {
-                exception = ParseComparison(ref segment, options, ref includeAllPrerelease, ex, maxLength, ref start, ref end);
+                exception = ParseComparison(ref segment, rangeOptions, ref includeAllPrerelease, ex, maxLength, ref start, ref end);
                 if (exception != null) return exception;
             }
 
@@ -84,7 +84,7 @@ namespace Semver.Ranges.Parsers
         /// <remarks>Must have leading whitespace removed. Will consume trailing whitespace.</remarks>
         private static Exception ParseComparison(
             ref StringSegment segment,
-            SemVersionRangeOptions options,
+            SemVersionRangeOptions rangeOptions,
             ref bool includeAllPrerelease,
             Exception ex,
             int maxLength,
@@ -100,7 +100,8 @@ namespace Semver.Ranges.Parsers
             exception = ParseWhitespace(ref segment, ex);
             if (exception != null) return exception;
 
-            exception = ParseVersion(ref segment, options, ex, maxLength, out var semver);
+            exception = ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
+                            out var semver, out var wildcardVersion);
             if (exception != null) return exception;
 
             exception = ParseWhitespace(ref segment, ex);
@@ -215,5 +216,8 @@ namespace Semver.Ranges.Parsers
                     return ex ?? RangeError.InvalidOperator(opSegment.ToString());
             }
         }
+
+        private static readonly SemVersionParsingOptions ParsingOptions =
+            new SemVersionParsingOptions(true, true, c => c == '*');
     }
 }

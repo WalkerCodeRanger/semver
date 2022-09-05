@@ -80,7 +80,14 @@ namespace Semver.Ranges.Parsers
         /// <summary>
         /// Parse a version number from the beginning of the segment.
         /// </summary>
-        public static Exception ParseVersion(ref StringSegment segment, SemVersionRangeOptions options, Exception ex, int maxLength, out SemVersion semver)
+        public static Exception ParseVersion(
+            ref StringSegment segment,
+            SemVersionRangeOptions rangeOptions,
+            SemVersionParsingOptions parseOptions,
+            Exception ex,
+            int maxLength,
+            out SemVersion semver,
+            out WildcardVersion wildcardVersion)
         {
             // The SemVersionParser assumes there is nothing following the version number. To reuse
             // its parsing, the appropriate end must be found.
@@ -89,7 +96,8 @@ namespace Semver.Ranges.Parsers
             var version = segment.Subsegment(0, end);
             segment = segment.Subsegment(end);
 
-            return SemVersionParser.Parse(version, options.ToStyles(), ex, maxLength, out semver);
+            return SemVersionParser.Parse(version, rangeOptions.ToStyles(), parseOptions, ex,
+                maxLength, out semver, out wildcardVersion);
         }
     }
 }
