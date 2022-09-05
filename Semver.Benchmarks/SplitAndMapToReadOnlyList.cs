@@ -20,7 +20,7 @@ namespace Semver.Benchmarks
 
         private static string Identity(string value) => value;
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public IReadOnlyList<string> Standard()
         {
             return Value.SplitAndMapToReadOnlyList('.', Identity);

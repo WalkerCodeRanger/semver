@@ -14,7 +14,7 @@ namespace Semver.Benchmarks
         [Params(99, 999, 999_999, int.MaxValue)]
         public int Number { get; set; }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public int Standard() => Number.DecimalDigits();
 
         [Benchmark]
