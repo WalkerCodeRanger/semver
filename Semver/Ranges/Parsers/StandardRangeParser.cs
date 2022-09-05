@@ -185,7 +185,7 @@ namespace Semver.Ranges.Parsers
             @operator = 0;
             if (opSegment.Length > 2
                 || (opSegment.Length == 2 && opSegment[1] != '='))
-                return ex ?? RangeError.InvalidOperator(opSegment.ToString());
+                return ex ?? RangeError.InvalidOperator(opSegment);
 
             var firstChar = opSegment[0];
             var isOrEqual = opSegment.Length == 2; // Already checked for second char != '='
@@ -213,7 +213,7 @@ namespace Semver.Ranges.Parsers
                     @operator = StandardOperator.Caret;
                     return null;
                 default:
-                    return ex ?? RangeError.InvalidOperator(opSegment.ToString());
+                    return ex ?? RangeError.InvalidOperator(opSegment);
             }
         }
 

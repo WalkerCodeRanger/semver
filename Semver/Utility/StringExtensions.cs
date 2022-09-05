@@ -93,5 +93,15 @@ namespace Semver.Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static StringSegment Slice(this string value, int offset, int length)
             => new StringSegment(value, offset, length);
+
+        public static string LimitLength(this string value)
+        {
+            if (value.Length > DisplayLimit)
+                return value.Substring(0, DisplayLimit - 3) + "...";
+
+            return value;
+        }
+
+        private const int DisplayLimit = 100;
     }
 }

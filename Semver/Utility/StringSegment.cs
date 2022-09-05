@@ -99,6 +99,15 @@ namespace Semver.Utility
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => Source.Substring(Offset, Length);
 
+        public string ToStringLimitLength()
+        {
+            if (Length > DisplayLimit) return Subsegment(0, DisplayLimit - 3) + "...";
+
+            return ToString();
+        }
+
+        private const int DisplayLimit = 100;
+
 #if DEBUG
         private void ValidateIndex(int i, string paramName)
         {

@@ -18,36 +18,26 @@ namespace Semver.Ranges.Parsers
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FormatException NewTooLongException(string range, int maxLength)
-            => NewFormatException(TooLongMessage, LimitLength(range), maxLength);
+            => NewFormatException(TooLongMessage, range.LimitLength(), maxLength);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Exception InvalidOperator(string @operator)
-            => NewFormatException(InvalidOperatorMessage, LimitLength(@operator));
+        public static Exception InvalidOperator(StringSegment @operator)
+            => NewFormatException(InvalidOperatorMessage, @operator.ToStringLimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception InvalidWhitespace(int position, string range)
-            => NewFormatException(InvalidWhitespaceMessage, position, LimitLength(range));
+            => NewFormatException(InvalidWhitespaceMessage, position, range.LimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception MissingComparison(int position, string range) =>
-            NewFormatException(MissingComparisonMessage, position, LimitLength(range));
+            NewFormatException(MissingComparisonMessage, position, range.LimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception MaxVersion(SemVersion version)
-            => NewFormatException(MaxVersionMessage, LimitLength(version.ToString()));
+            => NewFormatException(MaxVersionMessage, version.ToString().LimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static FormatException NewFormatException(string messageTemplate, params object[] args)
             => new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, args));
-
-        private const int RangeDisplayLimit = 100;
-
-        private static string LimitLength(StringSegment range)
-        {
-            if (range.Length > RangeDisplayLimit)
-                range = range.Subsegment(0, RangeDisplayLimit - 3) + "...";
-
-            return range.ToString();
-        }
     }
 }

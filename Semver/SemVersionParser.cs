@@ -109,7 +109,7 @@ namespace Semver
             if (version.Length == 0) return ex ?? new FormatException(EmptyVersionMessage);
 
             if (version.Length > maxLength)
-                return ex ?? NewFormatException(TooLongVersionMessage, LimitLength(version), maxLength);
+                return ex ?? NewFormatException(TooLongVersionMessage, version.ToStringLimitLength(), maxLength);
 
             // This code does two things to help provide good error messages:
             // 1. It breaks the version number into segments and then parses those segments
@@ -150,7 +150,7 @@ namespace Semver
                 if (minorIsWildcard) wildcardVersion |= WildcardVersion.MinorWildcard;
             }
             else if (!style.HasStyle(SemVersionStyles.OptionalMinorPatch) && !majorIsWildcard)
-                return ex ?? NewFormatException(MissingMinorMessage, LimitLength(version));
+                return ex ?? NewFormatException(MissingMinorMessage, version.ToStringLimitLength());
 
             // Parse patch version
             var patch = 0;
@@ -162,7 +162,7 @@ namespace Semver
                 if (patchIsWildcard) wildcardVersion |= WildcardVersion.MinorWildcard;
             }
             else if (!style.HasStyle(SemVersionStyles.OptionalPatch))
-                return ex ?? NewFormatException(MissingPatchMessage, LimitLength(version));
+                return ex ?? NewFormatException(MissingPatchMessage, version.ToStringLimitLength());
 
             // Handle fourth version number
             if (i < startOfPrerelease && version[i] == '.')
@@ -170,10 +170,10 @@ namespace Semver
                 i += 1;
                 // If it is ".\d" then we'll assume they were trying to have a fourth version number
                 if (i < version.Length && version[i].IsDigit())
-                    return ex ?? NewFormatException(FourthVersionNumberMessage, LimitLength(version));
+                    return ex ?? NewFormatException(FourthVersionNumberMessage, version.ToStringLimitLength());
 
                 // Otherwise, assume they used "." instead of "-" to start the prerelease
-                return ex ?? NewFormatException(PrereleasePrefixedByDotMessage, LimitLength(version));
+                return ex ?? NewFormatException(PrereleasePrefixedByDotMessage, version.ToStringLimitLength());
             }
 
             // Parse prerelease version
@@ -215,7 +215,7 @@ namespace Semver
 
             // Error if trailing whitespace not allowed
             if (startOfTrailingWhitespace != version.Length && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
-                return ex ?? NewFormatException(TrailingWhitespaceMessage, LimitLength(version));
+                return ex ?? NewFormatException(TrailingWhitespaceMessage, version.ToStringLimitLength());
 
             semver = new SemVersion(major, minor, patch,
                 prerelease, prereleaseIdentifiers, metadata, metadataIdentifiers);
@@ -237,7 +237,7 @@ namespace Semver
 
             // Error if leading whitespace not allowed
             if (i > 0 && !style.HasStyle(SemVersionStyles.AllowLeadingWhitespace))
-                return ex ?? NewFormatException(LeadingWhitespaceMessage, LimitLength(version));
+                return ex ?? NewFormatException(LeadingWhitespaceMessage, version.ToStringLimitLength());
 
             return null;
         }
@@ -252,12 +252,12 @@ namespace Semver
                     i += 1;
                     break;
                 case 'v':
-                    return ex ?? NewFormatException(LeadingLowerVMessage, LimitLength(version));
+                    return ex ?? NewFormatException(LeadingLowerVMessage, version.ToStringLimitLength());
                 case 'V' when style.HasStyle(SemVersionStyles.AllowUpperV):
                     i += 1;
                     break;
                 case 'V':
-                    return ex ?? NewFormatException(LeadingUpperVMessage, LimitLength(version));
+                    return ex ?? NewFormatException(LeadingUpperVMessage, version.ToStringLimitLength());
             }
 
             return null;
@@ -293,59 +293,57 @@ namespace Semver
                 {
                     // TODO this error message should be changed
                     return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage,
-                        LimitLength(version), kind, version[i]);
+                        version.ToStringLimitLength(), kind, version[i]);
                 }
 
                 return null;
             }
-            else
+
+            isWildcard = false;
+            var start = i;
+
+            // Skip leading zeros
+            while (i < end && version[i] == '0') i += 1;
+
+            var startOfNonZeroDigits = i;
+
+            while (i < end && version[i].IsDigit()) i += 1;
+
+            // If there are unprocessed characters, then it is an invalid char for this segment
+            if (i < end)
             {
-                isWildcard = false;
-                var start = i;
-
-                // Skip leading zeros
-                while (i < end && version[i] == '0') i += 1;
-
-                var startOfNonZeroDigits = i;
-
-                while (i < end && version[i].IsDigit()) i += 1;
-
-                // If there are unprocessed characters, then it is an invalid char for this segment
-                if (i < end)
-                {
-                    number = 0;
-                    return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, LimitLength(version),
-                        kind, version[i]);
-                }
-
-                if (start == i)
-                {
-                    number = 0;
-                    return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, LimitLength(version), kind);
-                }
-
-                if (!allowLeadingZero)
-                {
-                    // Since it isn't missing, if there are no non-zero digits, it must be zero
-                    var isZero = startOfNonZeroDigits == i;
-                    var maxLeadingZeros = isZero ? 1 : 0;
-                    if (startOfNonZeroDigits - start > maxLeadingZeros)
-                    {
-                        number = 0;
-                        return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage, LimitLength(version),
-                            kind);
-                    }
-                }
-
-                var numberString = version.Subsegment(start, i - start).ToString();
-                if (!int.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
-                    // Parsing validated this as a string of digits possibly proceeded by zero so the only
-                    // possible issue is a numeric overflow for `int`
-                    return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
-                        MajorMinorOrPatchOverflowMessage, LimitLength(version), kind, numberString));
-
-                return null;
+                number = 0;
+                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version.ToStringLimitLength(),
+                    kind, version[i]);
             }
+
+            if (start == i)
+            {
+                number = 0;
+                return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, version.ToStringLimitLength(), kind);
+            }
+
+            if (!allowLeadingZero)
+            {
+                // Since it isn't missing, if there are no non-zero digits, it must be zero
+                var isZero = startOfNonZeroDigits == i;
+                var maxLeadingZeros = isZero ? 1 : 0;
+                if (startOfNonZeroDigits - start > maxLeadingZeros)
+                {
+                    number = 0;
+                    return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage, version.ToStringLimitLength(),
+                        kind);
+                }
+            }
+
+            var numberString = version.Subsegment(start, i - start).ToString();
+            if (!int.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
+                // Parsing validated this as a string of digits possibly proceeded by zero so the only
+                // possible issue is a numeric overflow for `int`
+                return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
+                    MajorMinorOrPatchOverflowMessage, version.ToStringLimitLength(), kind, numberString));
+
+            return null;
         }
 
         private static Exception ParsePrerelease(
@@ -376,14 +374,14 @@ namespace Semver
                     else if (c == '.' || c == '+')
                         break;
                     else if (!c.IsDigit())
-                        return ex ?? NewFormatException(InvalidCharacterInPrereleaseMessage, LimitLength(version), c);
+                        return ex ?? NewFormatException(InvalidCharacterInPrereleaseMessage, version.ToStringLimitLength(), c);
 
                     i += 1;
                 }
 
                 // Empty identifiers not allowed
                 if (s == i)
-                    return ex ?? NewFormatException(MissingPrereleaseIdentifierMessage, LimitLength(version));
+                    return ex ?? NewFormatException(MissingPrereleaseIdentifierMessage, version.ToStringLimitLength());
 
                 var identifier = version.Subsegment(s, i - s).ToString();
                 if (!isNumeric)
@@ -392,7 +390,7 @@ namespace Semver
                 {
                     if (identifier[0] == '0' && identifier.Length > 1)
                     {
-                        if (!allowLeadingZero) return ex ?? NewFormatException(LeadingZeroInPrereleaseMessage, LimitLength(version));
+                        if (!allowLeadingZero) return ex ?? NewFormatException(LeadingZeroInPrereleaseMessage, version.ToStringLimitLength());
                         hasLeadingZeros = true;
                         identifier = identifier.TrimLeadingZeros();
                     }
@@ -401,7 +399,7 @@ namespace Semver
                         // Parsing validated this as a string of digits possibly proceeded by zero so the only
                         // possible issue is a numeric overflow for `int`
                         return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
-                            PrereleaseOverflowMessage, LimitLength(version), identifier));
+                            PrereleaseOverflowMessage, version.ToStringLimitLength(), identifier));
 
                     identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, numericValue));
                 }
@@ -437,13 +435,13 @@ namespace Semver
                     if (c == '.')
                         break;
                     if (!c.IsAlphaOrHyphen() && !c.IsDigit())
-                        return ex ?? NewFormatException(InvalidCharacterInMetadataMessage, LimitLength(version), c);
+                        return ex ?? NewFormatException(InvalidCharacterInMetadataMessage, version.ToStringLimitLength(), c);
                     i += 1;
                 }
 
                 // Empty identifiers not allowed
                 if (s == i)
-                    return ex ?? NewFormatException(MissingMetadataIdentifierMessage, LimitLength(version));
+                    return ex ?? NewFormatException(MissingMetadataIdentifierMessage, version.ToStringLimitLength());
 
                 var identifier = version.Subsegment(s, i - s).ToString();
                 identifiers.Add(MetadataIdentifier.CreateUnsafe(identifier));
@@ -456,15 +454,5 @@ namespace Semver
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static FormatException NewFormatException(string messageTemplate, params object[] args)
             => new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, args));
-
-        private const int VersionDisplayLimit = 100;
-
-        private static string LimitLength(StringSegment version)
-        {
-            if (version.Length > VersionDisplayLimit)
-                version = version.Subsegment(0, VersionDisplayLimit - 3) + "...";
-
-            return version.ToString();
-        }
     }
 }
