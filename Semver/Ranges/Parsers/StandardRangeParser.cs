@@ -104,6 +104,9 @@ namespace Semver.Ranges.Parsers
                             out var semver, out var wildcardVersion);
             if (exception != null) return exception;
 
+            if (@operator != StandardOperator.None && wildcardVersion != WildcardVersion.None)
+                return ex ?? RangeError.WildcardNotSupportedWithOperator(segment.Source);
+
             exception = ParseWhitespace(ref segment, ex);
             if (exception != null) return exception;
 
@@ -157,10 +160,20 @@ namespace Semver.Ranges.Parsers
                         false));
                     return null;
                 case StandardOperator.None: // implied = (supports wildcard *)
-                    // TODO support wildcards
-                    leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                    rightBound = rightBound.Min(new RightBoundedRange(semver, true));
-                    return null;
+                    switch (wildcardVersion)
+                    {
+                        case WildcardVersion.None:
+                            leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
+                            rightBound = rightBound.Min(new RightBoundedRange(semver, true));
+                            return null;
+                        case WildcardVersion.MajorMinorPatchWildcard:
+                        case WildcardVersion.MinorPatchWildcard:
+                        case WildcardVersion.PatchWildcard:
+                            throw new NotImplementedException();
+                        default:
+                            // This code should be unreachable
+                            throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
+                    }
                 default:
                     // This code should be unreachable
                     throw new ArgumentException($"DEBUG: Invalid {nameof(StandardOperator)} value {@operator}");
@@ -217,7 +230,7 @@ namespace Semver.Ranges.Parsers
             }
         }
 
-        private static readonly SemVersionParsingOptions ParsingOptions =
-            new SemVersionParsingOptions(true, true, c => c == '*');
+        private static readonly SemVersionParsingOptions ParsingOptions
+            = new SemVersionParsingOptions(true, true, c => c == '*');
     }
 }
