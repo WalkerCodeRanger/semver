@@ -24,8 +24,6 @@ namespace Semver
         private const string LeadingUpperVMessage = "Leading 'V' in '{0}'.";
         private const string LeadingZeroInMajorMinorOrPatchMessage = "{1} version has leading zero in '{0}'.";
         private const string EmptyMajorMinorOrPatchMessage = "{1} version missing in '{0}'.";
-        private const string MissingMinorMessage = "Missing minor version in '{0}'.";
-        private const string MissingPatchMessage = "Missing patch version in '{0}'.";
         private const string MajorMinorOrPatchOverflowMessage = "{1} version '{2}' was too large for Int32 in '{0}'.";
         private const string FourthVersionNumberMessage = "Fourth version number in '{0}'.";
         private const string PrereleasePrefixedByDotMessage = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'.";
@@ -115,74 +113,67 @@ namespace Semver
             // 1. It breaks the version number into segments and then parses those segments
             // 2. It parses an element first, then checks the flags for whether it should be allowed
 
-            var i = 0;
+            var mainSegment = version;
 
-            var parseEx = ParseLeadingWhitespace(version, style, ex, ref i);
+            var parseEx = ParseLeadingWhitespace(version, ref mainSegment, style, ex);
             if (parseEx != null) return parseEx;
 
-            parseEx = ParseLeadingV(version, style, ex, ref i);
+            // Take of trailing whitespace and remember that there was trailing whitespace
+            var lengthWithTrailingWhitespace = mainSegment.Length;
+            mainSegment = mainSegment.TrimEndWhitespace();
+            var hasTrailingWhitespace = lengthWithTrailingWhitespace > mainSegment.Length;
+
+            // Now break the version number down into segments.
+            mainSegment.SplitBeforeFirst('+', out mainSegment, out var metadataSegment);
+            mainSegment.SplitBeforeFirst('-', out var majorMinorPatchSegment, out var prereleaseSegment);
+
+            parseEx = ParseLeadingV(version, ref majorMinorPatchSegment, style, ex);
             if (parseEx != null) return parseEx;
-
-            // Now break the version number down into segments. Two segments have already been handled
-            // namely leading whitespace and 'v' or 'V'.
-
-            var startOfTrailingWhitespace = StartOfTrailingWhitespace(version);
-            var startOfMetadata = version.IndexOf('+', i, startOfTrailingWhitespace - i);
-            if (startOfMetadata < 0) startOfMetadata = startOfTrailingWhitespace;
-            var startOfPrerelease = version.IndexOf('-', i, startOfMetadata - i);
-            if (startOfPrerelease < 0) startOfPrerelease = startOfMetadata;
 
             // Are leading zeros allowed
             var allowLeadingZeros = style.HasStyle(SemVersionStyles.AllowLeadingZeros);
 
-            // Parse major version
-            parseEx = ParseVersionNumber("Major", version, ref i, startOfPrerelease, allowLeadingZeros, options, ex, out var major, out var majorIsWildcard);
-            if (parseEx != null) return parseEx;
-            if (majorIsWildcard) wildcardVersion |= WildcardVersion.MajorWildcard;
-
-            // Parse minor version
-            var minor = 0;
-            if (i < version.Length && version[i] == '.')
+            int major, minor, patch;
+            using (var versionNumbers = majorMinorPatchSegment.Split('.').GetEnumerator())
             {
-                i += 1;
-                parseEx = ParseVersionNumber("Minor", version, ref i, startOfPrerelease, allowLeadingZeros, options, ex, out minor, out var minorIsWildcard);
+                const bool majorIsOptional = false;
+                parseEx = ParseVersionNumber("Major", version, versionNumbers, allowLeadingZeros,
+                    majorIsOptional, options, ex, out major, out var majorIsWildcard);
+                if (parseEx != null) return parseEx;
+                if (majorIsWildcard) wildcardVersion |= WildcardVersion.MajorWildcard;
+
+                var minorIsOptional = style.HasStyle(SemVersionStyles.OptionalMinorPatch) || majorIsWildcard;
+                parseEx = ParseVersionNumber("Minor", version, versionNumbers, allowLeadingZeros,
+                    minorIsOptional, options, ex, out minor, out var minorIsWildcard);
                 if (parseEx != null) return parseEx;
                 if (minorIsWildcard) wildcardVersion |= WildcardVersion.MinorWildcard;
-            }
-            else if (!style.HasStyle(SemVersionStyles.OptionalMinorPatch) && !majorIsWildcard)
-                return ex ?? NewFormatException(MissingMinorMessage, version.ToStringLimitLength());
 
-            // Parse patch version
-            var patch = 0;
-            if (i < version.Length && version[i] == '.')
-            {
-                i += 1;
-                parseEx = ParseVersionNumber("Patch", version, ref i, startOfPrerelease, allowLeadingZeros, options, ex, out patch, out var patchIsWildcard);
+                var patchIsOptional = style.HasStyle(SemVersionStyles.OptionalPatch) || majorIsWildcard;
+                parseEx = ParseVersionNumber("Patch", version, versionNumbers, allowLeadingZeros,
+                    patchIsOptional, options, ex, out patch, out var patchIsWildcard);
                 if (parseEx != null) return parseEx;
                 if (patchIsWildcard) wildcardVersion |= WildcardVersion.MinorWildcard;
-            }
-            else if (!style.HasStyle(SemVersionStyles.OptionalPatch))
-                return ex ?? NewFormatException(MissingPatchMessage, version.ToStringLimitLength());
 
-            // Handle fourth version number
-            if (i < startOfPrerelease && version[i] == '.')
-            {
-                i += 1;
-                // If it is ".\d" then we'll assume they were trying to have a fourth version number
-                if (i < version.Length && version[i].IsDigit())
-                    return ex ?? NewFormatException(FourthVersionNumberMessage, version.ToStringLimitLength());
+                // Handle fourth version number
+                if (versionNumbers.MoveNext())
+                {
+                    var fourthSegment = versionNumbers.Current;
+                    // If it is ".\d" then we'll assume they were trying to have a fourth version number
+                    if (fourthSegment.Length > 0 && fourthSegment[0].IsDigit())
+                        return ex ?? NewFormatException(FourthVersionNumberMessage, version.ToStringLimitLength());
 
-                // Otherwise, assume they used "." instead of "-" to start the prerelease
-                return ex ?? NewFormatException(PrereleasePrefixedByDotMessage, version.ToStringLimitLength());
+                    // Otherwise, assume they used "." instead of "-" to start the prerelease
+                    return ex ?? NewFormatException(PrereleasePrefixedByDotMessage, version.ToStringLimitLength());
+                }
             }
 
             // Parse prerelease version
             string prerelease;
             IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers;
-            if (i < version.Length && version[i] == '-')
+            if (prereleaseSegment.Length > 0)
             {
-                i += 1;
-                parseEx = ParsePrerelease(version, ref i, startOfMetadata, allowLeadingZeros, ex,
+                prereleaseSegment = prereleaseSegment.Subsegment(1);
+                parseEx = ParsePrerelease(version, prereleaseSegment, allowLeadingZeros, ex,
                             out prerelease, out prereleaseIdentifiers);
                 if (parseEx != null) return parseEx;
             }
@@ -195,10 +186,10 @@ namespace Semver
             // Parse metadata
             string metadata;
             IReadOnlyList<MetadataIdentifier> metadataIdentifiers;
-            if (i < version.Length && version[i] == '+')
+            if (metadataSegment.Length > 0)
             {
-                i += 1;
-                parseEx = ParseMetadata(version, ref i, startOfTrailingWhitespace, ex, out metadata, out metadataIdentifiers);
+                metadataSegment = metadataSegment.Subsegment(1);
+                parseEx = ParseMetadata(version, metadataSegment, ex, out metadata, out metadataIdentifiers);
                 if (parseEx != null) return parseEx;
             }
             else
@@ -207,14 +198,8 @@ namespace Semver
                 metadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
             }
 
-            // There shouldn't be any unprocessed characters before the trailing whitespace.
-            // If there is, it is a programmer mistake, so immediately throw an exception rather
-            // than returning an exception which try parse wouldn't throw.
-            if (i != startOfTrailingWhitespace)
-                throw new InvalidOperationException($"Error parsing '{version}'");
-
             // Error if trailing whitespace not allowed
-            if (startOfTrailingWhitespace != version.Length && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
+            if (hasTrailingWhitespace && !style.HasStyle(SemVersionStyles.AllowTrailingWhitespace))
                 return ex ?? NewFormatException(TrailingWhitespaceMessage, version.ToStringLimitLength());
 
             semver = new SemVersion(major, minor, patch,
@@ -224,37 +209,43 @@ namespace Semver
 
         private static Exception ParseLeadingWhitespace(
             StringSegment version,
+            ref StringSegment segment,
             SemVersionStyles style,
-            Exception ex,
-            ref int i)
+            Exception ex)
         {
+            var oldLength = segment.Length;
+
             // Skip leading whitespace
-            while (i < version.Length && char.IsWhiteSpace(version[i])) i += 1;
+            segment = segment.TrimStartWhitespace();
 
             // Error if all whitespace
-            if (i == version.Length)
+            if (segment.Length == 0)
                 return ex ?? new FormatException(AllWhitespaceVersionMessage);
 
             // Error if leading whitespace not allowed
-            if (i > 0 && !style.HasStyle(SemVersionStyles.AllowLeadingWhitespace))
+            if (oldLength > segment.Length && !style.HasStyle(SemVersionStyles.AllowLeadingWhitespace))
                 return ex ?? NewFormatException(LeadingWhitespaceMessage, version.ToStringLimitLength());
 
             return null;
         }
 
-        private static Exception ParseLeadingV(StringSegment version, SemVersionStyles style, Exception ex, ref int i)
+        private static Exception ParseLeadingV(
+            StringSegment version,
+            ref StringSegment segment,
+            SemVersionStyles style,
+            Exception ex)
         {
             // This is safe because the check for all whitespace ensures there is at least one more char
-            var leadChar = version[i];
+            var leadChar = segment[0];
             switch (leadChar)
             {
                 case 'v' when style.HasStyle(SemVersionStyles.AllowLowerV):
-                    i += 1;
+                    segment = segment.Subsegment(1);
                     break;
                 case 'v':
                     return ex ?? NewFormatException(LeadingLowerVMessage, version.ToStringLimitLength());
                 case 'V' when style.HasStyle(SemVersionStyles.AllowUpperV):
-                    i += 1;
+                    segment = segment.Subsegment(1);
                     break;
                 case 'V':
                     return ex ?? NewFormatException(LeadingUpperVMessage, version.ToStringLimitLength());
@@ -263,80 +254,87 @@ namespace Semver
             return null;
         }
 
-        private static int StartOfTrailingWhitespace(StringSegment version)
-        {
-            var i = version.Length - 1;
-            while (i > 0 && char.IsWhiteSpace(version[i])) i -= 1;
-            return i + 1; // add one for the non-whitespace char that was found
-        }
-
         private static Exception ParseVersionNumber(
             string kind, // i.e. Major, Minor, or Patch
             StringSegment version,
-            ref int i,
-            int startOfNext,
-            bool allowLeadingZero,
+            IEnumerator<StringSegment> versionNumbers,
+            bool allowLeadingZeros,
+            bool isOptional,
             SemVersionParsingOptions options,
             Exception ex,
             out int number,
             out bool isWildcard)
         {
-            var end = version.IndexOf('.', i, startOfNext - i);
-            if (end < 0) end = startOfNext;
+            if (versionNumbers.MoveNext())
+                return ParseVersionNumber(kind, version, versionNumbers.Current, allowLeadingZeros,
+                    options, ex, out number, out isWildcard);
 
-            if (options.AllowWildcardMajorMinorPatch && i < end && options.IsWildcard(version[i]))
+            number = 0;
+            isWildcard = false;
+            if (!isOptional)
+                return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, version.ToStringLimitLength(), kind);
+
+            return null;
+        }
+
+        private static Exception ParseVersionNumber(
+            string kind, // i.e. Major, Minor, or Patch
+            StringSegment version,
+            StringSegment segment,
+            bool allowLeadingZeros,
+            SemVersionParsingOptions options,
+            Exception ex,
+            out int number,
+            out bool isWildcard)
+        {
+            if (segment.Length == 0)
+            {
+                number = 0;
+                isWildcard = false;
+                return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, version.ToStringLimitLength(), kind);
+            }
+
+            if (options.AllowWildcardMajorMinorPatch && segment.Length > 0 && options.IsWildcard(segment[0]))
             {
                 number = 0;
                 isWildcard = true;
-                i += 1;
-                if (i < end)
+                if (segment.Length > 1)
                 {
                     // TODO this error message should be changed
                     return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage,
-                        version.ToStringLimitLength(), kind, version[i]);
+                        version.ToStringLimitLength(), kind, segment[1]);
                 }
 
                 return null;
             }
 
             isWildcard = false;
-            var start = i;
+
+            var lengthWithLeadingZeros = segment.Length;
 
             // Skip leading zeros
-            while (i < end && version[i] == '0') i += 1;
+            segment = segment.TrimLeadingZeros();
 
-            var startOfNonZeroDigits = i;
-
-            while (i < end && version[i].IsDigit()) i += 1;
+            // Scan for digits
+            var i = 0;
+            while (i < segment.Length && segment[i].IsDigit()) i += 1;
 
             // If there are unprocessed characters, then it is an invalid char for this segment
-            if (i < end)
+            if (i < segment.Length)
             {
                 number = 0;
                 return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version.ToStringLimitLength(),
-                    kind, version[i]);
+                    kind, segment[i]);
             }
 
-            if (start == i)
+            if (!allowLeadingZeros && lengthWithLeadingZeros > segment.Length)
             {
                 number = 0;
-                return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, version.ToStringLimitLength(), kind);
+                return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage,
+                    version.ToStringLimitLength(), kind);
             }
 
-            if (!allowLeadingZero)
-            {
-                // Since it isn't missing, if there are no non-zero digits, it must be zero
-                var isZero = startOfNonZeroDigits == i;
-                var maxLeadingZeros = isZero ? 1 : 0;
-                if (startOfNonZeroDigits - start > maxLeadingZeros)
-                {
-                    number = 0;
-                    return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage, version.ToStringLimitLength(),
-                        kind);
-                }
-            }
-
-            var numberString = version.Subsegment(start, i - start).ToString();
+            var numberString = segment.ToString();
             if (!int.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
                 // Parsing validated this as a string of digits possibly proceeded by zero so the only
                 // possible issue is a numeric overflow for `int`
@@ -348,8 +346,7 @@ namespace Semver
 
         private static Exception ParsePrerelease(
             StringSegment version,
-            ref int i,
-            int startOfNext,
+            StringSegment segment,
             bool allowLeadingZero,
             Exception ex,
             out string prerelease,
@@ -358,95 +355,83 @@ namespace Semver
             prerelease = null;
             var identifiers = new List<PrereleaseIdentifier>();
             prereleaseIdentifiers = identifiers.AsReadOnly();
-            var startOfPrerelease = i;
+
             bool hasLeadingZeros = false;
-            i -= 1; // Back up so we are before the start of the first identifier
-            do
+            foreach (var identifier in segment.Split('.'))
             {
-                i += 1;
-                var s = i;
-                var isNumeric = true;
-                while (i < startOfNext)
-                {
-                    var c = version[i];
-                    if (c.IsAlphaOrHyphen())
-                        isNumeric = false;
-                    else if (c == '.' || c == '+')
-                        break;
-                    else if (!c.IsDigit())
-                        return ex ?? NewFormatException(InvalidCharacterInPrereleaseMessage, version.ToStringLimitLength(), c);
-
-                    i += 1;
-                }
-
                 // Empty identifiers not allowed
-                if (s == i)
+                if (identifier.Length == 0)
                     return ex ?? NewFormatException(MissingPrereleaseIdentifierMessage, version.ToStringLimitLength());
 
-                var identifier = version.Subsegment(s, i - s).ToString();
+                var isNumeric = true;
+                for (int i = 0; i < identifier.Length; i++)
+                {
+                    var c = identifier[i];
+                    if (c.IsAlphaOrHyphen())
+                        isNumeric = false;
+                    else if (!c.IsDigit())
+                        return ex ?? NewFormatException(InvalidCharacterInPrereleaseMessage,
+                            version.ToStringLimitLength(), c);
+                }
+
                 if (!isNumeric)
-                    identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, null));
+                    identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier.ToString(), null));
                 else
                 {
+                    string identifierString;
                     if (identifier[0] == '0' && identifier.Length > 1)
                     {
-                        if (!allowLeadingZero) return ex ?? NewFormatException(LeadingZeroInPrereleaseMessage, version.ToStringLimitLength());
+                        if (!allowLeadingZero)
+                            return ex ?? NewFormatException(LeadingZeroInPrereleaseMessage,
+                                version.ToStringLimitLength());
                         hasLeadingZeros = true;
-                        identifier = identifier.TrimLeadingZeros();
+                        identifierString = identifier.TrimLeadingZeros().ToString();
                     }
+                    else
+                        identifierString = identifier.ToString();
 
-                    if (!int.TryParse(identifier, NumberStyles.None, null, out var numericValue))
+                    if (!int.TryParse(identifierString, NumberStyles.None, null, out var numericValue))
                         // Parsing validated this as a string of digits possibly proceeded by zero so the only
                         // possible issue is a numeric overflow for `int`
                         return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
                             PrereleaseOverflowMessage, version.ToStringLimitLength(), identifier));
 
-                    identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifier, numericValue));
+                    identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifierString, numericValue));
                 }
-
-            } while (i < startOfNext && version[i] == '.');
+            }
 
             // If there are leading zeros, reconstruct the string from the identifiers, otherwise just take a substring
-            prerelease = hasLeadingZeros
-                ? string.Join(".", identifiers) : version.Subsegment(startOfPrerelease, startOfNext - startOfPrerelease).ToString();
+            prerelease = hasLeadingZeros ? string.Join(".", identifiers) : segment.ToString();
 
             return null;
         }
 
         private static Exception ParseMetadata(
             StringSegment version,
-            ref int i,
-            int startOfNext,
+            StringSegment segment,
             Exception ex,
             out string metadata,
             out IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
-            metadata = version.Subsegment(i, startOfNext - i).ToString();
+            metadata = segment.ToString();
             var identifiers = new List<MetadataIdentifier>();
             metadataIdentifiers = identifiers.AsReadOnly();
-            i -= 1; // Back up so we are before the start of the first identifier
-            do
+            foreach (var identifier in segment.Split('.'))
             {
-                i += 1; // Advance to start of identifier
-                var s = i;
-                while (i < startOfNext)
-                {
-                    var c = version[i];
-                    if (c == '.')
-                        break;
-                    if (!c.IsAlphaOrHyphen() && !c.IsDigit())
-                        return ex ?? NewFormatException(InvalidCharacterInMetadataMessage, version.ToStringLimitLength(), c);
-                    i += 1;
-                }
-
                 // Empty identifiers not allowed
-                if (s == i)
+                if (identifier.Length == 0)
                     return ex ?? NewFormatException(MissingMetadataIdentifierMessage, version.ToStringLimitLength());
 
-                var identifier = version.Subsegment(s, i - s).ToString();
-                identifiers.Add(MetadataIdentifier.CreateUnsafe(identifier));
+                for (int i = 0; i < identifier.Length; i++)
+                {
+                    var c = identifier[i];
+                    if (!c.IsAlphaOrHyphen() && !c.IsDigit())
+                        return ex ?? NewFormatException(InvalidCharacterInMetadataMessage,
+                            version.ToStringLimitLength(), c);
+                }
 
-            } while (i < startOfNext && version[i] == '.');
+                identifiers.Add(MetadataIdentifier.CreateUnsafe(identifier.ToString()));
+            }
 
             return null;
         }

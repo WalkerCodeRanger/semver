@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Semver.Test.Builders;
 using Semver.Test.Helpers;
 using Semver.Test.TestCases;
 using Xunit;
@@ -31,8 +30,8 @@ namespace Semver.Test
         private const string EmptyMajorMessage = "Major version missing in '{0}'.";
         private const string EmptyMinorMessage = "Minor version missing in '{0}'.";
         private const string EmptyPatchMessage = "Patch version missing in '{0}'.";
-        private const string MissingMinorMessage = "Missing minor version in '{0}'.";
-        private const string MissingPatchMessage = "Missing patch version in '{0}'.";
+        private const string MissingMinorMessage = "Minor version missing in '{0}'.";
+        private const string MissingPatchMessage = "Patch version missing in '{0}'.";
         private const string MajorOverflowMessage = "Major version '{1}' was too large for Int32 in '{0}'.";
         private const string MinorOverflowMessage = "Minor version '{1}' was too large for Int32 in '{0}'.";
         private const string PatchOverflowMessage = "Patch version '{1}' was too large for Int32 in '{0}'.";

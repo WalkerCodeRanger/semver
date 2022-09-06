@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -49,20 +50,47 @@ namespace Semver.Utility
         public StringSegment TrimStartSpaces()
         {
             var start = Offset;
-            var end = Offset + Length - 1;
+            var end = start + Length - 1;
 
             while (start <= end && Source[start] == ' ') start++;
 
             return new StringSegment(Source, start, end + 1 - start);
         }
 
-        public StringSegment TrimEndSpaces()
+        public StringSegment TrimStartWhitespace()
+        {
+            var start = Offset;
+            var end = start + Length - 1;
+
+            while (start <= end && char.IsWhiteSpace(Source[start])) start++;
+
+            return new StringSegment(Source, start, end + 1 - start);
+        }
+
+        public StringSegment TrimEndWhitespace()
         {
             var end = Offset + Length - 1;
 
-            while (Offset <= end && Source[end] == ' ') end--;
+            while (Offset <= end && char.IsWhiteSpace(Source[end])) end--;
 
             return new StringSegment(Source, Offset, end + 1 - Offset);
+        }
+
+        /// <summary>
+        /// Trim leading zeros from a numeric string segment. If the segment consists of all zeros,
+        /// return <c>"0"</c>.
+        /// </summary>
+        /// <remarks>The standard <see cref="string.TrimStart"/> method handles all zeros
+        /// by returning <c>""</c>. This efficiently handles the kind of trimming needed.</remarks>
+        public StringSegment TrimLeadingZeros()
+        {
+            int start = Offset;
+            var end = start + Length - 1;
+            for (; start < end; start++)
+                if (Source[start] != '0')
+                    break;
+
+            return new StringSegment(Source, start, end + 1 - start);
         }
 
         public StringSegment Subsegment(int start, int length)
@@ -82,6 +110,17 @@ namespace Semver.Utility
             return new StringSegment(Source, Offset + start, Length - start);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public StringSegment EmptySubsegment() => new StringSegment(Source, Offset, 0);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int IndexOf(char value)
+        {
+            var i = Source.IndexOf(value, Offset, Length);
+            return i < 0 ? i : i - Offset;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(char value, int startIndex, int count)
         {
 #if DEBUG
@@ -90,6 +129,39 @@ namespace Semver.Utility
 #endif
             var i = Source.IndexOf(value, Offset + startIndex, count);
             return i < 0 ? i : i - Offset;
+        }
+
+        public IEnumerable<StringSegment> Split(char c)
+        {
+            var start = Offset;
+            var end = start + Length;
+            // Use `for` instead of `foreach` to ensure performance
+            for (int i = start; i < end; i++)
+                if (Source[i] == c)
+                {
+                    yield return Subsegment(start - Offset, i - start);
+                    start = i + 1;
+                }
+
+            // The final segment from the last separator to the end of the string
+            yield return Subsegment(start - Offset);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SplitBeforeFirst(char c, out StringSegment left, out StringSegment right)
+        {
+            var index = IndexOf(c);
+            var self = this; // make a copy of this in case assigning to left or right modifies it
+            if (index >= 0)
+            {
+                left = self.Subsegment(0, index);
+                right = self.Subsegment(index);
+            }
+            else
+            {
+                left = self;
+                right = self.EmptySubsegment();
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

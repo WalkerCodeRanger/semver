@@ -1,4 +1,5 @@
-﻿using Semver.Utility;
+﻿using System.Linq;
+using Semver.Utility;
 using Xunit;
 
 namespace Semver.Test.Utility
@@ -25,16 +26,34 @@ namespace Semver.Test.Utility
         [Theory]
         [InlineData("", "")]
         [InlineData("     ", "")]
+        [InlineData("   \t  ", "")]
+        [InlineData("Hello", "Hello")]
+        [InlineData("  Hello", "Hello")]
+        [InlineData("Bye  ", "Bye  ")]
+        [InlineData("  foo!   ", "foo!   ")]
+        [InlineData("  \tsomething\r   ", "something\r   ")]
+        public void TrimStartWhitespace(string value, string expected)
+        {
+            StringSegment segment = value;
+
+            var trimmed = segment.TrimStartWhitespace();
+
+            Assert.Equal(expected, trimmed.ToString());
+        }
+
+        [Theory]
+        [InlineData("", "")]
+        [InlineData("   \t  ", "")]
         [InlineData("Hello", "Hello")]
         [InlineData("  Hello", "  Hello")]
         [InlineData("Bye  ", "Bye")]
         [InlineData("  foo!   ", "  foo!")]
-        [InlineData("  \tsomething\r   ", "  \tsomething\r")]
-        public void TrimEndSpaces(string value, string expected)
+        [InlineData("  \tsomething\r   ", "  \tsomething")]
+        public void TrimEndWhitespace(string value, string expected)
         {
             StringSegment segment = value;
 
-            var trimmed = segment.TrimEndSpaces();
+            var trimmed = segment.TrimEndWhitespace();
 
             Assert.Equal(expected, trimmed.ToString());
         }
@@ -46,6 +65,45 @@ namespace Semver.Test.Utility
             Assert.Equal(6, segment.IndexOf('^', 0, 10));
             Assert.Equal(6, segment.IndexOf('^', 3, 5));
             Assert.Equal(-1, segment.IndexOf('^', 3, 2));
+        }
+
+        [Fact]
+        public void Split()
+        {
+            StringSegment segment = ".a..hello.";
+
+            var expected = new[] { "", "a", "", "hello", "" };
+            Assert.Equal(expected, segment.Split('.').Select(s => s.ToString()));
+        }
+
+        [Theory]
+        [InlineData("", "", "")]
+        [InlineData("1.2.0-rc", "1.2.0", "-rc")]
+        [InlineData("1.2.0", "1.2.0", "")]
+        [InlineData("-rc", "", "-rc")]
+        public void SplitBeforeFirst(string value, string expectedLeft, string expectedRight)
+        {
+            StringSegment segment = value;
+
+            segment.SplitBeforeFirst('-', out var left, out var right);
+
+            Assert.Equal(expectedLeft, left.ToString());
+            Assert.Equal(expectedRight, right.ToString());
+        }
+
+        [Theory]
+        [InlineData("", "", "")]
+        [InlineData("1.2.0-rc", "1.2.0", "-rc")]
+        [InlineData("1.2.0", "1.2.0", "")]
+        [InlineData("-rc", "", "-rc")]
+        public void SplitBeforeFirstOutToSameVariable(string value, string expectedLeft, string expectedRight)
+        {
+            StringSegment segment = value;
+
+            segment.SplitBeforeFirst('-', out segment, out var right);
+
+            Assert.Equal(expectedLeft, segment.ToString());
+            Assert.Equal(expectedRight, right.ToString());
         }
     }
 }
