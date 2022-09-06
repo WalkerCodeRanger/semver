@@ -353,7 +353,7 @@ namespace Semver
             out IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers)
         {
             prerelease = null;
-            var identifiers = new List<PrereleaseIdentifier>();
+            var identifiers = new List<PrereleaseIdentifier>(segment.SplitCount('.'));
             prereleaseIdentifiers = identifiers.AsReadOnly();
 
             bool hasLeadingZeros = false;
@@ -414,7 +414,7 @@ namespace Semver
             out IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
             metadata = segment.ToString();
-            var identifiers = new List<MetadataIdentifier>();
+            var identifiers = new List<MetadataIdentifier>(segment.SplitCount('.'));
             metadataIdentifiers = identifiers.AsReadOnly();
             foreach (var identifier in segment.Split('.'))
             {

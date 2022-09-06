@@ -131,6 +131,18 @@ namespace Semver.Utility
             return i < 0 ? i : i - Offset;
         }
 
+        public int SplitCount(char c)
+        {
+            int count = 1; // Always one more item than there are separators
+            var end = Offset + Length;
+            // Use `for` instead of `foreach` to ensure performance
+            for (int i = Offset; i < end; i++)
+                if (Source[i] == c)
+                    count++;
+
+            return count;
+        }
+
         public IEnumerable<StringSegment> Split(char c)
         {
             var start = Offset;

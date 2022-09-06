@@ -67,6 +67,18 @@ namespace Semver.Test.Utility
             Assert.Equal(-1, segment.IndexOf('^', 3, 2));
         }
 
+        [Theory]
+        [InlineData("", 1)]
+        [InlineData(".", 2)]
+        [InlineData("hello.world", 2)]
+        [InlineData("hello..world", 3)]
+        public void SplitCount(string value, int expected)
+        {
+            StringSegment segment = value;
+
+            Assert.Equal(expected, segment.SplitCount('.'));
+        }
+
         [Fact]
         public void Split()
         {
