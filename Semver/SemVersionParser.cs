@@ -34,6 +34,8 @@ namespace Semver
         private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'.";
         private const string InvalidCharacterInMajorMinorOrPatchMessage = "{1} version contains invalid character '{2}' in '{0}'.";
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'.";
+        private const string InvalidWildcardInMajorMinorOrPatchMessage = "{1} version is a wildcard and should contain only 1 character in '{0}'.";
+        private const string MajorMinorOrPatchMustBeWildcardVersionMessage = "{1} version should be a wildcard because the preceding version is a wildcard in '{0}'.";
 
         /// <summary>
         /// The internal method that all parsing is based on. Because this is called by both
@@ -138,21 +140,21 @@ namespace Semver
             {
                 const bool majorIsOptional = false;
                 parseEx = ParseVersionNumber("Major", version, versionNumbers, allowLeadingZeros,
-                    majorIsOptional, options, ex, out major, out var majorIsWildcard);
+                    majorIsOptional, false, options, ex, out major, out var majorIsWildcard);
                 if (parseEx != null) return parseEx;
-                if (majorIsWildcard) wildcardVersion |= WildcardVersion.MajorWildcard;
+                if (majorIsWildcard) wildcardVersion |= WildcardVersion.MajorMinorPatchWildcard;
 
                 var minorIsOptional = style.HasStyle(SemVersionStyles.OptionalMinorPatch) || majorIsWildcard;
                 parseEx = ParseVersionNumber("Minor", version, versionNumbers, allowLeadingZeros,
-                    minorIsOptional, options, ex, out minor, out var minorIsWildcard);
+                    minorIsOptional, majorIsWildcard, options, ex, out minor, out var minorIsWildcard);
                 if (parseEx != null) return parseEx;
-                if (minorIsWildcard) wildcardVersion |= WildcardVersion.MinorWildcard;
+                if (minorIsWildcard) wildcardVersion |= WildcardVersion.MinorPatchWildcard;
 
-                var patchIsOptional = style.HasStyle(SemVersionStyles.OptionalPatch) || majorIsWildcard;
+                var patchIsOptional = style.HasStyle(SemVersionStyles.OptionalPatch) || majorIsWildcard || minorIsWildcard;
                 parseEx = ParseVersionNumber("Patch", version, versionNumbers, allowLeadingZeros,
-                    patchIsOptional, options, ex, out patch, out var patchIsWildcard);
+                    patchIsOptional, minorIsWildcard, options, ex, out patch, out var patchIsWildcard);
                 if (parseEx != null) return parseEx;
-                if (patchIsWildcard) wildcardVersion |= WildcardVersion.MinorWildcard;
+                if (patchIsWildcard) wildcardVersion |= WildcardVersion.PatchWildcard;
 
                 // Handle fourth version number
                 if (versionNumbers.MoveNext())
@@ -259,7 +261,8 @@ namespace Semver
             StringSegment version,
             IEnumerator<StringSegment> versionNumbers,
             bool allowLeadingZeros,
-            bool isOptional,
+            bool optional,
+            bool wildcardRequired,
             SemVersionParsingOptions options,
             Exception ex,
             out int number,
@@ -267,11 +270,11 @@ namespace Semver
         {
             if (versionNumbers.MoveNext())
                 return ParseVersionNumber(kind, version, versionNumbers.Current, allowLeadingZeros,
-                    options, ex, out number, out isWildcard);
+                    wildcardRequired, options, ex, out number, out isWildcard);
 
             number = 0;
             isWildcard = false;
-            if (!isOptional)
+            if (!optional)
                 return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, version.ToStringLimitLength(), kind);
 
             return null;
@@ -282,33 +285,36 @@ namespace Semver
             StringSegment version,
             StringSegment segment,
             bool allowLeadingZeros,
+            bool wildcardRequired,
             SemVersionParsingOptions options,
             Exception ex,
             out int number,
             out bool isWildcard)
         {
+            // Assign once so it doesn't have to be done any time parse fails
+            number = 0;
+
             if (segment.Length == 0)
             {
-                number = 0;
                 isWildcard = false;
                 return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, version.ToStringLimitLength(), kind);
             }
 
             if (options.AllowWildcardMajorMinorPatch && segment.Length > 0 && options.IsWildcard(segment[0]))
             {
-                number = 0;
                 isWildcard = true;
                 if (segment.Length > 1)
-                {
-                    // TODO this error message should be changed
-                    return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage,
-                        version.ToStringLimitLength(), kind, segment[1]);
-                }
+                    return ex ?? NewFormatException(InvalidWildcardInMajorMinorOrPatchMessage,
+                        version.ToStringLimitLength(), kind);
 
                 return null;
             }
 
             isWildcard = false;
+
+            if (wildcardRequired)
+                return ex ?? NewFormatException(MajorMinorOrPatchMustBeWildcardVersionMessage,
+                    version.ToStringLimitLength(), kind, segment[1]);
 
             var lengthWithLeadingZeros = segment.Length;
 
@@ -321,18 +327,13 @@ namespace Semver
 
             // If there are unprocessed characters, then it is an invalid char for this segment
             if (i < segment.Length)
-            {
-                number = 0;
-                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage, version.ToStringLimitLength(),
+                return ex ?? NewFormatException(InvalidCharacterInMajorMinorOrPatchMessage,
+                    version.ToStringLimitLength(),
                     kind, segment[i]);
-            }
 
             if (!allowLeadingZeros && lengthWithLeadingZeros > segment.Length)
-            {
-                number = 0;
                 return ex ?? NewFormatException(LeadingZeroInMajorMinorOrPatchMessage,
                     version.ToStringLimitLength(), kind);
-            }
 
             var numberString = segment.ToString();
             if (!int.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
