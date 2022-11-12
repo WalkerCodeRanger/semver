@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
+using Semver.Ranges.Npm;
 using Semver.Ranges.Parsers;
 using Semver.Utility;
 
@@ -105,7 +106,7 @@ namespace Semver.Ranges
         public static implicit operator Predicate<SemVersion>(SemVersionRange range)
             => range.Contains;
 
-        #region Parsing
+        #region Standard Parsing
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static SemVersionRange Parse(
             string range,
@@ -162,6 +163,13 @@ namespace Semver.Ranges
             int maxLength = MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
             => TryParse(range, SemVersionRangeOptions.Strict, out semverRange, maxLength);
+        #endregion
+
+        #region NPM Parsing
+        public static SemVersionRange ParseNpm(string range, bool includeAllPrerelease = false)
+#pragma warning disable CS0618 // Type or member is obsolete
+            => RangeParser.ParseRange(range, includeAllPrerelease).ToSemVersionRange();
+#pragma warning restore CS0618 // Type or member is obsolete
         #endregion
 
         #region IReadOnlyList<UnbrokenSemVersionRange>

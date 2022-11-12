@@ -97,8 +97,6 @@ namespace Semver.Ranges.Npm
         /// <inheritdoc />
         public override bool Contains(SemVersion version)
         {
-            bool anySuccess = false;
-
             foreach (NpmComparator[] comps in Ranges)
             {
                 // All comparators in range must succeed
@@ -116,12 +114,11 @@ namespace Semver.Ranges.Npm
                 if (!failed)
                 {
                     // Success if at least one range includes the version
-                    anySuccess = true;
-                    break;
+                    return true;
                 }
             }
 
-            return anySuccess;
+            return false;
         }
 
         /// <summary>
@@ -136,6 +133,18 @@ namespace Semver.Ranges.Npm
             cachedStringValue = string.Join($" {RangeParser.OrSeparator[0]} ", Ranges.Select(comps => string.Join(" ", comps.Select(comp => comp.ToString()))));
 
             return cachedStringValue;
+        }
+
+        public SemVersionRange ToSemVersionRange()
+        {
+            var unbrokenRanges = new List<UnbrokenSemVersionRange>();
+
+            foreach (NpmComparator[] comps in Ranges)
+            {
+                throw new NotImplementedException();
+            }
+
+            throw new NotImplementedException();
         }
     }
 }
