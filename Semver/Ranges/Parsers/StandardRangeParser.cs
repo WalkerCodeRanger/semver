@@ -133,6 +133,7 @@ namespace Semver.Ranges.Parsers
                     int major = 0, minor = 0, patch = 0;
                     if (semver.Major != 0)
                     {
+                        // TODO should this be an error or just no upper bound?
                         if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
                         major = semver.Major + 1;
                     }
@@ -149,8 +150,8 @@ namespace Semver.Ranges.Parsers
 
                     rightBound = rightBound.Min(new RightBoundedRange(new SemVersion(
                                     major, minor, patch,
-                                    "0", PrereleaseIdentifiers.Zero, "",
-                                    ReadOnlyList<MetadataIdentifier>.Empty), false));
+                                    "0", PrereleaseIdentifiers.Zero,
+                                    "", ReadOnlyList<MetadataIdentifier>.Empty), false));
                     return null;
                 case StandardOperator.Tilde:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
@@ -160,6 +161,9 @@ namespace Semver.Ranges.Parsers
                         false));
                     return null;
                 case StandardOperator.None: // implied = (supports wildcard *)
+                    var prereleaseWildcard = wildcardVersion.HasFlag(WildcardVersion.PrereleaseWildcard);
+                    includeAllPrerelease |= prereleaseWildcard;
+                    wildcardVersion.RemoveOption(WildcardVersion.PrereleaseWildcard);
                     switch (wildcardVersion)
                     {
                         case WildcardVersion.None:
@@ -167,9 +171,34 @@ namespace Semver.Ranges.Parsers
                             rightBound = rightBound.Min(new RightBoundedRange(semver, true));
                             return null;
                         case WildcardVersion.MajorMinorPatchWildcard:
+                            // No further bound is places on the left and right bounds
+                            return null;
                         case WildcardVersion.MinorPatchWildcard:
+                            leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
+                            // If major version is int.MaxValue, the right is unbounded
+                            if (semver.Major != int.MaxValue)
+                                rightBound = rightBound.Min(new RightBoundedRange(
+                                    new SemVersion(semver.Major + 1, 0, 0,
+                                        "0", PrereleaseIdentifiers.Zero,
+                                        "", ReadOnlyList<MetadataIdentifier>.Empty), false));
+                            return null;
                         case WildcardVersion.PatchWildcard:
-                            throw new NotImplementedException();
+                            leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
+                            if (semver.Minor == int.MaxValue)
+                            {
+                                // If minor and major version is int.MaxValue, the right is unbounded
+                                if (semver.Major != int.MaxValue)
+                                    rightBound = rightBound.Min(new RightBoundedRange(
+                                        new SemVersion(semver.Major + 1, 0, 0,
+                                            "0", PrereleaseIdentifiers.Zero,
+                                            "", ReadOnlyList<MetadataIdentifier>.Empty), false));
+                            }
+                            else
+                                rightBound = rightBound.Min(new RightBoundedRange(
+                                    new SemVersion(semver.Major, semver.Minor + 1, 0,
+                                        "0", PrereleaseIdentifiers.Zero,
+                                        "", ReadOnlyList<MetadataIdentifier>.Empty), false));
+                            return null;
                         default:
                             // This code should be unreachable
                             throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");

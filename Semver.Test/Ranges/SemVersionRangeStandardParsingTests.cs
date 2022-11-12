@@ -39,8 +39,6 @@ namespace Semver.Test.Ranges
 
         public static readonly TheoryData<RangeParsingTestCase> ParsingTestCases = new TheoryData<RangeParsingTestCase>()
         {
-            //Valid("*", AllRelease),
-            //Valid("*-*", All),
             Valid("1.2.3", EqualsVersion("1.2.3")),
             Valid("  1.2.3   ", EqualsVersion("1.2.3")),
             Valid("   1.2.3", EqualsVersion("1.2.3")),
@@ -88,6 +86,18 @@ namespace Semver.Test.Ranges
             Valid("^0.2.3-rc", InclusiveOfStart("0.2.3-rc", "0.3.0-0")),
             Valid("^0.0.3", InclusiveOfStart("0.0.3", "0.0.4-0")),
             Valid("^0.0.3-rc", InclusiveOfStart("0.0.3-rc", "0.0.4-0")),
+
+            // Wildcard versions
+            Valid("*", AllRelease),
+            Valid("*.*", AllRelease),
+            Valid("*.*.*", AllRelease),
+            //Valid("*-*", All),
+            Valid("3.*", InclusiveOfStart("3.0.0", "4.0.0-0")),
+            Valid("3.*.*", InclusiveOfStart("3.0.0", "4.0.0-0")),
+            Valid("2147483647.*", AtLeast("2147483647.0.0")),
+            Valid("3.1.*", InclusiveOfStart("3.1.0", "3.2.0-0")),
+            Valid("3.2147483647.*", InclusiveOfStart("3.2147483647.0", "4.0.0-0")),
+            Valid("2147483647.2147483647.*", AtLeast("2147483647.2147483647.0")),
 
             // Already at max version
             Invalid("~1.2147483647.3", MaxVersionMessage, "1.2147483647.3"),
