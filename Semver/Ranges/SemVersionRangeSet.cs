@@ -33,19 +33,5 @@ namespace Semver.Ranges
 
         public static SemVersionRangeSet ParseNpm(string range, bool includeAllPrerelease = false)
             => NpmRangeSet.Parse(range, includeAllPrerelease);
-
-        public static bool TryParseNpm(string range, bool includeAllPrerelease, out SemVersionRangeSet ranges)
-        {
-            var success = NpmRangeSet.TryParse(range, includeAllPrerelease, out var npmRange);
-            ranges = npmRange;
-            return success;
-        }
-
-        public static bool TryParseNpm(string range, out SemVersionRangeSet ranges)
-        {
-            var success = NpmRangeSet.TryParse(range, false, out var npmRange);
-            ranges = npmRange;
-            return success;
-        }
     }
 }
