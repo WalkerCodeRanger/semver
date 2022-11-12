@@ -81,7 +81,17 @@ namespace Semver.Ranges.Parsers
         /// <summary>
         /// Parse a comparison from the beginning of the segment.
         /// </summary>
-        /// <remarks>Must have leading whitespace removed. Will consume trailing whitespace.</remarks>
+        /// <remarks>
+        /// <para>Must have leading whitespace removed. Will consume trailing whitespace.</para>
+        ///
+        /// <para>When applying caret, tilde, or wildcards to versions already at
+        /// <see cref="int.MaxValue"/> there are ranges that would be equivalent to being able to
+        /// increment beyond max value. However, for simplicity, this is treated as an error instead.
+        /// This also makes sense given that these ranges would logically include versions valid
+        /// according to the spec that can't be represented by this library due to the limitations
+        /// of <see cref="int"/>. Finally, if these equivalent ranges were supported they would also
+        /// need special case handling in the <see cref="UnbrokenSemVersionRange.ToString"/> method.
+        /// </para></remarks>
         private static Exception ParseComparison(
             ref StringSegment segment,
             SemVersionRangeOptions rangeOptions,
@@ -133,7 +143,6 @@ namespace Semver.Ranges.Parsers
                     int major = 0, minor = 0, patch = 0;
                     if (semver.Major != 0)
                     {
-                        // TODO should this be an error or just no upper bound?
                         if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
                         major = semver.Major + 1;
                     }
@@ -175,29 +184,19 @@ namespace Semver.Ranges.Parsers
                             return null;
                         case WildcardVersion.MinorPatchWildcard:
                             leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                            // If major version is int.MaxValue, the right is unbounded
-                            if (semver.Major != int.MaxValue)
-                                rightBound = rightBound.Min(new RightBoundedRange(
-                                    new SemVersion(semver.Major + 1, 0, 0,
-                                        "0", PrereleaseIdentifiers.Zero,
-                                        "", ReadOnlyList<MetadataIdentifier>.Empty), false));
+                            if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                            rightBound = rightBound.Min(new RightBoundedRange(
+                                new SemVersion(semver.Major + 1, 0, 0,
+                                    "0", PrereleaseIdentifiers.Zero,
+                                    "", ReadOnlyList<MetadataIdentifier>.Empty), false));
                             return null;
                         case WildcardVersion.PatchWildcard:
                             leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                            if (semver.Minor == int.MaxValue)
-                            {
-                                // If minor and major version is int.MaxValue, the right is unbounded
-                                if (semver.Major != int.MaxValue)
-                                    rightBound = rightBound.Min(new RightBoundedRange(
-                                        new SemVersion(semver.Major + 1, 0, 0,
-                                            "0", PrereleaseIdentifiers.Zero,
-                                            "", ReadOnlyList<MetadataIdentifier>.Empty), false));
-                            }
-                            else
-                                rightBound = rightBound.Min(new RightBoundedRange(
-                                    new SemVersion(semver.Major, semver.Minor + 1, 0,
-                                        "0", PrereleaseIdentifiers.Zero,
-                                        "", ReadOnlyList<MetadataIdentifier>.Empty), false));
+                            if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                            rightBound = rightBound.Min(new RightBoundedRange(
+                                new SemVersion(semver.Major, semver.Minor + 1, 0,
+                                    "0", PrereleaseIdentifiers.Zero,
+                                    "", ReadOnlyList<MetadataIdentifier>.Empty), false));
                             return null;
                         default:
                             // This code should be unreachable

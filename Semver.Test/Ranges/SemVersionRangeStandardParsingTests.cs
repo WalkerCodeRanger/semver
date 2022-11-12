@@ -94,16 +94,16 @@ namespace Semver.Test.Ranges
             //Valid("*-*", All),
             Valid("3.*", InclusiveOfStart("3.0.0", "4.0.0-0")),
             Valid("3.*.*", InclusiveOfStart("3.0.0", "4.0.0-0")),
-            Valid("2147483647.*", AtLeast("2147483647.0.0")),
             Valid("3.1.*", InclusiveOfStart("3.1.0", "3.2.0-0")),
-            Valid("3.2147483647.*", InclusiveOfStart("3.2147483647.0", "4.0.0-0")),
-            Valid("2147483647.2147483647.*", AtLeast("2147483647.2147483647.0")),
 
             // Already at max version
             Invalid("~1.2147483647.3", MaxVersionMessage, "1.2147483647.3"),
             Invalid("^2147483647.2.3", MaxVersionMessage, "2147483647.2.3"),
             Invalid("^0.2147483647.3", MaxVersionMessage, "0.2147483647.3"),
             Invalid("^0.0.2147483647", MaxVersionMessage, "0.0.2147483647"),
+            Invalid("2147483647.*", MaxVersionMessage, "2147483647.0.0"),
+            Invalid("3.2147483647.*", MaxVersionMessage, "3.2147483647.0"),
+            Invalid("2147483647.2147483647.*", MaxVersionMessage, "2147483647.2147483647.0"),
 
             // Missing Comparison
             Invalid("", MissingComparisonMessage, "0"),
