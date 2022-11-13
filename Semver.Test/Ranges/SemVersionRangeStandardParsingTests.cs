@@ -91,10 +91,17 @@ namespace Semver.Test.Ranges
             Valid("*", AllRelease),
             Valid("*.*", AllRelease),
             Valid("*.*.*", AllRelease),
-            //Valid("*-*", All),
+            Valid("*-*", All),
+            Valid("*.*-*", All),
+            Valid("*.*.*-*", All),
             Valid("3.*", InclusiveOfStart("3.0.0", "4.0.0-0")),
+            Valid("3.*-*", InclusiveOfStart("3.0.0-0", "4.0.0-0", true)),
             Valid("3.*.*", InclusiveOfStart("3.0.0", "4.0.0-0")),
+            Valid("3.*.*-*", InclusiveOfStart("3.0.0-0", "4.0.0-0", true)),
             Valid("3.1.*", InclusiveOfStart("3.1.0", "3.2.0-0")),
+            Valid("3.1.*-*", InclusiveOfStart("3.1.0-0", "3.2.0-0", true)),
+            Valid("3.1.4-*", InclusiveOfStart("3.1.4-0", "3.1.5-0", true)),
+            Valid("3.1.4-rc.*", InclusiveOfStart("3.1.4-rc", "3.1.5-0", true)),
 
             // Already at max version
             Invalid("~1.2147483647.3", MaxVersionMessage, "1.2147483647.3"),
@@ -104,6 +111,7 @@ namespace Semver.Test.Ranges
             Invalid("2147483647.*", MaxVersionMessage, "2147483647.0.0"),
             Invalid("3.2147483647.*", MaxVersionMessage, "3.2147483647.0"),
             Invalid("2147483647.2147483647.*", MaxVersionMessage, "2147483647.2147483647.0"),
+            Invalid("3.1.2147483647-rc.*", MaxVersionMessage, "3.1.2147483647-rc"),
 
             // Missing Comparison
             Invalid("", MissingComparisonMessage, "0"),

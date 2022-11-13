@@ -36,6 +36,8 @@ namespace Semver
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'.";
         private const string InvalidWildcardInMajorMinorOrPatchMessage = "{1} version is a wildcard and should contain only 1 character in '{0}'.";
         private const string MajorMinorOrPatchMustBeWildcardVersionMessage = "{1} version should be a wildcard because the preceding version is a wildcard in '{0}'.";
+        private const string InvalidWildcardInPrereleaseMessage = "Prerelease version is a wildcard and should contain only 1 character in '{0}'.";
+        private const string PrereleaseWildcardMustBeLast = "Prerelease identifier follows wildcard prerelease identifier in '{0}'.";
 
         /// <summary>
         /// The internal method that all parsing is based on. Because this is called by both
@@ -175,9 +177,10 @@ namespace Semver
             if (prereleaseSegment.Length > 0)
             {
                 prereleaseSegment = prereleaseSegment.Subsegment(1);
-                parseEx = ParsePrerelease(version, prereleaseSegment, allowLeadingZeros, ex,
-                            out prerelease, out prereleaseIdentifiers);
+                parseEx = ParsePrerelease(version, prereleaseSegment, allowLeadingZeros, options, ex,
+                            out prerelease, out prereleaseIdentifiers, out var prereleaseIsWildcard);
                 if (parseEx != null) return parseEx;
+                if (prereleaseIsWildcard) wildcardVersion |= WildcardVersion.PrereleaseWildcard;
             }
             else
             {
@@ -349,30 +352,47 @@ namespace Semver
             StringSegment version,
             StringSegment segment,
             bool allowLeadingZero,
+            SemVersionParsingOptions options,
             Exception ex,
             out string prerelease,
-            out IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers)
+            out IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
+            out bool isWildcard)
         {
             prerelease = null;
             var identifiers = new List<PrereleaseIdentifier>(segment.SplitCount('.'));
             prereleaseIdentifiers = identifiers.AsReadOnly();
+            isWildcard = false;
 
             bool hasLeadingZeros = false;
             foreach (var identifier in segment.Split('.'))
             {
+                // Identifier after wildcard
+                if (isWildcard)
+                    return ex ?? NewFormatException(PrereleaseWildcardMustBeLast, version.ToStringLimitLength());
+
                 // Empty identifiers not allowed
                 if (identifier.Length == 0)
                     return ex ?? NewFormatException(MissingPrereleaseIdentifierMessage, version.ToStringLimitLength());
 
                 var isNumeric = true;
+
                 for (int i = 0; i < identifier.Length; i++)
                 {
                     var c = identifier[i];
                     if (c.IsAlphaOrHyphen())
                         isNumeric = false;
+                    else if (options.AllowWildcardPrerelease && options.IsWildcard(c))
+                        isWildcard = true;
                     else if (!c.IsDigit())
                         return ex ?? NewFormatException(InvalidCharacterInPrereleaseMessage,
                             version.ToStringLimitLength(), c);
+                }
+
+                if (isWildcard)
+                {
+                    if (identifier.Length > 1) return ex ?? NewFormatException(InvalidWildcardInPrereleaseMessage, version.ToStringLimitLength());
+                    isWildcard = true;
+                    continue; // continue to make sure there aren't more identifiers
                 }
 
                 if (!isNumeric)
@@ -401,8 +421,10 @@ namespace Semver
                 }
             }
 
-            // If there are leading zeros, reconstruct the string from the identifiers, otherwise just take a substring
-            prerelease = hasLeadingZeros ? string.Join(".", identifiers) : segment.ToString();
+            // If there are leading zeros or a wildcard, reconstruct the string from the identifiers,
+            // otherwise just take a substring.
+            prerelease = hasLeadingZeros || isWildcard
+                            ? string.Join(".", identifiers) : segment.ToString();
 
             return null;
         }

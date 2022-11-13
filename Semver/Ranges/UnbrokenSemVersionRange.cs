@@ -187,6 +187,16 @@ namespace Semver.Ranges
                     return PrereleaseIsZero(Start) ? wildcardRange + "-*" : "*-* " + wildcardRange;
                 }
 
+                // Wildcard ranges like 2.1.4-* and 2.3.7-rc.*
+                if (IncludeAllPrerelease && Start.IsPrerelease
+                    && Start.Major == End.Major && Start.Minor == End.Minor
+                    // Subtract instead of add to avoid overflow
+                    && Start.Patch == End.Patch - 1)
+                {
+                    if (PrereleaseIsZero(Start)) return $"{Start.Major}.{Start.Minor}.{Start.Patch}-*";
+                    return $"{Start}.*";
+                }
+
             tilde:
                 // Tilde ranges like ~1.2.3, and ~1.2.3-rc
                 if (Start.Major == End.Major

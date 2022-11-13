@@ -1036,9 +1036,13 @@ namespace Semver.Test.Ranges
             {InclusiveOfStart("3.0.0", "4.0.0-0"), "3.*"},
             {InclusiveOfStart("5.0.0-0", "6.0.0-0", true), "5.*-*"},
             {InclusiveOfStart("5.0.0", "6.0.0-0", true), "*-* 5.*"},
+            {InclusiveOfStart("3.1.4-0", "3.1.5-0", true), "3.1.4-*"},
+            {InclusiveOfStart("3.1.4-rc", "3.1.5-0", true), "3.1.4-rc.*"},
             // Wildcard ranges preferred to tilde or caret
             {InclusiveOfStart("0.1.0", "0.2.0-0"), "0.1.*"},
             {InclusiveOfStart("0.1.0", "0.2.0-0", true), "*-* 0.1.*"},
+            {InclusiveOfStart("0.0.3-0", "0.0.4-0", true), "0.0.3-*"},
+            {InclusiveOfStart("0.0.3-rc", "0.0.4-0", true), "0.0.3-rc.*"},
             // Tilde ranges
             {InclusiveOfStart("2.1.3", "2.2.0-0"), "~2.1.3"},
             {InclusiveOfStart("2.1.3", "2.2.0-0", true), "*-* ~2.1.3"},
@@ -1066,7 +1070,6 @@ namespace Semver.Test.Ranges
             {InclusiveOfStart("0.0.3", "0.0.4-0"), "^0.0.3"},
             {InclusiveOfStart("0.0.3", "0.0.4-0", true), "*-* ^0.0.3"},
             {InclusiveOfStart("0.0.3-rc", "0.0.4-0"), "^0.0.3-rc"},
-            {InclusiveOfStart("0.0.3-rc", "0.0.4-0", true), "*-* ^0.0.3-rc"},
         };
 
         [Theory]
