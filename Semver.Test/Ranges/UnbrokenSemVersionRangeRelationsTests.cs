@@ -15,6 +15,8 @@ namespace Semver.Test.Ranges
             Related(AllRelease, Empty),
             NotRelated(AllRelease, All),
             Related(All, AllRelease),
+            Related(LessThan("4.5.6"), LessThan("1.2.3")),
+            NotRelated(LessThan("1.2.3"), LessThan("4.5.6")),
         };
 
         public static readonly TheoryData<RangesRelatedTestCase> RangeOverlapsTestCases = new TheoryData<RangesRelatedTestCase>()

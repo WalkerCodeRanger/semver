@@ -71,11 +71,10 @@ namespace Semver.Ranges
 
             // Sort and merge ranges
             ranges.Sort(UnbrokenSemVersionRangeComparer.Instance);
-            // TODO combine ranges
             for (var i = 0; i < ranges.Count - 1; i++)
-            {
-
-            }
+                for (var j = ranges.Count - 1; j > i; j--)
+                    if (ranges[i].Contains(ranges[j]))
+                        ranges.RemoveAt(j);
 
             return new SemVersionRange(ranges.AsReadOnly());
         }

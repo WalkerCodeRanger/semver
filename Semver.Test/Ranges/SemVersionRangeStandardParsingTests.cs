@@ -58,26 +58,26 @@ namespace Semver.Test.Ranges
             Valid(">   1.2.3", GreaterThan("1.2.3")),
             Valid(" >   1.2.3 ", GreaterThan("1.2.3")),
             Valid(">1.2.3 >4.5.6", GreaterThan("4.5.6")),
-            //Valid(">1.2.3 || >4.5.6", GreaterThan("1.2.3")),
+            Valid(">1.2.3 || >4.5.6", GreaterThan("1.2.3")),
             Valid(">=1.2.3", AtLeast("1.2.3")),
             Valid("  >=1.2.3   ", AtLeast("1.2.3")),
             Valid(">=   1.2.3", AtLeast("1.2.3")),
             Valid(" >=   1.2.3 ", AtLeast("1.2.3")),
             Valid(">=1.2.3 >=4.5.6", AtLeast("4.5.6")),
-            //Valid(">=1.2.3 || >=4.5.6", AtLeast("1.2.3")),
+            Valid(">=1.2.3 || >=4.5.6", AtLeast("1.2.3")),
             Valid("<1.2.3", LessThan("1.2.3")),
             Valid("  <1.2.3   ", LessThan("1.2.3")),
             Valid("<   1.2.3", LessThan("1.2.3")),
             Valid(" <   1.2.3 ", LessThan("1.2.3")),
             Valid("<1.2.3 <4.5.6", LessThan("1.2.3")),
-            //Valid("<1.2.3 || <4.5.6", LessThan("4.5.6")),
+            Valid("<1.2.3 || <4.5.6", LessThan("4.5.6")),
             Valid("<=1.2.3", AtMost("1.2.3")),
             Valid("  <=1.2.3   ", AtMost("1.2.3")),
             Valid("<=   1.2.3", AtMost("1.2.3")),
             Valid(" <=   1.2.3 ", AtMost("1.2.3")),
             Valid("<=1.2.3 <=4.5.6", AtMost("1.2.3")),
-            //Valid("<=1.2.3 || <=4.5.6", AtMost("4.5.6")),
-            //Valid("*-* >=2.0.0-0", AtLeast("2.0.0-0", true)),
+            Valid("<=1.2.3 || <=4.5.6", AtMost("4.5.6")),
+            Valid("*-* >=2.0.0-0", AtLeast("2.0.0-0", true)),
             Valid("~1.2.3", InclusiveOfStart("1.2.3", "1.3.0-0")),
             Valid("~1.2.3-rc", InclusiveOfStart("1.2.3-rc", "1.3.0-0")),
             Valid("^1.2.3", InclusiveOfStart("1.2.3", "2.0.0-0")),
@@ -102,6 +102,10 @@ namespace Semver.Test.Ranges
             Valid("3.1.*-*", InclusiveOfStart("3.1.0-0", "3.2.0-0", true)),
             Valid("3.1.4-*", InclusiveOfStart("3.1.4-0", "3.1.5-0", true)),
             Valid("3.1.4-rc.*", InclusiveOfStart("3.1.4-rc", "3.1.5-0", true)),
+
+            // TODO wildcard char in prerelease identifier
+
+            // TODO prerelease wildcard not last
 
             // Already at max version
             Invalid("~1.2147483647.3", MaxVersionMessage, "1.2147483647.3"),

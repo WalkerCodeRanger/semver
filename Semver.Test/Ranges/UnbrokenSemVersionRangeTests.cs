@@ -11,8 +11,8 @@ namespace Semver.Test.Ranges
         private const string MaxVersion = "2147483647.2147483647.2147483647";
         private const string MinVersion = "0.0.0-0";
         private const string MinReleaseVersion = "0.0.0";
-        private static readonly SemVersion VersionWithMetadata =
-            SemVersion.Parse("1.2.3-foo+metadata", SemVersionStyles.Strict);
+        private static readonly SemVersion VersionWithMetadata
+            = SemVersion.Parse("1.2.3-foo+metadata", SemVersionStyles.Strict);
         private static readonly SemVersion FakeVersion = new SemVersion(1, 2, 3);
 
         [Fact]
