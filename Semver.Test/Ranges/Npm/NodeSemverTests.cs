@@ -1,5 +1,10 @@
-﻿using Semver.Test.TestCases;
+﻿using System;
+using Semver.Ranges;
+using Semver.Test.Helpers;
+using Semver.Test.TestCases;
 using Xunit;
+using static Semver.Ranges.SemVersionRangeOptions;
+using static Semver.Test.Builders.UnbrokenSemVersionRangeBuilder;
 
 namespace Semver.Test.Ranges.Npm
 {
@@ -143,8 +148,8 @@ namespace Semver.Test.Ranges.Npm
         /// </summary>
         /// <remarks>The loose option is not supported, so loose test cases have been removed if
         /// they otherwise duplicate other test cases or modified to not require the loose option.</remarks>
-        public static readonly TheoryData<NpmRangeContainsTestCase> ExcludeCases =
-            new TheoryData<NpmRangeContainsTestCase>
+        public static readonly TheoryData<NpmRangeContainsTestCase> ExcludeCases
+            = new TheoryData<NpmRangeContainsTestCase>
             {
                 Excludes("1.0.0 - 2.0.0", "2.2.3"),
                 Excludes("1.2.3+asdf - 2.4.3+asdf", "1.2.3-pre.2"),
@@ -244,6 +249,98 @@ namespace Semver.Test.Ranges.Npm
                 Excludes(">=1.0.0 <1.1.0-pre", "1.1.0-pre")
             };
 
+        /// <summary>
+        /// npm version range parsing cases from https://github.com/npm/node-semver/blob/main/test/fixtures/range-parse.js
+        /// </summary>
+        /// <remarks>The loose option is not supported, so loose test cases have been removed if
+        /// they otherwise duplicate other test cases or modified to not require the loose option.</remarks>
+        public static readonly TheoryData<RangeParsingTestCase> ParsingCases
+            = new TheoryData<RangeParsingTestCase>()
+            {
+                Valid("1.0.0 - 2.0.0", AtLeast("1.0.0"), AtMost("2.0.0")),
+                Valid("1.0.0 - 2.0.0", IncludeAllPrerelease, AtLeast("1.0.0-0"), LessThan("2.0.1-0")),
+                Valid("1 - 2", AtLeast("1.0.0"), LessThan("3.0.0-0")),
+                Valid("1 - 2", IncludeAllPrerelease, AtLeast("1.0.0-0"), LessThan("3.0.0-0")),
+                Valid("1.0 - 2.0", AtLeast("1.0.0"), LessThan("2.1.0-0")),
+                Valid("1.0 - 2.0", IncludeAllPrerelease, AtLeast("1.0.0-0"), LessThan("2.1.0-0")),
+                Valid("1.0.0", EqualsVersion("1.0.0")), // { loose: false }
+                Valid(">=*", AllRelease),
+                Valid("", AllRelease),
+                Valid("*", AllRelease),
+                Valid(">=1.0.0", AtLeast("1.0.0")),
+                Valid(">1.0.0", GreaterThan("1.0.0")),
+                Valid("<=2.0.0", AtMost("2.0.0")),
+                Valid("1", AtLeast("1.0.0"), LessThan("2.0.0-0")),
+                Valid("<2.0.0", LessThan("2.0.0")),
+                Valid(">= 1.0.0", AtLeast("1.0.0")),
+                Valid(">=  1.0.0", AtLeast("1.0.0")),
+                Valid(">=   1.0.0", AtLeast("1.0.0")),
+                Valid("> 1.0.0", GreaterThan("1.0.0")),
+                Valid(">  1.0.0", GreaterThan("1.0.0")),
+                Valid("<=   2.0.0", AtMost("2.0.0")),
+                Valid("<= 2.0.0", AtMost("2.0.0")),
+                Valid("<=  2.0.0", AtMost("2.0.0")),
+                Valid("<    2.0.0", LessThan("2.0.0")),
+                Valid("<\t2.0.0", LessThan("2.0.0")),
+                Valid(">=0.1.97", AtLeast("0.1.97")),
+                Valid("0.1.20 || 1.2.4", EqualsVersion("0.1.20"), EqualsVersion("1.2.4")),
+                Valid(">=0.2.3 || <0.0.1", AtLeast("0.2.3"), LessThan("0.0.1")),
+                Valid("||", AllRelease),
+                Valid("2.x.x", AtLeast("2.0.0"), LessThan("3.0.0-0")),
+                Valid("1.2.x", AtLeast("1.2.0"), LessThan("1.3.0-0")),
+                Valid("1.2.x || 2.x", InclusiveOfStart("1.2.0", "1.3.0-0"), InclusiveOfStart("2.0.0", "3.0.0-0")),
+                Valid("x", AllRelease),
+                Valid("2.*.*", InclusiveOfStart("2.0.0", "3.0.0-0")),
+                Valid("1.2.*", InclusiveOfStart("1.2.0", "1.3.0-0")),
+                Valid("1.2.* || 2.*", InclusiveOfStart("1.2.0", "1.3.0-0"), InclusiveOfStart("2.0.0", "3.0.0-0")),
+                Valid("2", InclusiveOfStart("2.0.0", "3.0.0-0")),
+                Valid("2.3", InclusiveOfStart("2.3.0", "2.4.0-0")),
+                Valid("~2.4", InclusiveOfStart("2.4.0", "2.5.0-0")),
+                Valid("~>3.2.1", InclusiveOfStart("3.2.1", "3.3.0-0")),
+                Valid("~1", InclusiveOfStart("1.0.0", "2.0.0-0")),
+                Valid("~>1", InclusiveOfStart("1.0.0", "2.0.0-0")),
+                Valid("~> 1", InclusiveOfStart("1.0.0", "2.0.0-0")),
+                Valid("~1.0", InclusiveOfStart("1.0.0", "1.1.0-0")),
+                Valid("~ 1.0", InclusiveOfStart("1.0.0", "1.1.0-0")),
+                Valid("^0", LessThan("1.0.0-0")),
+                Valid("^ 1", InclusiveOfStart("1.0.0", "2.0.0-0")),
+                Valid("^0.1", InclusiveOfStart("0.1.0", "0.2.0-0")),
+                Valid("^1.0", InclusiveOfStart("1.0.0", "2.0.0-0")),
+                Valid("^1.2", InclusiveOfStart("1.2.0", "2.0.0-0")),
+                Valid("^0.0.1", InclusiveOfStart("0.0.1", "0.0.2-0")),
+                Valid("^0.0.1-beta", InclusiveOfStart("0.0.1-beta", "0.0.2-0")),
+                Valid("^0.1.2", InclusiveOfStart("0.1.2", "0.2.0-0")),
+                Valid("^1.2.3", InclusiveOfStart("1.2.3", "2.0.0-0")),
+                Valid("^1.2.3-beta.4", InclusiveOfStart("1.2.3-beta.4", "2.0.0-0")),
+                Valid("<1", LessThan("1.0.0-0")),
+                Valid("< 1", LessThan("1.0.0-0")),
+                Valid(">=1", AtLeast("1.0.0")),
+                Valid(">= 1", AtLeast("1.0.0")),
+                Valid("<1.2", LessThan("1.2.0-0")),
+                Valid("< 1.2", LessThan("1.2.0-0")),
+                Valid(">01.02.03", GreaterThan("1.2.3")),// true],
+                //Valid(">01.02.03", null),
+                //Valid("~1.2.3beta", InclusiveOfStart("1.2.3-beta", "1.3.0-0")),//, { loose: true }],
+                //Valid("~1.2.3beta", null),
+                Valid("^ 1.2 ^ 1", InclusiveOfStart("1.2.0", "2.0.0-0")),
+                Valid("1.2 - 3.4.5", Inclusive("1.2.0", "3.4.5")),
+                Valid("1.2.3 - 3.4", InclusiveOfStart("1.2.3", "3.5.0-0")),
+                Valid("1.2 - 3.4", InclusiveOfStart("1.2.0", "3.5.0-0")),
+                Valid(">1", AtLeast("2.0.0")),
+                Valid(">1.2", AtLeast("1.3.0")),
+                Valid(">X", Empty),
+                Valid("<X", Empty),
+                Valid("<x <* || >* 2.x", Empty),
+                Valid(">x 2.x || * || <x", AllRelease),
+                //Valid(">=09090", null),
+                Valid(">=09090", AtLeast("9090.0.0")),//, true),
+                //Valid(">=09090-0", IncludeAllPrerelease, null),
+                //Valid(">=09090-0", IncludeAllPrerelease, null), //{ loose: true}
+                //Valid($"^{int.MaxValue}.0.0", null),
+                Valid($"={int.MaxValue}.0.0", EqualsVersion($"{int.MaxValue}.0.0")),
+                Valid($"^{int.MaxValue - 1}.0.0", InclusiveOfStart($"{int.MaxValue - 1}.0.0", $"{int.MaxValue}.0.0-0")),
+            };
+
         [Theory]
         [MemberData(nameof(IncludesCases))]
         public void RangeIncludes(NpmRangeContainsTestCase testCase)
@@ -258,10 +355,66 @@ namespace Semver.Test.Ranges.Npm
             testCase.Assert();
         }
 
+        [Theory]
+        [MemberData(nameof(ParsingCases))]
+        public void ParseTests(RangeParsingTestCase testCase)
+        {
+            // TODO implement this
+            Assert.Throws<NotImplementedException>(() => SemVersionRange.ParseNpm(testCase.Range));
+
+            //var range = SemVersionRange.ParseNpm(testCase.Range);
+
+            //Assert.Equal(testCase.ExpectedRange, range);
+        }
+
         private static NpmRangeContainsTestCase Includes(string range, string version, bool includeAllPrerelease = false)
             => NpmRangeContainsTestCase.NpmIncludes(range, version, includeAllPrerelease);
 
         private static NpmRangeContainsTestCase Excludes(string range, string version, bool includeAllPrerelease = false)
             => NpmRangeContainsTestCase.NpmExcludes(range, version, includeAllPrerelease);
+
+        internal static RangeParsingTestCase Valid(
+            string range,
+            SemVersionRange expected,
+            int maxLength = SemVersionRange.MaxRangeLength)
+            => RangeParsingTestCase.Valid(range, Strict, maxLength, expected);
+
+        internal static RangeParsingTestCase Valid(
+            string range,
+            UnbrokenSemVersionRange expected,
+            int maxLength = SemVersionRange.MaxRangeLength)
+            => RangeParsingTestCase.Valid(range, Strict, maxLength, SemVersionRange.Create(expected));
+
+        internal static RangeParsingTestCase Valid(string range, params UnbrokenSemVersionRange[] expectedRanges)
+            => RangeParsingTestCase.Valid(range, Strict, SemVersionRange.MaxRangeLength, SemVersionRange.Create(expectedRanges));
+
+        internal static RangeParsingTestCase Valid(
+            string range,
+            SemVersionRangeOptions options,
+            params UnbrokenSemVersionRange[] expectedRanges)
+            => RangeParsingTestCase.Valid(range, options, SemVersionRange.MaxRangeLength, SemVersionRange.Create(expectedRanges));
+
+        internal static RangeParsingTestCase Valid(
+            string range,
+            SemVersionRangeOptions options,
+            SemVersionRange expected,
+            int maxLength = SemVersionRange.MaxRangeLength)
+            => RangeParsingTestCase.Valid(range, options, maxLength, expected);
+
+        internal static RangeParsingTestCase Invalid<T>(
+            string range,
+            string exceptionMessage,
+            int maxLength = SemVersionRange.MaxRangeLength)
+            => RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(T), exceptionMessage);
+
+        private static RangeParsingTestCase Invalid(
+            string range,
+            string exceptionMessage = "",
+            string exceptionValue = null,
+            int maxLength = SemVersionRange.MaxRangeLength)
+        {
+            exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);
+            return RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(FormatException), exceptionMessage);
+        }
     }
 }
