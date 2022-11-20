@@ -16,16 +16,18 @@ namespace Semver.Test.Ranges
         private const string InvalidMaxLengthMessageStart = "Must not be negative.";
         private const string TooLongRangeMessage = "Exceeded maximum length of {1} for '{0}'.";
         private const string InvalidOperatorMessage = "Invalid operator '{1}'.";
-        private const string InvalidWhitespaceMessage =
-            "Invalid whitespace character at {1} in '{0}'. Only the ASCII space character is allowed.";
+        private const string InvalidWhitespaceMessage
+            = "Invalid whitespace character at {1} in '{0}'. Only the ASCII space character is allowed.";
         private const string MissingComparisonMessage
             = "Range is missing a comparison or limit at {1} in '{0}'";
         private const string MaxVersionMessage
             = "Cannot construct range from version '{1}' because version number cannot be incremented beyond max value.";
-        private const string InvalidWildcardInPrereleaseMessage =
-            "Prerelease version is a wildcard and should contain only 1 character in '{0}'.";
-        private const string PrereleaseWildcardMustBeLast =
-            "Prerelease identifier follows wildcard prerelease identifier in '{0}'.";
+        private const string InvalidWildcardInPrereleaseMessage
+            = "Prerelease version is a wildcard and should contain only 1 character in '{0}'.";
+        private const string PrereleaseWildcardMustBeLast
+            = "Prerelease identifier follows wildcard prerelease identifier in '{0}'.";
+        private const string PrereleaseWithWildcardVersionMessage
+            = "A wildcard major, minor, or patch is combined with a prerelease version in '{0}'.";
 
 
         public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
@@ -119,6 +121,14 @@ namespace Semver.Test.Ranges
             // Prerelease wildcard not last
             Invalid("1.2.3-*.a", PrereleaseWildcardMustBeLast),
             Invalid("1.2.3-a.*.a", PrereleaseWildcardMustBeLast),
+
+            // Prerelease after wildcard version
+            Invalid("*-rc", PrereleaseWithWildcardVersionMessage),
+            Invalid("*-rc.*", PrereleaseWithWildcardVersionMessage),
+            Invalid("1.*-rc", PrereleaseWithWildcardVersionMessage),
+            Invalid("1.*-rc.*", PrereleaseWithWildcardVersionMessage),
+            Invalid("1.2.*-rc", PrereleaseWithWildcardVersionMessage),
+            Invalid("1.2.*-rc.*", PrereleaseWithWildcardVersionMessage),
 
             // Already at max version
             Invalid("~1.2147483647.3", MaxVersionMessage, "1.2147483647.3"),

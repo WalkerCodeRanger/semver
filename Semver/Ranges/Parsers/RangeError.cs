@@ -17,6 +17,8 @@ namespace Semver.Ranges.Parsers
             = "Cannot construct range from version '{0}' because version number cannot be incremented beyond max value.";
         private const string WildcardWithOperatorMessage
             = "Operator is combined with wildcards in '{0}'.";
+        private const string PrereleaseWithWildcardVersionMessage
+            = "A wildcard major, minor, or patch is combined with a prerelease version in '{0}'.";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FormatException NewTooLongException(string range, int maxLength)
@@ -41,6 +43,10 @@ namespace Semver.Ranges.Parsers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception WildcardNotSupportedWithOperator(string range)
             => NewFormatException(WildcardWithOperatorMessage, range.LimitLength());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Exception PrereleaseNotSupportedWithWildcardVersion(string range)
+            => NewFormatException(PrereleaseWithWildcardVersionMessage, range.LimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static FormatException NewFormatException(string messageTemplate, params object[] args)

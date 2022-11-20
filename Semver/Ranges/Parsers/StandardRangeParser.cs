@@ -173,6 +173,8 @@ namespace Semver.Ranges.Parsers
                     var prereleaseWildcard = wildcardVersion.HasFlag(WildcardVersion.PrereleaseWildcard);
                     includeAllPrerelease |= prereleaseWildcard;
                     wildcardVersion.RemoveOption(WildcardVersion.PrereleaseWildcard);
+                    if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
+                        return ex ?? RangeError.PrereleaseNotSupportedWithWildcardVersion(segment.Source);
                     switch (wildcardVersion)
                     {
                         case WildcardVersion.None:
