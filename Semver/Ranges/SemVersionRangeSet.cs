@@ -20,7 +20,7 @@ namespace Semver.Ranges
     // been decided and the new class to use is SemVersionRange. This is being kept for now for
     // compatibility with the alpha release.
     [Obsolete("For alpha version only, removed in release")]
-    public abstract class SemVersionRangeSet
+    internal abstract class SemVersionRangeSet
     {
         private protected SemVersionRangeSet() { }
 

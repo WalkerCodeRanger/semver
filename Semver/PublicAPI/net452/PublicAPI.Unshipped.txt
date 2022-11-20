@@ -1,5 +1,4 @@
-﻿abstract Semver.Ranges.SemVersionRangeSet.Contains(Semver.SemVersion version) -> bool
-override Semver.Ranges.UnbrokenSemVersionRange.Equals(object obj) -> bool
+﻿override Semver.Ranges.UnbrokenSemVersionRange.Equals(object obj) -> bool
 override Semver.Ranges.UnbrokenSemVersionRange.GetHashCode() -> int
 override Semver.Ranges.UnbrokenSemVersionRange.ToString() -> string
 Semver.Ranges.SemVersionRange
@@ -18,7 +17,6 @@ Semver.Ranges.SemVersionRangeOptions.Loose = Semver.Ranges.SemVersionRangeOption
 Semver.Ranges.SemVersionRangeOptions.OptionalMinorPatch = 96 -> Semver.Ranges.SemVersionRangeOptions
 Semver.Ranges.SemVersionRangeOptions.OptionalPatch = 32 -> Semver.Ranges.SemVersionRangeOptions
 Semver.Ranges.SemVersionRangeOptions.Strict = 0 -> Semver.Ranges.SemVersionRangeOptions
-Semver.Ranges.SemVersionRangeSet
 Semver.Ranges.UnbrokenSemVersionRange
 Semver.Ranges.UnbrokenSemVersionRange.Contains(Semver.SemVersion version) -> bool
 Semver.Ranges.UnbrokenSemVersionRange.End.get -> Semver.SemVersion
@@ -27,7 +25,7 @@ Semver.Ranges.UnbrokenSemVersionRange.Equals(Semver.Ranges.UnbrokenSemVersionRan
 Semver.Ranges.UnbrokenSemVersionRange.IncludeAllPrerelease.get -> bool
 Semver.Ranges.UnbrokenSemVersionRange.Start.get -> Semver.SemVersion
 Semver.Ranges.UnbrokenSemVersionRange.StartInclusive.get -> bool
-Semver.SemVersion.Satisfies(Semver.Ranges.SemVersionRangeSet range) -> bool
+Semver.SemVersion.Satisfies(System.Predicate<Semver.SemVersion> predicate) -> bool
 Semver.SemVersion.SatisfiesNpm(string range, bool includeAllPrerelease = false) -> bool
 static readonly Semver.Ranges.SemVersionRange.All -> Semver.Ranges.SemVersionRange
 static readonly Semver.Ranges.SemVersionRange.AllRelease -> Semver.Ranges.SemVersionRange
@@ -52,7 +50,6 @@ static Semver.Ranges.SemVersionRange.Parse(string range, Semver.Ranges.SemVersio
 static Semver.Ranges.SemVersionRange.ParseNpm(string range, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.TryParse(string range, out Semver.Ranges.SemVersionRange semverRange, int maxLength = 2048) -> bool
 static Semver.Ranges.SemVersionRange.TryParse(string range, Semver.Ranges.SemVersionRangeOptions options, out Semver.Ranges.SemVersionRange semverRange, int maxLength = 2048) -> bool
-static Semver.Ranges.SemVersionRangeSet.ParseNpm(string range, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRangeSet
 static Semver.Ranges.UnbrokenSemVersionRange.AtLeast(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.UnbrokenSemVersionRange
 static Semver.Ranges.UnbrokenSemVersionRange.AtMost(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.UnbrokenSemVersionRange
 static Semver.Ranges.UnbrokenSemVersionRange.Equals(Semver.SemVersion version) -> Semver.Ranges.UnbrokenSemVersionRange
