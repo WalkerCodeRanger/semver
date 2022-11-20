@@ -59,7 +59,7 @@ namespace Semver.Ranges.Parsers
             unbrokenRange = null;
 
             // Parse off leading whitespace
-            var exception = ParseWhitespace(ref segment, ex);
+            var exception = ParseSpaces(ref segment, ex);
             if (exception != null) return exception;
 
             // Reject empty string ranges
@@ -107,7 +107,7 @@ namespace Semver.Ranges.Parsers
             var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;
 
-            exception = ParseWhitespace(ref segment, ex);
+            exception = ParseSpaces(ref segment, ex);
             if (exception != null) return exception;
 
             exception = ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
@@ -117,7 +117,7 @@ namespace Semver.Ranges.Parsers
             if (@operator != StandardOperator.None && wildcardVersion != WildcardVersion.None)
                 return ex ?? RangeError.WildcardNotSupportedWithOperator(segment.Source);
 
-            exception = ParseWhitespace(ref segment, ex);
+            exception = ParseSpaces(ref segment, ex);
             if (exception != null) return exception;
 
             switch (@operator)

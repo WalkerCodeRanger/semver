@@ -66,9 +66,9 @@ namespace Semver.Ranges.Parsers
             => !char.IsWhiteSpace(c) && (!IsPossibleOperatorChar(c) || c == '-' || c == '.');
 
         /// <summary>
-        /// Parse optional whitespace from the beginning of the segment.
+        /// Parse optional spaces from the beginning of the segment.
         /// </summary>
-        public static Exception ParseWhitespace(ref StringSegment segment, Exception ex)
+        public static Exception ParseSpaces(ref StringSegment segment, Exception ex)
         {
             segment = segment.TrimStartSpaces();
 
