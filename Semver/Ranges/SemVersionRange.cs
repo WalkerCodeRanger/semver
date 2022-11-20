@@ -165,6 +165,10 @@ namespace Semver.Ranges
         #endregion
 
         #region NPM Parsing
+        /// <summary>
+        /// Parse a range string following the npm range rules into a <see cref="SemVersionRange"/>.
+        /// </summary>
+        /// <remarks>The npm "loose" option is not supported.</remarks>
         public static SemVersionRange ParseNpm(string range, bool includeAllPrerelease = false)
 #pragma warning disable CS0618 // Type or member is obsolete
             => RangeParser.ParseRange(range, includeAllPrerelease).ToSemVersionRange();

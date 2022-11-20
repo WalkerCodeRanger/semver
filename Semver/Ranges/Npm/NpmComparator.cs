@@ -10,7 +10,7 @@ namespace Semver.Ranges.Npm
         public readonly SemVersion Version;
         public readonly bool AnyVersion;
 
-        private readonly bool includeAllPrerelease;
+        public readonly bool IncludeAllPrerelease;
         private NpmComparator[] comparators; // The other comparators in the same AND range
         private string cachedStringValue;
 
@@ -21,7 +21,7 @@ namespace Semver.Ranges.Npm
 
             Operator = @operator;
             Version = version;
-            this.includeAllPrerelease = includeAllPrerelease;
+            IncludeAllPrerelease = includeAllPrerelease;
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Semver.Ranges.Npm
         public NpmComparator(bool includeAllPrerelease)
         {
             AnyVersion = true;
-            this.includeAllPrerelease = includeAllPrerelease;
+            IncludeAllPrerelease = includeAllPrerelease;
         }
 
         internal void SetRangeComparators(NpmComparator[] comparators)
@@ -46,7 +46,7 @@ namespace Semver.Ranges.Npm
             // c) another comparator in range is prerelease and matches main version
             if (!AnyVersion)
             {
-                if (version.IsPrerelease && !includeAllPrerelease)
+                if (version.IsPrerelease && !IncludeAllPrerelease)
                 {
                     if (!Version.IsPrerelease || !MainVersionEquals(version))
                     {
@@ -74,7 +74,7 @@ namespace Semver.Ranges.Npm
             }
 
             if (AnyVersion)
-                return !version.IsPrerelease || includeAllPrerelease;
+                return !version.IsPrerelease || IncludeAllPrerelease;
 
             int comparison = Compare(version);
             bool result;
@@ -118,7 +118,7 @@ namespace Semver.Ranges.Npm
             if (comparison != 0) return comparison;
 
             if ((version.IsPrerelease && Version.IsPrerelease)
-                || (version.IsPrerelease && includeAllPrerelease))
+                || (version.IsPrerelease && IncludeAllPrerelease))
                 comparison = Math.Sign(ComparePreRelease(version));
 
             return comparison;
@@ -149,7 +149,7 @@ namespace Semver.Ranges.Npm
         private bool MainVersionEquals(SemVersion version)
         {
             // Not equal if this comparator is * and version is prerelease but options does not include pre-releases
-            if (AnyVersion && version.IsPrerelease && !includeAllPrerelease)
+            if (AnyVersion && version.IsPrerelease && !IncludeAllPrerelease)
                 return false;
 
             if (AnyVersion)
@@ -192,7 +192,7 @@ namespace Semver.Ranges.Npm
 
             return Operator == other.Operator
                 && AnyVersion == other.AnyVersion
-                && includeAllPrerelease == other.includeAllPrerelease
+                && IncludeAllPrerelease == other.IncludeAllPrerelease
                 && (Version == null && other.Version == null || other.Version != null && Version != null && Version.Equals(other.Version));
         }
 
@@ -208,6 +208,6 @@ namespace Semver.Ranges.Npm
         }
 
         public override int GetHashCode()
-            => CombinedHashCode.Create(Operator, Version, AnyVersion, includeAllPrerelease);
+            => CombinedHashCode.Create(Operator, Version, AnyVersion, IncludeAllPrerelease);
     }
 }

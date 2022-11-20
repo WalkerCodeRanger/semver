@@ -1,9 +1,6 @@
-﻿using System;
-using Semver.Ranges;
-using Semver.Test.Helpers;
+﻿using Semver.Ranges;
 using Semver.Test.TestCases;
 using Xunit;
-using static Semver.Ranges.SemVersionRangeOptions;
 using static Semver.Test.Builders.UnbrokenSemVersionRangeBuilder;
 
 namespace Semver.Test.Ranges.Npm
@@ -254,23 +251,23 @@ namespace Semver.Test.Ranges.Npm
         /// </summary>
         /// <remarks>The loose option is not supported, so loose test cases have been removed if
         /// they otherwise duplicate other test cases or modified to not require the loose option.</remarks>
-        public static readonly TheoryData<RangeParsingTestCase> ParsingCases
-            = new TheoryData<RangeParsingTestCase>()
+        public static readonly TheoryData<NpmRangeParsingTestCase> ParsingCases
+            = new TheoryData<NpmRangeParsingTestCase>()
             {
-                Valid("1.0.0 - 2.0.0", AtLeast("1.0.0"), AtMost("2.0.0")),
-                Valid("1.0.0 - 2.0.0", IncludeAllPrerelease, AtLeast("1.0.0-0"), LessThan("2.0.1-0")),
-                Valid("1 - 2", AtLeast("1.0.0"), LessThan("3.0.0-0")),
-                Valid("1 - 2", IncludeAllPrerelease, AtLeast("1.0.0-0"), LessThan("3.0.0-0")),
-                Valid("1.0 - 2.0", AtLeast("1.0.0"), LessThan("2.1.0-0")),
-                Valid("1.0 - 2.0", IncludeAllPrerelease, AtLeast("1.0.0-0"), LessThan("2.1.0-0")),
-                Valid("1.0.0", EqualsVersion("1.0.0")), // { loose: false }
+                Valid("1.0.0 - 2.0.0", Inclusive("1.0.0", "2.0.0")),
+                Valid("1.0.0 - 2.0.0", true, InclusiveOfStart("1.0.0-0", "2.0.1-0", true)),
+                Valid("1 - 2", InclusiveOfStart("1.0.0","3.0.0-0")),
+                Valid("1 - 2", true, InclusiveOfStart("1.0.0-0", "3.0.0-0", true)),
+                Valid("1.0 - 2.0", InclusiveOfStart("1.0.0", "2.1.0-0")),
+                Valid("1.0 - 2.0", true, InclusiveOfStart("1.0.0-0", "2.1.0-0", true)),
+                Valid("1.0.0", EqualsVersion("1.0.0")),
                 Valid(">=*", AllRelease),
                 Valid("", AllRelease),
                 Valid("*", AllRelease),
                 Valid(">=1.0.0", AtLeast("1.0.0")),
                 Valid(">1.0.0", GreaterThan("1.0.0")),
                 Valid("<=2.0.0", AtMost("2.0.0")),
-                Valid("1", AtLeast("1.0.0"), LessThan("2.0.0-0")),
+                Valid("1", InclusiveOfStart("1.0.0","2.0.0-0")),
                 Valid("<2.0.0", LessThan("2.0.0")),
                 Valid(">= 1.0.0", AtLeast("1.0.0")),
                 Valid(">=  1.0.0", AtLeast("1.0.0")),
@@ -286,8 +283,8 @@ namespace Semver.Test.Ranges.Npm
                 Valid("0.1.20 || 1.2.4", EqualsVersion("0.1.20"), EqualsVersion("1.2.4")),
                 Valid(">=0.2.3 || <0.0.1", AtLeast("0.2.3"), LessThan("0.0.1")),
                 Valid("||", AllRelease),
-                Valid("2.x.x", AtLeast("2.0.0"), LessThan("3.0.0-0")),
-                Valid("1.2.x", AtLeast("1.2.0"), LessThan("1.3.0-0")),
+                Valid("2.x.x", InclusiveOfStart("2.0.0", "3.0.0-0")),
+                Valid("1.2.x", InclusiveOfStart("1.2.0", "1.3.0-0")),
                 Valid("1.2.x || 2.x", InclusiveOfStart("1.2.0", "1.3.0-0"), InclusiveOfStart("2.0.0", "3.0.0-0")),
                 Valid("x", AllRelease),
                 Valid("2.*.*", InclusiveOfStart("2.0.0", "3.0.0-0")),
@@ -320,8 +317,7 @@ namespace Semver.Test.Ranges.Npm
                 Valid("< 1.2", LessThan("1.2.0-0")),
                 Valid(">01.02.03", GreaterThan("1.2.3")),// true],
                 //Valid(">01.02.03", null),
-                //Valid("~1.2.3beta", InclusiveOfStart("1.2.3-beta", "1.3.0-0")),//, { loose: true }],
-                //Valid("~1.2.3beta", null),
+                Valid("~1.2.3-beta", InclusiveOfStart("1.2.3-beta", "1.3.0-0")),//, { loose: true }],
                 Valid("^ 1.2 ^ 1", InclusiveOfStart("1.2.0", "2.0.0-0")),
                 Valid("1.2 - 3.4.5", Inclusive("1.2.0", "3.4.5")),
                 Valid("1.2.3 - 3.4", InclusiveOfStart("1.2.3", "3.5.0-0")),
@@ -334,8 +330,8 @@ namespace Semver.Test.Ranges.Npm
                 Valid(">x 2.x || * || <x", AllRelease),
                 //Valid(">=09090", null),
                 Valid(">=09090", AtLeast("9090.0.0")),//, true),
-                //Valid(">=09090-0", IncludeAllPrerelease, null),
-                //Valid(">=09090-0", IncludeAllPrerelease, null), //{ loose: true}
+                //Valid(">=09090-0", true, null),
+                //Valid(">=09090-0", true, null), //{ loose: true}
                 //Valid($"^{int.MaxValue}.0.0", null),
                 Valid($"={int.MaxValue}.0.0", EqualsVersion($"{int.MaxValue}.0.0")),
                 Valid($"^{int.MaxValue - 1}.0.0", InclusiveOfStart($"{int.MaxValue - 1}.0.0", $"{int.MaxValue}.0.0-0")),
@@ -357,14 +353,11 @@ namespace Semver.Test.Ranges.Npm
 
         [Theory]
         [MemberData(nameof(ParsingCases))]
-        public void ParseTests(RangeParsingTestCase testCase)
+        public void ParseTests(NpmRangeParsingTestCase testCase)
         {
-            // TODO implement this
-            Assert.Throws<NotImplementedException>(() => SemVersionRange.ParseNpm(testCase.Range));
+            var range = SemVersionRange.ParseNpm(testCase.Range, testCase.IncludeAllPrerelease);
 
-            //var range = SemVersionRange.ParseNpm(testCase.Range);
-
-            //Assert.Equal(testCase.ExpectedRange, range);
+            Assert.Equal(testCase.ExpectedRange, range);
         }
 
         private static NpmRangeContainsTestCase Includes(string range, string version, bool includeAllPrerelease = false)
@@ -373,48 +366,13 @@ namespace Semver.Test.Ranges.Npm
         private static NpmRangeContainsTestCase Excludes(string range, string version, bool includeAllPrerelease = false)
             => NpmRangeContainsTestCase.NpmExcludes(range, version, includeAllPrerelease);
 
-        internal static RangeParsingTestCase Valid(
-            string range,
-            SemVersionRange expected,
-            int maxLength = SemVersionRange.MaxRangeLength)
-            => RangeParsingTestCase.Valid(range, Strict, maxLength, expected);
+        internal static NpmRangeParsingTestCase Valid(string range, params UnbrokenSemVersionRange[] expectedRanges)
+            => NpmRangeParsingTestCase.Valid(range, false, SemVersionRange.Create(expectedRanges));
 
-        internal static RangeParsingTestCase Valid(
+        internal static NpmRangeParsingTestCase Valid(
             string range,
-            UnbrokenSemVersionRange expected,
-            int maxLength = SemVersionRange.MaxRangeLength)
-            => RangeParsingTestCase.Valid(range, Strict, maxLength, SemVersionRange.Create(expected));
-
-        internal static RangeParsingTestCase Valid(string range, params UnbrokenSemVersionRange[] expectedRanges)
-            => RangeParsingTestCase.Valid(range, Strict, SemVersionRange.MaxRangeLength, SemVersionRange.Create(expectedRanges));
-
-        internal static RangeParsingTestCase Valid(
-            string range,
-            SemVersionRangeOptions options,
+            bool includeAllPrerelease,
             params UnbrokenSemVersionRange[] expectedRanges)
-            => RangeParsingTestCase.Valid(range, options, SemVersionRange.MaxRangeLength, SemVersionRange.Create(expectedRanges));
-
-        internal static RangeParsingTestCase Valid(
-            string range,
-            SemVersionRangeOptions options,
-            SemVersionRange expected,
-            int maxLength = SemVersionRange.MaxRangeLength)
-            => RangeParsingTestCase.Valid(range, options, maxLength, expected);
-
-        internal static RangeParsingTestCase Invalid<T>(
-            string range,
-            string exceptionMessage,
-            int maxLength = SemVersionRange.MaxRangeLength)
-            => RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(T), exceptionMessage);
-
-        private static RangeParsingTestCase Invalid(
-            string range,
-            string exceptionMessage = "",
-            string exceptionValue = null,
-            int maxLength = SemVersionRange.MaxRangeLength)
-        {
-            exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);
-            return RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(FormatException), exceptionMessage);
-        }
+            => NpmRangeParsingTestCase.Valid(range, includeAllPrerelease, SemVersionRange.Create(expectedRanges));
     }
 }

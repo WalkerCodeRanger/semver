@@ -141,10 +141,40 @@ namespace Semver.Ranges.Npm
 
             foreach (NpmComparator[] comps in Ranges)
             {
-                throw new NotImplementedException();
+                var leftBound = LeftBoundedRange.Unbounded;
+                var rightBound = RightBoundedRange.Unbounded;
+                var includeAllPrerelease = false;
+                foreach (var comp in comps)
+                {
+                    includeAllPrerelease |= comp.IncludeAllPrerelease;
+                    if (comp.AnyVersion)
+                        break;
+                    switch (comp.Operator)
+                    {
+                        case ComparatorOp.LessThan:
+                            rightBound = rightBound.Min(new RightBoundedRange(comp.Version, false));
+                            break;
+                        case ComparatorOp.LessThanOrEqualTo:
+                            rightBound = rightBound.Min(new RightBoundedRange(comp.Version, true));
+                            break;
+                        case ComparatorOp.GreaterThan:
+                            leftBound = leftBound.Max(new LeftBoundedRange(comp.Version, false));
+                            break;
+                        case ComparatorOp.GreaterThanOrEqualTo:
+                            leftBound = leftBound.Max(new LeftBoundedRange(comp.Version, true));
+                            break;
+                        case ComparatorOp.Equals:
+                            leftBound = leftBound.Max(new LeftBoundedRange(comp.Version, true));
+                            rightBound = rightBound.Min(new RightBoundedRange(comp.Version, true));
+                            break;
+                        default:
+                            throw new InvalidOperationException($"Invalid enum value {comp.Operator}");
+                    }
+                }
+                unbrokenRanges.Add(UnbrokenSemVersionRange.Create(leftBound, rightBound, includeAllPrerelease));
             }
 
-            throw new NotImplementedException();
+            return SemVersionRange.Create(unbrokenRanges);
         }
     }
 }
