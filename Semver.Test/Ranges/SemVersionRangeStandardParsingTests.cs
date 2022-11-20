@@ -22,6 +22,11 @@ namespace Semver.Test.Ranges
             = "Range is missing a comparison or limit at {1} in '{0}'";
         private const string MaxVersionMessage
             = "Cannot construct range from version '{1}' because version number cannot be incremented beyond max value.";
+        private const string InvalidWildcardInPrereleaseMessage =
+            "Prerelease version is a wildcard and should contain only 1 character in '{0}'.";
+        private const string PrereleaseWildcardMustBeLast =
+            "Prerelease identifier follows wildcard prerelease identifier in '{0}'.";
+
 
         public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
         {
@@ -103,9 +108,17 @@ namespace Semver.Test.Ranges
             Valid("3.1.4-*", InclusiveOfStart("3.1.4-0", "3.1.5-0", true)),
             Valid("3.1.4-rc.*", InclusiveOfStart("3.1.4-rc", "3.1.5-0", true)),
 
-            // TODO wildcard char in prerelease identifier
+            // Wildcard char in prerelease identifier
+            Invalid("1.2.3-*a", InvalidWildcardInPrereleaseMessage),
+            Invalid("1.2.3-a*b", InvalidWildcardInPrereleaseMessage),
+            Invalid("1.2.3-a*", InvalidWildcardInPrereleaseMessage),
+            Invalid("1.2.3-a.*a", InvalidWildcardInPrereleaseMessage),
+            Invalid("1.2.3-a.a*b", InvalidWildcardInPrereleaseMessage),
+            Invalid("1.2.3-a.a*", InvalidWildcardInPrereleaseMessage),
 
-            // TODO prerelease wildcard not last
+            // Prerelease wildcard not last
+            Invalid("1.2.3-*.a", PrereleaseWildcardMustBeLast),
+            Invalid("1.2.3-a.*.a", PrereleaseWildcardMustBeLast),
 
             // Already at max version
             Invalid("~1.2147483647.3", MaxVersionMessage, "1.2147483647.3"),
@@ -121,6 +134,7 @@ namespace Semver.Test.Ranges
             Invalid("", MissingComparisonMessage, "0"),
             Invalid("   ", MissingComparisonMessage, "3"),
             Invalid("1.2.3||", MissingComparisonMessage, "7"),
+            Invalid(" ||1.2.3", MissingComparisonMessage, "1"),
 
             // Invalid Whitespace
             Invalid("  \t", InvalidWhitespaceMessage, "2"),

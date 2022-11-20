@@ -4,7 +4,7 @@ using Semver.Ranges;
 namespace Semver.Comparers
 {
     /// <summary>
-    /// Comparer <see cref="UnbrokenSemVersionRange"/> by the left bound and then by the reversed
+    /// Compare <see cref="UnbrokenSemVersionRange"/> by the left bound and then by the reversed
     /// right bound. Thus wider ranges sort before narrower ones. Finally, sort ranges including
     /// prerelease before those not including prerelease.
     /// </summary>
