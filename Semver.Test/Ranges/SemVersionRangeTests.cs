@@ -489,5 +489,27 @@ namespace Semver.Test.Ranges
 
             Assert.Same(SemVersionRange.Empty, range);
         }
+
+        [Fact]
+        public void ToStringOfRangeWithSingleUnbrokenRange()
+        {
+            var range = SemVersionRange.Parse(">= 1.2.3");
+
+            Assert.Equal(">=1.2.3", range.ToString());
+        }
+
+        [Fact]
+        public void ToStringOfEmpty()
+        {
+            Assert.Equal("", SemVersionRange.Empty.ToString());
+        }
+
+        [Fact]
+        public void ToStringOfRangeWithMultipleUnbrokenRanges()
+        {
+            var range = SemVersionRange.Parse(" >= 5.6.7 ||  < 1.2.3");
+
+            Assert.Equal("<1.2.3 || >=5.6.7", range.ToString());
+        }
     }
 }

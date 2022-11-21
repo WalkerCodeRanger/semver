@@ -193,5 +193,7 @@ namespace Semver.Ranges
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         #endregion
+
+        public override string ToString() => string.Join(" || ", this);
     }
 }

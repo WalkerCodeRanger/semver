@@ -1,4 +1,5 @@
-﻿override Semver.Ranges.UnbrokenSemVersionRange.Equals(object obj) -> bool
+﻿override Semver.Ranges.SemVersionRange.ToString() -> string
+override Semver.Ranges.UnbrokenSemVersionRange.Equals(object obj) -> bool
 override Semver.Ranges.UnbrokenSemVersionRange.GetHashCode() -> int
 override Semver.Ranges.UnbrokenSemVersionRange.ToString() -> string
 Semver.Ranges.SemVersionRange
