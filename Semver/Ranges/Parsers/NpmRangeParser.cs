@@ -135,9 +135,9 @@ namespace Semver.Ranges.Parsers
             exception = ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
                             out var semver, out var wildcardVersion);
             if (exception != null) return exception;
-
-            if (@operator != StandardOperator.None && wildcardVersion != WildcardVersion.None)
-                return ex ?? RangeError.WildcardNotSupportedWithOperator(segment.Source);
+            // TODO check for wildcards combined with metadata which is not allow by npm
+            // Remove the metadata the npm ranges allow
+            semver = semver.WithoutMetadata();
 
             exception = ParseWhitespace(ref segment, ex);
             if (exception != null) return exception;
