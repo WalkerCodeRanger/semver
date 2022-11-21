@@ -1692,6 +1692,8 @@ namespace Semver
             return predicate(this);
         }
 
+        // TODO add Satisfies overloads that take regular string ranges?
+
         /// <summary>
         /// Checks if this version is in the given range. Uses the same range syntax as npm.
         /// </summary>
@@ -1700,17 +1702,17 @@ namespace Semver
         /// if you're going to be testing multiple versions against the same range
         /// to avoid having to parse the range multiple times.
         /// </remarks>
-        /// <param name="range">The range to compare with. If the syntax is invalid the method will always return false.</param>
+        /// <param name="range">The range to compare with.</param>
         /// <param name="includeAllPrerelease"></param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="range"/> is <see langword="null"/>.</exception>
         public bool SatisfiesNpm(string range, bool includeAllPrerelease = false)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
 
-            return SemVersionRange.TryParseNpm(range, out var parsedRange, includeAllPrerelease)
-                   && parsedRange.Contains(this);
+            var parsedRange = SemVersionRange.ParseNpm(range, includeAllPrerelease);
+            return parsedRange.Contains(this);
         }
         #endregion
 
