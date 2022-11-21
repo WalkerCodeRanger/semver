@@ -38,10 +38,7 @@ namespace Semver.Ranges.Parsers
                 if (exception is null)
                     unbrokenRanges.Add(unbrokenRange);
                 else
-                {
-                    semverRange = null;
                     return exception;
-                }
             }
 
             semverRange = SemVersionRange.Create(unbrokenRanges);
@@ -102,7 +99,7 @@ namespace Semver.Ranges.Parsers
             ref RightBoundedRange rightBound)
         {
 #if DEBUG
-            if (segment.IsEmpty) throw new ArgumentException("Cannot be empty", nameof(segment));
+            if (segment.IsEmpty) throw new ArgumentException("DEBUG: Cannot be empty", nameof(segment));
 #endif
             var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;

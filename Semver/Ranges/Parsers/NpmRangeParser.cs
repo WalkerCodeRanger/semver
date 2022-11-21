@@ -7,7 +7,25 @@ namespace Semver.Ranges.Parsers
 {
     internal static class NpmRangeParser
     {
+        private const SemVersionRangeOptions StandardRangeOptions
+            = SemVersionRangeOptions.AllowLowerV
+              | SemVersionRangeOptions.AllowMetadata
+              | SemVersionRangeOptions.OptionalMinorPatch;
+
         public static Exception Parse(
+            string range,
+            bool includeAllPrerelease,
+            Exception ex,
+            int maxLength,
+            out SemVersionRange semverRange)
+        {
+            var options = StandardRangeOptions;
+            if (includeAllPrerelease)
+                options |= SemVersionRangeOptions.IncludeAllPrerelease;
+            return Parse(range, options, ex, maxLength, out semverRange);
+        }
+
+        private static Exception Parse(
             string range,
             SemVersionRangeOptions rangeOptions,
             Exception ex,
@@ -39,10 +57,7 @@ namespace Semver.Ranges.Parsers
                 if (exception is null)
                     unbrokenRanges.Add(unbrokenRange);
                 else
-                {
-                    semverRange = null;
                     return exception;
-                }
             }
 
             semverRange = SemVersionRange.Create(unbrokenRanges);
@@ -63,12 +78,17 @@ namespace Semver.Ranges.Parsers
             var exception = ParseWhitespace(ref segment, ex);
             if (exception != null) return exception;
 
-            // Reject empty string ranges
-            if (segment.IsEmpty) return ex ?? RangeError.MissingComparison(segment.Offset, segment.Source);
+            var includeAllPrerelease = rangeOptions.HasOption(SemVersionRangeOptions.IncludeAllPrerelease);
+
+            // Handle empty string ranges
+            if (segment.IsEmpty)
+            {
+                unbrokenRange = includeAllPrerelease ? UnbrokenSemVersionRange.All : UnbrokenSemVersionRange.AllRelease;
+                return null;
+            }
 
             var start = LeftBoundedRange.Unbounded;
             var end = RightBoundedRange.Unbounded;
-            var includeAllPrerelease = rangeOptions.HasOption(SemVersionRangeOptions.IncludeAllPrerelease);
             while (!segment.IsEmpty)
             {
                 exception = ParseComparison(ref segment, rangeOptions, ref includeAllPrerelease, ex, maxLength,
@@ -104,12 +124,12 @@ namespace Semver.Ranges.Parsers
             ref RightBoundedRange rightBound)
         {
 #if DEBUG
-            if (segment.IsEmpty) throw new ArgumentException("Cannot be empty", nameof(segment));
+            if (segment.IsEmpty) throw new ArgumentException("DEBUG: Cannot be empty", nameof(segment));
 #endif
             var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;
 
-            exception = ParseSpaces(ref segment, ex);
+            exception = ParseWhitespace(ref segment, ex);
             if (exception != null) return exception;
 
             exception = ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
@@ -119,7 +139,7 @@ namespace Semver.Ranges.Parsers
             if (@operator != StandardOperator.None && wildcardVersion != WildcardVersion.None)
                 return ex ?? RangeError.WildcardNotSupportedWithOperator(segment.Source);
 
-            exception = ParseSpaces(ref segment, ex);
+            exception = ParseWhitespace(ref segment, ex);
             if (exception != null) return exception;
 
             switch (@operator)
@@ -242,15 +262,17 @@ namespace Semver.Ranges.Parsers
                 @operator = StandardOperator.None;
                 return null;
             }
-
+            
             // Assign invalid once so it doesn't have to be done any time parse fails
             @operator = 0;
             if (opSegment.Length > 2
-                || (opSegment.Length == 2 && opSegment[1] != '='))
+                || (opSegment.Length == 2
+                    && opSegment[1] != '='
+                    && !(opSegment[0] == '~' && opSegment[1] == '>')))
                 return ex ?? RangeError.InvalidOperator(opSegment);
 
             var firstChar = opSegment[0];
-            var isOrEqual = opSegment.Length == 2; // Already checked for second char != '='
+            var isOrEqual = opSegment.Length == 2 && opSegment[1] == '=';
             switch (firstChar)
             {
                 case '=' when !isOrEqual:
@@ -269,6 +291,7 @@ namespace Semver.Ranges.Parsers
                     @operator = StandardOperator.GreaterThan;
                     return null;
                 case '~' when !isOrEqual:
+                    // '~>' operator is allowed by check for invalid above and matched by this
                     @operator = StandardOperator.Tilde;
                     return null;
                 case '^' when !isOrEqual:
@@ -280,6 +303,6 @@ namespace Semver.Ranges.Parsers
         }
 
         private static readonly SemVersionParsingOptions ParsingOptions
-            = new SemVersionParsingOptions(true, true, c => c == '*');
+            = new SemVersionParsingOptions(true, false, c => c == 'x' || c == 'X' || c == '*');
     }
 }
