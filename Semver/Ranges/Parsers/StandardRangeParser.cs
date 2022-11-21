@@ -275,6 +275,6 @@ namespace Semver.Ranges.Parsers
         }
 
         private static readonly SemVersionParsingOptions ParsingOptions
-            = new SemVersionParsingOptions(true, true, c => c == '*');
+            = new SemVersionParsingOptions(true, true, false, c => c == '*');
     }
 }

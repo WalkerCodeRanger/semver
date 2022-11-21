@@ -262,7 +262,7 @@ namespace Semver.Ranges.Parsers
                 @operator = StandardOperator.None;
                 return null;
             }
-            
+
             // Assign invalid once so it doesn't have to be done any time parse fails
             @operator = 0;
             if (opSegment.Length > 2
@@ -303,6 +303,6 @@ namespace Semver.Ranges.Parsers
         }
 
         private static readonly SemVersionParsingOptions ParsingOptions
-            = new SemVersionParsingOptions(true, false, c => c == 'x' || c == 'X' || c == '*');
+            = new SemVersionParsingOptions(true, false, true, c => c == 'x' || c == 'X' || c == '*');
     }
 }

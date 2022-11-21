@@ -276,7 +276,7 @@ namespace Semver
                     wildcardRequired, options, ex, out number, out isWildcard);
 
             number = 0;
-            isWildcard = false;
+            isWildcard = options.MissingVersionsAreWildcards;
             if (!optional)
                 return ex ?? NewFormatException(EmptyMajorMinorOrPatchMessage, version.ToStringLimitLength(), kind);
 
