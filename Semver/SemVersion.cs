@@ -1708,10 +1708,9 @@ namespace Semver
         public bool SatisfiesNpm(string range, bool includeAllPrerelease = false)
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
-#pragma warning disable 618
-            return NpmRangeSet.TryParse(range, includeAllPrerelease, out var parsedRange)
+
+            return SemVersionRange.TryParseNpm(range, out var parsedRange, includeAllPrerelease)
                    && parsedRange.Contains(this);
-#pragma warning restore 618
         }
         #endregion
 

@@ -171,8 +171,17 @@ namespace Semver.Ranges
         /// <remarks>The npm "loose" option is not supported.</remarks>
         public static SemVersionRange ParseNpm(string range, bool includeAllPrerelease = false)
 #pragma warning disable CS0618 // Type or member is obsolete
-            => RangeParser.ParseRange(range, includeAllPrerelease).ToSemVersionRange();
+            => NpmRangeSet.Parse(range, includeAllPrerelease).ToSemVersionRange();
 #pragma warning restore CS0618 // Type or member is obsolete
+
+        public static bool TryParseNpm(string range, out SemVersionRange semverRange, bool includeAllPrerelease = false)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            var success = NpmRangeSet.TryParse(range, includeAllPrerelease, out var npmRangeSet);
+#pragma warning restore CS0618 // Type or member is obsolete
+            semverRange = npmRangeSet?.ToSemVersionRange();
+            return success;
+        }
         #endregion
 
         #region IReadOnlyList<UnbrokenSemVersionRange>
