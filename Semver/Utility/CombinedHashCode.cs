@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Semver.Utility
@@ -86,7 +87,7 @@ namespace Semver.Utility
             return hashCode.hash;
         }
 
-        [Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes. Use ToHashCode to retrieve the computed hash code.", true)]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("HashCode is a mutable struct and should not be compared with other HashCodes. Use ToHashCode to retrieve the computed hash code.", true)]
 #pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
         public override int GetHashCode() => throw new NotSupportedException();
 #pragma warning restore CS0809 // Obsolete member overrides non-obsolete member

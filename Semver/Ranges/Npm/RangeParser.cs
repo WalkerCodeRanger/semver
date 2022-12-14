@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Semver.Ranges.Npm
 {
-    [Obsolete("For alpha version only, removed in release")]
+    [EditorBrowsable(EditorBrowsableState.Never), Obsolete("For alpha version only, removed in release")]
     internal class RangeParser
     {
         internal static readonly string[] OrSeparator = { "||" };

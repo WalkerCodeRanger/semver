@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -145,7 +146,7 @@ namespace Semver
         /// <param name="patch">The patch version number.</param>
         /// <param name="prerelease">The prerelease portion (e.g. "alpha.5").</param>
         /// <param name="build">The build metadata (e.g. "nightly.232").</param>
-        [Obsolete("This constructor is obsolete. Use another constructor or SemVersion.ParsedFrom() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This constructor is obsolete. Use another constructor or SemVersion.ParsedFrom() instead.")]
         public SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "")
         {
             Major = major;
@@ -342,7 +343,7 @@ namespace Semver
         /// minor version numbers. The patch version number will be the fourth component
         /// of the <paramref name="version"/>. The build meta data will contain the third component
         /// of the <paramref name="version"/> if it is greater than zero.</remarks>
-        [Obsolete("This constructor is obsolete. Use SemVersion.FromVersion() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This constructor is obsolete. Use SemVersion.FromVersion() instead.")]
         public SemVersion(Version version)
         {
             if (version == null)
@@ -493,7 +494,7 @@ namespace Semver
         /// or patch version numbers when <paramref name="strict"/> is <see langword="true"/>.</exception>
         /// <exception cref="OverflowException">The major, minor, or patch version number is larger
         /// than <see cref="int.MaxValue"/>.</exception>
-        [Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
         public static SemVersion Parse(string version, bool strict = false)
         {
             var match = ParseRegex.Match(version);
@@ -563,7 +564,7 @@ namespace Semver
         /// <param name="strict">If set to <see langword="true"/>, minor and patch version numbers are required;
         /// otherwise they are optional.</param>
         /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
-        [Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
         public static bool TryParse(string version, out SemVersion semver, bool strict = false)
         {
             semver = null;
@@ -630,7 +631,7 @@ namespace Semver
         /// </list>
         /// </returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Method is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static int Compare(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return 0;
@@ -661,7 +662,7 @@ namespace Semver
         /// To change only the patch version:
         /// <code>var changedVersion = version.Change(patch: 4);</code>
         /// </example>
-        [Obsolete("Method is obsolete. Use With() or With...() method instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use With() or With...() method instead.")]
         public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
             string prerelease = null, string build = null)
         {
@@ -1185,7 +1186,7 @@ namespace Semver
         /// The build metadata for this version or empty string if there is no build metadata.
         /// </value>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="MetadataIdentifiers"]/*'/>
-        [Obsolete("This property is obsolete. Use Metadata instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This property is obsolete. Use Metadata instead.")]
         public string Build => Metadata;
 
         /// <summary>The build metadata for this version.</summary>
@@ -1314,7 +1315,7 @@ namespace Semver
         /// </summary>
         /// <param name="other">The semantic version to compare to.</param>
         /// <returns><see langword="true"/> if the version precedences are equal.</returns>
-        [Obsolete("Method is obsolete. Use PrecedenceEquals() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use PrecedenceEquals() instead.")]
         public bool PrecedenceMatches(SemVersion other) => CompareByPrecedence(other) == 0;
 
         /// <summary>
@@ -1511,7 +1512,7 @@ namespace Semver
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
         /// <exception cref="InvalidCastException">The <paramref name="obj"/> is not a <see cref="SemVersion"/>.</exception>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
         public int CompareTo(object obj) => CompareTo((SemVersion)obj);
 
         /// <summary>
@@ -1520,7 +1521,7 @@ namespace Semver
         /// </summary>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
         public int CompareTo(SemVersion other)
         {
             var r = CompareByPrecedence(other);
@@ -1572,7 +1573,7 @@ namespace Semver
         /// in ASCII sort order. A longer series of prerelease identifiers follows a shorter series
         /// if all the preceding identifiers are equal.</para>
         /// </remarks>
-        [Obsolete("Method is obsolete. Use ComparePrecedenceTo() or CompareSortOrderTo() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use ComparePrecedenceTo() or CompareSortOrderTo() instead.")]
         public int CompareByPrecedence(SemVersion other)
         {
             if (other is null)
@@ -1590,7 +1591,7 @@ namespace Semver
             return CompareComponents(Prerelease, other.Prerelease, true);
         }
 
-        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete]
         private static int CompareComponents(string a, string b, bool nonEmptyIsLower = false)
         {
             var aEmpty = string.IsNullOrEmpty(a);
@@ -1640,7 +1641,7 @@ namespace Semver
         /// <returns><see langword="true"/> if <paramref name="left"/> follows <paramref name="right"/>
         /// in the sort order; otherwise <see langword="false"/>.</returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator >(SemVersion left, SemVersion right)
             => Compare(left, right) > 0;
 
@@ -1650,7 +1651,7 @@ namespace Semver
         /// <returns><see langword="true"/> if <paramref name="left"/> follows or is equal to
         /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator >=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) > 0;
 
@@ -1660,7 +1661,7 @@ namespace Semver
         /// <returns><see langword="true"/> if <paramref name="left"/> precedes <paramref name="right"/>
         /// in the sort order; otherwise <see langword="false"/>.</returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator <(SemVersion left, SemVersion right)
             => Compare(left, right) < 0;
 
@@ -1670,7 +1671,7 @@ namespace Semver
         /// <returns><see langword="true"/> if <paramref name="left"/> precedes or is equal to
         /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator <=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) < 0;
         #endregion
@@ -1724,7 +1725,7 @@ namespace Semver
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
         /// <exception cref="OverflowException">The major, minor, or patch version number is larger than <see cref="int.MaxValue"/>.</exception>
-        [Obsolete("Implicit conversion from string is obsolete. Use Parse() or TryParse() method instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Implicit conversion from string is obsolete. Use Parse() or TryParse() method instead.")]
         public static implicit operator SemVersion(string version)
             => Parse(version);
     }

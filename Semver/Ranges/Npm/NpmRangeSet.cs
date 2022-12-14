@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -9,7 +10,7 @@ namespace Semver.Ranges.Npm
     /// A range of versions that can be checked against to see if a <see cref="SemVersion"/> is included.
     /// Uses the same syntax as npm.
     /// </summary>
-    [Obsolete("For alpha version only, removed in release")]
+    [EditorBrowsable(EditorBrowsableState.Never), Obsolete("For alpha version only, removed in release")]
     internal class NpmRangeSet : SemVersionRangeSet
     {
         internal readonly NpmComparator[][] Ranges;
