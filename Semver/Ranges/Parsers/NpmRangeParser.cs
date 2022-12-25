@@ -222,16 +222,12 @@ namespace Semver.Ranges.Parsers
                 case StandardOperator.GreaterThan:
                     return GreaterThan(semver, wildcardVersion, ex, ref leftBound);
                 case StandardOperator.GreaterThanOrEqual:
-                    if (wildcardVersion == WildcardVersion.MajorMinorPatchWildcard)
-                        // No further bound is places on the left and right bounds
-                        return null;
-                    leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
+                    WildcardLowerBound(ref leftBound, includeAllPrerelease, semver, wildcardVersion);
                     return null;
                 case StandardOperator.LessThan:
                     return LessThan(semver, wildcardVersion, ex, ref rightBound);
                 case StandardOperator.LessThanOrEqual:
-                    rightBound = rightBound.Min(new RightBoundedRange(semver, true));
-                    return null;
+                    return WildcardUpperBound(ref rightBound, ex, semver, wildcardVersion);
                 case StandardOperator.Caret:
                     if (wildcardVersion == WildcardVersion.MajorMinorPatchWildcard)
                         // No further bound is places on the left and right bounds
