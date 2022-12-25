@@ -258,7 +258,7 @@ namespace Semver.Test.Ranges.Npm
             = new TheoryData<NpmRangeParsingTestCase>()
             {
                 Valid("1.0.0 - 2.0.0", Inclusive("1.0.0", "2.0.0")),
-                Valid("1.0.0 - 2.0.0", true, InclusiveOfStart("1.0.0-0", "2.0.1-0", true)),
+                Valid("1.0.0 - 2.0.0", true, Inclusive("1.0.0-0", "2.0.0", true)), // Corrected, npm has >=1.0.0-0 <2.0.1-0
                 Valid("1 - 2", InclusiveOfStart("1.0.0","3.0.0-0")),
                 Valid("1 - 2", true, InclusiveOfStart("1.0.0-0", "3.0.0-0", true)),
                 Valid("1.0 - 2.0", InclusiveOfStart("1.0.0", "2.1.0-0")),

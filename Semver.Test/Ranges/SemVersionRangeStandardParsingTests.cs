@@ -29,7 +29,6 @@ namespace Semver.Test.Ranges
         private const string PrereleaseWithWildcardVersionMessage
             = "A wildcard major, minor, or patch is combined with a prerelease version in '{0}'.";
 
-
         public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
         {
             // Optional minor flag without optional patch flag
