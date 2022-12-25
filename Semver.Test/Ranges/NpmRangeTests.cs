@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Globalization;
-using Semver.Ranges;
 using Semver.Test.Helpers;
 using Semver.Test.TestCases;
 using Xunit;
@@ -358,27 +356,7 @@ namespace Semver.Test.Ranges
         [MemberData(nameof(ParsingCases))]
         public void ParseTests(NpmRangeParsingTestCase testCase)
         {
-            if (testCase.IsValid)
-            {
-                var range = SemVersionRange.ParseNpm(testCase.Range, testCase.IncludeAllPrerelease);
-                Assert.Equal(testCase.ExpectedRange, range);
-            }
-            else
-            {
-                var ex = Assert.Throws(testCase.ExceptionType,
-                    () => SemVersionRange.ParseNpm(testCase.Range, testCase.IncludeAllPrerelease));
-
-                var expected = string.Format(CultureInfo.InvariantCulture, testCase.ExceptionMessageFormat,
-                    testCase.Range.LimitLength());
-
-                if (ex is ArgumentException argumentException)
-                {
-                    Assert.StartsWith(expected, argumentException.Message);
-                    Assert.Equal("range", argumentException.ParamName);
-                }
-                else
-                    Assert.Equal(expected, ex.Message);
-            }
+            testCase.AssertParse();
         }
 
         private static NpmRangeContainsTestCase Includes(string range, string version, bool includeAllPrerelease = false)

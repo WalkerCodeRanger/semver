@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using Semver.Ranges;
+using Semver.Test.Helpers;
+using Xunit;
 
 namespace Semver.Test.TestCases
 {
@@ -62,6 +65,30 @@ namespace Semver.Test.TestCases
         public string ExceptionMessageFormat { get; }
 
         #endregion
+
+        public void AssertParse()
+        {
+            if (IsValid)
+            {
+                var range = SemVersionRange.ParseNpm(Range, IncludeAllPrerelease, MaxLength);
+                Assert.Equal(ExpectedRange, range);
+            }
+            else
+            {
+                var ex = Assert.Throws(ExceptionType,
+                    () => SemVersionRange.ParseNpm(Range, IncludeAllPrerelease, MaxLength));
+
+                var expected = string.Format(CultureInfo.InvariantCulture, ExceptionMessageFormat, Range.LimitLength());
+
+                if (ex is ArgumentException argumentException)
+                {
+                    Assert.StartsWith(expected, argumentException.Message);
+                    Assert.Equal("range", argumentException.ParamName);
+                }
+                else
+                    Assert.Equal(expected, ex.Message);
+            }
+        }
 
         public override string ToString()
             => !IncludeAllPrerelease ? $"'{Range}'" : $"'{Range}' true";
