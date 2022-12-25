@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using Semver.Ranges;
 using Semver.Test.Helpers;
 using Xunit;
@@ -20,8 +19,8 @@ namespace Semver.Test.TestCases
             bool includeAllPrerelease,
             int maxLength,
             Type exceptionType,
-            string exceptionMessage)
-            => new NpmRangeParsingTestCase(range, includeAllPrerelease, maxLength, exceptionType, exceptionMessage);
+            string exceptionMessageFormat)
+            => new NpmRangeParsingTestCase(range, includeAllPrerelease, maxLength, exceptionType, exceptionMessageFormat);
 
         private NpmRangeParsingTestCase(
             string range,
@@ -78,7 +77,7 @@ namespace Semver.Test.TestCases
                 var ex = Assert.Throws(ExceptionType,
                     () => SemVersionRange.ParseNpm(Range, IncludeAllPrerelease, MaxLength));
 
-                var expected = string.Format(CultureInfo.InvariantCulture, ExceptionMessageFormat, Range.LimitLength());
+                var expected = ExceptionMessages.InjectRange(ExceptionMessageFormat, Range);
 
                 if (ex is ArgumentException argumentException)
                 {

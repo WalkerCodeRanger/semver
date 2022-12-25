@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using Semver.Test.Builders;
@@ -347,7 +346,9 @@ namespace Semver.Test
             // TODO change in v3.0.0 for issue #72
             var ex = Assert.Throws<FormatException>(() => SemVersion.Parse("ignored", Strict, maxLength));
 
-            Assert.Equal(string.Format(ExceptionMessages.TooLongVersion, "ignored", maxLength), ex.Message);
+            var expected = ExceptionMessages.InjectValue(ExceptionMessages.TooLongVersion, maxLength.ToString());
+            expected = ExceptionMessages.InjectVersion(expected, "ignored");
+            Assert.Equal(expected, ex.Message);
         }
 
         [Theory]
@@ -367,8 +368,7 @@ namespace Semver.Test
                 var ex = Assert.Throws(testCase.ExceptionType,
                     () => SemVersion.Parse(testCase.Version, testCase.Styles, testCase.MaxLength));
 
-                var expected = string.Format(CultureInfo.InvariantCulture,
-                    testCase.ExceptionMessageFormat, testCase.Version.LimitLength());
+                var expected = ExceptionMessages.InjectVersion(testCase.ExceptionMessageFormat, testCase.Version);
 
                 if (ex is ArgumentException argumentException)
                 {

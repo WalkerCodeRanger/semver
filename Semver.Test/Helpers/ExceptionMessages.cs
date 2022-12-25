@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 
 namespace Semver.Test.Helpers
 {
@@ -19,47 +18,66 @@ namespace Semver.Test.Helpers
         public const string InvalidSemVersionStylesStart = "An invalid SemVersionStyles value was used.";
 
         #region Parsing SemVersion
-        public const string LeadingWhitespace = "Version '{0}' has leading whitespace.";
-        public const string TrailingWhitespace = "Version '{0}' has trailing whitespace.";
+        public const string LeadingWhitespace = "Version '{version}' has leading whitespace.";
+        public const string TrailingWhitespace = "Version '{version}' has trailing whitespace.";
         public const string EmptyVersion = "Empty string is not a valid version.";
-        public const string TooLongVersion = "Exceeded maximum length of {1} for '{0}'.";
+        public const string TooLongVersion = "Exceeded maximum length of {value} for '{version}'.";
         public const string AllWhitespaceVersion = "Whitespace is not a valid version.";
-        public const string LeadingLowerV = "Leading 'v' in '{0}'.";
-        public const string LeadingUpperV = "Leading 'V' in '{0}'.";
-        public const string LeadingZeroInMajor = "Major version has leading zero in '{0}'.";
-        public const string LeadingZeroInMinor = "Minor version has leading zero in '{0}'.";
-        public const string LeadingZeroInPatch = "Patch version has leading zero in '{0}'.";
-        public const string EmptyMajor = "Major version missing in '{0}'.";
-        public const string EmptyMinor = "Minor version missing in '{0}'.";
-        public const string EmptyPatch = "Patch version missing in '{0}'.";
-        public const string MissingMinor = "Minor version missing in '{0}'.";
-        public const string MissingPatch = "Patch version missing in '{0}'.";
-        public const string MajorOverflow = "Major version '{1}' was too large for Int32 in '{0}'.";
-        public const string MinorOverflow = "Minor version '{1}' was too large for Int32 in '{0}'.";
-        public const string PatchOverflow = "Patch version '{1}' was too large for Int32 in '{0}'.";
-        public const string FourthVersionNumber = "Fourth version number in '{0}'.";
-        public const string PrereleasePrefixedByDot = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'.";
-        public const string MissingPrereleaseIdentifier = "Missing prerelease identifier in '{0}'.";
-        public const string LeadingZeroInPrerelease = "Leading zero in prerelease identifier in version '{0}'.";
-        public const string PrereleaseOverflow = "Prerelease identifier '{1}' was too large for Int32 in version '{0}'.";
-        public const string InvalidCharacterInPrerelease = "Invalid character '{1}' in prerelease identifier in '{0}'.";
-        public const string MissingMetadataIdentifier = "Missing metadata identifier in '{0}'.";
-        public const string InvalidCharacterInMajor = "Major version contains invalid character '{1}' in '{0}'.";
-        public const string InvalidCharacterInMinor = "Minor version contains invalid character '{1}' in '{0}'.";
-        public const string InvalidCharacterInPatch = "Patch version contains invalid character '{1}' in '{0}'.";
-        public const string InvalidCharacterInMetadata = "Invalid character '{1}' in metadata identifier in '{0}'.";
+        public const string LeadingLowerV = "Leading 'v' in '{version}'.";
+        public const string LeadingUpperV = "Leading 'V' in '{version}'.";
+        public const string LeadingZeroInMajor = "Major version has leading zero in '{version}'.";
+        public const string LeadingZeroInMinor = "Minor version has leading zero in '{version}'.";
+        public const string LeadingZeroInPatch = "Patch version has leading zero in '{version}'.";
+        public const string EmptyMajor = "Major version missing in '{version}'.";
+        public const string EmptyMinor = "Minor version missing in '{version}'.";
+        public const string EmptyPatch = "Patch version missing in '{version}'.";
+        public const string MissingMinor = "Minor version missing in '{version}'.";
+        public const string MissingPatch = "Patch version missing in '{version}'.";
+        public const string MajorOverflow = "Major version '{value}' was too large for Int32 in '{version}'.";
+        public const string MinorOverflow = "Minor version '{value}' was too large for Int32 in '{version}'.";
+        public const string PatchOverflow = "Patch version '{value}' was too large for Int32 in '{version}'.";
+        public const string FourthVersionNumber = "Fourth version number in '{version}'.";
+        public const string PrereleasePrefixedByDot = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{version}'.";
+        public const string MissingPrereleaseIdentifier = "Missing prerelease identifier in '{version}'.";
+        public const string LeadingZeroInPrerelease = "Leading zero in prerelease identifier in version '{version}'.";
+        public const string PrereleaseOverflow = "Prerelease identifier '{value}' was too large for Int32 in version '{version}'.";
+        public const string InvalidCharacterInPrerelease = "Invalid character '{value}' in prerelease identifier in '{version}'.";
+        public const string MissingMetadataIdentifier = "Missing metadata identifier in '{version}'.";
+        public const string InvalidCharacterInMajor = "Major version contains invalid character '{value}' in '{version}'.";
+        public const string InvalidCharacterInMinor = "Minor version contains invalid character '{value}' in '{version}'.";
+        public const string InvalidCharacterInPatch = "Patch version contains invalid character '{value}' in '{version}'.";
+        public const string InvalidCharacterInMetadata = "Invalid character '{value}' in metadata identifier in '{version}'.";
+        #endregion
+
+        #region Parsing Ranges
+        public const string InvalidSemVersionRangeOptionsStart
+            = "An invalid SemVersionRangeOptions value was used.";
+        public const string InvalidMaxLengthStart = "Must not be negative.";
+        public const string TooLongRange = "Exceeded maximum length of {value} for '{range}'.";
+        public const string InvalidOperator = "Invalid operator '{value}'.";
+        public const string InvalidWhitespace
+            = "Invalid whitespace character at {value} in '{range}'. Only the ASCII space character is allowed.";
+        public const string MissingComparison
+            = "Range is missing a comparison or limit at {value} in '{range}'.";
+        public const string MaxVersion
+            = "Cannot construct range because version number cannot be incremented beyond max value in '{version}'.";
+        public const string InvalidWildcardInPrerelease
+            = "Prerelease version is a wildcard and should contain only 1 character in '{range}'.";
+        public const string PrereleaseWildcardMustBeLast
+            = "Prerelease identifier follows wildcard prerelease identifier in '{range}'.";
+        public const string PrereleaseWithWildcardVersion
+            = "A wildcard major, minor, or patch is combined with a prerelease version in '{range}'.";
+        public const string WildcardNotSupportedWithOperator
+            = "Operator is combined with wildcards in '{range}'.";
         #endregion
 
         public static string InjectValue(string format, string value)
-        {
-            try
-            {
-                return string.Format(CultureInfo.InvariantCulture, format, "{0}", value);
-            }
-            catch (FormatException ex)
-            {
-                throw new FormatException($"Could not inject '{value}' into '{format}'", ex);
-            }
-        }
+            => format.Replace("{value}", value);
+
+        public static string InjectVersion(string format, string version)
+            => format.Replace("{version}", version.LimitLength());
+
+        public static string InjectRange(string format, string range)
+            => format.Replace("{range}", range.LimitLength());
     }
 }

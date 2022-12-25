@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Globalization;
 using Semver.Ranges;
+using Semver.Test.Helpers;
 using Semver.Test.TestCases;
 
 namespace Semver.Test.Builders
@@ -31,18 +31,19 @@ namespace Semver.Test.Builders
 
         public static NpmRangeParsingTestCase Invalid<T>(
             string range,
-            string exceptionMessage,
+            string message,
             int maxLength = SemVersionRange.MaxRangeLength) =>
-            NpmRangeParsingTestCase.Invalid(range, false, maxLength, typeof(T), exceptionMessage);
+            NpmRangeParsingTestCase.Invalid(range, false, maxLength, typeof(T), message);
 
         public static NpmRangeParsingTestCase Invalid(
             string range,
-            string exceptionMessage = "",
-            string exceptionValue = null,
+            string message = "",
+            string value = null,
             int maxLength = SemVersionRange.MaxRangeLength)
         {
-            exceptionMessage = string.Format(CultureInfo.InvariantCulture, exceptionMessage, exceptionValue);
-            return NpmRangeParsingTestCase.Invalid(range, false, maxLength, typeof(FormatException), exceptionMessage);
+            message = ExceptionMessages.InjectValue(message, value);
+            message = ExceptionMessages.InjectVersion(message, value);
+            return NpmRangeParsingTestCase.Invalid(range, false, maxLength, typeof(FormatException), message);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using Semver.Ranges;
 using Semver.Test.Helpers;
 using Semver.Test.TestCases;
@@ -11,26 +10,6 @@ namespace Semver.Test.Ranges
 {
     public class SemVersionRangeStandardParsingTests
     {
-        private const string InvalidSemVersionRangeOptionsMessageStart
-            = "An invalid SemVersionRangeOptions value was used.";
-        private const string InvalidMaxLengthMessageStart = "Must not be negative.";
-        private const string TooLongRangeMessage = "Exceeded maximum length of {1} for '{0}'.";
-        private const string InvalidOperatorMessage = "Invalid operator '{1}'.";
-        private const string InvalidWhitespaceMessage
-            = "Invalid whitespace character at {1} in '{0}'. Only the ASCII space character is allowed.";
-        private const string MissingComparisonMessage
-            = "Range is missing a comparison or limit at {1} in '{0}'.";
-        private const string MaxVersionMessage
-            = "Cannot construct range from version '{1}' because version number cannot be incremented beyond max value.";
-        private const string InvalidWildcardInPrereleaseMessage
-            = "Prerelease version is a wildcard and should contain only 1 character in '{0}'.";
-        private const string PrereleaseWildcardMustBeLast
-            = "Prerelease identifier follows wildcard prerelease identifier in '{0}'.";
-        private const string PrereleaseWithWildcardVersionMessage
-            = "A wildcard major, minor, or patch is combined with a prerelease version in '{0}'.";
-        private const string WildcardNotSupportedWithOperatorMessage
-            = "Operator is combined with wildcards in '{0}'.";
-
         public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
         {
             // Optional minor flag without optional patch flag
@@ -112,65 +91,65 @@ namespace Semver.Test.Ranges
             Valid("3.1.4-rc.*", InclusiveOfStart("3.1.4-rc", "3.1.5-0", true)),
 
             // Wildcard char in prerelease identifier
-            Invalid("1.2.3-*a", InvalidWildcardInPrereleaseMessage),
-            Invalid("1.2.3-a*b", InvalidWildcardInPrereleaseMessage),
-            Invalid("1.2.3-a*", InvalidWildcardInPrereleaseMessage),
-            Invalid("1.2.3-a.*a", InvalidWildcardInPrereleaseMessage),
-            Invalid("1.2.3-a.a*b", InvalidWildcardInPrereleaseMessage),
-            Invalid("1.2.3-a.a*", InvalidWildcardInPrereleaseMessage),
+            Invalid("1.2.3-*a", ExceptionMessages.InvalidWildcardInPrerelease),
+            Invalid("1.2.3-a*b", ExceptionMessages.InvalidWildcardInPrerelease),
+            Invalid("1.2.3-a*", ExceptionMessages.InvalidWildcardInPrerelease),
+            Invalid("1.2.3-a.*a", ExceptionMessages.InvalidWildcardInPrerelease),
+            Invalid("1.2.3-a.a*b", ExceptionMessages.InvalidWildcardInPrerelease),
+            Invalid("1.2.3-a.a*", ExceptionMessages.InvalidWildcardInPrerelease),
 
             // Prerelease wildcard not last
-            Invalid("1.2.3-*.a", PrereleaseWildcardMustBeLast),
-            Invalid("1.2.3-a.*.a", PrereleaseWildcardMustBeLast),
+            Invalid("1.2.3-*.a", ExceptionMessages.PrereleaseWildcardMustBeLast),
+            Invalid("1.2.3-a.*.a", ExceptionMessages.PrereleaseWildcardMustBeLast),
 
             // Prerelease after wildcard version
-            Invalid("*-rc", PrereleaseWithWildcardVersionMessage),
-            Invalid("*-rc.*", PrereleaseWithWildcardVersionMessage),
-            Invalid("1.*-rc", PrereleaseWithWildcardVersionMessage),
-            Invalid("1.*-rc.*", PrereleaseWithWildcardVersionMessage),
-            Invalid("1.2.*-rc", PrereleaseWithWildcardVersionMessage),
-            Invalid("1.2.*-rc.*", PrereleaseWithWildcardVersionMessage),
+            Invalid("*-rc", ExceptionMessages.PrereleaseWithWildcardVersion),
+            Invalid("*-rc.*", ExceptionMessages.PrereleaseWithWildcardVersion),
+            Invalid("1.*-rc", ExceptionMessages.PrereleaseWithWildcardVersion),
+            Invalid("1.*-rc.*", ExceptionMessages.PrereleaseWithWildcardVersion),
+            Invalid("1.2.*-rc", ExceptionMessages.PrereleaseWithWildcardVersion),
+            Invalid("1.2.*-rc.*", ExceptionMessages.PrereleaseWithWildcardVersion),
 
             // Already at max version
-            Invalid("~1.2147483647.3", MaxVersionMessage, "1.2147483647.3"),
-            Invalid("^2147483647.2.3", MaxVersionMessage, "2147483647.2.3"),
-            Invalid("^0.2147483647.3", MaxVersionMessage, "0.2147483647.3"),
-            Invalid("^0.0.2147483647", MaxVersionMessage, "0.0.2147483647"),
-            Invalid("2147483647.*", MaxVersionMessage, "2147483647.0.0"),
-            Invalid("3.2147483647.*", MaxVersionMessage, "3.2147483647.0"),
-            Invalid("2147483647.2147483647.*", MaxVersionMessage, "2147483647.2147483647.0"),
-            Invalid("3.1.2147483647-rc.*", MaxVersionMessage, "3.1.2147483647-rc"),
+            Invalid("~1.2147483647.3", ExceptionMessages.MaxVersion, "1.2147483647.3"),
+            Invalid("^2147483647.2.3", ExceptionMessages.MaxVersion, "2147483647.2.3"),
+            Invalid("^0.2147483647.3", ExceptionMessages.MaxVersion, "0.2147483647.3"),
+            Invalid("^0.0.2147483647", ExceptionMessages.MaxVersion, "0.0.2147483647"),
+            Invalid("2147483647.*", ExceptionMessages.MaxVersion, "2147483647.0.0"),
+            Invalid("3.2147483647.*", ExceptionMessages.MaxVersion, "3.2147483647.0"),
+            Invalid("2147483647.2147483647.*", ExceptionMessages.MaxVersion, "2147483647.2147483647.0"),
+            Invalid("3.1.2147483647-rc.*", ExceptionMessages.MaxVersion, "3.1.2147483647-rc"),
 
             // Missing Comparison
-            Invalid("", MissingComparisonMessage, "0"),
-            Invalid("   ", MissingComparisonMessage, "3"),
-            Invalid("1.2.3||", MissingComparisonMessage, "7"),
-            Invalid(" ||1.2.3", MissingComparisonMessage, "1"),
+            Invalid("", ExceptionMessages.MissingComparison, "0"),
+            Invalid("   ", ExceptionMessages.MissingComparison, "3"),
+            Invalid("1.2.3||", ExceptionMessages.MissingComparison, "7"),
+            Invalid(" ||1.2.3", ExceptionMessages.MissingComparison, "1"),
 
             // Invalid Whitespace
-            Invalid("  \t", InvalidWhitespaceMessage, "2"),
-            Invalid("\t=1.2.3", InvalidWhitespaceMessage, "0"),
-            Invalid("=\t1.2.3", InvalidWhitespaceMessage, "1"),
-            Invalid("=1.2.3\t", InvalidWhitespaceMessage, "6"),
+            Invalid("  \t", ExceptionMessages.InvalidWhitespace, "2"),
+            Invalid("\t=1.2.3", ExceptionMessages.InvalidWhitespace, "0"),
+            Invalid("=\t1.2.3", ExceptionMessages.InvalidWhitespace, "1"),
+            Invalid("=1.2.3\t", ExceptionMessages.InvalidWhitespace, "6"),
 
             // Invalid Operator
-            Invalid("~>1.2.3", InvalidOperatorMessage, "~>"),
-            Invalid("==1.2.3", InvalidOperatorMessage, "=="),
-            Invalid("=1.2.3|4.5.6", InvalidOperatorMessage, "|"),
-            Invalid("@&%1.2.3", InvalidOperatorMessage, "@&%"),
-            Invalid("≥1.2.3", InvalidOperatorMessage, "≥"),
+            Invalid("~>1.2.3", ExceptionMessages.InvalidOperator, "~>"),
+            Invalid("==1.2.3", ExceptionMessages.InvalidOperator, "=="),
+            Invalid("=1.2.3|4.5.6", ExceptionMessages.InvalidOperator, "|"),
+            Invalid("@&%1.2.3", ExceptionMessages.InvalidOperator, "@&%"),
+            Invalid("≥1.2.3", ExceptionMessages.InvalidOperator, "≥"),
 
             // Longer than max length
-            Invalid("=1.0.0", TooLongRangeMessage, "2", maxLength: 2),
+            Invalid("=1.0.0", ExceptionMessages.TooLongRange, "2", maxLength: 2),
 
             // Wildcard with operator
-            Invalid("<1.*", WildcardNotSupportedWithOperatorMessage),
-            Invalid("<=1.2.*", WildcardNotSupportedWithOperatorMessage),
-            Invalid(">*", WildcardNotSupportedWithOperatorMessage),
-            Invalid(">=1.2.3-*", WildcardNotSupportedWithOperatorMessage),
-            Invalid("=1.2.*", WildcardNotSupportedWithOperatorMessage),
-            Invalid("^1.2.*", WildcardNotSupportedWithOperatorMessage),
-            Invalid("~1.2.*", WildcardNotSupportedWithOperatorMessage),
+            Invalid("<1.*", ExceptionMessages.WildcardNotSupportedWithOperator),
+            Invalid("<=1.2.*", ExceptionMessages.WildcardNotSupportedWithOperator),
+            Invalid(">*", ExceptionMessages.WildcardNotSupportedWithOperator),
+            Invalid(">=1.2.3-*", ExceptionMessages.WildcardNotSupportedWithOperator),
+            Invalid("=1.2.*", ExceptionMessages.WildcardNotSupportedWithOperator),
+            Invalid("^1.2.*", ExceptionMessages.WildcardNotSupportedWithOperator),
+            Invalid("~1.2.*", ExceptionMessages.WildcardNotSupportedWithOperator),
 
             Invalid<ArgumentNullException>(null, ExceptionMessages.NotNull),
         };
@@ -181,7 +160,7 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentException>(() => SemVersionRange.Parse("ignored", options));
 
-            Assert.StartsWith(InvalidSemVersionRangeOptionsMessageStart, ex.Message);
+            Assert.StartsWith(ExceptionMessages.InvalidSemVersionRangeOptionsStart, ex.Message);
             Assert.Equal("options", ex.ParamName);
         }
 
@@ -191,7 +170,7 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentOutOfRangeException>(() => SemVersionRange.Parse("ignored", Strict, maxLength));
 
-            Assert.StartsWith(InvalidMaxLengthMessageStart, ex.Message);
+            Assert.StartsWith(ExceptionMessages.InvalidMaxLengthStart, ex.Message);
             Assert.Equal("maxLength", ex.ParamName);
             Assert.Equal(maxLength, ex.ActualValue);
         }
@@ -212,8 +191,7 @@ namespace Semver.Test.Ranges
                 var ex = Assert.Throws(testCase.ExceptionType,
                     () => SemVersionRange.Parse(testCase.Range, testCase.Options, testCase.MaxLength));
 
-                var expected = string.Format(CultureInfo.InvariantCulture,
-                    testCase.ExceptionMessageFormat, testCase.Range.LimitLength());
+                var expected = ExceptionMessages.InjectRange(testCase.ExceptionMessageFormat, testCase.Range);
 
                 if (ex is ArgumentException argumentException)
                 {
@@ -231,7 +209,7 @@ namespace Semver.Test.Ranges
         {
             var ex = Assert.Throws<ArgumentException>(() => SemVersionRange.TryParse("ignored", options, out _));
 
-            Assert.StartsWith(InvalidSemVersionRangeOptionsMessageStart, ex.Message);
+            Assert.StartsWith(ExceptionMessages.InvalidSemVersionRangeOptionsStart, ex.Message);
             Assert.Equal("options", ex.ParamName);
         }
 
@@ -242,7 +220,7 @@ namespace Semver.Test.Ranges
             var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
                 SemVersionRange.TryParse("ignored", Strict, out _, maxLength));
 
-            Assert.StartsWith(InvalidMaxLengthMessageStart, ex.Message);
+            Assert.StartsWith(ExceptionMessages.InvalidMaxLengthStart, ex.Message);
             Assert.Equal("maxLength", ex.ParamName);
             Assert.Equal(maxLength, ex.ActualValue);
         }
@@ -284,18 +262,19 @@ namespace Semver.Test.Ranges
 
         internal static RangeParsingTestCase Invalid<T>(
             string range,
-            string exceptionMessage,
+            string message,
             int maxLength = SemVersionRange.MaxRangeLength)
-            => RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(T), exceptionMessage);
+            => RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(T), message);
 
         private static RangeParsingTestCase Invalid(
             string range,
-            string exceptionMessage = "",
-            string exceptionValue = null,
+            string message = "",
+            string value = null,
             int maxLength = SemVersionRange.MaxRangeLength)
         {
-            exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);
-            return RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(FormatException), exceptionMessage);
+            message = ExceptionMessages.InjectValue(message, value);
+            message = ExceptionMessages.InjectVersion(message, value);
+            return RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(FormatException), message);
         }
     }
 }

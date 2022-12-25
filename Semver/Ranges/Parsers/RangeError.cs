@@ -14,7 +14,7 @@ namespace Semver.Ranges.Parsers
         private const string MissingComparisonMessage
             = "Range is missing a comparison or limit at {0} in '{1}'.";
         private const string MaxVersionMessage
-            = "Cannot construct range from version '{0}' because version number cannot be incremented beyond max value.";
+            = "Cannot construct range because version number cannot be incremented beyond max value in '{0}'.";
         private const string WildcardWithOperatorMessage
             = "Operator is combined with wildcards in '{0}'.";
         private const string PrereleaseWithWildcardVersionMessage
