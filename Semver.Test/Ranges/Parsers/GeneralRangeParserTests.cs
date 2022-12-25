@@ -1,66 +1,72 @@
-﻿using Semver.Ranges.Parsers;
+﻿using Semver.Ranges;
+using Semver.Ranges.Parsers;
 using Xunit;
+using static Semver.Ranges.SemVersionRangeOptions;
 
 namespace Semver.Test.Ranges.Parsers
 {
     public class GeneralRangeParserTests
     {
         [Theory]
-        [InlineData('$', true)]
-        [InlineData('|', true)]
-        [InlineData('>', true)]
-        [InlineData('=', true)]
-        [InlineData('<', true)]
-        [InlineData('^', true)]
-        [InlineData('(', true)]
-        [InlineData('~', true)]
-        [InlineData('`', true)]
-        [InlineData('"', true)]
+        [InlineData('$', Strict, true)]
+        [InlineData('|', Strict, true)]
+        [InlineData('>', Strict, true)]
+        [InlineData('=', Strict, true)]
+        [InlineData('<', Strict, true)]
+        [InlineData('^', Strict, true)]
+        [InlineData('(', Strict, true)]
+        [InlineData('~', Strict, true)]
+        [InlineData('`', Strict, true)]
+        [InlineData('"', Strict, true)]
         // Could be an operator even though it can be part of a version
-        [InlineData('-', true)]
-        [InlineData('.', true)]
+        [InlineData('-', Strict, true)]
+        [InlineData('.', Strict, true)]
         // Can't be an operator
-        [InlineData('0', false)]
-        [InlineData('1', false)]
-        [InlineData('9', false)]
-        [InlineData('a', false)]
-        [InlineData('z', false)]
-        [InlineData('A', false)]
-        [InlineData('Z', false)]
-        [InlineData('*', false)]
-        [InlineData(' ', false)]
-        [InlineData('\t', false)]
-        public void IsPossibleOperatorChar(char c, bool expected)
+        [InlineData('0', Strict, false)]
+        [InlineData('1', Strict, false)]
+        [InlineData('9', Strict, false)]
+        [InlineData('a', Strict, false)]
+        [InlineData('z', Strict, false)]
+        [InlineData('A', Strict, false)]
+        [InlineData('Z', Strict, false)]
+        [InlineData('*', Strict, false)]
+        [InlineData('+', Strict, true)]
+        [InlineData('+', AllowMetadata, false)]
+        [InlineData(' ', Strict, false)]
+        [InlineData('\t', Strict, false)]
+        public void IsPossibleOperatorChar(char c, SemVersionRangeOptions rangeOptions, bool expected)
         {
-            Assert.Equal(expected, GeneralRangeParser.IsPossibleOperatorChar(c));
+            Assert.Equal(expected, GeneralRangeParser.IsPossibleOperatorChar(c, rangeOptions));
         }
 
         [Theory]
-        [InlineData('$', false)]
-        [InlineData('|', false)]
-        [InlineData('>', false)]
-        [InlineData('=', false)]
-        [InlineData('<', false)]
-        [InlineData('^', false)]
-        [InlineData('(', false)]
-        [InlineData('~', false)]
-        [InlineData('`', false)]
-        [InlineData('"', false)]
-        [InlineData('-', true)]
-        [InlineData('.', true)]
-        [InlineData('0', true)]
-        [InlineData('1', true)]
-        [InlineData('9', true)]
-        [InlineData('a', true)]
-        [InlineData('z', true)]
-        [InlineData('A', true)]
-        [InlineData('Z', true)]
-        [InlineData('*', true)]
-        [InlineData(' ', false)]
-        [InlineData('\t', false)]
-        public void IsPossibleVersionChar(char c, bool expected)
+        [InlineData('$', Strict, false)]
+        [InlineData('|', Strict, false)]
+        [InlineData('>', Strict, false)]
+        [InlineData('=', Strict, false)]
+        [InlineData('<', Strict, false)]
+        [InlineData('^', Strict, false)]
+        [InlineData('(', Strict, false)]
+        [InlineData('~', Strict, false)]
+        [InlineData('`', Strict, false)]
+        [InlineData('"', Strict, false)]
+        [InlineData('-', Strict, true)]
+        [InlineData('.', Strict, true)]
+        [InlineData('0', Strict, true)]
+        [InlineData('1', Strict, true)]
+        [InlineData('9', Strict, true)]
+        [InlineData('a', Strict, true)]
+        [InlineData('z', Strict, true)]
+        [InlineData('A', Strict, true)]
+        [InlineData('Z', Strict, true)]
+        [InlineData('*', Strict, true)]
+        [InlineData('+', Strict, false)]
+        [InlineData('+', AllowMetadata, true)]
+        [InlineData(' ', Strict, false)]
+        [InlineData('\t', Strict, false)]
+        public void IsPossibleVersionChar(char c, SemVersionRangeOptions rangeOptions, bool expected)
         {
-            Assert.Equal(expected, GeneralRangeParser.IsPossibleVersionChar(c));
+            Assert.Equal(expected, GeneralRangeParser.IsPossibleVersionChar(c, rangeOptions));
         }
     }
 }

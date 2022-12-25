@@ -315,7 +315,7 @@ namespace Semver.Ranges.Parsers
             ref StringSegment segment, Exception ex, out StandardOperator @operator)
         {
             var end = 0;
-            while (end < segment.Length && IsPossibleOperatorChar(segment[end])) end++;
+            while (end < segment.Length && IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.AllowMetadata)) end++;
             var opSegment = segment.Subsegment(0, end);
             segment = segment.Subsegment(end);
 

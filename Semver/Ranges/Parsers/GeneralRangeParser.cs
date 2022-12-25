@@ -56,14 +56,16 @@ namespace Semver.Ranges.Parsers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPossibleOperatorChar(char c)
+        public static bool IsPossibleOperatorChar(char c, SemVersionRangeOptions rangeOptions)
             => c == '=' || c == '<' || c == '>' || c == '~' || c == '^'
                || (char.IsPunctuation(c) && !char.IsWhiteSpace(c) && c != '*')
-               || (char.IsSymbol(c) && c != '*');
+               || (char.IsSymbol(c) && (c != '+' || !rangeOptions.HasOption(SemVersionRangeOptions.AllowMetadata)));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPossibleVersionChar(char c)
-            => !char.IsWhiteSpace(c) && (!IsPossibleOperatorChar(c) || c == '-' || c == '.');
+        public static bool IsPossibleVersionChar(char c, SemVersionRangeOptions rangeOptions)
+            => !char.IsWhiteSpace(c)
+               && (!IsPossibleOperatorChar(c, rangeOptions) || c == '-' || c == '.'
+                   || (c == '+' && rangeOptions.HasOption(SemVersionRangeOptions.AllowMetadata)));
 
         /// <summary>
         /// Parse optional spaces from the beginning of the segment.
@@ -101,7 +103,7 @@ namespace Semver.Ranges.Parsers
             // The SemVersionParser assumes there is nothing following the version number. To reuse
             // its parsing, the appropriate end must be found.
             var end = 0;
-            while (end < segment.Length && IsPossibleVersionChar(segment[end])) end++;
+            while (end < segment.Length && IsPossibleVersionChar(segment[end], rangeOptions)) end++;
             var version = segment.Subsegment(0, end);
             segment = segment.Subsegment(end);
 
