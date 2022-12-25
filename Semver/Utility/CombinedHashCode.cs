@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace Semver.Utility
@@ -52,6 +53,15 @@ namespace Semver.Utility
             hash = CombineValue(hash, value3);
             hash = CombineValue(hash, value4);
             hash = CombineValue(hash, value5);
+            return new CombinedHashCode(hash);
+        }
+
+        public static CombinedHashCode CreateForItems<T>(IEnumerable<T> values)
+        {
+            var hash = RandomSeed;
+            foreach (var value in values)
+                hash = CombineValue(hash, value);
+
             return new CombinedHashCode(hash);
         }
         #endregion

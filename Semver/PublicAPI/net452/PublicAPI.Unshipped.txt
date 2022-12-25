@@ -1,10 +1,13 @@
-﻿override Semver.Ranges.SemVersionRange.ToString() -> string
+﻿override Semver.Ranges.SemVersionRange.Equals(object obj) -> bool
+override Semver.Ranges.SemVersionRange.GetHashCode() -> int
+override Semver.Ranges.SemVersionRange.ToString() -> string
 override Semver.Ranges.UnbrokenSemVersionRange.Equals(object obj) -> bool
 override Semver.Ranges.UnbrokenSemVersionRange.GetHashCode() -> int
 override Semver.Ranges.UnbrokenSemVersionRange.ToString() -> string
 Semver.Ranges.SemVersionRange
 Semver.Ranges.SemVersionRange.Contains(Semver.SemVersion version) -> bool
 Semver.Ranges.SemVersionRange.Count.get -> int
+Semver.Ranges.SemVersionRange.Equals(Semver.Ranges.SemVersionRange other) -> bool
 Semver.Ranges.SemVersionRange.GetEnumerator() -> System.Collections.Generic.IEnumerator<Semver.Ranges.UnbrokenSemVersionRange>
 Semver.Ranges.SemVersionRange.this[int index].get -> Semver.Ranges.UnbrokenSemVersionRange
 Semver.Ranges.SemVersionRangeOptions
@@ -46,6 +49,8 @@ static Semver.Ranges.SemVersionRange.Inclusive(Semver.SemVersion start, Semver.S
 static Semver.Ranges.SemVersionRange.InclusiveOfEnd(Semver.SemVersion start, Semver.SemVersion end, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.InclusiveOfStart(Semver.SemVersion start, Semver.SemVersion end, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.LessThan(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.Ranges.SemVersionRange
+static Semver.Ranges.SemVersionRange.operator !=(Semver.Ranges.SemVersionRange left, Semver.Ranges.SemVersionRange right) -> bool
+static Semver.Ranges.SemVersionRange.operator ==(Semver.Ranges.SemVersionRange left, Semver.Ranges.SemVersionRange right) -> bool
 static Semver.Ranges.SemVersionRange.Parse(string range, int maxLength = 2048) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.Parse(string range, Semver.Ranges.SemVersionRangeOptions options, int maxLength = 2048) -> Semver.Ranges.SemVersionRange
 static Semver.Ranges.SemVersionRange.ParseNpm(string range, bool includeAllPrerelease, int maxLength = 2048) -> Semver.Ranges.SemVersionRange
