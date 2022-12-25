@@ -6,13 +6,13 @@ using Semver.Test.TestCases;
 using Xunit;
 using static Semver.Test.Builders.UnbrokenSemVersionRangeBuilder;
 
-namespace Semver.Test.Ranges.Npm
+namespace Semver.Test.Ranges
 {
 
     /// <summary>
     /// Test cases taken directly from the npm project for versions ranges.
     /// </summary>
-    public class NodeSemverTests
+    public class NpmRangeTests
     {
         /// <summary>
         /// npm version range includes cases from https://github.com/npm/node-semver/blob/main/test/fixtures/range-include.js
