@@ -302,7 +302,7 @@ namespace Semver.Test.Ranges.Npm
                 Valid("~> 1", InclusiveOfStart("1.0.0", "2.0.0-0")),
                 Valid("~1.0", InclusiveOfStart("1.0.0", "1.1.0-0")),
                 Valid("~ 1.0", InclusiveOfStart("1.0.0", "1.1.0-0")),
-                Valid("^0", LessThan("1.0.0-0")),
+                Valid("^0", InclusiveOfStart("0.0.0", "1.0.0-0")), // Corrected, npm has <1.0.0-0
                 Valid("^ 1", InclusiveOfStart("1.0.0", "2.0.0-0")),
                 Valid("^0.1", InclusiveOfStart("0.1.0", "0.2.0-0")),
                 Valid("^1.0", InclusiveOfStart("1.0.0", "2.0.0-0")),
@@ -318,7 +318,7 @@ namespace Semver.Test.Ranges.Npm
                 Valid(">= 1", AtLeast("1.0.0")),
                 Valid("<1.2", LessThan("1.2.0-0")),
                 Valid("< 1.2", LessThan("1.2.0-0")),
-                Valid("~1.2.3-beta", InclusiveOfStart("1.2.3-beta", "1.3.0-0")),//, { loose: true }],
+                Valid("~1.2.3-beta", InclusiveOfStart("1.2.3-beta", "1.3.0-0")),
                 Valid("^ 1.2 ^ 1", InclusiveOfStart("1.2.0", "2.0.0-0")),
                 Valid("1.2 - 3.4.5", Inclusive("1.2.0", "3.4.5")),
                 Valid("1.2.3 - 3.4", InclusiveOfStart("1.2.3", "3.5.0-0")),

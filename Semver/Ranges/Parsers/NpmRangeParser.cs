@@ -147,6 +147,9 @@ namespace Semver.Ranges.Parsers
                 case StandardOperator.GreaterThan:
                     return GreaterThan(semver, wildcardVersion, ex, ref leftBound);
                 case StandardOperator.GreaterThanOrEqual:
+                    if (wildcardVersion == WildcardVersion.MajorMinorPatchWildcard)
+                        // No further bound is places on the left and right bounds
+                        return null;
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                     return null;
                 case StandardOperator.LessThan:
@@ -157,12 +160,12 @@ namespace Semver.Ranges.Parsers
                 case StandardOperator.Caret:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                     int major = 0, minor = 0, patch = 0;
-                    if (semver.Major != 0)
+                    if (semver.Major != 0 || wildcardVersion == WildcardVersion.MinorPatchWildcard)
                     {
                         if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
                         major = semver.Major + 1;
                     }
-                    else if (semver.Minor != 0)
+                    else if (semver.Minor != 0 || wildcardVersion == WildcardVersion.PatchWildcard)
                     {
                         if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
                         minor = semver.Minor + 1;
