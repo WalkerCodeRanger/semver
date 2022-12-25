@@ -28,6 +28,8 @@ namespace Semver.Test.Ranges
             = "Prerelease identifier follows wildcard prerelease identifier in '{0}'.";
         private const string PrereleaseWithWildcardVersionMessage
             = "A wildcard major, minor, or patch is combined with a prerelease version in '{0}'.";
+        private const string WildcardNotSupportedWithOperatorMessage
+            = "Operator is combined with wildcards in '{0}'.";
 
         public static readonly TheoryData<SemVersionRangeOptions> InvalidSemVersionRangeOptions = new TheoryData<SemVersionRangeOptions>()
         {
@@ -160,6 +162,15 @@ namespace Semver.Test.Ranges
 
             // Longer than max length
             Invalid("=1.0.0", TooLongRangeMessage, "2", maxLength: 2),
+
+            // Wildcard with operator
+            Invalid("<1.*", WildcardNotSupportedWithOperatorMessage),
+            Invalid("<=1.2.*", WildcardNotSupportedWithOperatorMessage),
+            Invalid(">*", WildcardNotSupportedWithOperatorMessage),
+            Invalid(">=1.2.3-*", WildcardNotSupportedWithOperatorMessage),
+            Invalid("=1.2.*", WildcardNotSupportedWithOperatorMessage),
+            Invalid("^1.2.*", WildcardNotSupportedWithOperatorMessage),
+            Invalid("~1.2.*", WildcardNotSupportedWithOperatorMessage),
 
             Invalid<ArgumentNullException>(null, ExceptionMessages.NotNull),
         };
