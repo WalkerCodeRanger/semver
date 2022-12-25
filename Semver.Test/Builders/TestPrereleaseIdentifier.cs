@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Semver.Test.TestCases
+namespace Semver.Test.Builders
 {
     public readonly struct TestPrereleaseIdentifier
     {

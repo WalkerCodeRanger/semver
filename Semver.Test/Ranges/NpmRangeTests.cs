@@ -4,6 +4,7 @@ using Semver.Ranges;
 using Semver.Test.Helpers;
 using Semver.Test.TestCases;
 using Xunit;
+using static Semver.Test.Builders.NpmRangeParsingTestCaseBuilder;
 using static Semver.Test.Builders.UnbrokenSemVersionRangeBuilder;
 
 namespace Semver.Test.Ranges
@@ -385,28 +386,5 @@ namespace Semver.Test.Ranges
 
         private static NpmRangeContainsTestCase Excludes(string range, string version, bool includeAllPrerelease = false)
             => NpmRangeContainsTestCase.NpmExcludes(range, version, includeAllPrerelease);
-
-        internal static NpmRangeParsingTestCase Valid(string range, params UnbrokenSemVersionRange[] expectedRanges)
-            => NpmRangeParsingTestCase.Valid(range, false, SemVersionRange.Create(expectedRanges));
-
-        internal static NpmRangeParsingTestCase Valid(
-            string range,
-            bool includeAllPrerelease,
-            params UnbrokenSemVersionRange[] expectedRanges)
-            => NpmRangeParsingTestCase.Valid(range, includeAllPrerelease, SemVersionRange.Create(expectedRanges));
-
-        internal static NpmRangeParsingTestCase Invalid<T>(
-            string range,
-            string exceptionMessage) =>
-            NpmRangeParsingTestCase.Invalid(range, false, typeof(T), exceptionMessage);
-
-        private static NpmRangeParsingTestCase Invalid(
-            string range,
-            string exceptionMessage = "",
-            string exceptionValue = null)
-        {
-            exceptionMessage = string.Format(CultureInfo.InvariantCulture, exceptionMessage, exceptionValue);
-            return NpmRangeParsingTestCase.Invalid(range, false, typeof(FormatException), exceptionMessage);
-        }
     }
 }
