@@ -70,7 +70,7 @@ namespace Semver.Ranges.Parsers
         /// <summary>
         /// Parse optional spaces from the beginning of the segment.
         /// </summary>
-        public static Exception ParseSpaces(ref StringSegment segment, Exception ex)
+        public static Exception ParseOptionalSpaces(ref StringSegment segment, Exception ex)
         {
             segment = segment.TrimStartSpaces();
 
@@ -82,11 +82,8 @@ namespace Semver.Ranges.Parsers
         /// <summary>
         /// Parse optional whitespace from the beginning of the segment.
         /// </summary>
-        public static Exception ParseWhitespace(ref StringSegment segment, Exception ex)
-        {
-            segment = segment.TrimStartWhitespace();
-            return null;
-        }
+        public static void ParseOptionalWhitespace(ref StringSegment segment)
+            => segment = segment.TrimStartWhitespace();
 
         /// <summary>
         /// Parse a version number from the beginning of the segment.

@@ -29,7 +29,7 @@ namespace Semver.Ranges.Parsers
             // when a non-null exception is passed in.
 
             if (range is null) return ex ?? new ArgumentNullException(nameof(range));
-            if (range.Length > maxLength) return ex ?? RangeError.NewTooLongException(range, maxLength);
+            if (range.Length > maxLength) return ex ?? RangeError.TooLong(range, maxLength);
 
             var unbrokenRanges = new List<UnbrokenSemVersionRange>(CountSplitOnOrOperator(range));
             foreach (var segment in SplitOnOrOperator(range))
@@ -56,7 +56,7 @@ namespace Semver.Ranges.Parsers
             unbrokenRange = null;
 
             // Parse off leading whitespace
-            var exception = ParseSpaces(ref segment, ex);
+            var exception = ParseOptionalSpaces(ref segment, ex);
             if (exception != null) return exception;
 
             // Reject empty string ranges
@@ -104,7 +104,7 @@ namespace Semver.Ranges.Parsers
             var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;
 
-            exception = ParseSpaces(ref segment, ex);
+            exception = ParseOptionalSpaces(ref segment, ex);
             if (exception != null) return exception;
 
             exception = ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
@@ -114,7 +114,7 @@ namespace Semver.Ranges.Parsers
             if (@operator != StandardOperator.None && wildcardVersion != WildcardVersion.None)
                 return ex ?? RangeError.WildcardNotSupportedWithOperator(segment.Source);
 
-            exception = ParseSpaces(ref segment, ex);
+            exception = ParseOptionalSpaces(ref segment, ex);
             if (exception != null) return exception;
 
             switch (@operator)

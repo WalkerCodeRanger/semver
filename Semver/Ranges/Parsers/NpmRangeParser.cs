@@ -48,7 +48,7 @@ namespace Semver.Ranges.Parsers
             // when a non-null exception is passed in.
 
             if (range is null) return ex ?? new ArgumentNullException(nameof(range));
-            if (range.Length > maxLength) return ex ?? RangeError.NewTooLongException(range, maxLength);
+            if (range.Length > maxLength) return ex ?? RangeError.TooLong(range, maxLength);
 
             var unbrokenRanges = new List<UnbrokenSemVersionRange>(CountSplitOnOrOperator(range));
             foreach (var segment in SplitOnOrOperator(range))
@@ -75,8 +75,7 @@ namespace Semver.Ranges.Parsers
             unbrokenRange = null;
 
             // Parse off leading whitespace
-            var exception = ParseWhitespace(ref segment, ex);
-            if (exception != null) return exception;
+            ParseOptionalWhitespace(ref segment);
 
             var includeAllPrerelease = rangeOptions.HasOption(SemVersionRangeOptions.IncludeAllPrerelease);
 
@@ -89,14 +88,95 @@ namespace Semver.Ranges.Parsers
 
             var start = LeftBoundedRange.Unbounded;
             var end = RightBoundedRange.Unbounded;
-            while (!segment.IsEmpty)
+
+            if (TrySplitOnHyphenRangeSeparator(segment, out var segment1, out var segment2))
             {
-                exception = ParseComparison(ref segment, rangeOptions, includeAllPrerelease, ex, maxLength,
-                    ref start, ref end);
+                var exception = ParseHyphenRange(segment1, segment2, rangeOptions, includeAllPrerelease, ex,
+                    maxLength, ref start, ref end);
                 if (exception != null) return exception;
             }
+            else
+                while (!segment.IsEmpty)
+                {
+                    var exception = ParseComparison(ref segment, rangeOptions, includeAllPrerelease, ex,
+                        maxLength, ref start, ref end);
+                    if (exception != null) return exception;
+                }
 
             unbrokenRange = UnbrokenSemVersionRange.Create(start, end, includeAllPrerelease);
+            return null;
+        }
+
+        private static bool TrySplitOnHyphenRangeSeparator(
+            StringSegment segment,
+            out StringSegment segment1,
+            out StringSegment segment2)
+        {
+            var searchLength = segment.Length - 1;
+            int start = 1;
+            int i;
+            while (start < segment.Length && (i = segment.IndexOf('-', start, searchLength - start)) >= 0)
+            {
+                var indexBefore = i - 1;
+                var indexAfter = i + 1;
+
+                if (char.IsWhiteSpace(segment[indexBefore]) && char.IsWhiteSpace(segment[indexAfter]))
+                {
+                    // Split in two before and after the whitespace around the hyphen
+                    segment1 = segment.Subsegment(0, indexBefore);
+                    segment2 = segment.Subsegment(indexAfter + 1);
+                    return true;
+                }
+
+                start = indexAfter;
+            }
+            // No hyphen, just don't split but have to set the out params to something
+            segment1 = segment2 = segment;
+            return false;
+        }
+
+        private static Exception ParseHyphenRange(
+            StringSegment beforeHyphenSegment,
+            StringSegment afterHyphenSegment,
+            SemVersionRangeOptions rangeOptions,
+            bool includeAllPrerelease,
+            Exception ex,
+            int maxLength,
+            ref LeftBoundedRange leftBound,
+            ref RightBoundedRange rightBound)
+        {
+            var exception = ParseHyphenSegment(beforeHyphenSegment, rangeOptions, ex, maxLength,
+                out var semver1, out var wildcardVersion1);
+            if (exception != null) return exception;
+
+            exception = ParseHyphenSegment(afterHyphenSegment, rangeOptions, ex, maxLength,
+                out var semver2, out var wildcardVersion2);
+            if (exception != null) return exception;
+
+            WildcardLowerBound(ref leftBound, includeAllPrerelease, semver1, wildcardVersion1);
+            return WildcardUpperBound(ref rightBound, ex, semver2, wildcardVersion2);
+        }
+
+        private static Exception ParseHyphenSegment(
+            StringSegment segment,
+            SemVersionRangeOptions rangeOptions,
+            Exception ex,
+            int maxLength,
+            out SemVersion semver,
+            out WildcardVersion wildcardVersion)
+        {
+            // Parse off leading whitespace from before hyphen segment
+            ParseOptionalWhitespace(ref segment);
+
+            var exception = ParseNpmVersion(ref segment, rangeOptions, ex, maxLength,
+                out semver, out wildcardVersion);
+            if (exception != null) return exception;
+
+            // Parse off trailing whitespace from before hyphen segment
+            ParseOptionalWhitespace(ref segment);
+
+            if (segment.Length != 0) return ex ?? RangeError.UnexpectedInHyphenRange(segment.ToString());
+
             return null;
         }
 
@@ -129,18 +209,13 @@ namespace Semver.Ranges.Parsers
             var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;
 
-            exception = ParseWhitespace(ref segment, ex);
-            if (exception != null) return exception;
+            ParseOptionalWhitespace(ref segment);
 
-            exception = ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
+            exception = ParseNpmVersion(ref segment, rangeOptions, ex, maxLength,
                             out var semver, out var wildcardVersion);
             if (exception != null) return exception;
-            // TODO check for wildcards combined with metadata which is not allow by npm
-            // Remove the metadata the npm ranges allow
-            semver = semver.WithoutMetadata();
 
-            exception = ParseWhitespace(ref segment, ex);
-            if (exception != null) return exception;
+            ParseOptionalWhitespace(ref segment);
 
             switch (@operator)
             {
@@ -161,7 +236,7 @@ namespace Semver.Ranges.Parsers
                     if (wildcardVersion == WildcardVersion.MajorMinorPatchWildcard)
                         // No further bound is places on the left and right bounds
                         return null;
-                    leftBound = leftBound.Max(WildcardLowerBound(semver, wildcardVersion, includeAllPrerelease));
+                    WildcardLowerBound(ref leftBound, includeAllPrerelease, semver, wildcardVersion);
                     int major = 0, minor = 0, patch = 0;
                     if (semver.Major != 0 || wildcardVersion == WildcardVersion.MinorPatchWildcard)
                     {
@@ -188,7 +263,7 @@ namespace Semver.Ranges.Parsers
                     if (wildcardVersion == WildcardVersion.MajorMinorPatchWildcard)
                         // No further bound is places on the left and right bounds
                         return null;
-                    leftBound = leftBound.Max(WildcardLowerBound(semver, wildcardVersion, includeAllPrerelease));
+                    WildcardLowerBound(ref leftBound, includeAllPrerelease, semver, wildcardVersion);
                     if (wildcardVersion == WildcardVersion.MinorPatchWildcard)
                     {
                         if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
@@ -205,43 +280,32 @@ namespace Semver.Ranges.Parsers
                     }
                     return null;
                 case StandardOperator.Equals:
-                case StandardOperator.None: // implied = (supports wildcard *)
-                    wildcardVersion.RemoveOption(WildcardVersion.PrereleaseWildcard);
-                    if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
-                        return ex ?? RangeError.PrereleaseNotSupportedWithWildcardVersion(segment.Source);
-                    switch (wildcardVersion)
-                    {
-                        case WildcardVersion.None:
-                            leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                            rightBound = rightBound.Min(new RightBoundedRange(semver, true));
-                            return null;
-                        case WildcardVersion.MajorMinorPatchWildcard:
-                            // No further bound is places on the left and right bounds
-                            return null;
-                        case WildcardVersion.MinorPatchWildcard:
-                            leftBound = leftBound.Max(WildcardLowerBound(semver, wildcardVersion, includeAllPrerelease));
-                            if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
-                            rightBound = rightBound.Min(new RightBoundedRange(
-                                new SemVersion(semver.Major + 1, 0, 0,
-                                    "0", PrereleaseIdentifiers.Zero,
-                                    "", ReadOnlyList<MetadataIdentifier>.Empty), false));
-                            return null;
-                        case WildcardVersion.PatchWildcard:
-                            leftBound = leftBound.Max(WildcardLowerBound(semver, wildcardVersion, includeAllPrerelease));
-                            if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
-                            rightBound = rightBound.Min(new RightBoundedRange(
-                                new SemVersion(semver.Major, semver.Minor + 1, 0,
-                                    "0", PrereleaseIdentifiers.Zero,
-                                    "", ReadOnlyList<MetadataIdentifier>.Empty), false));
-                            return null;
-                        default:
-                            // This code should be unreachable
-                            throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
-                    }
+                case StandardOperator.None: // implied =
+                    WildcardLowerBound(ref leftBound, includeAllPrerelease, semver, wildcardVersion);
+                    return WildcardUpperBound(ref rightBound, ex, semver, wildcardVersion);
                 default:
                     // This code should be unreachable
                     throw new ArgumentException($"DEBUG: Invalid {nameof(StandardOperator)} value {@operator}");
             }
+        }
+
+        public static Exception ParseNpmVersion(
+            ref StringSegment segment,
+            SemVersionRangeOptions rangeOptions,
+            Exception ex,
+            int maxLength,
+            out SemVersion semver,
+            out WildcardVersion wildcardVersion)
+        {
+            var exception = ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
+                out semver, out wildcardVersion);
+            if (exception != null) return exception;
+            if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
+                return ex ?? RangeError.PrereleaseNotSupportedWithWildcardVersion(segment.Source);
+            // TODO check for wildcards combined with metadata which is not allow by npm
+            // Remove the metadata the npm ranges allow
+            semver = semver.WithoutMetadata();
+            return null;
         }
 
         /// <summary>
@@ -311,14 +375,17 @@ namespace Semver.Ranges.Parsers
             return null;
         }
 
-        private static LeftBoundedRange WildcardLowerBound(
+        private static void WildcardLowerBound(
+            ref LeftBoundedRange leftBound,
+            bool includeAllPrerelease,
             SemVersion semver,
-            WildcardVersion wildcardVersion,
-            bool includeAllPrerelease)
+            WildcardVersion wildcardVersion)
         {
             switch (wildcardVersion)
             {
                 case WildcardVersion.MajorMinorPatchWildcard:
+                    // No further bound placed
+                    return;
                 case WildcardVersion.MinorPatchWildcard:
                 case WildcardVersion.PatchWildcard:
                     if (includeAllPrerelease && !semver.IsPrerelease)
@@ -331,7 +398,40 @@ namespace Semver.Ranges.Parsers
                     // This code should be unreachable
                     throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
             }
-            return new LeftBoundedRange(semver, true);
+
+            leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
+        }
+
+        private static Exception WildcardUpperBound(
+            ref RightBoundedRange rightBound,
+            Exception ex,
+            SemVersion semver,
+            WildcardVersion wildcardVersion)
+        {
+            switch (wildcardVersion)
+            {
+                case WildcardVersion.None:
+                    rightBound = rightBound.Min(new RightBoundedRange(semver, true));
+                    return null;
+                case WildcardVersion.MajorMinorPatchWildcard:
+                    // No further bounds placed
+                    return null;
+                case WildcardVersion.MinorPatchWildcard:
+                    if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                    rightBound = rightBound.Min(new RightBoundedRange(
+                        new SemVersion(semver.Major + 1, 0, 0, "0", PrereleaseIdentifiers.Zero, "",
+                            ReadOnlyList<MetadataIdentifier>.Empty), false));
+                    return null;
+                case WildcardVersion.PatchWildcard:
+                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                    rightBound = rightBound.Min(new RightBoundedRange(
+                        new SemVersion(semver.Major, semver.Minor + 1, 0, "0", PrereleaseIdentifiers.Zero, "",
+                            ReadOnlyList<MetadataIdentifier>.Empty), false));
+                    return null;
+                default:
+                    // This code should be unreachable
+                    throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
+            }
         }
 
         private static Exception ParseOperator(

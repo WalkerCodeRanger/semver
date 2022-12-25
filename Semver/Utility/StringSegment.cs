@@ -121,6 +121,16 @@ namespace Semver.Utility
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int IndexOf(char value, int startIndex)
+        {
+#if DEBUG
+            ValidateIndex(startIndex, nameof(startIndex));
+#endif
+            var i = Source.IndexOf(value, Offset + startIndex, Length - startIndex);
+            return i < 0 ? i : i - Offset;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(char value, int startIndex, int count)
         {
 #if DEBUG
