@@ -7,9 +7,11 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
 {
     public class NpmRangeParsingHyphenRange : NpmRangeParsing
     {
+        private const int Seed = 1450160939;
+
         protected override IReadOnlyList<string> GetRanges()
         {
-            var random = new Random();
+            var random = new Random(Seed);
 
             return Enumerables.Generate(RangeCount, () =>
             {
