@@ -11,7 +11,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
         {
             var random = new Random();
 
-            return Enumerables.Generate(NumRanges, () => random.VersionString()).ToReadOnlyList();
+            return Enumerables.Generate(RangeCount, () => random.VersionString()).ToReadOnlyList();
         }
     }
 }

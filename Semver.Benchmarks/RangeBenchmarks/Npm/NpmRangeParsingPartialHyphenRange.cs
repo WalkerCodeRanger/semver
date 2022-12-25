@@ -11,7 +11,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
         {
             var random = new Random();
 
-            return Enumerables.Generate(NumRanges, () =>
+            return Enumerables.Generate(RangeCount, () =>
             {
                 var a = random.RandomPartialVersion(prependOperator: false);
                 var b = random.RandomPartialVersion(prependOperator: false);
