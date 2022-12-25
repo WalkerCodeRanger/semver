@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using Semver.Ranges.Npm;
 
 namespace Semver.Benchmarks.RangeBenchmarks.Npm
 {
@@ -10,6 +9,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     public abstract class NpmRangeParsing
     {
+        // TODO re-implement for new version ranges
         protected const int NumRanges = 1000;
         private readonly IReadOnlyList<string> ranges;
 
@@ -20,13 +20,13 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
             ranges = GetRanges();
         }
 
-        [Benchmark(OperationsPerInvoke = NumRanges)]
-        [Arguments(false)]
-        [Arguments(true)]
-        public void Parse(bool prerelease)
-        {
-            foreach (var range in ranges)
-                NpmRangeSet.Parse(range, prerelease);
-        }
+        //[Benchmark(OperationsPerInvoke = NumRanges)]
+        //[Arguments(false)]
+        //[Arguments(true)]
+        //public void Parse(bool prerelease)
+        //{
+        //    foreach (var range in ranges)
+        //        NpmRangeSet.Parse(range, prerelease);
+        //}
     }
 }

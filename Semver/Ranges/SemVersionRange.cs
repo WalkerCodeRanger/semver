@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
-using Semver.Ranges.Npm;
 using Semver.Ranges.Parsers;
 using Semver.Utility;
 
@@ -170,17 +169,23 @@ namespace Semver.Ranges
         /// </summary>
         /// <remarks>The npm "loose" option is not supported.</remarks>
         public static SemVersionRange ParseNpm(string range, bool includeAllPrerelease = false)
-#pragma warning disable CS0618 // Type or member is obsolete
-            => NpmRangeSet.Parse(range, includeAllPrerelease).ToSemVersionRange();
-#pragma warning restore CS0618 // Type or member is obsolete
+        {
+            var ex = NpmRangeParser.Parse(range, includeAllPrerelease, null, MaxRangeLength, out var semverRange);
+            if (ex != null) throw ex;
+            return semverRange;
+        }
 
         public static bool TryParseNpm(string range, out SemVersionRange semverRange, bool includeAllPrerelease = false)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var success = NpmRangeSet.TryParse(range, includeAllPrerelease, out var npmRangeSet);
-#pragma warning restore CS0618 // Type or member is obsolete
-            semverRange = npmRangeSet?.ToSemVersionRange();
-            return success;
+            var exception = NpmRangeParser.Parse(range, includeAllPrerelease, Parsing.FailedException, MaxRangeLength, out semverRange);
+
+#if DEBUG
+            // This check ensures that NpmRangeParser.Parse doesn't construct an exception, but always returns ParseFailedException
+            if (exception != null && exception != Parsing.FailedException)
+                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}", exception);
+#endif
+
+            return exception is null;
         }
         #endregion
 

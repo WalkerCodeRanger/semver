@@ -10,7 +10,6 @@ using System.Security.Permissions;
 using System.Text.RegularExpressions;
 using Semver.Comparers;
 using Semver.Ranges;
-using Semver.Ranges.Npm;
 using Semver.Utility;
 
 namespace Semver
@@ -1698,7 +1697,7 @@ namespace Semver
         /// Checks if this version is in the given range. Uses the same range syntax as npm.
         /// </summary>
         /// <remarks>
-        /// It's more optimal to use the static parse methods on <see cref="NpmRangeSet"/>
+        /// It's more optimal to use the static parse methods on <see cref="SemVersionRange"/>
         /// if you're going to be testing multiple versions against the same range
         /// to avoid having to parse the range multiple times.
         /// </remarks>

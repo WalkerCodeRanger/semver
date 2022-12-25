@@ -30,4 +30,8 @@
             <Link>LocalVersion\Ranges\%(RecursiveDir)%(FileName)%(Extension)</Link>
         </Compile>
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="..\Semver\Ranges\Npm\NpmComparator.cs" />
+    </ItemGroup>
 </Project>
