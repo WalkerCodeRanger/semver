@@ -1,4 +1,5 @@
-﻿using Semver.Ranges;
+﻿using System;
+using Semver.Ranges;
 
 namespace Semver.Test.TestCases
 {
@@ -10,6 +11,13 @@ namespace Semver.Test.TestCases
             SemVersionRange expected)
             => new NpmRangeParsingTestCase(range, includeAllPrerelease, expected);
 
+        public static NpmRangeParsingTestCase Invalid(
+            string range,
+            bool includeAllPrerelease,
+            Type exceptionType,
+            string exceptionMessage)
+            => new NpmRangeParsingTestCase(range, includeAllPrerelease, exceptionType, exceptionMessage);
+
         private NpmRangeParsingTestCase(
             string range,
             bool includeAllPrerelease,
@@ -17,7 +25,21 @@ namespace Semver.Test.TestCases
         {
             Range = range;
             IncludeAllPrerelease = includeAllPrerelease;
+            IsValid = true;
             ExpectedRange = expected;
+        }
+
+        private NpmRangeParsingTestCase(
+            string range,
+            bool includeAllPrerelease,
+            Type exceptionType,
+            string exceptionMessageFormat)
+        {
+            Range = range;
+            IncludeAllPrerelease = includeAllPrerelease;
+            IsValid = false;
+            ExceptionType = exceptionType;
+            ExceptionMessageFormat = exceptionMessageFormat;
         }
 
         public string Range { get; }
@@ -26,6 +48,12 @@ namespace Semver.Test.TestCases
 
         #region Valid Values
         public SemVersionRange ExpectedRange { get; }
+        #endregion
+
+        #region Invalid Values
+        public Type ExceptionType { get; }
+        public string ExceptionMessageFormat { get; }
+
         #endregion
 
         public override string ToString()

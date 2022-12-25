@@ -1,4 +1,7 @@
-﻿using Semver.Ranges;
+﻿using System;
+using System.Globalization;
+using Semver.Ranges;
+using Semver.Test.Helpers;
 using Semver.Test.TestCases;
 using Xunit;
 using static Semver.Test.Builders.UnbrokenSemVersionRangeBuilder;
@@ -315,8 +318,6 @@ namespace Semver.Test.Ranges.Npm
                 Valid(">= 1", AtLeast("1.0.0")),
                 Valid("<1.2", LessThan("1.2.0-0")),
                 Valid("< 1.2", LessThan("1.2.0-0")),
-                Valid(">01.02.03", GreaterThan("1.2.3")),// true],
-                //Valid(">01.02.03", null),
                 Valid("~1.2.3-beta", InclusiveOfStart("1.2.3-beta", "1.3.0-0")),//, { loose: true }],
                 Valid("^ 1.2 ^ 1", InclusiveOfStart("1.2.0", "2.0.0-0")),
                 Valid("1.2 - 3.4.5", Inclusive("1.2.0", "3.4.5")),
@@ -328,13 +329,14 @@ namespace Semver.Test.Ranges.Npm
                 Valid("<X", Empty),
                 Valid("<x <* || >* 2.x", Empty),
                 Valid(">x 2.x || * || <x", AllRelease),
-                //Valid(">=09090", null),
-                Valid(">=09090", AtLeast("9090.0.0")),//, true),
-                //Valid(">=09090-0", true, null),
-                //Valid(">=09090-0", true, null), //{ loose: true}
                 //Valid($"^{int.MaxValue}.0.0", null),
                 Valid($"={int.MaxValue}.0.0", EqualsVersion($"{int.MaxValue}.0.0")),
                 Valid($"^{int.MaxValue - 1}.0.0", InclusiveOfStart($"{int.MaxValue - 1}.0.0", $"{int.MaxValue}.0.0-0")),
+
+                Invalid(">01.02.03", ExceptionMessages.LeadingZeroInMajor, "01.02.03"),
+                Invalid(">=09090", ExceptionMessages.LeadingZeroInMajor, "09090"),
+                Invalid(">=09090-0", ExceptionMessages.LeadingZeroInMajor, "09090-0"),
+                Invalid<ArgumentNullException>(null, ExceptionMessages.NotNull),
             };
 
         [Theory]
@@ -355,9 +357,27 @@ namespace Semver.Test.Ranges.Npm
         [MemberData(nameof(ParsingCases))]
         public void ParseTests(NpmRangeParsingTestCase testCase)
         {
-            var range = SemVersionRange.ParseNpm(testCase.Range, testCase.IncludeAllPrerelease);
+            if (testCase.IsValid)
+            {
+                var range = SemVersionRange.ParseNpm(testCase.Range, testCase.IncludeAllPrerelease);
+                Assert.Equal(testCase.ExpectedRange, range);
+            }
+            else
+            {
+                var ex = Assert.Throws(testCase.ExceptionType,
+                    () => SemVersionRange.ParseNpm(testCase.Range, testCase.IncludeAllPrerelease));
 
-            Assert.Equal(testCase.ExpectedRange, range);
+                var expected = string.Format(CultureInfo.InvariantCulture, testCase.ExceptionMessageFormat,
+                    testCase.Range.LimitLength());
+
+                if (ex is ArgumentException argumentException)
+                {
+                    Assert.StartsWith(expected, argumentException.Message);
+                    Assert.Equal("range", argumentException.ParamName);
+                }
+                else
+                    Assert.Equal(expected, ex.Message);
+            }
         }
 
         private static NpmRangeContainsTestCase Includes(string range, string version, bool includeAllPrerelease = false)
@@ -374,5 +394,19 @@ namespace Semver.Test.Ranges.Npm
             bool includeAllPrerelease,
             params UnbrokenSemVersionRange[] expectedRanges)
             => NpmRangeParsingTestCase.Valid(range, includeAllPrerelease, SemVersionRange.Create(expectedRanges));
+
+        internal static NpmRangeParsingTestCase Invalid<T>(
+            string range,
+            string exceptionMessage) =>
+            NpmRangeParsingTestCase.Invalid(range, false, typeof(T), exceptionMessage);
+
+        private static NpmRangeParsingTestCase Invalid(
+            string range,
+            string exceptionMessage = "",
+            string exceptionValue = null)
+        {
+            exceptionMessage = string.Format(CultureInfo.InvariantCulture, exceptionMessage, exceptionValue);
+            return NpmRangeParsingTestCase.Invalid(range, false, typeof(FormatException), exceptionMessage);
+        }
     }
 }

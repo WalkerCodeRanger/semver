@@ -17,8 +17,8 @@ namespace Semver.Test.TestCases
             SemVersionRangeOptions options,
             int maxLength,
             Type exceptionType,
-            string exceptionMessage)
-            => new RangeParsingTestCase(range, options, maxLength, exceptionType, exceptionMessage);
+            string exceptionMessageFormat)
+            => new RangeParsingTestCase(range, options, maxLength, exceptionType, exceptionMessageFormat);
 
         private RangeParsingTestCase(
             string range,
