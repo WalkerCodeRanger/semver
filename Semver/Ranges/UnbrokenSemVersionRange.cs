@@ -57,6 +57,8 @@ namespace Semver.Ranges
             => Create(Validate(start, nameof(start)), false,
                 Validate(end, nameof(end)), false, includeAllPrerelease);
 
+        // TODO support parsing unbroken ranges?
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static UnbrokenSemVersionRange Create(
             SemVersion startVersion,

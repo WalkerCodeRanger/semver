@@ -1691,7 +1691,23 @@ namespace Semver
             return predicate(this);
         }
 
-        // TODO add Satisfies overloads that take regular string ranges?
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public bool Satisfies(
+            string range,
+            SemVersionRangeOptions options,
+            int maxLength = SemVersionRange.MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+        {
+            if (range == null) throw new ArgumentNullException(nameof(range));
+
+            var parsedRange = SemVersionRange.Parse(range, options, maxLength);
+            return parsedRange.Contains(this);
+        }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public bool Satisfies(string range, int maxLength = SemVersionRange.MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => Satisfies(range, SemVersionRangeOptions.Strict, maxLength);
 
         /// <summary>
         /// Checks if this version is in the given range. Uses the same range syntax as npm.
@@ -1703,16 +1719,24 @@ namespace Semver
         /// </remarks>
         /// <param name="range">The range to compare with.</param>
         /// <param name="includeAllPrerelease"></param>
+        /// <param name="maxLength"></param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown if the <paramref name="range"/> is <see langword="null"/>.</exception>
-        public bool SatisfiesNpm(string range, bool includeAllPrerelease = false)
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public bool SatisfiesNpm(string range, bool includeAllPrerelease, int maxLength = SemVersionRange.MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
 
-            var parsedRange = SemVersionRange.ParseNpm(range, includeAllPrerelease);
+            var parsedRange = SemVersionRange.ParseNpm(range, includeAllPrerelease, maxLength);
             return parsedRange.Contains(this);
         }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public bool SatisfiesNpm(string range, int maxLength = SemVersionRange.MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => SatisfiesNpm(range, false, maxLength);
         #endregion
 
         /// <summary>
