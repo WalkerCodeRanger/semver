@@ -168,7 +168,8 @@ namespace Semver.Test.Ranges
         [MemberData(nameof(InvalidMaxLength))]
         public void ParseWithInvalidMaxLength(int maxLength)
         {
-            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => SemVersionRange.Parse("ignored", Strict, maxLength));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(
+                () => SemVersionRange.Parse("ignored", Strict, maxLength));
 
             Assert.StartsWith(ExceptionMessages.InvalidMaxLengthStart, ex.Message);
             Assert.Equal("maxLength", ex.ParamName);
@@ -207,7 +208,8 @@ namespace Semver.Test.Ranges
         [MemberData(nameof(InvalidSemVersionRangeOptions))]
         public void TryParseWithInvalidOptions(SemVersionRangeOptions options)
         {
-            var ex = Assert.Throws<ArgumentException>(() => SemVersionRange.TryParse("ignored", options, out _));
+            var ex = Assert.Throws<ArgumentException>(
+                () => SemVersionRange.TryParse("ignored", options, out _));
 
             Assert.StartsWith(ExceptionMessages.InvalidSemVersionRangeOptionsStart, ex.Message);
             Assert.Equal("options", ex.ParamName);
@@ -217,8 +219,8 @@ namespace Semver.Test.Ranges
         [MemberData(nameof(InvalidMaxLength))]
         public void TryParseWithInvalidMaxLength(int maxLength)
         {
-            var ex = Assert.Throws<ArgumentOutOfRangeException>(() =>
-                SemVersionRange.TryParse("ignored", Strict, out _, maxLength));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(
+                () => SemVersionRange.TryParse("ignored", Strict, out _, maxLength));
 
             Assert.StartsWith(ExceptionMessages.InvalidMaxLengthStart, ex.Message);
             Assert.Equal("maxLength", ex.ParamName);

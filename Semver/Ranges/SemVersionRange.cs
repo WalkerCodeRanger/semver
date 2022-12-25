@@ -173,6 +173,9 @@ namespace Semver.Ranges
             bool includeAllPrerelease,
             int maxLength = MaxRangeLength)
         {
+            if (maxLength < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
+
             var ex = NpmRangeParser.Parse(range, includeAllPrerelease, null, maxLength, out var semverRange);
             if (ex != null) throw ex;
             return semverRange;
@@ -191,6 +194,9 @@ namespace Semver.Ranges
             out SemVersionRange semverRange,
             int maxLength = MaxRangeLength)
         {
+            if (maxLength < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
+
             var exception = NpmRangeParser.Parse(range, includeAllPrerelease, Parsing.FailedException, maxLength, out semverRange);
 
 #if DEBUG
