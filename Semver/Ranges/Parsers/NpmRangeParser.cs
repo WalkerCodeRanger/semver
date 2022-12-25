@@ -144,10 +144,6 @@ namespace Semver.Ranges.Parsers
 
             switch (@operator)
             {
-                case StandardOperator.Equals:
-                    leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                    rightBound = rightBound.Min(new RightBoundedRange(semver, true));
-                    return null;
                 case StandardOperator.GreaterThan:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, false));
                     return null;
@@ -155,7 +151,7 @@ namespace Semver.Ranges.Parsers
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                     return null;
                 case StandardOperator.LessThan:
-                    rightBound = rightBound.Min(new RightBoundedRange(semver, false));
+                    rightBound = rightBound.Min(new RightBoundedRange(semver.WildcardMin(wildcardVersion), false));
                     return null;
                 case StandardOperator.LessThanOrEqual:
                     rightBound = rightBound.Min(new RightBoundedRange(semver, true));
@@ -191,33 +187,22 @@ namespace Semver.Ranges.Parsers
                         semver.With(minor: semver.Minor + 1, patch: 0, prerelease: PrereleaseIdentifiers.Zero),
                         false));
                     return null;
+                case StandardOperator.Equals:
                 case StandardOperator.None: // implied = (supports wildcard *)
-                    var prereleaseWildcard = wildcardVersion.HasFlag(WildcardVersion.PrereleaseWildcard);
-                    includeAllPrerelease |= prereleaseWildcard;
                     wildcardVersion.RemoveOption(WildcardVersion.PrereleaseWildcard);
                     if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
                         return ex ?? RangeError.PrereleaseNotSupportedWithWildcardVersion(segment.Source);
                     switch (wildcardVersion)
                     {
                         case WildcardVersion.None:
-                            leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
-                            if (prereleaseWildcard)
-                            {
-                                if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
-                                rightBound = rightBound.Min(new RightBoundedRange(
-                                    new SemVersion(semver.Major, semver.Minor, semver.Patch + 1, "0",
-                                        PrereleaseIdentifiers.Zero, "",
-                                        ReadOnlyList<MetadataIdentifier>.Empty), false));
-                            }
-                            else
-                                rightBound = rightBound.Min(new RightBoundedRange(semver, true));
-
+                            leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
+                            rightBound = rightBound.Min(new RightBoundedRange(semver, true));
                             return null;
                         case WildcardVersion.MajorMinorPatchWildcard:
                             // No further bound is places on the left and right bounds
                             return null;
                         case WildcardVersion.MinorPatchWildcard:
-                            leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
+                            leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                             if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
                             rightBound = rightBound.Min(new RightBoundedRange(
                                 new SemVersion(semver.Major + 1, 0, 0,
@@ -225,7 +210,7 @@ namespace Semver.Ranges.Parsers
                                     "", ReadOnlyList<MetadataIdentifier>.Empty), false));
                             return null;
                         case WildcardVersion.PatchWildcard:
-                            leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
+                            leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                             if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
                             rightBound = rightBound.Min(new RightBoundedRange(
                                 new SemVersion(semver.Major, semver.Minor + 1, 0,
@@ -242,12 +227,46 @@ namespace Semver.Ranges.Parsers
             }
         }
 
-        private static LeftBoundedRange WildcardLowerBound(SemVersion semver, bool prereleaseWildcard)
+        /// <summary>
+        /// The minimum version that would be included in a wildcard range.
+        /// </summary>
+        private static SemVersion WildcardMin(this SemVersion semver, WildcardVersion wildcardVersion)
         {
-            if (prereleaseWildcard && !semver.IsPrerelease)
-                semver = semver.WithPrerelease(PrereleaseIdentifier.Zero);
-            return new LeftBoundedRange(semver, true);
+            switch (wildcardVersion)
+            {
+                case WildcardVersion.MajorMinorPatchWildcard:
+                case WildcardVersion.MinorPatchWildcard:
+                case WildcardVersion.PatchWildcard:
+                    // Wildcard places already filled with zeros
+                    return semver.WithPrerelease(PrereleaseIdentifier.Zero);
+                case WildcardVersion.None:
+                    return semver;
+                default:
+                    // This code should be unreachable
+                    throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
+
+            }
         }
+
+        private static SemVersion WildcardMax(this SemVersion semver, WildcardVersion wildcardVersion)
+        {
+            switch (wildcardVersion)
+            {
+                case WildcardVersion.MajorMinorPatchWildcard:
+                case WildcardVersion.MinorPatchWildcard:
+                case WildcardVersion.MinorWildcard:
+
+                case WildcardVersion.None:
+                    return semver;
+                default:
+                    // This code should be unreachable
+                    throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
+
+            }
+        }
+
+        private static SemVersion RoundDownPrerelease(this SemVersion semver)
+            => semver.IsPrerelease ? semver : semver.WithPrerelease(PrereleaseIdentifier.Zero);
 
         private static Exception ParseOperator(
             ref StringSegment segment, Exception ex, out StandardOperator @operator)
