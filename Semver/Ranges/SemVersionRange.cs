@@ -146,9 +146,7 @@ namespace Semver.Ranges
 #if DEBUG
             // This check ensures that StandardRangeParser.Parse doesn't construct an exception, but always returns ParseFailedException
             if (exception != null && exception != Parsing.FailedException)
-                throw new InvalidOperationException(
-                    $"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}",
-                    exception);
+                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}", exception);
 #endif
 
             return exception is null;
@@ -163,21 +161,37 @@ namespace Semver.Ranges
             => TryParse(range, SemVersionRangeOptions.Strict, out semverRange, maxLength);
         #endregion
 
-        #region NPM Parsing
+        #region npm Parsing
         /// <summary>
         /// Parse a range string following the npm range rules into a <see cref="SemVersionRange"/>.
         /// </summary>
         /// <remarks>The npm "loose" option is not supported.</remarks>
-        public static SemVersionRange ParseNpm(string range, bool includeAllPrerelease = false)
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static SemVersionRange ParseNpm(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            string range,
+            bool includeAllPrerelease,
+            int maxLength = MaxRangeLength)
         {
-            var ex = NpmRangeParser.Parse(range, includeAllPrerelease, null, MaxRangeLength, out var semverRange);
+            var ex = NpmRangeParser.Parse(range, includeAllPrerelease, null, maxLength, out var semverRange);
             if (ex != null) throw ex;
             return semverRange;
         }
 
-        public static bool TryParseNpm(string range, out SemVersionRange semverRange, bool includeAllPrerelease = false)
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static SemVersionRange ParseNpm(string range, int maxLength = MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => ParseNpm(range, false, maxLength);
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParseNpm(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            string range,
+            bool includeAllPrerelease,
+            out SemVersionRange semverRange,
+            int maxLength = MaxRangeLength)
         {
-            var exception = NpmRangeParser.Parse(range, includeAllPrerelease, Parsing.FailedException, MaxRangeLength, out semverRange);
+            var exception = NpmRangeParser.Parse(range, includeAllPrerelease, Parsing.FailedException, maxLength, out semverRange);
 
 #if DEBUG
             // This check ensures that NpmRangeParser.Parse doesn't construct an exception, but always returns ParseFailedException
@@ -187,6 +201,14 @@ namespace Semver.Ranges
 
             return exception is null;
         }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParseNpm(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            string range,
+            out SemVersionRange semverRange,
+            int maxLength = MaxRangeLength)
+            => TryParseNpm(range, false, out semverRange, maxLength);
         #endregion
 
         #region IReadOnlyList<UnbrokenSemVersionRange>
