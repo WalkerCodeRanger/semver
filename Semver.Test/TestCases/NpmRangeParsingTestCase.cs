@@ -89,6 +89,19 @@ namespace Semver.Test.TestCases
             }
         }
 
+        public void AssertTryParse()
+        {
+            var result = SemVersionRange.TryParseNpm(Range, IncludeAllPrerelease, out var semverRange,
+                MaxLength);
+
+            Assert.Equal(IsValid, result);
+
+            if (IsValid)
+                Assert.Equal(ExpectedRange, semverRange);
+            else
+                Assert.Null(semverRange);
+        }
+
         public override string ToString()
             => !IncludeAllPrerelease ? $"'{Range}'" : $"'{Range}' true";
     }

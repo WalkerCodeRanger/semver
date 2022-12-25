@@ -34,6 +34,13 @@ namespace Semver.Test.Ranges
         }
 
         [Theory]
+        [MemberData(nameof(ParsingTestCases))]
+        public void ParseWithOptionsParsesCorrectly(NpmRangeParsingTestCase testCase)
+        {
+            testCase.AssertParse();
+        }
+
+        [Theory]
         [MemberData(nameof(InvalidMaxLength))]
         public void TryParseWithInvalidMaxLength(int maxLength)
         {
@@ -43,6 +50,13 @@ namespace Semver.Test.Ranges
             Assert.StartsWith(ExceptionMessages.InvalidMaxLengthStart, ex.Message);
             Assert.Equal("maxLength", ex.ParamName);
             Assert.Equal(maxLength, ex.ActualValue);
+        }
+
+        [Theory]
+        [MemberData(nameof(ParsingTestCases))]
+        public void TryParseWithOptionsParsesCorrectly(NpmRangeParsingTestCase testCase)
+        {
+            testCase.AssertTryParse();
         }
     }
 }
