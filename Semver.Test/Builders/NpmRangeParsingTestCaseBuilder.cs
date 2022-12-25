@@ -39,10 +39,11 @@ namespace Semver.Test.Builders
             string range,
             string message = "",
             string value = null,
+            string version = null,
             int maxLength = SemVersionRange.MaxRangeLength)
         {
             message = ExceptionMessages.InjectValue(message, value);
-            message = ExceptionMessages.InjectVersion(message, value);
+            message = ExceptionMessages.InjectVersion(message, version);
             return NpmRangeParsingTestCase.Invalid(range, false, maxLength, typeof(FormatException), message);
         }
     }

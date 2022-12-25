@@ -331,10 +331,10 @@ namespace Semver.Test.Ranges
                 Valid($"={int.MaxValue}.0.0", EqualsVersion($"{int.MaxValue}.0.0")),
                 Valid($"^{int.MaxValue - 1}.0.0", InclusiveOfStart($"{int.MaxValue - 1}.0.0", $"{int.MaxValue}.0.0-0")),
 
-                Invalid(">01.02.03", ExceptionMessages.LeadingZeroInMajor, "01.02.03"),
-                Invalid(">=09090", ExceptionMessages.LeadingZeroInMajor, "09090"),
-                Invalid(">=09090-0", ExceptionMessages.LeadingZeroInMajor, "09090-0"),
-                Invalid($"^{int.MaxValue}.0.0", ExceptionMessages.MaxVersion, "2147483647.0.0"),
+                Invalid(">01.02.03", ExceptionMessages.LeadingZeroInMajor, version: "01.02.03"),
+                Invalid(">=09090", ExceptionMessages.LeadingZeroInMajor, version: "09090"),
+                Invalid(">=09090-0", ExceptionMessages.LeadingZeroInMajor, version: "09090-0"),
+                Invalid($"^{int.MaxValue}.0.0", ExceptionMessages.MaxVersion, version: "2147483647.0.0"),
                 Invalid<ArgumentNullException>(null, ExceptionMessages.NotNull),
             };
 
