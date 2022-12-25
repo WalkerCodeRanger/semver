@@ -167,7 +167,7 @@ namespace Semver.Ranges.Parsers
                         false));
                     return null;
                 case StandardOperator.None: // implied = (supports wildcard *)
-                    var prereleaseWildcard = wildcardVersion.HasFlag(WildcardVersion.PrereleaseWildcard);
+                    var prereleaseWildcard = wildcardVersion.HasOption(WildcardVersion.PrereleaseWildcard);
                     includeAllPrerelease |= prereleaseWildcard;
                     wildcardVersion.RemoveOption(WildcardVersion.PrereleaseWildcard);
                     if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
