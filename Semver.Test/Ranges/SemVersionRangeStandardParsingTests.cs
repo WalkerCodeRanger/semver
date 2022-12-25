@@ -19,7 +19,7 @@ namespace Semver.Test.Ranges
         private const string InvalidWhitespaceMessage
             = "Invalid whitespace character at {1} in '{0}'. Only the ASCII space character is allowed.";
         private const string MissingComparisonMessage
-            = "Range is missing a comparison or limit at {1} in '{0}'";
+            = "Range is missing a comparison or limit at {1} in '{0}'.";
         private const string MaxVersionMessage
             = "Cannot construct range from version '{1}' because version number cannot be incremented beyond max value.";
         private const string InvalidWildcardInPrereleaseMessage
