@@ -45,7 +45,16 @@ namespace Semver.Ranges
         #endregion
 
         #region Using values of SemVersionStyles that do not apply to ranges
+        /// <summary>
+        /// Include all prerelease versions in the range rather than just prerelease versions
+        /// matching a prerelease identifier in the range.
+        /// </summary>
         IncludeAllPrerelease = 1 << 1,
+
+        /// <summary>
+        /// Allow version numbers with build metadata in version range expressions. The metadata
+        /// will be removed/ignored for the definition of the version range.
+        /// </summary>
         AllowMetadata = 1 << 2,
         #endregion
 
