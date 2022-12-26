@@ -90,6 +90,11 @@ namespace Semver.Test.Ranges
             Valid("3.1.4-*", InclusiveOfStart("3.1.4-0", "3.1.5-0", true)),
             Valid("3.1.4-rc.*", InclusiveOfStart("3.1.4-rc", "3.1.5-0", true)),
 
+            // Wildcard before version
+            Invalid("*.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "*.2.3"),
+            Invalid("1.*.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "1.*.3"),
+            Invalid("*.*.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "*.*.3"),
+
             // Wildcard char in prerelease identifier
             Invalid("1.2.3-*a", ExceptionMessages.InvalidWildcardInPrerelease),
             Invalid("1.2.3-a*b", ExceptionMessages.InvalidWildcardInPrerelease),
@@ -111,14 +116,14 @@ namespace Semver.Test.Ranges
             Invalid("1.2.*-rc.*", ExceptionMessages.PrereleaseWithWildcardVersion),
 
             // Already at max version
-            Invalid("~1.2147483647.3", ExceptionMessages.MaxVersion, "1.2147483647.3"),
-            Invalid("^2147483647.2.3", ExceptionMessages.MaxVersion, "2147483647.2.3"),
-            Invalid("^0.2147483647.3", ExceptionMessages.MaxVersion, "0.2147483647.3"),
-            Invalid("^0.0.2147483647", ExceptionMessages.MaxVersion, "0.0.2147483647"),
-            Invalid("2147483647.*", ExceptionMessages.MaxVersion, "2147483647.0.0"),
-            Invalid("3.2147483647.*", ExceptionMessages.MaxVersion, "3.2147483647.0"),
-            Invalid("2147483647.2147483647.*", ExceptionMessages.MaxVersion, "2147483647.2147483647.0"),
-            Invalid("3.1.2147483647-rc.*", ExceptionMessages.MaxVersion, "3.1.2147483647-rc"),
+            Invalid("~1.2147483647.3", ExceptionMessages.MaxVersion, version: "1.2147483647.3"),
+            Invalid("^2147483647.2.3", ExceptionMessages.MaxVersion, version: "2147483647.2.3"),
+            Invalid("^0.2147483647.3", ExceptionMessages.MaxVersion, version: "0.2147483647.3"),
+            Invalid("^0.0.2147483647", ExceptionMessages.MaxVersion, version: "0.0.2147483647"),
+            Invalid("2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.0.0"),
+            Invalid("3.2147483647.*", ExceptionMessages.MaxVersion, version: "3.2147483647.0"),
+            Invalid("2147483647.2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.2147483647.0"),
+            Invalid("3.1.2147483647-rc.*", ExceptionMessages.MaxVersion, version: "3.1.2147483647-rc"),
 
             // Missing Comparison
             Invalid("", ExceptionMessages.MissingComparison, "0"),
@@ -272,10 +277,11 @@ namespace Semver.Test.Ranges
             string range,
             string message = "",
             string value = null,
+            string version = null,
             int maxLength = SemVersionRange.MaxRangeLength)
         {
             message = ExceptionMessages.InjectValue(message, value);
-            message = ExceptionMessages.InjectVersion(message, value);
+            message = ExceptionMessages.InjectVersion(message, version);
             return RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(FormatException), message);
         }
     }

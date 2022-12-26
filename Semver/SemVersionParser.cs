@@ -35,7 +35,7 @@ namespace Semver
         private const string InvalidCharacterInMajorMinorOrPatchMessage = "{1} version contains invalid character '{2}' in '{0}'.";
         private const string InvalidCharacterInMetadataMessage = "Invalid character '{1}' in metadata identifier in '{0}'.";
         private const string InvalidWildcardInMajorMinorOrPatchMessage = "{1} version is a wildcard and should contain only 1 character in '{0}'.";
-        private const string MajorMinorOrPatchMustBeWildcardVersionMessage = "{1} version should be a wildcard because the preceding version is a wildcard in '{0}'.";
+        private const string MinorOrPatchMustBeWildcardVersionMessage = "{1} version should be a wildcard because the preceding version is a wildcard in '{0}'.";
         private const string InvalidWildcardInPrereleaseMessage = "Prerelease version is a wildcard and should contain only 1 character in '{0}'.";
         private const string PrereleaseWildcardMustBeLast = "Prerelease identifier follows wildcard prerelease identifier in '{0}'.";
 
@@ -141,8 +141,9 @@ namespace Semver
             using (var versionNumbers = majorMinorPatchSegment.Split('.').GetEnumerator())
             {
                 const bool majorIsOptional = false;
+                const bool majorIsWildcardRequired = false;
                 parseEx = ParseVersionNumber("Major", version, versionNumbers, allowLeadingZeros,
-                    majorIsOptional, false, options, ex, out major, out var majorIsWildcard);
+                    majorIsOptional, majorIsWildcardRequired, options, ex, out major, out var majorIsWildcard);
                 if (parseEx != null) return parseEx;
                 if (majorIsWildcard) wildcardVersion |= WildcardVersion.MajorMinorPatchWildcard;
 
@@ -316,8 +317,8 @@ namespace Semver
             isWildcard = false;
 
             if (wildcardRequired)
-                return ex ?? NewFormatException(MajorMinorOrPatchMustBeWildcardVersionMessage,
-                    version.ToStringLimitLength(), kind, segment[1]);
+                return ex ?? NewFormatException(MinorOrPatchMustBeWildcardVersionMessage,
+                    version.ToStringLimitLength(), kind);
 
             var lengthWithLeadingZeros = segment.Length;
 

@@ -51,8 +51,8 @@ namespace Semver.Ranges.Parsers
             => NewFormatException(PrereleaseWithWildcardVersionMessage, range.LimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Exception UnexpectedInHyphenRange(string unpexected)
-            => NewFormatException(UnexpectedInHyphenRangeMessage, unpexected);
+        public static Exception UnexpectedInHyphenRange(string unexpected)
+            => NewFormatException(UnexpectedInHyphenRangeMessage, unexpected);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static FormatException NewFormatException(string messageTemplate, params object[] args)

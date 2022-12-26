@@ -50,7 +50,17 @@ namespace Semver.Test.Ranges
             Valid("1.2", InclusiveOfStart("1.2.0", "1.3.0-0")),
             Valid("1.X", InclusiveOfStart("1.0.0", "2.0.0-0")),
             Valid("1.*", InclusiveOfStart("1.0.0", "2.0.0-0")),
+            // '1.x.x-rc' is allowed by npm but doesn't work right (shorter wildcards are invalid)
+            Invalid("1.x.x-rc", ExceptionMessages.PrereleaseWithWildcardVersion), // accepted by npm
+            Invalid("1.x-rc", ExceptionMessages.PrereleaseWithWildcardVersion),
+            Invalid("1-rc", ExceptionMessages.PrereleaseWithWildcardVersion),
             Invalid("1.2.3-*", ExceptionMessages.InvalidCharacterInPrerelease, "*", "1.2.3-*"),
+            Valid("1.x.x+build", InclusiveOfStart("1.0.0", "2.0.0-0")),
+            Valid("1.x+build", InclusiveOfStart("1.0.0", "2.0.0-0")), // rejected by npm
+            Valid("1+build", InclusiveOfStart("1.0.0", "2.0.0-0")), // rejected by npm
+            Invalid("1.x.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "1.x.3"), // accepted by npm
+            Invalid("x.x.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "x.x.3"), // accepted by npm
+            Invalid("x.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "x.2.3"), // accepted by npm
 
             // Tilde Ranges
             Valid("~1.2.3", InclusiveOfStart("1.2.3", "1.3.0-0")),
