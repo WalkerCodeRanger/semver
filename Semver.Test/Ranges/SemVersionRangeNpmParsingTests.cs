@@ -35,12 +35,6 @@ namespace Semver.Test.Ranges
             // Prerelease in Version
             Valid(">1.2.3-alpha.3", GreaterThan("1.2.3-alpha.3")),
 
-            // Hyphen Ranges
-            Valid("1.2.3 - 2.3.4", Inclusive("1.2.3", "2.3.4")),
-            Valid("1.2 - 2.3.4", Inclusive("1.2.0", "2.3.4")),
-            Valid("1.2.3 - 2.3", InclusiveOfStart("1.2.3", "2.4.0-0")),
-            Valid("1.2.3 - 2", InclusiveOfStart("1.2.3", "3.0.0-0")),
-
             // X-Ranges
             Valid("*", AllRelease),
             Valid("1.x", InclusiveOfStart("1.0.0", "2.0.0-0")),
@@ -62,6 +56,12 @@ namespace Semver.Test.Ranges
             Invalid("x.x.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "x.x.3"), // accepted by npm
             Invalid("x.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "x.2.3"), // accepted by npm
 
+            // Hyphen Ranges
+            Valid("1.2.3 - 2.3.4", Inclusive("1.2.3", "2.3.4")),
+            Valid("1.2 - 2.3.4", Inclusive("1.2.0", "2.3.4")),
+            Valid("1.2.3 - 2.3", InclusiveOfStart("1.2.3", "2.4.0-0")),
+            Valid("1.2.3 - 2", InclusiveOfStart("1.2.3", "3.0.0-0")),
+
             // Tilde Ranges
             Valid("~1.2.3", InclusiveOfStart("1.2.3", "1.3.0-0")),
             Valid("~1.2", InclusiveOfStart("1.2.0", "1.3.0-0")),
@@ -82,6 +82,19 @@ namespace Semver.Test.Ranges
             Valid("^0.0", InclusiveOfStart("0.0.0", "0.1.0-0")),
             Valid("^1.x", InclusiveOfStart("1.0.0", "2.0.0-0")),
             Valid("^0.x", InclusiveOfStart("0.0.0", "1.0.0-0")),
+
+            // Invalid Operator
+            Invalid("~<1.2.3", ExceptionMessages.InvalidOperator, "~<"),
+            Invalid("==1.2.3", ExceptionMessages.InvalidOperator, "=="),
+            Invalid("=1.2.3|4.5.6", ExceptionMessages.InvalidOperator, "|"),
+            Invalid("@&%1.2.3", ExceptionMessages.InvalidOperator, "@&%"),
+            Invalid("≥1.2.3", ExceptionMessages.InvalidOperator, "≥"),
+
+            // Longer than max length
+            Invalid("=1.0.0", ExceptionMessages.TooLongRange, "2", maxLength: 2),
+
+            // Null range string
+            Invalid<ArgumentNullException>(null, ExceptionMessages.NotNull),
         };
 
         [Theory]

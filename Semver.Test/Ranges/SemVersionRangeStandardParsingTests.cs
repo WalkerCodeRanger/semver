@@ -156,6 +156,7 @@ namespace Semver.Test.Ranges
             Invalid("^1.2.*", ExceptionMessages.WildcardNotSupportedWithOperator),
             Invalid("~1.2.*", ExceptionMessages.WildcardNotSupportedWithOperator),
 
+            // Null range string
             Invalid<ArgumentNullException>(null, ExceptionMessages.NotNull),
         };
 
