@@ -101,23 +101,33 @@ namespace Semver.Test.Ranges
 
             // Tilde Ranges
             Valid("~1.2.3", InclusiveOfStart("1.2.3", "1.3.0-0")),
+            Valid("~1.2.3", true, InclusiveOfStart("1.2.3", "1.3.0-0", true)),
             Valid("~1.2.*", InclusiveOfStart("1.2.0", "1.3.0-0")),
+            Valid("~1.2.*", true, InclusiveOfStart("1.2.0-0", "1.3.0-0", true)), // npm parses as >=1.2.0 <1.3.0-0
             Valid("~1.*", InclusiveOfStart("1.0.0", "2.0.0-0")),
+            Valid("~1.*", true, InclusiveOfStart("1.0.0-0", "2.0.0-0", true)), // npm parses as >=1.0.0 <2.0.0-0
             Valid("~0.2.3", InclusiveOfStart("0.2.3", "0.3.0-0")),
             Valid("~0.2.*", InclusiveOfStart("0.2.0", "0.3.0-0")),
+            Valid("~0.2.*", true, InclusiveOfStart("0.2.0-0", "0.3.0-0", true)), // npm parses as >=0.2.0 <0.3.0-0
             Valid("~0.*", InclusiveOfStart("0.0.0", "1.0.0-0")),
+            Valid("~0.*", true, InclusiveOfStart("0.0.0-0", "1.0.0-0", true)), // npm parses as >=0.0.0 <1.0.0-0
             Valid("~1.2.3-beta.2", InclusiveOfStart("1.2.3-beta.2", "1.3.0-0")),
+            Valid("~1.2.3-beta.2", true, InclusiveOfStart("1.2.3-beta.2", "1.3.0-0", true)),
 
             // Caret Ranges
             Valid("^1.2.3", InclusiveOfStart("1.2.3", "2.0.0-0")),
+            Valid("^1.2.3", true, InclusiveOfStart("1.2.3", "2.0.0-0", true)),
             Valid("^0.2.3", InclusiveOfStart("0.2.3", "0.3.0-0")),
             Valid("^0.0.3", InclusiveOfStart("0.0.3", "0.0.4-0")),
             Valid("^1.2.3-beta.2", InclusiveOfStart("1.2.3-beta.2", "2.0.0-0")),
+            Valid("^1.2.3-beta.2", true, InclusiveOfStart("1.2.3-beta.2", "2.0.0-0", true)),
             Valid("^0.0.3-beta", InclusiveOfStart("0.0.3-beta", "0.0.4-0")),
             Valid("^1.2.x", InclusiveOfStart("1.2.0", "2.0.0-0")),
+            Valid("^1.2.x", true, InclusiveOfStart("1.2.0-0", "2.0.0-0", true)),
             Valid("^0.0.x", InclusiveOfStart("0.0.0", "0.1.0-0")),
             Valid("^0.0", InclusiveOfStart("0.0.0", "0.1.0-0")),
             Valid("^1.x", InclusiveOfStart("1.0.0", "2.0.0-0")),
+            Valid("^1.x", true, InclusiveOfStart("1.0.0-0", "2.0.0-0", true)),
             Valid("^0.x", InclusiveOfStart("0.0.0", "1.0.0-0")),
 
             // Invalid Operator
