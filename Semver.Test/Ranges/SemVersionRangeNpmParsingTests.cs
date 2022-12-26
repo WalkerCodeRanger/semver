@@ -49,17 +49,17 @@ namespace Semver.Test.Ranges
             Valid("1.2", InclusiveOfStart("1.2.0", "1.3.0-0")),
             Valid("1.X", InclusiveOfStart("1.0.0", "2.0.0-0")),
             Valid("1.*", InclusiveOfStart("1.0.0", "2.0.0-0")),
-            // '1.x.x-rc' is allowed by npm but doesn't work right (shorter wildcards are invalid)
-            Invalid("1.x.x-rc", ExceptionMessages.PrereleaseWithWildcardVersion), // accepted by npm
+            // '1.x.x-rc' is allowed by npm but doesn't work right (shorter wildcards are invalid) npm issue #510
+            Invalid("1.x.x-rc", ExceptionMessages.PrereleaseWithWildcardVersion), // accepted by npm issue #509
             Invalid("1.x-rc", ExceptionMessages.PrereleaseWithWildcardVersion),
             Invalid("1-rc", ExceptionMessages.PrereleaseWithWildcardVersion),
             Invalid("1.2.3-*", ExceptionMessages.InvalidCharacterInPrerelease, "*", "1.2.3-*"),
             Valid("1.x.x+build", InclusiveOfStart("1.0.0", "2.0.0-0")),
-            Valid("1.x+build", InclusiveOfStart("1.0.0", "2.0.0-0")), // rejected by npm
-            Valid("1+build", InclusiveOfStart("1.0.0", "2.0.0-0")), // rejected by npm
-            Invalid("1.x.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "1.x.3"), // accepted by npm
-            Invalid("x.x.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "x.x.3"), // accepted by npm
-            Invalid("x.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "x.2.3"), // accepted by npm
+            Valid("1.x+build", InclusiveOfStart("1.0.0", "2.0.0-0")), // rejected by npm issue #509
+            Valid("1+build", InclusiveOfStart("1.0.0", "2.0.0-0")), // rejected by npm issue #509
+            Invalid("1.x.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "1.x.3"), // accepted by npm issue #511
+            Invalid("x.x.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "x.x.3"), // accepted by npm issue #511
+            Invalid("x.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "x.2.3"), // accepted by npm issue #511
 
             // Wildcards with basic operators
             Valid("<1.2.*", LessThan("1.2.0-0")),
@@ -103,14 +103,14 @@ namespace Semver.Test.Ranges
             Valid("~1.2.3", InclusiveOfStart("1.2.3", "1.3.0-0")),
             Valid("~1.2.3", true, InclusiveOfStart("1.2.3", "1.3.0-0", true)),
             Valid("~1.2.*", InclusiveOfStart("1.2.0", "1.3.0-0")),
-            Valid("~1.2.*", true, InclusiveOfStart("1.2.0-0", "1.3.0-0", true)), // npm parses as >=1.2.0 <1.3.0-0
+            Valid("~1.2.*", true, InclusiveOfStart("1.2.0-0", "1.3.0-0", true)), // npm issue #512 parses as >=1.2.0 <1.3.0-0
             Valid("~1.*", InclusiveOfStart("1.0.0", "2.0.0-0")),
-            Valid("~1.*", true, InclusiveOfStart("1.0.0-0", "2.0.0-0", true)), // npm parses as >=1.0.0 <2.0.0-0
+            Valid("~1.*", true, InclusiveOfStart("1.0.0-0", "2.0.0-0", true)), // npm issue #512 parses as >=1.0.0 <2.0.0-0
             Valid("~0.2.3", InclusiveOfStart("0.2.3", "0.3.0-0")),
             Valid("~0.2.*", InclusiveOfStart("0.2.0", "0.3.0-0")),
-            Valid("~0.2.*", true, InclusiveOfStart("0.2.0-0", "0.3.0-0", true)), // npm parses as >=0.2.0 <0.3.0-0
+            Valid("~0.2.*", true, InclusiveOfStart("0.2.0-0", "0.3.0-0", true)), // npm issue #512 parses as >=0.2.0 <0.3.0-0
             Valid("~0.*", InclusiveOfStart("0.0.0", "1.0.0-0")),
-            Valid("~0.*", true, InclusiveOfStart("0.0.0-0", "1.0.0-0", true)), // npm parses as >=0.0.0 <1.0.0-0
+            Valid("~0.*", true, InclusiveOfStart("0.0.0-0", "1.0.0-0", true)), // npm issue #512 parses as >=0.0.0 <1.0.0-0
             Valid("~1.2.3-beta.2", InclusiveOfStart("1.2.3-beta.2", "1.3.0-0")),
             Valid("~1.2.3-beta.2", true, InclusiveOfStart("1.2.3-beta.2", "1.3.0-0", true)),
 
