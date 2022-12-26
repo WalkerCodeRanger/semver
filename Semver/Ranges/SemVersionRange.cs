@@ -75,6 +75,8 @@ namespace Semver.Ranges
                     if (ranges[i].Contains(ranges[j]))
                         ranges.RemoveAt(j);
 
+            // TODO union together overlapping ranges?
+
             return new SemVersionRange(ranges.AsReadOnly());
         }
 

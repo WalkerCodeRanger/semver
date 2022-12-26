@@ -40,7 +40,6 @@ namespace Semver.Ranges
         public static UnbrokenSemVersionRange AtMost(SemVersion version, bool includeAllPrerelease = false)
             => Create(null, false, Validate(version, nameof(version)), true, includeAllPrerelease);
 
-        // TODO start == end with includeAllPrerelease == true should be same as Equals(start)
         public static UnbrokenSemVersionRange Inclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(Validate(start, nameof(start)), true,
                 Validate(end, nameof(end)), true, includeAllPrerelease);
