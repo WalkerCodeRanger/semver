@@ -153,8 +153,8 @@ namespace Semver.Ranges.Parsers
                 out var semver2, out var wildcardVersion2);
             if (exception != null) return exception;
 
-            WildcardLowerBound(ref leftBound, includeAllPrerelease, semver1, wildcardVersion1);
-            return WildcardUpperBound(ref rightBound, ex, afterHyphenSegment, semver2, wildcardVersion2);
+            WildcardLowerBound(includeAllPrerelease, ref leftBound, semver1, wildcardVersion1);
+            return WildcardUpperBound(ex, ref rightBound, afterHyphenSegment, semver2, wildcardVersion2);
         }
 
         private static Exception ParseHyphenSegment(
@@ -221,19 +221,19 @@ namespace Semver.Ranges.Parsers
             switch (@operator)
             {
                 case StandardOperator.GreaterThan:
-                    return GreaterThan(versionSegment, semver, wildcardVersion, ex, ref leftBound);
+                    return GreaterThan(includeAllPrerelease, ex, ref leftBound, versionSegment, semver, wildcardVersion);
                 case StandardOperator.GreaterThanOrEqual:
-                    WildcardLowerBound(ref leftBound, includeAllPrerelease, semver, wildcardVersion);
+                    WildcardLowerBound(includeAllPrerelease, ref leftBound, semver, wildcardVersion);
                     return null;
                 case StandardOperator.LessThan:
-                    return LessThan(semver, wildcardVersion, ref rightBound);
+                    return LessThan(ref rightBound, semver, wildcardVersion);
                 case StandardOperator.LessThanOrEqual:
-                    return WildcardUpperBound(ref rightBound, ex, versionSegment, semver, wildcardVersion);
+                    return WildcardUpperBound(ex, ref rightBound, versionSegment, semver, wildcardVersion);
                 case StandardOperator.Caret:
                     if (wildcardVersion == WildcardVersion.MajorMinorPatchWildcard)
                         // No further bound is places on the left and right bounds
                         return null;
-                    WildcardLowerBound(ref leftBound, includeAllPrerelease, semver, wildcardVersion);
+                    WildcardLowerBound(includeAllPrerelease, ref leftBound, semver, wildcardVersion);
                     int major = 0, minor = 0, patch = 0;
                     if (semver.Major != 0 || wildcardVersion == WildcardVersion.MinorPatchWildcard)
                     {
@@ -260,7 +260,7 @@ namespace Semver.Ranges.Parsers
                     if (wildcardVersion == WildcardVersion.MajorMinorPatchWildcard)
                         // No further bound is places on the left and right bounds
                         return null;
-                    WildcardLowerBound(ref leftBound, includeAllPrerelease, semver, wildcardVersion);
+                    WildcardLowerBound(includeAllPrerelease, ref leftBound, semver, wildcardVersion);
                     if (wildcardVersion == WildcardVersion.MinorPatchWildcard)
                     {
                         if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
@@ -278,8 +278,8 @@ namespace Semver.Ranges.Parsers
                     return null;
                 case StandardOperator.Equals:
                 case StandardOperator.None: // implied =
-                    WildcardLowerBound(ref leftBound, includeAllPrerelease, semver, wildcardVersion);
-                    return WildcardUpperBound(ref rightBound, ex, versionSegment, semver, wildcardVersion);
+                    WildcardLowerBound(includeAllPrerelease, ref leftBound, semver, wildcardVersion);
+                    return WildcardUpperBound(ex, ref rightBound, versionSegment, semver, wildcardVersion);
                 default:
                     // This code should be unreachable
                     throw new ArgumentException($"DEBUG: Invalid {nameof(StandardOperator)} value {@operator}");
@@ -309,11 +309,12 @@ namespace Semver.Ranges.Parsers
         /// The greater than operator taking into account the wildcard.
         /// </summary>
         private static Exception GreaterThan(
+            bool includeAllPrerelease,
+            Exception ex,
+            ref LeftBoundedRange leftBound,
             StringSegment versionSegment,
             SemVersion semver,
-            WildcardVersion wildcardVersion,
-            Exception ex,
-            ref LeftBoundedRange leftBound)
+            WildcardVersion wildcardVersion)
         {
             bool inclusive;
             switch (wildcardVersion)
@@ -323,15 +324,25 @@ namespace Semver.Ranges.Parsers
                     leftBound = leftBound.Max(new LeftBoundedRange(SemVersion.Max, false));
                     return null;
                 case WildcardVersion.MinorPatchWildcard:
+                {
                     if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
-                    semver = new SemVersion(semver.Major + 1, 0, 0);
+                    var prereleaseString = includeAllPrerelease ? "0" : "";
+                    var prerelease = includeAllPrerelease ? PrereleaseIdentifiers.Zero : ReadOnlyList<PrereleaseIdentifier>.Empty;
+                    semver = new SemVersion(semver.Major + 1, 0, 0, prereleaseString, prerelease,
+                        "", ReadOnlyList<MetadataIdentifier>.Empty);
                     inclusive = true;
                     break;
+                }
                 case WildcardVersion.PatchWildcard:
+                {
                     if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
-                    semver = new SemVersion(semver.Major, semver.Minor + 1, 0);
+                    var prereleaseString = includeAllPrerelease ? "0" : "";
+                    var prerelease = includeAllPrerelease ? PrereleaseIdentifiers.Zero : ReadOnlyList<PrereleaseIdentifier>.Empty;
+                    semver = new SemVersion(semver.Major, semver.Minor + 1, 0, prereleaseString, prerelease,
+                        "", ReadOnlyList<MetadataIdentifier>.Empty);
                     inclusive = true;
                     break;
+                }
                 case WildcardVersion.None:
                     inclusive = false;
                     break;
@@ -347,9 +358,9 @@ namespace Semver.Ranges.Parsers
         /// The less than operator taking into account the wildcard.
         /// </summary>
         private static Exception LessThan(
+            ref RightBoundedRange rightBound,
             SemVersion semver,
-            WildcardVersion wildcardVersion,
-            ref RightBoundedRange rightBound)
+            WildcardVersion wildcardVersion)
         {
 #if DEBUG
             if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
@@ -376,11 +387,15 @@ namespace Semver.Ranges.Parsers
         }
 
         private static void WildcardLowerBound(
-            ref LeftBoundedRange leftBound,
             bool includeAllPrerelease,
+            ref LeftBoundedRange leftBound,
             SemVersion semver,
             WildcardVersion wildcardVersion)
         {
+#if DEBUG
+            if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
+                throw new InvalidOperationException("DEBUG: prerelease not allowed with wildcard");
+#endif
             switch (wildcardVersion)
             {
                 case WildcardVersion.MajorMinorPatchWildcard:
@@ -388,7 +403,7 @@ namespace Semver.Ranges.Parsers
                     return;
                 case WildcardVersion.MinorPatchWildcard:
                 case WildcardVersion.PatchWildcard:
-                    if (includeAllPrerelease && !semver.IsPrerelease)
+                    if (includeAllPrerelease)
                         semver = semver.WithPrerelease(PrereleaseIdentifier.Zero);
                     break;
                 case WildcardVersion.None:
@@ -403,8 +418,8 @@ namespace Semver.Ranges.Parsers
         }
 
         private static Exception WildcardUpperBound(
-            ref RightBoundedRange rightBound,
             Exception ex,
+            ref RightBoundedRange rightBound,
             StringSegment versionSegment,
             SemVersion semver,
             WildcardVersion wildcardVersion)

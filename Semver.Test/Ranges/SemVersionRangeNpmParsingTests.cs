@@ -37,9 +37,14 @@ namespace Semver.Test.Ranges
 
             // X-Ranges
             Valid("*", AllRelease),
+            Valid("*", true, All),
             Valid("1.x", InclusiveOfStart("1.0.0", "2.0.0-0")),
             Valid("1.2.x", InclusiveOfStart("1.2.0", "1.3.0-0")),
             Valid("", AllRelease),
+            Valid("", true, All),
+            Valid("   ", AllRelease),
+            Valid("1.2.3||", AllRelease, EqualsVersion("1.2.3")),
+            Valid(" ||1.2.3", AllRelease, EqualsVersion("1.2.3")),
             Valid("1", InclusiveOfStart("1.0.0", "2.0.0-0")),
             Valid("1.2", InclusiveOfStart("1.2.0", "1.3.0-0")),
             Valid("1.X", InclusiveOfStart("1.0.0", "2.0.0-0")),
@@ -56,6 +61,38 @@ namespace Semver.Test.Ranges
             Invalid("x.x.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "x.x.3"), // accepted by npm
             Invalid("x.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "x.2.3"), // accepted by npm
 
+            // Wildcards with basic operators
+            Valid("<1.2.*", LessThan("1.2.0-0")),
+            Valid("<1.2.*", true, LessThan("1.2.0-0", true)),
+            Valid("<1.*", LessThan("1.0.0-0")),
+            Valid("<1.*", true, LessThan("1.0.0-0", true)),
+            Valid("<*", Empty),
+            Valid("<*", true, Empty),
+            Valid("<=1.2.*", LessThan("1.3.0-0")),
+            Valid("<=1.2.*", true, LessThan("1.3.0-0", true)),
+            Valid("<=1.*", LessThan("2.0.0-0")),
+            Valid("<=1.*", true, LessThan("2.0.0-0", true)),
+            Valid("<=*", AllRelease),
+            Valid("<=*", true, All),
+            Valid(">1.2.*", AtLeast("1.3.0")),
+            Valid(">1.2.*", true, AtLeast("1.3.0-0", true)),
+            Valid(">1.*", AtLeast("2.0.0")),
+            Valid(">1.*", true, AtLeast("2.0.0-0", true)),
+            Valid(">*", Empty),
+            Valid(">*", true, Empty),
+            Valid(">=1.2.*", AtLeast("1.2.0")),
+            Valid(">=1.2.*", true, AtLeast("1.2.0-0", true)),
+            Valid(">=1.*", AtLeast("1.0.0")),
+            Valid(">=1.*", true, AtLeast("1.0.0-0", true)),
+            Valid(">=*", AllRelease),
+            Valid(">=*", true, All),
+            Valid("=1.2.*", InclusiveOfStart("1.2.0", "1.3.0-0")),
+            Valid("=1.2.*", true, InclusiveOfStart("1.2.0-0", "1.3.0-0", true)),
+            Valid("=1.*", InclusiveOfStart("1.0.0", "2.0.0-0")),
+            Valid("=1.*", true, InclusiveOfStart("1.0.0-0", "2.0.0-0", true)),
+            Valid("=*", AllRelease),
+            Valid("=*", true, All),
+
             // Hyphen Ranges
             Valid("1.2.3 - 2.3.4", Inclusive("1.2.3", "2.3.4")),
             Valid("1.2 - 2.3.4", Inclusive("1.2.0", "2.3.4")),
@@ -64,11 +101,11 @@ namespace Semver.Test.Ranges
 
             // Tilde Ranges
             Valid("~1.2.3", InclusiveOfStart("1.2.3", "1.3.0-0")),
-            Valid("~1.2", InclusiveOfStart("1.2.0", "1.3.0-0")),
-            Valid("~1", InclusiveOfStart("1.0.0", "2.0.0-0")),
+            Valid("~1.2.*", InclusiveOfStart("1.2.0", "1.3.0-0")),
+            Valid("~1.*", InclusiveOfStart("1.0.0", "2.0.0-0")),
             Valid("~0.2.3", InclusiveOfStart("0.2.3", "0.3.0-0")),
-            Valid("~0.2", InclusiveOfStart("0.2.0", "0.3.0-0")),
-            Valid("~0", InclusiveOfStart("0.0.0", "1.0.0-0")),
+            Valid("~0.2.*", InclusiveOfStart("0.2.0", "0.3.0-0")),
+            Valid("~0.*", InclusiveOfStart("0.0.0", "1.0.0-0")),
             Valid("~1.2.3-beta.2", InclusiveOfStart("1.2.3-beta.2", "1.3.0-0")),
 
             // Caret Ranges
@@ -85,6 +122,7 @@ namespace Semver.Test.Ranges
 
             // Invalid Operator
             Invalid("~<1.2.3", ExceptionMessages.InvalidOperator, "~<"),
+            Invalid("~=1.2.3", ExceptionMessages.InvalidOperator, "~="),
             Invalid("==1.2.3", ExceptionMessages.InvalidOperator, "=="),
             Invalid("=1.2.3|4.5.6", ExceptionMessages.InvalidOperator, "|"),
             Invalid("@&%1.2.3", ExceptionMessages.InvalidOperator, "@&%"),
