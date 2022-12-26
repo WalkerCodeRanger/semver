@@ -226,7 +226,7 @@ namespace Semver.Ranges.Parsers
                     WildcardLowerBound(ref leftBound, includeAllPrerelease, semver, wildcardVersion);
                     return null;
                 case StandardOperator.LessThan:
-                    return LessThan(semver, wildcardVersion, ex, ref rightBound);
+                    return LessThan(semver, wildcardVersion, ref rightBound);
                 case StandardOperator.LessThanOrEqual:
                     return WildcardUpperBound(ref rightBound, ex, versionSegment, semver, wildcardVersion);
                 case StandardOperator.Caret:
@@ -299,8 +299,8 @@ namespace Semver.Ranges.Parsers
             if (exception != null) return exception;
             if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
                 return ex ?? RangeError.PrereleaseNotSupportedWithWildcardVersion(segment.Source);
-            // TODO check for wildcards combined with metadata which is not allow by npm
-            // Remove the metadata the npm ranges allow
+            // Remove the metadata the npm ranges allow (note we always allow metadata even though
+            // npm rejects it for partial versions)
             semver = semver.WithoutMetadata();
             return null;
         }
@@ -349,15 +349,17 @@ namespace Semver.Ranges.Parsers
         private static Exception LessThan(
             SemVersion semver,
             WildcardVersion wildcardVersion,
-            Exception ex,
             ref RightBoundedRange rightBound)
         {
+#if DEBUG
+            if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
+                throw new InvalidOperationException("DEBUG: prerelease not allowed with wildcard");
+#endif
             switch (wildcardVersion)
             {
                 case WildcardVersion.MajorMinorPatchWildcard:
                 case WildcardVersion.MinorPatchWildcard:
                 case WildcardVersion.PatchWildcard:
-                    // TODO what if this is already a prerelease version?
                     // Wildcard places already filled with zeros
                     semver = semver.WithPrerelease(PrereleaseIdentifier.Zero);
                     break;
