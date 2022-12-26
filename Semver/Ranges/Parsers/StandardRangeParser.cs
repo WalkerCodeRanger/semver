@@ -107,6 +107,7 @@ namespace Semver.Ranges.Parsers
             exception = ParseOptionalSpaces(ref segment, ex);
             if (exception != null) return exception;
 
+            var versionSegment = segment;
             exception = ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
                             out var semver, out var wildcardVersion);
             if (exception != null) return exception;
@@ -140,17 +141,17 @@ namespace Semver.Ranges.Parsers
                     int major = 0, minor = 0, patch = 0;
                     if (semver.Major != 0)
                     {
-                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         major = semver.Major + 1;
                     }
                     else if (semver.Minor != 0)
                     {
-                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         minor = semver.Minor + 1;
                     }
                     else
                     {
-                        if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                        if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         patch = semver.Patch + 1;
                     }
 
@@ -161,7 +162,7 @@ namespace Semver.Ranges.Parsers
                     return null;
                 case StandardOperator.Tilde:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                     rightBound = rightBound.Min(new RightBoundedRange(
                         semver.With(minor: semver.Minor + 1, patch: 0, prerelease: PrereleaseIdentifiers.Zero),
                         false));
@@ -178,7 +179,7 @@ namespace Semver.Ranges.Parsers
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
                             if (prereleaseWildcard)
                             {
-                                if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                                if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                                 rightBound = rightBound.Min(new RightBoundedRange(
                                     new SemVersion(semver.Major, semver.Minor, semver.Patch + 1, "0",
                                         PrereleaseIdentifiers.Zero, "",
@@ -193,7 +194,7 @@ namespace Semver.Ranges.Parsers
                             return null;
                         case WildcardVersion.MinorPatchWildcard:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
-                            if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                            if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                             rightBound = rightBound.Min(new RightBoundedRange(
                                 new SemVersion(semver.Major + 1, 0, 0,
                                     "0", PrereleaseIdentifiers.Zero,
@@ -201,7 +202,7 @@ namespace Semver.Ranges.Parsers
                             return null;
                         case WildcardVersion.PatchWildcard:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
-                            if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(semver);
+                            if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                             rightBound = rightBound.Min(new RightBoundedRange(
                                 new SemVersion(semver.Major, semver.Minor + 1, 0,
                                     "0", PrereleaseIdentifiers.Zero,

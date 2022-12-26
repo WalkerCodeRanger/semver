@@ -120,10 +120,10 @@ namespace Semver.Test.Ranges
             Invalid("^2147483647.2.3", ExceptionMessages.MaxVersion, version: "2147483647.2.3"),
             Invalid("^0.2147483647.3", ExceptionMessages.MaxVersion, version: "0.2147483647.3"),
             Invalid("^0.0.2147483647", ExceptionMessages.MaxVersion, version: "0.0.2147483647"),
-            Invalid("2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.0.0"),
-            Invalid("3.2147483647.*", ExceptionMessages.MaxVersion, version: "3.2147483647.0"),
-            Invalid("2147483647.2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.2147483647.0"),
-            Invalid("3.1.2147483647-rc.*", ExceptionMessages.MaxVersion, version: "3.1.2147483647-rc"),
+            Invalid("2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.*"),
+            Invalid("3.2147483647.*", ExceptionMessages.MaxVersion, version: "3.2147483647.*"),
+            Invalid("2147483647.2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.2147483647.*"),
+            Invalid("3.1.2147483647-rc.*", ExceptionMessages.MaxVersion, version: "3.1.2147483647-rc.*"),
 
             // Missing Comparison
             Invalid("", ExceptionMessages.MissingComparison, "0"),
