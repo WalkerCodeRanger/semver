@@ -209,5 +209,27 @@ namespace Semver.Test.Ranges
         {
             testCase.AssertTryParse();
         }
+
+        /// <summary>
+        /// While the <see cref="SemVersionRange.ToString"/> method uses the standard range syntax,
+        /// this test exists to make sure that reasonable output is given for various npm ranges.
+        /// </summary>
+        [Theory]
+        [InlineData("1.2.x", "1.2.*")]
+        [InlineData("1.2.x", "1.2.*-*", true)]
+        [InlineData("1.x", "1.*")]
+        [InlineData("1.x", "1.*-*", true)]
+        [InlineData("1.2.3||", "*")]
+        [InlineData(">1.*", "*-* >=2.0.0-0", true)]
+        [InlineData("=*", "*-*", true)]
+        [InlineData("~1.2.*", "1.2.*")]
+        [InlineData("~0.2.*", "0.2.*-*", true)]
+        [InlineData("^1.2.x", "*-* ^1.2.0-0", true)]
+        public void ToStringOfNpmRange(string npmRange, string expected, bool includeAllPrerelease = false)
+        {
+            var range = SemVersionRange.ParseNpm(npmRange, includeAllPrerelease);
+
+            Assert.Equal(expected, range.ToString());
+        }
     }
 }

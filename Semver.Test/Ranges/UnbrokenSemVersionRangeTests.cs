@@ -1038,6 +1038,8 @@ namespace Semver.Test.Ranges
             {InclusiveOfStart("5.0.0", "6.0.0-0", true), "*-* 5.*"},
             {InclusiveOfStart("3.1.4-0", "3.1.5-0", true), "3.1.4-*"},
             {InclusiveOfStart("3.1.4-rc", "3.1.5-0", true), "3.1.4-rc.*"},
+            {InclusiveOfStart("2.0.0-0", "3.0.0-0"), "2.*"},
+            {InclusiveOfStart("2.0.0-0", "3.0.0-0", true), "2.*-*"},
             // Wildcard ranges preferred to tilde or caret
             {InclusiveOfStart("0.1.0", "0.2.0-0"), "0.1.*"},
             {InclusiveOfStart("0.1.0", "0.2.0-0", true), "*-* 0.1.*"},
@@ -1064,6 +1066,8 @@ namespace Semver.Test.Ranges
             {InclusiveOfStart("2.1.3", "3.0.0-0", true), "*-* ^2.1.3"},
             {InclusiveOfStart("2.1.3-rc", "3.0.0-0"), "^2.1.3-rc"},
             {InclusiveOfStart("2.1.3-rc", "3.0.0-0", true), "*-* ^2.1.3-rc"},
+            {InclusiveOfStart("2.1.3-0", "3.0.0-0"), "^2.1.3-0"},
+            {InclusiveOfStart("2.1.3-0", "3.0.0-0", true), "*-* ^2.1.3-0"},
             {InclusiveOfStart("2.0.0-rc", "3.0.0-0"), "^2.0.0-rc"},
             {InclusiveOfStart("2.0.0-rc", "3.0.0-0", true), "*-* ^2.0.0-rc"},
             // Caret ranges starting with patch
