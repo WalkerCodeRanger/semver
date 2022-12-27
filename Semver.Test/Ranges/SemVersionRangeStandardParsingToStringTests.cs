@@ -29,6 +29,7 @@ namespace Semver.Test.Ranges
             Valid("1.2.3-rc.*", "1.2.3-rc.*"),
             Valid("1.2.3-5.*", "1.2.3-5.*"),
             Valid("1.2.3-2147483647.*", "1.2.3-2147483647.*"),
+            Valid("3.1.4-l.o.n.g.e.r.rc.*", "3.1.4-l.o.n.g.e.r.rc.*"),
         };
 
         [Theory]

@@ -243,7 +243,7 @@ namespace Semver.Ranges.Parsers
             IReadOnlyList<PrereleaseIdentifier> identifiers)
         {
             for (int i = 0; i < identifiers.Count - 1; i++)
-                yield return identifiers[0];
+                yield return identifiers[i];
 
             var lastIdentifier = identifiers[identifiers.Count - 1];
 

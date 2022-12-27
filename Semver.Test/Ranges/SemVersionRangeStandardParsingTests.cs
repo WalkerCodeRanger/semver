@@ -91,6 +91,7 @@ namespace Semver.Test.Ranges
             Valid("3.1.4-rc.*", InclusiveOfStart("3.1.4-rc.0", "3.1.4-rc-", true)),
             Valid("3.1.4-5.*", InclusiveOfStart("3.1.4-5.0", "3.1.4-6", true)),
             Valid("3.1.4-2147483647.*", InclusiveOfStart("3.1.4-2147483647.0", "3.1.4--", true)),
+            Valid("3.1.4-l.o.n.g.e.r.rc.*", InclusiveOfStart("3.1.4-l.o.n.g.e.r.rc.0", "3.1.4-l.o.n.g.e.r.rc-", true)),
 
             // Range containment (or non-containment)
             Valid("1.*||1.2.*", InclusiveOfStart("1.0.0", "2.0.0-0")),
