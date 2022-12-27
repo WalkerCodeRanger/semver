@@ -6,6 +6,20 @@ using Semver.Ranges.Parsers;
 
 namespace Semver.Utility
 {
+    /// <summary>
+    /// The <see cref="DebugChecks"/> class allows for the various conditional checks done only in
+    /// debug builds to not count against the code coverage metrics.
+    /// </summary>
+    /// <remarks>When using a preprocessor conditional block, the contained lines are not covered by
+    /// the unit tests (see example below). This is expected because the conditions should not be
+    /// reachable. But it makes it difficult to evaluate at a glance whether full code coverage has
+    /// been reached.
+    /// <code>
+    /// #if DEBUG
+    ///     if(condition) throw new Exception("...");
+    /// #endif
+    /// </code>
+    /// </remarks>
     [ExcludeFromCodeCoverage]
     internal static class DebugChecks
     {
@@ -28,6 +42,13 @@ namespace Semver.Utility
         {
             if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
                 throw new InvalidOperationException("DEBUG: prerelease not allowed with wildcard");
+        }
+
+        [Conditional("DEBUG")]
+        public static void IsNotEmpty(StringSegment segment, string paramName)
+        {
+            if (segment.IsEmpty)
+                throw new ArgumentException("DEBUG: Cannot be empty", paramName);
         }
     }
 }

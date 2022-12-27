@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Semver.Utility;
 using static Semver.Ranges.Parsers.GeneralRangeParser;
 
@@ -199,9 +198,8 @@ namespace Semver.Ranges.Parsers
             ref LeftBoundedRange leftBound,
             ref RightBoundedRange rightBound)
         {
-#if DEBUG
-            if (segment.IsEmpty) throw new ArgumentException("DEBUG: Cannot be empty", nameof(segment));
-#endif
+            DebugChecks.IsNotEmpty(segment, nameof(segment));
+
             var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;
 
@@ -277,8 +275,8 @@ namespace Semver.Ranges.Parsers
                     WildcardLowerBound(includeAllPrerelease, ref leftBound, semver, wildcardVersion);
                     return WildcardUpperBound(ex, ref rightBound, versionSegment, semver, wildcardVersion);
                 default:
-                    // This code should be unreachable
-                    throw new ArgumentException($"DEBUG: Invalid {nameof(StandardOperator)} value {@operator}");
+                    // dotcover disable next line
+                    throw Unreachable.InvalidEnum(@operator);
             }
         }
 
@@ -345,8 +343,8 @@ namespace Semver.Ranges.Parsers
                     inclusive = false;
                     break;
                 default:
-                    // This code should be unreachable
-                    throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
+                    // dotcover disable next line
+                    throw Unreachable.InvalidEnum(wildcardVersion);
             }
             leftBound = leftBound.Max(new LeftBoundedRange(semver, inclusive));
             return null;
@@ -374,8 +372,8 @@ namespace Semver.Ranges.Parsers
                     // No changes to version
                     break;
                 default:
-                    // This code should be unreachable
-                    throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
+                    // dotcover disable next line
+                    throw Unreachable.InvalidEnum(wildcardVersion);
             }
 
             rightBound = rightBound.Min(new RightBoundedRange(semver, false));
@@ -404,8 +402,8 @@ namespace Semver.Ranges.Parsers
                     // No changes to version
                     break;
                 default:
-                    // This code should be unreachable
-                    throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
+                    // dotcover disable next line
+                    throw Unreachable.InvalidEnum(wildcardVersion);
             }
 
             leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
@@ -441,8 +439,8 @@ namespace Semver.Ranges.Parsers
                             ReadOnlyList<MetadataIdentifier>.Empty), false));
                     return null;
                 default:
-                    // This code should be unreachable
-                    throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
+                    // dotcover disable next line
+                    throw Unreachable.InvalidEnum(wildcardVersion);
             }
         }
 
