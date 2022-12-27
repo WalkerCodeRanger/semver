@@ -95,9 +95,20 @@ namespace Semver.Test.Ranges
 
             // Hyphen Ranges
             Valid("1.2.3 - 2.3.4", Inclusive("1.2.3", "2.3.4")),
+            Valid("1.2.3-rc - 2.3.4-rc", Inclusive("1.2.3-rc", "2.3.4-rc")),
             Valid("1.2 - 2.3.4", Inclusive("1.2.0", "2.3.4")),
             Valid("1.2.3 - 2.3", InclusiveOfStart("1.2.3", "2.4.0-0")),
             Valid("1.2.3 - 2", InclusiveOfStart("1.2.3", "3.0.0-0")),
+            Invalid("1.0.0 - 2.a.*", ExceptionMessages.InvalidCharacterInMinor, "a", "2.a.*"),
+            Invalid(">1.0.0 - 2.0.0", ExceptionMessages.UnexpectedInHyphenRange, ">"),
+            Invalid(">1.0.0 1.5.0 - 2.0.0", ExceptionMessages.UnexpectedInHyphenRange, ">"),
+            Invalid("1.5.0 < - 2.0.0", ExceptionMessages.UnexpectedInHyphenRange, "<"),
+            Invalid("1.5.0 - <2.0.0", ExceptionMessages.UnexpectedInHyphenRange, "<"),
+            Invalid("1.5.0 - 2.0.0 <4.0.0", ExceptionMessages.UnexpectedInHyphenRange, "<4.0.0"),
+            Invalid(" - 2.0.0", ExceptionMessages.MissingVersionInHyphenRange),
+            Invalid("    - 2.0.0", ExceptionMessages.MissingVersionInHyphenRange),
+            Invalid("1.0.0 - ", ExceptionMessages.MissingVersionInHyphenRange),
+            Invalid("1.0.0 -    ", ExceptionMessages.MissingVersionInHyphenRange),
 
             // Tilde Ranges
             Valid("~1.2.3", InclusiveOfStart("1.2.3", "1.3.0-0")),

@@ -21,6 +21,8 @@ namespace Semver.Ranges.Parsers
             = "A wildcard major, minor, or patch is combined with a prerelease version in '{0}'.";
         private const string UnexpectedInHyphenRangeMessage
             = "Unexpected characters in hyphen range '{0}'.";
+        private const string MissingVersionInHyphenRangeMessage
+            = "Missing a version number in hyphen range in '{0}'.";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FormatException TooLong(string range, int maxLength)
@@ -53,6 +55,9 @@ namespace Semver.Ranges.Parsers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception UnexpectedInHyphenRange(string unexpected)
             => NewFormatException(UnexpectedInHyphenRangeMessage, unexpected);
+
+        public static Exception MissingVersionInHyphenRange(string range)
+            => NewFormatException(MissingVersionInHyphenRangeMessage, range.LimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static FormatException NewFormatException(string messageTemplate, params object[] args)

@@ -70,6 +70,10 @@ namespace Semver.Test.Helpers
             = "A wildcard major, minor, or patch is combined with a prerelease version in '{range}'.";
         public const string WildcardNotSupportedWithOperator
             = "Operator is combined with wildcards in '{range}'.";
+        public const string UnexpectedInHyphenRange
+            = "Unexpected characters in hyphen range '{value}'.";
+        public const string MissingVersionInHyphenRange
+            = "Missing a version number in hyphen range in '{range}'.";
         #endregion
 
         public static string InjectValue(string format, string value)

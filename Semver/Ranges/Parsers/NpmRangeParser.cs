@@ -69,21 +69,12 @@ namespace Semver.Ranges.Parsers
             // Assign null once so it doesn't have to be done any time parse fails
             unbrokenRange = null;
 
-            // Parse off leading whitespace
-            ParseOptionalWhitespace(ref segment);
-
             var includeAllPrerelease = rangeOptions.HasOption(SemVersionRangeOptions.IncludeAllPrerelease);
-
-            // Handle empty string ranges
-            if (segment.IsEmpty)
-            {
-                unbrokenRange = includeAllPrerelease ? UnbrokenSemVersionRange.All : UnbrokenSemVersionRange.AllRelease;
-                return null;
-            }
 
             var start = LeftBoundedRange.Unbounded;
             var end = RightBoundedRange.Unbounded;
 
+            // Try to split before removing leading whitespace because of invalid ranges like ' - 2.0.0'
             if (TrySplitOnHyphenRangeSeparator(segment, out var segment1, out var segment2))
             {
                 var exception = ParseHyphenRange(segment1, segment2, rangeOptions, includeAllPrerelease, ex,
@@ -91,12 +82,26 @@ namespace Semver.Ranges.Parsers
                 if (exception != null) return exception;
             }
             else
+            {
+                // Parse off leading whitespace
+                ParseOptionalWhitespace(ref segment);
+
+                // Handle empty string ranges
+                if (segment.IsEmpty)
+                {
+                    unbrokenRange = includeAllPrerelease
+                        ? UnbrokenSemVersionRange.All
+                        : UnbrokenSemVersionRange.AllRelease;
+                    return null;
+                }
+
                 while (!segment.IsEmpty)
                 {
-                    var exception = ParseComparison(ref segment, rangeOptions, includeAllPrerelease, ex,
-                        maxLength, ref start, ref end);
+                    var exception = ParseComparison(ref segment, rangeOptions, includeAllPrerelease, ex, maxLength,
+                        ref start, ref end);
                     if (exception != null) return exception;
                 }
+            }
 
             unbrokenRange = UnbrokenSemVersionRange.Create(start, end, includeAllPrerelease);
             return null;
@@ -160,9 +165,22 @@ namespace Semver.Ranges.Parsers
             out SemVersion semver,
             out WildcardVersion wildcardVersion)
         {
+            // Assign null once so it doesn't have to be done any time parse fails
+            semver = null;
+            wildcardVersion = WildcardVersion.None;
+
             // Parse off leading whitespace from before hyphen segment
             ParseOptionalWhitespace(ref segment);
 
+            // Check for missing version number
+            if (segment.Length == 0)
+                return ex ?? RangeError.MissingVersionInHyphenRange(segment.Source);
+
+            // Check for invalid chars, like an operator, before the version
+            if (!IsPossibleVersionChar(segment[0], rangeOptions))
+                return ex ?? RangeError.UnexpectedInHyphenRange(segment[0].ToString());
+
+            // Now parse the actual version number
             var exception = ParseNpmVersion(ref segment, rangeOptions, ex, maxLength,
                 out semver, out wildcardVersion);
             if (exception != null) return exception;
