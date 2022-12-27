@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Semver.Utility
 {
@@ -10,6 +11,7 @@ namespace Semver.Utility
     /// <remarks>Algorithm based on HashHelpers previously used in the core CLR.
     /// https://github.com/dotnet/coreclr/blob/456afea9fbe721e57986a21eb3b4bb1c9c7e4c56/src/System.Private.CoreLib/shared/System/Numerics/Hashing/HashHelpers.cs
     /// </remarks>
+    [StructLayout(LayoutKind.Auto)]
     internal struct CombinedHashCode
     {
         private static readonly int RandomSeed = new Random().Next(int.MinValue, int.MaxValue);

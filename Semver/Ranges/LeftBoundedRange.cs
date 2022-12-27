@@ -36,20 +36,30 @@ namespace Semver.Ranges
         public SemVersion Version { get; }
         public bool Inclusive { get; }
 
+        public bool IncludesPrerelease => Version?.IsPrerelease == true;
+
         public bool Contains(SemVersion version)
         {
             var comparison = SemVersion.ComparePrecedence(Version, version);
             return Inclusive ? comparison <= 0 : comparison < 0;
         }
 
+        public LeftBoundedRange Min(LeftBoundedRange other)
+        {
+            var comparison = SemVersion.ComparePrecedence(Version, other.Version);
+            if (comparison == 0)
+                // If the versions are equal, then inclusive will be min
+                return new LeftBoundedRange(Version, Inclusive || other.Inclusive);
+            return comparison < 0 ? this : other;
+        }
+
         public LeftBoundedRange Max(LeftBoundedRange other)
         {
             var comparison = SemVersion.ComparePrecedence(Version, other.Version);
-            if (comparison < 0) return other;
             if (comparison == 0)
                 // If the versions are equal, then non-inclusive will be max
                 return new LeftBoundedRange(Version, Inclusive && other.Inclusive);
-            return this;
+            return comparison < 0 ? other : this;
         }
 
         #region Equality

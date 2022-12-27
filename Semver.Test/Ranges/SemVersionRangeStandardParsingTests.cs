@@ -90,6 +90,17 @@ namespace Semver.Test.Ranges
             Valid("3.1.4-*", InclusiveOfStart("3.1.4-0", "3.1.5-0", true)),
             Valid("3.1.4-rc.*", InclusiveOfStart("3.1.4-rc", "3.1.5-0", true)),
 
+            // Range containment (or non-containment)
+            Valid("1.*||1.2.*", InclusiveOfStart("1.0.0", "2.0.0-0")),
+            Valid("1.*-*||1.2.*", InclusiveOfStart("1.0.0-0", "2.0.0-0", true)),
+            Valid("1.*||1.2.*-*", InclusiveOfStart("1.0.0", "2.0.0-0"), InclusiveOfStart("1.2.0-0", "1.3.0-0", true)),
+            Valid("1.*||2.*", InclusiveOfStart("1.0.0", "3.0.0-0")),
+            Valid("<2.0.0||>=2.0.0", AllRelease),
+            Valid(">=1.2.3 <=2.5.0||>=2.0.0 <=3.1.4", Inclusive("1.2.3", "3.1.4")),
+            Valid(">=1.2.3 <=2.5.0|| *-* >=2.0.0 <=3.1.4", Inclusive("1.2.3", "2.5.0"), Inclusive("2.0.0", "3.1.4", true)),
+            Valid(">=1.2.3 <=2.5.0||>=2.0.0-rc <=3.1.4", Inclusive("1.2.3", "2.5.0"), Inclusive("2.0.0-rc", "3.1.4")),
+            Valid("*-* >=1.2.3 <=2.5.0||>=2.0.0-rc <=3.1.4", Inclusive("1.2.3", "2.5.0", true), Inclusive("2.0.0-rc", "3.1.4")),
+
             // Wildcard before version
             Invalid(">*.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "*.2.3"),
             Invalid(">1.*.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "1.*.3"),

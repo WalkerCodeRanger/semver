@@ -1,7 +1,9 @@
 ﻿using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace Semver.Test.Builders
 {
+    [StructLayout(LayoutKind.Auto)]
     public readonly struct TestPrereleaseIdentifier
     {
         public string Value { get; }

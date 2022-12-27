@@ -1159,6 +1159,13 @@ namespace Semver
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrereleaseIdentifiers"]/*'/>
         public IReadOnlyList<PrereleaseIdentifier> PrereleaseIdentifiers { get; }
 
+        /// <summary>
+        /// Whether this is a prerelease version where the prerelease version is zero (i.e. "-0").
+        /// </summary>
+        internal bool PrereleaseIsZero
+            => PrereleaseIdentifiers.Count == 1
+               && PrereleaseIdentifiers[0] == PrereleaseIdentifier.Zero;
+
         /// <summary>Whether this is a prerelease version.</summary>
         /// <value>Whether this is a prerelease version. A semantic version with
         /// prerelease identifiers is a prerelease version.</value>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Semver.Comparers;
 using Semver.Utility;
 
 namespace Semver.Ranges
@@ -25,6 +26,7 @@ namespace Semver.Ranges
         public static readonly UnbrokenSemVersionRange AllRelease = AtMost(SemVersion.Max);
         public static readonly UnbrokenSemVersionRange All = AtMost(SemVersion.Max, true);
 
+        #region Static Factory Methods
         public static UnbrokenSemVersionRange Equals(SemVersion version)
             => Create(Validate(version, nameof(version)), true, version, true, false);
 
@@ -55,6 +57,7 @@ namespace Semver.Ranges
         public static UnbrokenSemVersionRange Exclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(Validate(start, nameof(start)), false,
                 Validate(end, nameof(end)), false, includeAllPrerelease);
+        #endregion
 
         // TODO support parsing unbroken ranges?
 
@@ -164,11 +167,11 @@ namespace Semver.Ranges
             if (leftUnbounded && rightUnbounded)
                 return IncludeAllPrerelease ? "*-*" : "*";
 
-            if (LeftBound.Inclusive && !RightBound.Inclusive && PrereleaseIsZero(End))
+            if (LeftBound.Inclusive && !RightBound.Inclusive && End.PrereleaseIsZero)
             {
                 // Wildcard Ranges like 2.*, 2.3.*, and 2.*-*
                 if (Start.Patch == 0 && End.Patch == 0
-                    && (!Start.IsPrerelease || PrereleaseIsZero(Start)))
+                    && (!Start.IsPrerelease || Start.PrereleaseIsZero))
                 {
                     string wildcardRange;
 
@@ -185,7 +188,7 @@ namespace Semver.Ranges
 
                     if (!IncludeAllPrerelease) return wildcardRange;
 
-                    return PrereleaseIsZero(Start) ? wildcardRange + "-*" : "*-* " + wildcardRange;
+                    return Start.PrereleaseIsZero ? wildcardRange + "-*" : "*-* " + wildcardRange;
                 }
 
                 // Wildcard ranges like 2.1.4-* and 2.3.7-rc.*
@@ -194,7 +197,7 @@ namespace Semver.Ranges
                     // Subtract instead of add to avoid overflow
                     && Start.Patch == End.Patch - 1)
                 {
-                    if (PrereleaseIsZero(Start)) return $"{Start.Major}.{Start.Minor}.{Start.Patch}-*";
+                    if (Start.PrereleaseIsZero) return $"{Start.Major}.{Start.Minor}.{Start.Patch}-*";
                     return $"{Start}.*";
                 }
 
@@ -247,15 +250,41 @@ namespace Semver.Ranges
             return IncludeAllPrerelease ? "*-* " + range : range;
         }
 
-        private static bool PrereleaseIsZero(SemVersion version)
-            => version.PrereleaseIdentifiers.Count == 1
-               && version.PrereleaseIdentifiers[0] == PrereleaseIdentifier.Zero;
-
         internal bool Overlaps(UnbrokenSemVersionRange other)
         {
             // see https://stackoverflow.com/a/3269471/268898
             return LeftBound.CompareTo(other.RightBound) <= 0
                    && other.LeftBound.CompareTo(RightBound) <= 0;
+        }
+
+        internal bool OverlapsOrAbuts(UnbrokenSemVersionRange other)
+        {
+            if (Overlaps(other)) return true;
+
+            // The empty range is never considered to abut anything even though its "ends" might
+            // actually abut things.
+            if (Empty.Equals(this) || Empty.Equals(other)) return false;
+
+            // To check abutting, we just need to put them in the right order and check the gab between them
+            var isLessThanOrEqual = UnbrokenSemVersionRangeComparer.Instance.Compare(this, other) <= 0;
+            var leftRangeEnd = (isLessThanOrEqual ? this : other).RightBound;
+            var rightRangeStart = (isLessThanOrEqual ? other : this).LeftBound;
+
+            // Note: the case where a major, minor, or patch version is at max value and so is just
+            // less than the next prerelease version is being ignored.
+
+            // If one of the ends is inclusive then it is sufficient for them to be the same version.
+            if ((leftRangeEnd.Inclusive || rightRangeStart.Inclusive)
+                && leftRangeEnd.Version.Equals(rightRangeStart.Version))
+                return true;
+
+            // But they could also abut if the prerelease versions between them are being excluded.
+            if (IncludeAllPrerelease || other.IncludeAllPrerelease
+                || leftRangeEnd.IncludesPrerelease || rightRangeStart.IncludesPrerelease)
+                return false;
+
+            return rightRangeStart.Inclusive
+                   && leftRangeEnd.Version.MajorMinorPatchEquals(rightRangeStart.Version);
         }
 
         /// <summary>
@@ -282,14 +311,14 @@ namespace Semver.Ranges
             if (IncludeAllPrerelease) return true;
 
             // Make sure we include prerelease at the start
-            if (other.Start?.IsPrerelease ?? false)
+            if (other.LeftBound.IncludesPrerelease)
             {
                 if (!(Start?.IsPrerelease ?? false)
                     || !Start.MajorMinorPatchEquals(other.Start)) return false;
             }
 
             // Make sure we include prerelease at the end
-            if (other.End.IsPrerelease)
+            if (other.RightBound.IncludesPrerelease)
             {
                 if (!(End?.IsPrerelease ?? false)
                     || !End.MajorMinorPatchEquals(other.End)) return false;
@@ -300,10 +329,13 @@ namespace Semver.Ranges
 
         /// <summary>
         /// Try to union this range with the other. This is a complex operation because it must
-        /// account for
+        /// account for prerelease versions that may be accepted at the endpoints of the ranges.
         /// </summary>
         internal bool TryUnion(UnbrokenSemVersionRange other, out UnbrokenSemVersionRange union)
         {
+            // First deal with simple containment. This handles cases where the containing range
+            // includes all prerelease that aren't handled with the union below. It also handles
+            // containment of empty ranges.
             if (Contains(other))
             {
                 union = this;
@@ -316,7 +348,40 @@ namespace Semver.Ranges
                 return true;
             }
 
-            throw new NotImplementedException();
+            // Assign null once so it doesn't need to be assigned in every return case
+            union = null;
+
+            // Can't union ranges with different prerelease coverage
+            // TODO what if those prerelease were covered by the range ends?
+            if (IncludeAllPrerelease != other.IncludeAllPrerelease) return false;
+
+            // No overlap means no union
+            if (!OverlapsOrAbuts(other)) return false;
+
+            var leftBound = LeftBound.Min(other.LeftBound);
+            var rightBound = RightBound.Max(other.RightBound);
+            var includeAllPrerelease = IncludeAllPrerelease; // note that other.IncludeAllPrerelease is equal
+
+            // Create the union early to use it for containment checks
+            var possibleUnion = new UnbrokenSemVersionRange(leftBound, rightBound, includeAllPrerelease);
+
+            // If all prerelease is included, then the prerelease versions from the dropped ends
+            // will be covered.
+            if (!includeAllPrerelease)
+            {
+                var otherLeftBound = LeftBound.Max(other.LeftBound);
+                if (otherLeftBound.IncludesPrerelease
+                    && !possibleUnion.Contains(otherLeftBound.Version))
+                    return false;
+
+                var otherRightBound = RightBound.Min(other.RightBound);
+                if (otherRightBound.IncludesPrerelease
+                    && !possibleUnion.Contains(otherRightBound.Version))
+                    return false;
+            }
+
+            union = possibleUnion;
+            return true;
         }
 
         private static bool IsEmpty(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)

@@ -33,6 +33,15 @@ namespace Semver.Ranges
         public SemVersion Version { get; }
         public bool Inclusive { get; }
 
+        /// <summary>
+        /// Whether this bound actually includes any prerelease versions.
+        /// </summary>
+        /// <remarks>
+        /// A non-inclusive bound of X.Y.Z-0 doesn't actually include any prerelease versions.
+        /// </remarks>
+        public bool IncludesPrerelease
+            => Version.IsPrerelease && !(!Inclusive && Version.PrereleaseIsZero);
+
         public bool Contains(SemVersion version)
         {
             var comparison = SemVersion.ComparePrecedence(version, Version);
@@ -42,11 +51,19 @@ namespace Semver.Ranges
         public RightBoundedRange Min(RightBoundedRange other)
         {
             var comparison = SemVersion.ComparePrecedence(Version, other.Version);
-            if (comparison < 0) return this;
             if (comparison == 0)
                 // If the versions are equal, then non-inclusive will be min
                 return new RightBoundedRange(Version, Inclusive && other.Inclusive);
-            return other;
+            return comparison < 0 ? this : other;
+        }
+
+        public RightBoundedRange Max(RightBoundedRange other)
+        {
+            var comparison = SemVersion.ComparePrecedence(Version, other.Version);
+            if (comparison == 0)
+                // If the versions are equal, then inclusive will be max
+                return new RightBoundedRange(Version, Inclusive || other.Inclusive);
+            return comparison < 0 ? other : this;
         }
 
         #region Equality

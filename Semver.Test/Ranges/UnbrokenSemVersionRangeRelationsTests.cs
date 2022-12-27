@@ -7,7 +7,7 @@ namespace Semver.Test.Ranges
 {
     public class UnbrokenSemVersionRangeRelationsTests
     {
-        public static readonly TheoryData<RangesRelatedTestCase> RangeContains = new TheoryData<RangesRelatedTestCase>()
+        public static readonly TheoryData<RangesRelatedTestCase> RangeContains = new TheoryData<RangesRelatedTestCase>
         {
             Related(Empty, Empty),
             NotRelated(Empty, All),
@@ -17,21 +17,49 @@ namespace Semver.Test.Ranges
             Related(All, AllRelease),
             Related(LessThan("4.5.6"), LessThan("1.2.3")),
             NotRelated(LessThan("1.2.3"), LessThan("4.5.6")),
+            Related(InclusiveOfStart("1.0.0", "2.0.0-0"), InclusiveOfStart("1.2.0", "1.3.0-0")),
+            Related(InclusiveOfStart("1.0.0-0", "1.0.0-rc"), InclusiveOfStart("1.0.0-alpha", "1.0.0-beta")),
         };
 
-        public static readonly TheoryData<RangesRelatedTestCase> RangeOverlapsTestCases = new TheoryData<RangesRelatedTestCase>()
+        public static readonly TheoryData<RangesRelatedTestCase> RangeOverlapsTestCases = new TheoryData<RangesRelatedTestCase>
         {
             NotRelated(Empty, Empty),
             NotRelated(Empty, All),
             NotRelated(Empty, AllRelease),
             Related(All, All),
             Related(AllRelease, AllRelease),
+            Related(All, AllRelease),
             NotRelated(Inclusive("1.2.3", "4.5.6"), Inclusive("7.8.9", "8.2.3")),
             Related(Inclusive("1.2.3", "4.5.6"), Inclusive("4.5.6", "7.8.9")),
             NotRelated(InclusiveOfStart("1.2.3", "4.5.6"), InclusiveOfEnd("4.5.6", "7.8.9")),
             NotRelated(Inclusive("1.2.3", "4.5.6"), InclusiveOfEnd("4.5.6", "7.8.9")),
             NotRelated(InclusiveOfStart("1.2.3", "4.5.6"), Inclusive("4.5.6", "7.8.9")),
             Related(Inclusive("1.2.3", "4.5.6"), Inclusive("1.5.0", "3.5.4")),
+        };
+
+        /// <summary>
+        /// This must repeat a number of the overlaps tests cases because abutting changes the outcome.
+        /// </summary>
+        public static readonly TheoryData<RangesRelatedTestCase> RangeOverlapsOrAbutsTestCases = new TheoryData<RangesRelatedTestCase>
+        {
+            NotRelated(Empty, Empty),
+            NotRelated(Empty, All),
+            NotRelated(Empty, AllRelease),
+            Related(All, All),
+            Related(AllRelease, AllRelease),
+            Related(All, AllRelease),
+            NotRelated(Inclusive("1.2.3", "4.5.6"), Inclusive("7.8.9", "8.2.3")),
+            Related(Inclusive("1.2.3", "4.5.6"), Inclusive("4.5.6", "7.8.9")),
+            NotRelated(InclusiveOfStart("1.2.3", "4.5.6"), InclusiveOfEnd("4.5.6", "7.8.9")),
+            Related(Inclusive("1.2.3", "4.5.6"), InclusiveOfEnd("4.5.6", "7.8.9")),
+            Related(InclusiveOfStart("1.2.3", "4.5.6"), Inclusive("4.5.6", "7.8.9")),
+            Related(Inclusive("1.2.3", "4.5.6"), Inclusive("1.5.0", "3.5.4")),
+            Related(InclusiveOfStart("1.0.0", "2.0.0-0"), InclusiveOfStart("2.0.0", "3.0.0-0"))
+        };
+
+        public static readonly TheoryData<RangesRelatedTestCase> RangeTryUnionTestCases = new TheoryData<RangesRelatedTestCase>
+        {
+            Related(InclusiveOfStart("1.0.0", "2.0.0-0"), InclusiveOfStart("1.2.0", "1.3.0-0")),
         };
 
         [Theory]
@@ -52,15 +80,47 @@ namespace Semver.Test.Ranges
             {
                 Assert.True(testCase.X.Overlaps(testCase.Y),
                     $"{testCase.X} {testCase.Y}");
-                Assert.True(testCase.X.Overlaps(testCase.Y),
+                Assert.True(testCase.Y.Overlaps(testCase.X),
                     $"{testCase.Y} {testCase.X}");
             }
             else
             {
                 Assert.False(testCase.X.Overlaps(testCase.Y),
                     $"{testCase.X} {testCase.Y}");
-                Assert.False(testCase.X.Overlaps(testCase.Y),
+                Assert.False(testCase.Y.Overlaps(testCase.X),
                     $"{testCase.Y} {testCase.X}");
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(RangeOverlapsOrAbutsTestCases))]
+        public void OverlapsOrAbutsIsCorrect(RangesRelatedTestCase testCase)
+        {
+            if (testCase.Related)
+            {
+                Assert.True(testCase.X.OverlapsOrAbuts(testCase.Y), $"{testCase.X} {testCase.Y}");
+                Assert.True(testCase.Y.OverlapsOrAbuts(testCase.X), $"{testCase.Y} {testCase.X}");
+            }
+            else
+            {
+                Assert.False(testCase.X.OverlapsOrAbuts(testCase.Y), $"{testCase.X} {testCase.Y}");
+                Assert.False(testCase.Y.OverlapsOrAbuts(testCase.X), $"{testCase.Y} {testCase.X}");
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(RangeTryUnionTestCases))]
+        public void TryUnionIsCorrect(RangesRelatedTestCase testCase)
+        {
+            if (testCase.Related)
+            {
+                Assert.True(testCase.X.TryUnion(testCase.Y, out _), $"{testCase.X} {testCase.Y}");
+                Assert.True(testCase.Y.TryUnion(testCase.X, out _), $"{testCase.Y} {testCase.X}");
+            }
+            else
+            {
+                Assert.False(testCase.X.TryUnion(testCase.Y, out _), $"{testCase.X} {testCase.Y}");
+                Assert.False(testCase.Y.TryUnion(testCase.X, out _), $"{testCase.Y} {testCase.X}");
             }
         }
 

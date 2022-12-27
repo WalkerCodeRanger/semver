@@ -61,9 +61,8 @@ namespace Semver.Ranges
         /// be referenced by the caller.</remarks>
         internal static SemVersionRange Create(List<UnbrokenSemVersionRange> ranges)
         {
-#if DEBUG
-            if (ranges is null) throw new ArgumentNullException(nameof(ranges), "DEBUG: Value cannot be null.");
-#endif
+            DebugChecks.IsNotNull(ranges, nameof(ranges));
+
             // Remove empty ranges and see if the result is empty
             ranges.RemoveAll(range => UnbrokenSemVersionRange.Empty.Equals(range));
             if (ranges.Count == 0) return Empty;
@@ -72,10 +71,11 @@ namespace Semver.Ranges
             ranges.Sort(UnbrokenSemVersionRangeComparer.Instance);
             for (var i = 0; i < ranges.Count - 1; i++)
                 for (var j = ranges.Count - 1; j > i; j--)
-                    if (ranges[i].Contains(ranges[j]))
+                    if (ranges[i].TryUnion(ranges[j], out var union))
+                    {
                         ranges.RemoveAt(j);
-
-            // TODO union together overlapping ranges?
+                        ranges[i] = union;
+                    }
 
             return new SemVersionRange(ranges.AsReadOnly());
         }
