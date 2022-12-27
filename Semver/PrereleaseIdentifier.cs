@@ -65,9 +65,8 @@ namespace Semver
         [Obsolete]
         internal static PrereleaseIdentifier CreateLoose(string value)
         {
-#if DEBUG
-            if (value is null) throw new ArgumentNullException(nameof(value), "DEBUG: Value cannot be null.");
-#endif
+            DebugChecks.IsNotNull(value, nameof(value));
+
             // Avoid parsing some non-ASCII digits as a number by checking that they are all digits
             if (value.IsDigits() && int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out var numericValue))
                 return new PrereleaseIdentifier(value, numericValue);
@@ -86,8 +85,8 @@ namespace Semver
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static PrereleaseIdentifier CreateUnsafe(string value, int? numericValue)
         {
+            DebugChecks.IsNotNull(value, nameof(value));
 #if DEBUG
-            if (value is null) throw new ArgumentNullException(nameof(value), "DEBUG: Value cannot be null.");
             PrereleaseIdentifier expected;
             try
             {

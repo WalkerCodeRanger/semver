@@ -24,6 +24,13 @@ namespace Semver.Utility
     internal static class DebugChecks
     {
         [Conditional("DEBUG")]
+        public static void IsValid(SemVersionStyles style, string paramName)
+        {
+            if (!style.IsValid())
+                throw new ArgumentException("DEBUG: " + SemVersion.InvalidSemVersionStylesMessage, paramName);
+        }
+
+        [Conditional("DEBUG")]
         public static void IsValid(SemVersionRangeOptions rangeOptions, string paramName)
         {
             if (!rangeOptions.IsValid())
@@ -49,6 +56,13 @@ namespace Semver.Utility
         {
             if (segment.IsEmpty)
                 throw new ArgumentException("DEBUG: Cannot be empty", paramName);
+        }
+
+        [Conditional("DEBUG")]
+        public static void IsNotNull<T>(T value, string paramName)
+        {
+            if (value == null)
+                throw new ArgumentNullException(paramName, "DEBUG: Value cannot be null.");
         }
     }
 }

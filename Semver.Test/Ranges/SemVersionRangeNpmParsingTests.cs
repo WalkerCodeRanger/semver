@@ -61,6 +61,11 @@ namespace Semver.Test.Ranges
             Invalid("x.x.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "x.x.3"), // accepted by npm issue #511
             Invalid("x.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "x.2.3"), // accepted by npm issue #511
 
+            // Wildcard char in major, minor, or patch
+            Invalid(">*1.2.3", ExceptionMessages.InvalidWildcardInMajorMinorOrPatch, "Major", "*1.2.3"),
+            Invalid(">1.*2.3", ExceptionMessages.InvalidWildcardInMajorMinorOrPatch, "Minor", "1.*2.3"),
+            Invalid(">1.2.*3", ExceptionMessages.InvalidWildcardInMajorMinorOrPatch, "Patch", "1.2.*3"),
+
             // Wildcards with basic operators
             Valid("<1.2.*", LessThan("1.2.0-0")),
             Valid("<1.2.*", true, LessThan("1.2.0-0", true)),

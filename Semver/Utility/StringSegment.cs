@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -203,12 +204,14 @@ namespace Semver.Utility
         private const int DisplayLimit = 100;
 
 #if DEBUG
+        [ExcludeFromCodeCoverage]
         private void ValidateIndex(int i, string paramName)
         {
             if (i < 0) throw new ArgumentOutOfRangeException(paramName, i, "DEBUG: Cannot be negative.");
             if (i > Length) throw new ArgumentOutOfRangeException(paramName, i, $"DEBUG: Cannot be > length {Length}.");
         }
 
+        [ExcludeFromCodeCoverage]
         private void ValidateLength(int start, int length, string paramName)
         {
             if (length < 0) throw new ArgumentOutOfRangeException(paramName, length, "DEBUG: Cannot be negative.");

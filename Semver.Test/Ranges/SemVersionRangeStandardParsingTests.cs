@@ -91,9 +91,14 @@ namespace Semver.Test.Ranges
             Valid("3.1.4-rc.*", InclusiveOfStart("3.1.4-rc", "3.1.5-0", true)),
 
             // Wildcard before version
-            Invalid("*.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "*.2.3"),
-            Invalid("1.*.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "1.*.3"),
-            Invalid("*.*.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "*.*.3"),
+            Invalid(">*.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "*.2.3"),
+            Invalid(">1.*.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "1.*.3"),
+            Invalid(">*.*.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "*.*.3"),
+
+            // Wildcard char in major, minor, or patch
+            Invalid(">*1.2.3", ExceptionMessages.InvalidWildcardInMajorMinorOrPatch, "Major", "*1.2.3"),
+            Invalid(">1.*2.3", ExceptionMessages.InvalidWildcardInMajorMinorOrPatch, "Minor", "1.*2.3"),
+            Invalid(">1.2.*3", ExceptionMessages.InvalidWildcardInMajorMinorOrPatch, "Patch", "1.2.*3"),
 
             // Wildcard char in prerelease identifier
             Invalid("1.2.3-*a", ExceptionMessages.InvalidWildcardInPrerelease),

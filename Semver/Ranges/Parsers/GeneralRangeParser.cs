@@ -9,9 +9,8 @@ namespace Semver.Ranges.Parsers
     {
         public static int CountSplitOnOrOperator(string range)
         {
-#if DEBUG
-            if (range is null) throw new ArgumentNullException(nameof(range), "DEBUG: Value cannot be null.");
-#endif
+            DebugChecks.IsNotNull(range, nameof(range));
+
             int count = 1; // Always one more item than there are separators
             bool possiblyInSeparator = false;
             // Use `for` instead of `foreach` to ensure performance
@@ -32,9 +31,8 @@ namespace Semver.Ranges.Parsers
 
         public static IEnumerable<StringSegment> SplitOnOrOperator(string range)
         {
-#if DEBUG
-            if (range is null) throw new ArgumentNullException(nameof(range), "DEBUG: Value cannot be null.");
-#endif
+            DebugChecks.IsNotNull(range, nameof(range));
+
             var possiblyInSeparator = false;
             int start = 0;
             // Use `for` instead of `foreach` to ensure performance

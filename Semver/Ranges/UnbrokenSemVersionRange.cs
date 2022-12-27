@@ -304,7 +304,7 @@ namespace Semver.Ranges
         /// </summary>
         internal bool TryUnion(UnbrokenSemVersionRange other, out UnbrokenSemVersionRange union)
         {
-            if (this.Contains(other))
+            if (Contains(other))
             {
                 union = this;
                 return true;

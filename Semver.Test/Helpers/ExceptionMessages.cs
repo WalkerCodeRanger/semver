@@ -48,6 +48,7 @@ namespace Semver.Test.Helpers
         public const string InvalidCharacterInPatch = "Patch version contains invalid character '{value}' in '{version}'.";
         public const string InvalidCharacterInMetadata = "Invalid character '{value}' in metadata identifier in '{version}'.";
         public const string MinorOrPatchMustBeWildcardVersion = "{value} version should be a wildcard because the preceding version is a wildcard in '{version}'.";
+        public const string InvalidWildcardInMajorMinorOrPatch = "{value} version is a wildcard and should contain only 1 character in '{version}'.";
         #endregion
 
         #region Parsing Ranges

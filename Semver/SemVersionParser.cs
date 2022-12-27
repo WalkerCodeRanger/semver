@@ -57,13 +57,9 @@ namespace Semver
             int maxLength,
             out SemVersion semver)
         {
-#if DEBUG
-            if (!style.IsValid())
-                throw new ArgumentException("DEBUG: " + SemVersion.InvalidSemVersionStylesMessage, nameof(style));
+            DebugChecks.IsValid(style, nameof(style));
             // TODO include in v3.0.0 for issue #72
-            //if(maxLength < 0)
-            //    throw new ArgumentOutOfRangeException("DEBUG: " + SemVersion.InvalidMaxLengthMessage, nameof(maxLength));
-#endif
+            // DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
 
             if (version != null)
                 return Parse(version, style, SemVersionParsingOptions.None, ex, maxLength, out semver, out _);
@@ -92,13 +88,9 @@ namespace Semver
             out SemVersion semver,
             out WildcardVersion wildcardVersion)
         {
-#if DEBUG
-            if (!style.IsValid())
-                throw new ArgumentException("DEBUG: " + SemVersion.InvalidSemVersionStylesMessage, nameof(style));
+            DebugChecks.IsValid(style, nameof(style));
             // TODO include in v3.0.0 for issue #72
-            //if(maxLength < 0)
-            //    throw new ArgumentOutOfRangeException("DEBUG: " + SemVersion.InvalidMaxLengthMessage, nameof(maxLength));
-#endif
+            // DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
 
             // Assign once so it doesn't have to be done any time parse fails
             semver = null;
