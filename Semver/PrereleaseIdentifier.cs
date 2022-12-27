@@ -35,7 +35,8 @@ namespace Semver
     /// </remarks>
     public readonly struct PrereleaseIdentifier : IEquatable<PrereleaseIdentifier>, IComparable<PrereleaseIdentifier>, IComparable
     {
-        internal static readonly PrereleaseIdentifier Zero = new PrereleaseIdentifier(0);
+        internal static readonly PrereleaseIdentifier Zero = CreateUnsafe("0", 0);
+        internal static readonly PrereleaseIdentifier Hyphen = CreateUnsafe("-", null);
 
         /// <summary>
         /// The string value of the prerelease identifier even if it is a numeric identifier.
@@ -355,5 +356,15 @@ namespace Semver
         /// <returns>The string value of this identifier or <see langword="null"/> if this is
         /// a default <see cref="PrereleaseIdentifier"/></returns>
         public override string ToString() => Value;
+
+        internal PrereleaseIdentifier NextIdentifier()
+        {
+            if (NumericValue is int numericValue)
+                return numericValue == int.MaxValue
+                    ? Hyphen
+                    : new PrereleaseIdentifier(numericValue + 1);
+
+            return new PrereleaseIdentifier(Value + "-");
+        }
     }
 }

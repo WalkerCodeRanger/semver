@@ -22,7 +22,7 @@ namespace Semver.Ranges
         /// </remarks>
         public static readonly UnbrokenSemVersionRange Empty
             = new UnbrokenSemVersionRange(new LeftBoundedRange(SemVersion.Max, false),
-                new RightBoundedRange(SemVersion.Min, false), false);
+                new RightBoundedRange(SemVersion.Min, false), false, false);
         public static readonly UnbrokenSemVersionRange AllRelease = AtMost(SemVersion.Max);
         public static readonly UnbrokenSemVersionRange All = AtMost(SemVersion.Max, true);
 
@@ -81,20 +81,47 @@ namespace Semver.Ranges
         {
             // Always return the same empty range
             if (IsEmpty(start, end, includeAllPrerelease)) return Empty;
-            // Equals ranges never include all prerelease
-            if (start.Version == end.Version) includeAllPrerelease = false;
-            return new UnbrokenSemVersionRange(start, end, includeAllPrerelease);
+
+            var allPrereleaseCoveredByEnds = false;
+
+            // Equals ranges include all prerelease if they are prerelease
+            if (start.Version == end.Version)
+                allPrereleaseCoveredByEnds = includeAllPrerelease = start.Version.IsPrerelease;
+            // Some ranges have all the prerelease versions in them covered by the bounds
+            else if (!(start.Version is null) && (start.IncludesPrerelease || end.IncludesPrerelease))
+            {
+                if (start.Version.MajorMinorPatchEquals(end.Version))
+                    allPrereleaseCoveredByEnds = true;
+                else if ((end.IncludesPrerelease || end.Version.PrereleaseIsZero)
+                         && start.Version.Major == end.Version.Major && start.Version.Minor == end.Version.Minor
+                         // Subtract instead of add to avoid overflow
+                         && start.Version.Patch == end.Version.Patch - 1)
+                    allPrereleaseCoveredByEnds = true;
+            }
+
+            return new UnbrokenSemVersionRange(start, end, includeAllPrerelease, allPrereleaseCoveredByEnds);
         }
 
-        private UnbrokenSemVersionRange(LeftBoundedRange leftBound, RightBoundedRange rightBound, bool includeAllPrerelease)
+        private UnbrokenSemVersionRange(
+            LeftBoundedRange leftBound,
+            RightBoundedRange rightBound,
+            bool includeAllPrerelease,
+            bool allPrereleaseCoveredByEnds)
         {
             LeftBound = leftBound;
             RightBound = rightBound;
-            IncludeAllPrerelease = includeAllPrerelease;
+            IncludeAllPrerelease = includeAllPrerelease | allPrereleaseCoveredByEnds;
+            this.allPrereleaseCoveredByEnds = allPrereleaseCoveredByEnds;
         }
 
         internal readonly LeftBoundedRange LeftBound;
         internal readonly RightBoundedRange RightBound;
+        /// <summary>
+        /// If this <see cref="IncludeAllPrerelease"/> and those prerelease versions are entirely
+        /// covered by the left and right bounds so that effectively, it doesn't need to include all
+        /// prerelease.
+        /// </summary>
+        private readonly bool allPrereleaseCoveredByEnds;
         private string toStringCache;
 
         public SemVersion Start => LeftBound.Version;
@@ -153,91 +180,18 @@ namespace Semver.Ranges
 
             // Simple Equals ranges
             if (LeftBound.Inclusive && RightBound.Inclusive && SemVersion.Equals(Start, End))
-            {
-#if DEBUG
-                if (IncludeAllPrerelease)
-                    throw new InvalidOperationException("DEBUG: Equals range includes all prerelease");
-#endif
                 return Start.ToString();
-            }
+
+            var includesPrereleaseNotCoveredByEnds = IncludeAllPrerelease && !allPrereleaseCoveredByEnds;
 
             // All versions ranges
             var leftUnbounded = LeftBound == LeftBoundedRange.Unbounded;
             var rightUnbounded = RightBound == RightBoundedRange.Unbounded;
             if (leftUnbounded && rightUnbounded)
-                return IncludeAllPrerelease ? "*-*" : "*";
+                return includesPrereleaseNotCoveredByEnds ? "*-*" : "*";
 
-            if (LeftBound.Inclusive && !RightBound.Inclusive && End.PrereleaseIsZero)
-            {
-                // Wildcard Ranges like 2.*, 2.3.*, and 2.*-*
-                if (Start.Patch == 0 && End.Patch == 0
-                    && (!Start.IsPrerelease || Start.PrereleaseIsZero))
-                {
-                    string wildcardRange;
-
-                    // Subtract instead of add to avoid overflow
-                    if (Start.Major == End.Major && Start.Minor == End.Minor - 1)
-                        // Wildcard patch
-                        wildcardRange = $"{Start.Major}.{Start.Minor}.*";
-                    // Subtract instead of add to avoid overflow
-                    else if (Start.Major == End.Major - 1 && Start.Minor == 0 && End.Minor == 0)
-                        // Wildcard minor
-                        wildcardRange = $"{Start.Major}.*";
-                    else
-                        goto tilde;
-
-                    if (!IncludeAllPrerelease) return wildcardRange;
-
-                    return Start.PrereleaseIsZero ? wildcardRange + "-*" : "*-* " + wildcardRange;
-                }
-
-                // Wildcard ranges like 2.1.4-* and 2.3.7-rc.*
-                if (IncludeAllPrerelease && Start.IsPrerelease
-                    && Start.Major == End.Major && Start.Minor == End.Minor
-                    // Subtract instead of add to avoid overflow
-                    && Start.Patch == End.Patch - 1)
-                {
-                    if (Start.PrereleaseIsZero) return $"{Start.Major}.{Start.Minor}.{Start.Patch}-*";
-                    return $"{Start}.*";
-                }
-
-            tilde:
-                // Tilde ranges like ~1.2.3, and ~1.2.3-rc
-                if (Start.Major == End.Major
-                    // Subtract instead of add to avoid overflow
-                    && Start.Minor == End.Minor - 1
-                    && End.Patch == 0)
-                    return (IncludeAllPrerelease ? "*-* ~" : "~") + Start;
-
-                if (Start.Major != 0)
-                {
-                    // Caret ranges like ^1.2.3 and ^1.2.3-rc
-                    // Subtract instead of add to avoid overflow
-                    if (Start.Major == End.Major - 1
-                        && End.Minor == 0 && End.Patch == 0)
-                        return (IncludeAllPrerelease ? "*-* ^" : "^") + Start;
-                }
-                else if (End.Major == 0)
-                {
-                    // Start.Major == 0 and End.Major == 0
-                    if (Start.Minor != 0)
-                    {
-                        // Caret ranges like ^0.1.2 and ^0.2.3-rc
-                        // Subtract instead of add to avoid overflow
-                        if (Start.Minor == End.Minor - 1
-                            && End.Patch == 0)
-                            return (IncludeAllPrerelease ? "*-* ^" : "^") + Start;
-                    }
-                    else if (End.Minor == 0)
-                    {
-                        // Start.Minor == 0 and End.Minor == 0
-
-                        // Caret ranges like ^0.0.2 and ^0.0.2-rc
-                        if (Start.Patch == End.Patch - 1)
-                            return (IncludeAllPrerelease ? "*-* ^" : "^") + Start;
-                    }
-                }
-            }
+            if (TryToSpecialString(includesPrereleaseNotCoveredByEnds, out var result))
+                return result;
 
             string range;
             if (leftUnbounded)
@@ -247,7 +201,123 @@ namespace Semver.Ranges
             else
                 range = $"{LeftBound} {RightBound}";
 
-            return IncludeAllPrerelease ? "*-* " + range : range;
+            return includesPrereleaseNotCoveredByEnds ? "*-* " + range : range;
+        }
+
+        private bool TryToSpecialString(bool includesPrereleaseNotCoveredByEnds, out string result)
+        {
+            // Most special ranges follow the pattern '>=X.Y.Z <P.Q.R-0'
+            if (LeftBound.Inclusive && !RightBound.Inclusive && End.PrereleaseIsZero)
+            {
+                // Wildcard Ranges like 2.*, 2.*-*, 2.3.*, and 2.3.*-*
+                if (Start.Patch == 0 && End.Patch == 0 && (!Start.IsPrerelease || Start.PrereleaseIsZero))
+                {
+                    // Subtract instead of add to avoid overflow
+                    if (Start.Major == End.Major && Start.Minor == End.Minor - 1)
+                        // Wildcard patch
+                        result = $"{Start.Major}.{Start.Minor}.*";
+                    // Subtract instead of add to avoid overflow
+                    else if (Start.Major == End.Major - 1 && Start.Minor == 0 && End.Minor == 0)
+                        // Wildcard minor
+                        result = $"{Start.Major}.*";
+                    else
+                        goto tilde;
+
+                    if (!includesPrereleaseNotCoveredByEnds)
+                        return true;
+
+                    result = Start.PrereleaseIsZero ? result + "-*" : "*-* " + result;
+                    return true;
+                }
+
+                // Wildcard ranges like 2.1.4-* follow the pattern '>=X.Y.Z-0 <X.Y.(Z+1)-0'
+                if (Start.PrereleaseIsZero
+                    && Start.Major == End.Major && Start.Minor == End.Minor
+                    // Subtract instead of add to avoid overflow
+                    && Start.Patch == End.Patch - 1)
+                {
+                    result = $"{Start.Major}.{Start.Minor}.{Start.Patch}-*";
+                    return true;
+                }
+
+            tilde:
+                // Tilde ranges like ~1.2.3, and ~1.2.3-rc
+                if (Start.Major == End.Major
+                    // Subtract instead of add to avoid overflow
+                    && Start.Minor == End.Minor - 1 && End.Patch == 0)
+                {
+                    result = (includesPrereleaseNotCoveredByEnds ? "*-* ~" : "~") + Start;
+                    return true;
+                }
+
+                if (Start.Major != 0)
+                {
+                    // Caret ranges like ^1.2.3 and ^1.2.3-rc
+                    // Subtract instead of add to avoid overflow
+                    if (Start.Major == End.Major - 1 && End.Minor == 0 && End.Patch == 0)
+                    {
+                        result = (includesPrereleaseNotCoveredByEnds ? "*-* ^" : "^") + Start;
+                        return true;
+                    }
+                }
+                else if (End.Major == 0)
+                {
+                    // Start.Major == 0 and End.Major == 0
+                    if (Start.Minor != 0)
+                    {
+                        // Caret ranges like ^0.1.2 and ^0.2.3-rc
+                        // Subtract instead of add to avoid overflow
+                        if (Start.Minor == End.Minor - 1 && End.Patch == 0)
+                        {
+                            result = (includesPrereleaseNotCoveredByEnds ? "*-* ^" : "^") + Start;
+                            return true;
+                        }
+                    }
+                    else if (End.Minor == 0)
+                    {
+                        // Start.Minor == 0 and End.Minor == 0
+
+                        // Caret ranges like ^0.0.2 and ^0.0.2-rc
+                        if (Start.Patch == End.Patch - 1)
+                        {
+                            result = (includesPrereleaseNotCoveredByEnds ? "*-* ^" : "^") + Start;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            // Assign null once
+            result = null;
+
+            // Wildcards with prerelease follow the pattern >=X.Y.Z-φ.α.0 <X.Y.Z-φ.β
+            if (LeftBound.Inclusive && !RightBound.Inclusive
+                && LeftBound.Version?.MajorMinorPatchEquals(RightBound.Version) == true
+                && LeftBound.Version.IsPrerelease && RightBound.Version.IsPrerelease)
+            {
+                var leftPrerelease = LeftBound.Version.PrereleaseIdentifiers;
+                var rightPrerelease = RightBound.Version.PrereleaseIdentifiers;
+                if (leftPrerelease.Count < 2
+                    || leftPrerelease[leftPrerelease.Count-1] != PrereleaseIdentifier.Zero
+                    || leftPrerelease.Count - 1 != rightPrerelease.Count)
+                    return false;
+
+                // But they must be equal in prerelease up to the correct point
+                for (int i = 0; i < leftPrerelease.Count-2; i++)
+                    if (leftPrerelease[i] != rightPrerelease[i])
+                        return false;
+
+                // And the prerelease identifiers must have the correct relationship
+                if (leftPrerelease[leftPrerelease.Count - 2].NextIdentifier()
+                    != rightPrerelease[rightPrerelease.Count - 1])
+                    return false;
+
+                var originalPrerelease = string.Join(".", leftPrerelease.Take(leftPrerelease.Count-1));
+                result = $"{Start.Major}.{Start.Minor}.{Start.Patch}-{originalPrerelease}.*";
+                return true;
+            }
+
+            return false;
         }
 
         internal bool Overlaps(UnbrokenSemVersionRange other)
@@ -297,7 +367,6 @@ namespace Semver.Ranges
             if (other == Empty) return true;
 
             // It contains prerelease we don't
-            // TODO what if those prerelease were covered by our ends?
             if (other.IncludeAllPrerelease && !IncludeAllPrerelease) return false;
 
             // If our bounds don't contain the other bounds, there is no containment
@@ -352,7 +421,6 @@ namespace Semver.Ranges
             union = null;
 
             // Can't union ranges with different prerelease coverage
-            // TODO what if those prerelease were covered by the range ends?
             if (IncludeAllPrerelease != other.IncludeAllPrerelease) return false;
 
             // No overlap means no union
@@ -363,7 +431,7 @@ namespace Semver.Ranges
             var includeAllPrerelease = IncludeAllPrerelease; // note that other.IncludeAllPrerelease is equal
 
             // Create the union early to use it for containment checks
-            var possibleUnion = new UnbrokenSemVersionRange(leftBound, rightBound, includeAllPrerelease);
+            var possibleUnion = Create(leftBound, rightBound, includeAllPrerelease);
 
             // If all prerelease is included, then the prerelease versions from the dropped ends
             // will be covered.

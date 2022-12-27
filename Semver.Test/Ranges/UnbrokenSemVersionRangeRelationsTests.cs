@@ -19,6 +19,7 @@ namespace Semver.Test.Ranges
             NotRelated(LessThan("1.2.3"), LessThan("4.5.6")),
             Related(InclusiveOfStart("1.0.0", "2.0.0-0"), InclusiveOfStart("1.2.0", "1.3.0-0")),
             Related(InclusiveOfStart("1.0.0-0", "1.0.0-rc"), InclusiveOfStart("1.0.0-alpha", "1.0.0-beta")),
+            Related(InclusiveOfStart("1.0.0-0", "1.0.0-rc"), InclusiveOfStart("1.0.0-alpha", "1.0.0-beta", true)),
         };
 
         public static readonly TheoryData<RangesRelatedTestCase> RangeOverlapsTestCases = new TheoryData<RangesRelatedTestCase>

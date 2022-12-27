@@ -88,7 +88,9 @@ namespace Semver.Test.Ranges
             Valid("3.1.*", InclusiveOfStart("3.1.0", "3.2.0-0")),
             Valid("3.1.*-*", InclusiveOfStart("3.1.0-0", "3.2.0-0", true)),
             Valid("3.1.4-*", InclusiveOfStart("3.1.4-0", "3.1.5-0", true)),
-            Valid("3.1.4-rc.*", InclusiveOfStart("3.1.4-rc", "3.1.5-0", true)),
+            Valid("3.1.4-rc.*", InclusiveOfStart("3.1.4-rc.0", "3.1.4-rc-", true)),
+            Valid("3.1.4-5.*", InclusiveOfStart("3.1.4-5.0", "3.1.4-6", true)),
+            Valid("3.1.4-2147483647.*", InclusiveOfStart("3.1.4-2147483647.0", "3.1.4--", true)),
 
             // Range containment (or non-containment)
             Valid("1.*||1.2.*", InclusiveOfStart("1.0.0", "2.0.0-0")),
@@ -139,7 +141,7 @@ namespace Semver.Test.Ranges
             Invalid("2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.*"),
             Invalid("3.2147483647.*", ExceptionMessages.MaxVersion, version: "3.2147483647.*"),
             Invalid("2147483647.2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.2147483647.*"),
-            Invalid("3.1.2147483647-rc.*", ExceptionMessages.MaxVersion, version: "3.1.2147483647-rc.*"),
+            Invalid("3.1.2147483647-*", ExceptionMessages.MaxVersion, version: "3.1.2147483647-*"),
 
             // Missing Comparison
             Invalid("", ExceptionMessages.MissingComparison, "0"),
