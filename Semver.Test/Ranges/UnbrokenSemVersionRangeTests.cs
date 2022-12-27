@@ -1003,6 +1003,35 @@ namespace Semver.Test.Ranges
             Assert.Same(UnbrokenSemVersionRange.Empty, range);
         }
 
+        [Fact]
+        public void ContainsNullVersion()
+        {
+            var range = UnbrokenSemVersionRange.AllRelease;
+            var ex = Assert.Throws<ArgumentNullException>(() => range.Contains((SemVersion)null));
+
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
+            Assert.Equal("version", ex.ParamName);
+        }
+
+        [Fact]
+        public void GetHashCodeAndEquality()
+        {
+            var end = FakeVersion.WithMinor(6);
+            var range1 = UnbrokenSemVersionRange.Inclusive(FakeVersion, end);
+            var range2 = UnbrokenSemVersionRange.Inclusive(FakeVersion, end);
+
+            Assert.NotSame(range1, range2);
+            Assert.Equal(range1.GetHashCode(), range2.GetHashCode());
+            Assert.True(range1 == range2);
+            Assert.False(range1 != range2);
+        }
+
+        [Fact]
+        public void EqualsNull()
+        {
+            Assert.False(UnbrokenSemVersionRange.AllRelease.Equals(null));
+        }
+
         public static readonly TheoryData<UnbrokenSemVersionRange, string> ToStringTestCases = new TheoryData<UnbrokenSemVersionRange, string>()
         {
             {All, "*-*"},
@@ -1041,6 +1070,7 @@ namespace Semver.Test.Ranges
             {InclusiveOfStart("2.0.0-0", "3.0.0-0"), "2.*"},
             {InclusiveOfStart("2.0.0-0", "3.0.0-0", true), "2.*-*"},
             {InclusiveOfStart("0.0.3-rc.0", "0.0.3-rc-", true), "0.0.3-rc.*"},
+            {InclusiveOfStart("0.0.3-longer.rc.0", "0.0.3-longer.rc-", true), "0.0.3-longer.rc.*"},
             // Wildcard ranges preferred to tilde or caret
             {InclusiveOfStart("0.1.0", "0.2.0-0"), "0.1.*"},
             {InclusiveOfStart("0.1.0", "0.2.0-0", true), "*-* 0.1.*"},
@@ -1074,6 +1104,15 @@ namespace Semver.Test.Ranges
             {InclusiveOfStart("0.0.3", "0.0.4-0"), "^0.0.3"},
             {InclusiveOfStart("0.0.3", "0.0.4-0", true), "*-* ^0.0.3"},
             {InclusiveOfStart("0.0.3-rc", "0.0.4-0"), "^0.0.3-rc"},
+            // Note quite a special range
+            {InclusiveOfStart("0.0.3-a.rc.0", "0.0.3-b.rc-", true), ">=0.0.3-a.rc.0 <0.0.3-b.rc-"},
+            {InclusiveOfStart("0.0.3-0", "0.0.3-rc-", true), ">=0.0.3-0 <0.0.3-rc-" },
+            {InclusiveOfStart("0.0.3-rc.1", "0.0.3-rc-", true), ">=0.0.3-rc.1 <0.0.3-rc-" },
+            {InclusiveOfStart("0.0.3-rc.0", "0.0.3-rc-.x", true), ">=0.0.3-rc.0 <0.0.3-rc-.x" },
+            {InclusiveOfStart("0.0.3-rc.0", "0.0.3-rcx", true), ">=0.0.3-rc.0 <0.0.3-rcx"},
+            {InclusiveOfStart("0.0.3-5.0", "0.0.3-7", true), ">=0.0.3-5.0 <0.0.3-7"},
+            {InclusiveOfStart("0.0.3-2147483647.0", "0.0.3---", true), ">=0.0.3-2147483647.0 <0.0.3---"},
+            {InclusiveOfStart("1.0.0", "3.0.0-0"), ">=1.0.0 <3.0.0-0" },
         };
 
         [Theory]

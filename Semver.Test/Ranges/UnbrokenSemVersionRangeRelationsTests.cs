@@ -20,6 +20,12 @@ namespace Semver.Test.Ranges
             Related(InclusiveOfStart("1.0.0", "2.0.0-0"), InclusiveOfStart("1.2.0", "1.3.0-0")),
             Related(InclusiveOfStart("1.0.0-0", "1.0.0-rc"), InclusiveOfStart("1.0.0-alpha", "1.0.0-beta")),
             Related(InclusiveOfStart("1.0.0-0", "1.0.0-rc"), InclusiveOfStart("1.0.0-alpha", "1.0.0-beta", true)),
+            NotRelated(Inclusive("1.0.0", "2.0.0"), Inclusive("1.0.0-rc", "2.0.0")),
+            NotRelated(Inclusive("1.0.0-rc", "2.0.0"), Inclusive("1.0.1-rc", "2.0.0")),
+            Related(Inclusive("1.0.0-alpha", "2.0.0"), Inclusive("1.0.0-rc", "2.0.0")),
+            NotRelated(Inclusive("1.0.0", "2.0.0"), Inclusive("1.0.0", "2.0.0-rc")),
+            NotRelated(Inclusive("1.0.0", "2.0.0-x"), Inclusive("1.0.0", "1.10.0-rc")),
+            Related(Inclusive("1.0.0", "2.0.0-beta"), Inclusive("1.0.0", "2.0.0-alpha")),
         };
 
         public static readonly TheoryData<RangesRelatedTestCase> RangeOverlapsTestCases = new TheoryData<RangesRelatedTestCase>
@@ -55,12 +61,20 @@ namespace Semver.Test.Ranges
             Related(Inclusive("1.2.3", "4.5.6"), InclusiveOfEnd("4.5.6", "7.8.9")),
             Related(InclusiveOfStart("1.2.3", "4.5.6"), Inclusive("4.5.6", "7.8.9")),
             Related(Inclusive("1.2.3", "4.5.6"), Inclusive("1.5.0", "3.5.4")),
-            Related(InclusiveOfStart("1.0.0", "2.0.0-0"), InclusiveOfStart("2.0.0", "3.0.0-0"))
+            Related(InclusiveOfStart("1.0.0", "2.0.0-0"), InclusiveOfStart("2.0.0", "3.0.0-0")),
+            NotRelated(InclusiveOfStart("1.0.0", "2.0.0-rc"), InclusiveOfStart("2.0.0", "3.0.0-0")),
         };
 
-        public static readonly TheoryData<RangesRelatedTestCase> RangeTryUnionTestCases = new TheoryData<RangesRelatedTestCase>
+        public static readonly TheoryData<RangesUnionTestCase> RangeTryUnionTestCases = new TheoryData<RangesUnionTestCase>
         {
-            Related(InclusiveOfStart("1.0.0", "2.0.0-0"), InclusiveOfStart("1.2.0", "1.3.0-0")),
+            Union(InclusiveOfStart("1.0.0", "2.0.0-0"), InclusiveOfStart("1.2.0", "1.3.0-0"),
+                InclusiveOfStart("1.0.0", "2.0.0-0")),
+            NoUnion(Inclusive("1.0.0","2.0.0",true), Inclusive("1.5.0","3.0.0")),
+            NoUnion(Inclusive("1.0.0", "1.5.0"), Inclusive("2.0.0", "2.5.0")),
+            NoUnion(Inclusive("1.0.0", "2.0.0"), Inclusive("1.5.0-rc", "3.0.0")),
+            NoUnion(Inclusive("1.0.0", "2.0.0"), Inclusive("0.5.0", "1.5.0-rc")),
+            Union(Inclusive("1.0.0","2.5.0"), Inclusive("2.5.0", "3.0.0"),
+                Inclusive("1.0.0", "3.0.0")),
         };
 
         [Theory]
@@ -111,17 +125,18 @@ namespace Semver.Test.Ranges
 
         [Theory]
         [MemberData(nameof(RangeTryUnionTestCases))]
-        public void TryUnionIsCorrect(RangesRelatedTestCase testCase)
+        public void TryUnionIsCorrect(RangesUnionTestCase testCase)
         {
-            if (testCase.Related)
-            {
-                Assert.True(testCase.X.TryUnion(testCase.Y, out _), $"{testCase.X} {testCase.Y}");
-                Assert.True(testCase.Y.TryUnion(testCase.X, out _), $"{testCase.Y} {testCase.X}");
-            }
-            else
+            if (testCase.Expected is null)
             {
                 Assert.False(testCase.X.TryUnion(testCase.Y, out _), $"{testCase.X} {testCase.Y}");
                 Assert.False(testCase.Y.TryUnion(testCase.X, out _), $"{testCase.Y} {testCase.X}");
+            }
+            else
+            {
+                Assert.True(testCase.X.TryUnion(testCase.Y, out var union), $"{testCase.X} {testCase.Y}");
+                Assert.Equal(testCase.Expected, union);
+                Assert.True(testCase.Y.TryUnion(testCase.X, out _), $"{testCase.Y} {testCase.X}");
             }
         }
 
@@ -130,5 +145,16 @@ namespace Semver.Test.Ranges
 
         public static RangesRelatedTestCase NotRelated(UnbrokenSemVersionRange x, UnbrokenSemVersionRange y)
             => new RangesRelatedTestCase(x, y, false);
+
+        public static RangesUnionTestCase Union(
+            UnbrokenSemVersionRange x,
+            UnbrokenSemVersionRange y,
+            UnbrokenSemVersionRange expected)
+            => new RangesUnionTestCase(x, y, expected);
+
+        public static RangesUnionTestCase NoUnion(
+            UnbrokenSemVersionRange x,
+            UnbrokenSemVersionRange y)
+            => new RangesUnionTestCase(x, y);
     }
 }

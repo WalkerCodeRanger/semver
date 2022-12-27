@@ -250,6 +250,8 @@ namespace Semver.Ranges
                     return true;
                 }
 
+                // Note: caret ranges like ^0.1.2 and ^0.2.3-rc are converted to tilde ranges
+
                 if (Start.Major != 0)
                 {
                     // Caret ranges like ^1.2.3 and ^1.2.3-rc
@@ -260,30 +262,13 @@ namespace Semver.Ranges
                         return true;
                     }
                 }
-                else if (End.Major == 0)
+                else if (End.Major == 0
+                         && Start.Minor == 0 && End.Minor == 0
+                         && Start.Patch == End.Patch - 1)
                 {
-                    // Start.Major == 0 and End.Major == 0
-                    if (Start.Minor != 0)
-                    {
-                        // Caret ranges like ^0.1.2 and ^0.2.3-rc
-                        // Subtract instead of add to avoid overflow
-                        if (Start.Minor == End.Minor - 1 && End.Patch == 0)
-                        {
-                            result = (includesPrereleaseNotCoveredByEnds ? "*-* ^" : "^") + Start;
-                            return true;
-                        }
-                    }
-                    else if (End.Minor == 0)
-                    {
-                        // Start.Minor == 0 and End.Minor == 0
-
-                        // Caret ranges like ^0.0.2 and ^0.0.2-rc
-                        if (Start.Patch == End.Patch - 1)
-                        {
-                            result = (includesPrereleaseNotCoveredByEnds ? "*-* ^" : "^") + Start;
-                            return true;
-                        }
-                    }
+                    // Caret ranges like ^0.0.2 and ^0.0.2-rc
+                    result = (includesPrereleaseNotCoveredByEnds ? "*-* ^" : "^") + Start;
+                    return true;
                 }
             }
 
