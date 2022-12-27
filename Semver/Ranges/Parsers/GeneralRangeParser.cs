@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
 
@@ -102,8 +103,14 @@ namespace Semver.Ranges.Parsers
             var version = segment.Subsegment(0, end);
             segment = segment.Subsegment(end);
 
-            return SemVersionParser.Parse(version, rangeOptions.ToStyles(), parseOptions, ex,
+            var exception = SemVersionParser.Parse(version, rangeOptions.ToStyles(), parseOptions, ex,
                 maxLength, out semver, out wildcardVersion);
+            if (exception != null) return exception;
+
+            // Trim off metadata if it was allowed
+            if (semver.MetadataIdentifiers.Any())
+                semver = semver.WithoutMetadata();
+            return null;
         }
     }
 }

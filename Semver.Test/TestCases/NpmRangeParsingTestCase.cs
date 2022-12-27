@@ -65,7 +65,7 @@ namespace Semver.Test.TestCases
 
         #endregion
 
-        public void AssertParse()
+        public void AssertParseNpm()
         {
             if (IsValid)
             {
@@ -89,7 +89,7 @@ namespace Semver.Test.TestCases
             }
         }
 
-        public void AssertTryParse()
+        public void AssertTryParseNpm()
         {
             var result = SemVersionRange.TryParseNpm(Range, IncludeAllPrerelease, out var semverRange,
                 MaxLength);

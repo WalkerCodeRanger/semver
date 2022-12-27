@@ -179,7 +179,7 @@ namespace Semver.Test.Ranges
 
         [Theory]
         [MemberData(nameof(InvalidMaxLength))]
-        public void ParseWithInvalidMaxLength(int maxLength)
+        public void ParseNpmWithInvalidMaxLength(int maxLength)
         {
             var ex = Assert.Throws<ArgumentOutOfRangeException>(
                 () => SemVersionRange.ParseNpm("ignored", false, maxLength));
@@ -191,14 +191,25 @@ namespace Semver.Test.Ranges
 
         [Theory]
         [MemberData(nameof(ParsingTestCases))]
-        public void ParseWithOptionsParsesCorrectly(NpmRangeParsingTestCase testCase)
+        public void ParseNpmWithOptionsParsesCorrectly(NpmRangeParsingTestCase testCase)
         {
-            testCase.AssertParse();
+            testCase.AssertParseNpm();
+        }
+
+        /// <summary>
+        /// This doesn't need to check all cases, just that this overload forwards.
+        /// </summary>
+        [Fact]
+        public void ParseNpmWithoutOptions()
+        {
+            var range = SemVersionRange.ParseNpm("1.x");
+
+            Assert.Equal(SemVersionRange.Create(InclusiveOfStart("1.0.0", "2.0.0-0")), range);
         }
 
         [Theory]
         [MemberData(nameof(InvalidMaxLength))]
-        public void TryParseWithInvalidMaxLength(int maxLength)
+        public void TryParseNpmWithInvalidMaxLength(int maxLength)
         {
             var ex = Assert.Throws<ArgumentOutOfRangeException>(
                 () => SemVersionRange.TryParseNpm("ignored", false, out _, maxLength));
@@ -210,9 +221,20 @@ namespace Semver.Test.Ranges
 
         [Theory]
         [MemberData(nameof(ParsingTestCases))]
-        public void TryParseWithOptionsParsesCorrectly(NpmRangeParsingTestCase testCase)
+        public void TryParseNpmWithOptionsParsesCorrectly(NpmRangeParsingTestCase testCase)
         {
-            testCase.AssertTryParse();
+            testCase.AssertTryParseNpm();
+        }
+
+        /// <summary>
+        /// This doesn't need to check all cases, just that this overload forwards.
+        /// </summary>
+        [Fact]
+        public void TryParseNpmWithoutOptions()
+        {
+            Assert.True(SemVersionRange.TryParseNpm("1.x", out var range));
+
+            Assert.Equal(SemVersionRange.Create(InclusiveOfStart("1.0.0", "2.0.0-0")), range);
         }
 
         /// <summary>

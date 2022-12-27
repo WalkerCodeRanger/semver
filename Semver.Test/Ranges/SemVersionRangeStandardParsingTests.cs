@@ -104,6 +104,9 @@ namespace Semver.Test.Ranges
             Valid(">=1.2.3 <=2.5.0||>=2.0.0-rc <=3.1.4", Inclusive("1.2.3", "2.5.0"), Inclusive("2.0.0-rc", "3.1.4")),
             Valid("*-* >=1.2.3 <=2.5.0||>=2.0.0-rc <=3.1.4", Inclusive("1.2.3", "2.5.0", true), Inclusive("2.0.0-rc", "3.1.4")),
 
+            // Loose Parsing
+            Valid("v01+build", Loose, EqualsVersion("1.0.0")),
+
             // Wildcard before version
             Invalid(">*.2.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Minor", "*.2.3"),
             Invalid(">1.*.3", ExceptionMessages.MinorOrPatchMustBeWildcardVersion, "Patch", "1.*.3"),
@@ -270,12 +273,6 @@ namespace Semver.Test.Ranges
 
         internal static RangeParsingTestCase Valid(
             string range,
-            SemVersionRange expected,
-            int maxLength = SemVersionRange.MaxRangeLength)
-            => RangeParsingTestCase.Valid(range, Strict, maxLength, expected);
-
-        internal static RangeParsingTestCase Valid(
-            string range,
             UnbrokenSemVersionRange expected,
             int maxLength = SemVersionRange.MaxRangeLength)
             => RangeParsingTestCase.Valid(range, Strict, maxLength, SemVersionRange.Create(expected));
@@ -283,9 +280,11 @@ namespace Semver.Test.Ranges
         internal static RangeParsingTestCase Valid(string range, params UnbrokenSemVersionRange[] expectedRanges)
             => RangeParsingTestCase.Valid(range, Strict, SemVersionRange.MaxRangeLength, SemVersionRange.Create(expectedRanges));
 
-        internal static RangeParsingTestCase Valid(string range, SemVersionRangeOptions options, SemVersionRange expected,
-            int maxLength = SemVersionRange.MaxRangeLength)
-            => RangeParsingTestCase.Valid(range, options, maxLength, expected);
+        internal static RangeParsingTestCase Valid(
+            string range,
+            SemVersionRangeOptions options,
+            params UnbrokenSemVersionRange[] expectedRanges)
+            => RangeParsingTestCase.Valid(range, options, SemVersionRange.MaxRangeLength, SemVersionRange.Create(expectedRanges));
 
         internal static RangeParsingTestCase Invalid<T>(
             string range,

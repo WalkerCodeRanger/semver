@@ -356,7 +356,7 @@ namespace Semver.Test.Ranges
         [MemberData(nameof(ParsingCases))]
         public void ParseTests(NpmRangeParsingTestCase testCase)
         {
-            testCase.AssertParse();
+            testCase.AssertParseNpm();
         }
 
         private static NpmRangeContainsTestCase Includes(string range, string version, bool includeAllPrerelease = false)
