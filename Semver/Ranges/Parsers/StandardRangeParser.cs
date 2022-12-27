@@ -14,12 +14,8 @@ namespace Semver.Ranges.Parsers
             int maxLength,
             out SemVersionRange semverRange)
         {
-#if DEBUG
-            if (!rangeOptions.IsValid())
-                throw new ArgumentException("DEBUG: " + SemVersionRange.InvalidOptionsMessage, nameof(rangeOptions));
-            if (maxLength < 0)
-                throw new ArgumentOutOfRangeException(nameof(maxLength), "DEBUG: " + SemVersionRange.InvalidMaxLengthMessage);
-#endif
+            DebugChecks.IsValid(rangeOptions, nameof(rangeOptions));
+            DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
 
             // Assign null once so it doesn't have to be done any time parse fails
             semverRange = null;
@@ -98,9 +94,8 @@ namespace Semver.Ranges.Parsers
             ref LeftBoundedRange leftBound,
             ref RightBoundedRange rightBound)
         {
-#if DEBUG
-            if (segment.IsEmpty) throw new ArgumentException("DEBUG: Cannot be empty", nameof(segment));
-#endif
+            DebugChecks.IsNotEmpty(segment, nameof(segment));
+
             var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;
 
@@ -209,12 +204,12 @@ namespace Semver.Ranges.Parsers
                                     "", ReadOnlyList<MetadataIdentifier>.Empty), false));
                             return null;
                         default:
-                            // This code should be unreachable
-                            throw new ArgumentException($"DEBUG: Invalid {nameof(WildcardVersion)} value {wildcardVersion}");
+                            // dotcover disable next line
+                            throw Unreachable.InvalidEnum(wildcardVersion);
                     }
                 default:
-                    // This code should be unreachable
-                    throw new ArgumentException($"DEBUG: Invalid {nameof(StandardOperator)} value {@operator}");
+                    // dotcover disable next line
+                    throw Unreachable.InvalidEnum(@operator);
             }
         }
 
