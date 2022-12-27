@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Semver.Utility;
 using static Semver.Ranges.Parsers.GeneralRangeParser;
 
@@ -32,13 +33,8 @@ namespace Semver.Ranges.Parsers
             int maxLength,
             out SemVersionRange semverRange)
         {
-#if DEBUG
-            if (!rangeOptions.IsValid())
-                throw new ArgumentException("DEBUG: " + SemVersionRange.InvalidOptionsMessage, nameof(rangeOptions));
-            if (maxLength < 0)
-                throw new ArgumentOutOfRangeException(nameof(maxLength),
-                    "DEBUG: " + SemVersionRange.InvalidMaxLengthMessage);
-#endif
+            DebugChecks.IsValid(rangeOptions, nameof(rangeOptions));
+            DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
 
             // Assign null once so it doesn't have to be done any time parse fails
             semverRange = null;
@@ -316,6 +312,8 @@ namespace Semver.Ranges.Parsers
             SemVersion semver,
             WildcardVersion wildcardVersion)
         {
+            DebugChecks.IsNotWildcardVersionWithPrerelease(wildcardVersion, semver);
+
             bool inclusive;
             switch (wildcardVersion)
             {
@@ -362,10 +360,8 @@ namespace Semver.Ranges.Parsers
             SemVersion semver,
             WildcardVersion wildcardVersion)
         {
-#if DEBUG
-            if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
-                throw new InvalidOperationException("DEBUG: prerelease not allowed with wildcard");
-#endif
+            DebugChecks.IsNotWildcardVersionWithPrerelease(wildcardVersion, semver);
+
             switch (wildcardVersion)
             {
                 case WildcardVersion.MajorMinorPatchWildcard:
@@ -392,10 +388,8 @@ namespace Semver.Ranges.Parsers
             SemVersion semver,
             WildcardVersion wildcardVersion)
         {
-#if DEBUG
-            if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
-                throw new InvalidOperationException("DEBUG: prerelease not allowed with wildcard");
-#endif
+            DebugChecks.IsNotWildcardVersionWithPrerelease(wildcardVersion, semver);
+
             switch (wildcardVersion)
             {
                 case WildcardVersion.MajorMinorPatchWildcard:
@@ -424,6 +418,8 @@ namespace Semver.Ranges.Parsers
             SemVersion semver,
             WildcardVersion wildcardVersion)
         {
+            DebugChecks.IsNotWildcardVersionWithPrerelease(wildcardVersion, semver);
+
             switch (wildcardVersion)
             {
                 case WildcardVersion.None:

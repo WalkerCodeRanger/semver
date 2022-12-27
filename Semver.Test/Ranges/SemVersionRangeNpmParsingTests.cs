@@ -113,6 +113,8 @@ namespace Semver.Test.Ranges
             Valid("~0.*", true, InclusiveOfStart("0.0.0-0", "1.0.0-0", true)), // npm issue #512 parses as >=0.0.0 <1.0.0-0
             Valid("~1.2.3-beta.2", InclusiveOfStart("1.2.3-beta.2", "1.3.0-0")),
             Valid("~1.2.3-beta.2", true, InclusiveOfStart("1.2.3-beta.2", "1.3.0-0", true)),
+            Valid("~*", AllRelease),
+            Valid("~*", true, All),
 
             // Caret Ranges
             Valid("^1.2.3", InclusiveOfStart("1.2.3", "2.0.0-0")),
@@ -129,6 +131,20 @@ namespace Semver.Test.Ranges
             Valid("^1.x", InclusiveOfStart("1.0.0", "2.0.0-0")),
             Valid("^1.x", true, InclusiveOfStart("1.0.0-0", "2.0.0-0", true)),
             Valid("^0.x", InclusiveOfStart("0.0.0", "1.0.0-0")),
+            Valid("^*", AllRelease),
+            Valid("^*", true, All),
+
+            // Already at max version
+            Invalid(">2147483647.*.*", ExceptionMessages.MaxVersion, version: "2147483647.*.*"),
+            Invalid(">1.2147483647.*", ExceptionMessages.MaxVersion, version: "1.2147483647.*"),
+            Invalid("~2147483647.*.*", ExceptionMessages.MaxVersion, version: "2147483647.*.*"),
+            Invalid("~1.2147483647.3", ExceptionMessages.MaxVersion, version: "1.2147483647.3"),
+            Invalid("^2147483647.2.3", ExceptionMessages.MaxVersion, version: "2147483647.2.3"),
+            Invalid("^0.2147483647.3", ExceptionMessages.MaxVersion, version: "0.2147483647.3"),
+            Invalid("^0.0.2147483647", ExceptionMessages.MaxVersion, version: "0.0.2147483647"),
+            Invalid("2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.*"),
+            Invalid("3.2147483647.*", ExceptionMessages.MaxVersion, version: "3.2147483647.*"),
+            Invalid("2147483647.2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.2147483647.*"),
 
             // Invalid Operator
             Invalid("~<1.2.3", ExceptionMessages.InvalidOperator, "~<"),
