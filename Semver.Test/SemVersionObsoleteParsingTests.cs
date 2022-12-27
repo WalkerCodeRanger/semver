@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using Semver.Test.Builders;
 using Semver.Test.Helpers;
 using Xunit;
 

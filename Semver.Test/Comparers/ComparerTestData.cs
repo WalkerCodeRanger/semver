@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Semver.Test.Builders;
 using Semver.Test.Helpers;
 using Semver.Utility;
 
