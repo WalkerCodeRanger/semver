@@ -1,101 +1,246 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using Semver.Comparers;
+using Semver.Ranges.Parsers;
+using Semver.Utility;
 
 namespace Semver.Ranges
 {
-    internal class SemVersionRange
+    /// <summary>
+    /// A range of <see cref="SemVersion"/> values. A range can have gaps in it and may include only
+    /// some prerelease versions between included release versions. For a range that cannot have
+    /// gaps see the <see cref="UnbrokenSemVersionRange"/> class.
+    /// </summary>
+    public sealed class SemVersionRange : IReadOnlyList<UnbrokenSemVersionRange>, IEquatable<SemVersionRange>
     {
-        private static readonly SemVersion LowestVersion = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
-        private static readonly SemVersion HighestVersion = new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue);
+        internal const int MaxRangeLength = 2048;
+        internal const string InvalidOptionsMessage = "An invalid SemVersionRangeOptions value was used.";
+        internal const string InvalidMaxLengthMessage = "Must not be negative.";
 
-        public static readonly SemVersionRange Empty
-            = new SemVersionRange(new LeftBoundedRange(null, false),
-                new RightBoundedRange(LowestVersion, false), false);
-        public static readonly SemVersionRange AllRelease = AtMost(HighestVersion);
-        public static readonly SemVersionRange All = AtMost(HighestVersion, true);
+        public static readonly SemVersionRange Empty = new SemVersionRange(ReadOnlyList<UnbrokenSemVersionRange>.Empty);
+
+        public static readonly SemVersionRange AllRelease = new SemVersionRange(UnbrokenSemVersionRange.AllRelease);
+        public static readonly SemVersionRange All = new SemVersionRange(UnbrokenSemVersionRange.All);
+
+        public static SemVersionRange Equals(SemVersion version)
+            => Create(UnbrokenSemVersionRange.Equals(version));
 
         public static SemVersionRange GreaterThan(SemVersion version, bool includeAllPrerelease = false)
-            => Create(version ?? throw new ArgumentNullException(nameof(version)), false,
-                HighestVersion, true, includeAllPrerelease);
+            => Create(UnbrokenSemVersionRange.GreaterThan(version, includeAllPrerelease));
 
         public static SemVersionRange AtLeast(SemVersion version, bool includeAllPrerelease = false)
-            => Create(version ?? throw new ArgumentNullException(nameof(version)), true,
-                HighestVersion, true, includeAllPrerelease);
+             => Create(UnbrokenSemVersionRange.AtLeast(version, includeAllPrerelease));
 
         public static SemVersionRange LessThan(SemVersion version, bool includeAllPrerelease = false)
-            => Create(null, false,
-                version ?? throw new ArgumentNullException(nameof(version)), false, includeAllPrerelease);
+             => Create(UnbrokenSemVersionRange.LessThan(version, includeAllPrerelease));
 
         public static SemVersionRange AtMost(SemVersion version, bool includeAllPrerelease = false)
-            => Create(null, false,
-                version ?? throw new ArgumentNullException(nameof(version)), true, includeAllPrerelease);
+            => Create(UnbrokenSemVersionRange.AtMost(version, includeAllPrerelease));
 
         public static SemVersionRange Inclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
-            => Create(start ?? throw new ArgumentNullException(nameof(start)), true,
-                end ?? throw new ArgumentNullException(nameof(end)), true, includeAllPrerelease);
+            => Create(UnbrokenSemVersionRange.Inclusive(start, end, includeAllPrerelease));
 
         public static SemVersionRange InclusiveOfStart(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
-            => Create(start ?? throw new ArgumentNullException(nameof(start)), true,
-                end ?? throw new ArgumentNullException(nameof(end)), false, includeAllPrerelease);
+            => Create(UnbrokenSemVersionRange.InclusiveOfStart(start, end, includeAllPrerelease));
 
         public static SemVersionRange InclusiveOfEnd(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
-            => Create(start ?? throw new ArgumentNullException(nameof(start)), false,
-                end ?? throw new ArgumentNullException(nameof(end)), true, includeAllPrerelease);
+            => Create(UnbrokenSemVersionRange.InclusiveOfEnd(start, end, includeAllPrerelease));
 
         public static SemVersionRange Exclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
-            => Create(start ?? throw new ArgumentNullException(nameof(start)), false,
-                end ?? throw new ArgumentNullException(nameof(end)), false, includeAllPrerelease);
+            => Create(UnbrokenSemVersionRange.Exclusive(start, end, includeAllPrerelease));
 
-        private static SemVersionRange Create(
-            SemVersion startVersion,
-            bool startInclusive,
-            SemVersion endVersion,
-            bool endInclusive,
-            bool includeAllPrerelease)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static SemVersionRange Create(UnbrokenSemVersionRange range)
+            => UnbrokenSemVersionRange.Empty.Equals(range) ? Empty : new SemVersionRange(range);
+
+        /// <remarks>Ownership of the <paramref name="ranges"/> list must be given to this method.
+        /// The list will be mutated and used as the basis of an immutable list. It must not still
+        /// be referenced by the caller.</remarks>
+        internal static SemVersionRange Create(List<UnbrokenSemVersionRange> ranges)
         {
-            var start = new LeftBoundedRange(startVersion, startInclusive);
-            var end = new RightBoundedRange(endVersion, endInclusive);
-            // Always return the same empty range
-            if (!start.Overlaps(end)) return Empty;
-            return new SemVersionRange(start, end, includeAllPrerelease);
+            DebugChecks.IsNotNull(ranges, nameof(ranges));
+
+            // Remove empty ranges and see if the result is empty
+            ranges.RemoveAll(range => UnbrokenSemVersionRange.Empty.Equals(range));
+            if (ranges.Count == 0) return Empty;
+
+            // Sort and merge ranges
+            ranges.Sort(UnbrokenSemVersionRangeComparer.Instance);
+            for (var i = 0; i < ranges.Count - 1; i++)
+                for (var j = ranges.Count - 1; j > i; j--)
+                    if (ranges[i].TryUnion(ranges[j], out var union))
+                    {
+                        ranges.RemoveAt(j);
+                        ranges[i] = union;
+                    }
+
+            return new SemVersionRange(ranges.AsReadOnly());
         }
 
-        private SemVersionRange(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)
+        public static SemVersionRange Create(IEnumerable<UnbrokenSemVersionRange> ranges)
+            => Create((ranges ?? throw new ArgumentNullException(nameof(ranges))).ToList());
+
+        public static SemVersionRange Create(params UnbrokenSemVersionRange[] ranges)
+            => Create((ranges ?? throw new ArgumentNullException(nameof(ranges))).ToList());
+
+        private readonly IReadOnlyList<UnbrokenSemVersionRange> ranges;
+
+        /// <remarks>Parameter validation is not performed. The unbroken range must not be empty.</remarks>
+        private SemVersionRange(UnbrokenSemVersionRange range)
+            : this(new List<UnbrokenSemVersionRange>(1) { range }.AsReadOnly())
         {
-            this.start = start;
-            this.end = end;
-            IncludeAllPrerelease = includeAllPrerelease;
         }
 
-        private readonly LeftBoundedRange start;
-        private readonly RightBoundedRange end;
-
-        public SemVersion Start => start.Version;
-        public bool StartInclusive => start.Inclusive;
-        public SemVersion End => end.Version;
-        public bool EndInclusive => end.Inclusive;
-        public bool IncludeAllPrerelease { get; }
-
-        public bool Contains(SemVersion version)
+        /// <remarks>Parameter validation is not performed. The <paramref name="ranges"/> must be
+        /// an immutable list of properly ordered and combined ranges.</remarks>
+        private SemVersionRange(IReadOnlyList<UnbrokenSemVersionRange> ranges)
         {
-            if (version is null) throw new ArgumentNullException(nameof(version));
-
-            if (!start.Contains(version) || !end.Contains(version)) return false;
-
-            if (IncludeAllPrerelease || !version.IsPrerelease) return true;
-
-            // Prerelease versions must match either the start or end
-            return Start?.IsPrerelease == true && version.MajorMinorPatchEquals(Start)
-                   || End.IsPrerelease && version.MajorMinorPatchEquals(End);
+            this.ranges = ranges;
         }
 
-        // TODO this isn't quite intersect
-        public SemVersionRange Intersect(SemVersionRange range)
+        public bool Contains(SemVersion version) => ranges.Any(r => r.Contains(version));
+
+        public static implicit operator Predicate<SemVersion>(SemVersionRange range)
+            => range.Contains;
+
+        #region Standard Parsing
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static SemVersionRange Parse(
+            string range,
+            SemVersionRangeOptions options,
+            int maxLength = MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
-            var includeAllPrerelease = IncludeAllPrerelease && range.IncludeAllPrerelease;
-            var newStart = start.Max(range.start);
-            var newEnd = end.Min(range.end);
-            if (!start.Overlaps(end)) return Empty;
-            return new SemVersionRange(newStart, newEnd, includeAllPrerelease);
+            if (!options.IsValid())
+                throw new ArgumentException(InvalidOptionsMessage, nameof(options));
+            if (maxLength < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
+
+            var ex = StandardRangeParser.Parse(range, options, null, maxLength, out var semverRange);
+            if (ex != null) throw ex;
+            return semverRange;
         }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static SemVersionRange Parse(
+            string range,
+            int maxLength = MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => Parse(range, SemVersionRangeOptions.Strict, maxLength);
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParse(
+            string range,
+            SemVersionRangeOptions options,
+            out SemVersionRange semverRange,
+            int maxLength = MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+        {
+            if (!options.IsValid()) throw new ArgumentException(InvalidOptionsMessage, nameof(options));
+            if (maxLength < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
+
+            var exception = StandardRangeParser.Parse(range, options, Parsing.FailedException, maxLength, out semverRange);
+
+            DebugChecks.IsNotFailedException(exception, nameof(SemVersionParser), nameof(SemVersionParser.Parse));
+
+            return exception is null;
+        }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParse(
+            string range,
+            out SemVersionRange semverRange,
+            int maxLength = MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => TryParse(range, SemVersionRangeOptions.Strict, out semverRange, maxLength);
+        #endregion
+
+        #region npm Parsing
+        /// <summary>
+        /// Parse a range string following the npm range rules into a <see cref="SemVersionRange"/>.
+        /// </summary>
+        /// <remarks>The npm "loose" option is not supported.</remarks>
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static SemVersionRange ParseNpm(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            string range,
+            bool includeAllPrerelease,
+            int maxLength = MaxRangeLength)
+        {
+            if (maxLength < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
+
+            var ex = NpmRangeParser.Parse(range, includeAllPrerelease, null, maxLength, out var semverRange);
+            if (ex != null) throw ex;
+            return semverRange;
+        }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static SemVersionRange ParseNpm(string range, int maxLength = MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => ParseNpm(range, false, maxLength);
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParseNpm(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            string range,
+            bool includeAllPrerelease,
+            out SemVersionRange semverRange,
+            int maxLength = MaxRangeLength)
+        {
+            if (maxLength < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
+
+            var exception = NpmRangeParser.Parse(range, includeAllPrerelease, Parsing.FailedException, maxLength, out semverRange);
+
+            DebugChecks.IsNotFailedException(exception, nameof(NpmRangeParser), nameof(NpmRangeParser.Parse));
+
+            return exception is null;
+        }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParseNpm(
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            string range,
+            out SemVersionRange semverRange,
+            int maxLength = MaxRangeLength)
+            => TryParseNpm(range, false, out semverRange, maxLength);
+        #endregion
+
+        #region IReadOnlyList<UnbrokenSemVersionRange>
+        public int Count => ranges.Count;
+
+        public UnbrokenSemVersionRange this[int index] => ranges[index];
+
+        public IEnumerator<UnbrokenSemVersionRange> GetEnumerator() => ranges.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        #endregion
+
+        #region Equality
+        public bool Equals(SemVersionRange other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return ranges.SequenceEqual(other.ranges);
+        }
+
+        public override bool Equals(object obj)
+            => obj is SemVersionRange other && Equals(other);
+
+        public override int GetHashCode() => CombinedHashCode.CreateForItems(ranges);
+
+        public static bool operator ==(SemVersionRange left, SemVersionRange right)
+            => Equals(left, right);
+
+        public static bool operator !=(SemVersionRange left, SemVersionRange right)
+            => !Equals(left, right);
+        #endregion
+
+        public override string ToString() => string.Join(" || ", this);
     }
 }

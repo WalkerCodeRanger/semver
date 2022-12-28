@@ -35,6 +35,9 @@ namespace Semver
     /// </remarks>
     public readonly struct PrereleaseIdentifier : IEquatable<PrereleaseIdentifier>, IComparable<PrereleaseIdentifier>, IComparable
     {
+        internal static readonly PrereleaseIdentifier Zero = CreateUnsafe("0", 0);
+        internal static readonly PrereleaseIdentifier Hyphen = CreateUnsafe("-", null);
+
         /// <summary>
         /// The string value of the prerelease identifier even if it is a numeric identifier.
         /// </summary>
@@ -63,9 +66,8 @@ namespace Semver
         [Obsolete]
         internal static PrereleaseIdentifier CreateLoose(string value)
         {
-#if DEBUG
-            if (value is null) throw new ArgumentNullException(nameof(value), "DEBUG: Value cannot be null.");
-#endif
+            DebugChecks.IsNotNull(value, nameof(value));
+
             // Avoid parsing some non-ASCII digits as a number by checking that they are all digits
             if (value.IsDigits() && int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out var numericValue))
                 return new PrereleaseIdentifier(value, numericValue);
@@ -84,8 +86,8 @@ namespace Semver
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static PrereleaseIdentifier CreateUnsafe(string value, int? numericValue)
         {
+            DebugChecks.IsNotNull(value, nameof(value));
 #if DEBUG
-            if (value is null) throw new ArgumentNullException(nameof(value), "DEBUG: Value cannot be null.");
             PrereleaseIdentifier expected;
             try
             {
@@ -354,5 +356,15 @@ namespace Semver
         /// <returns>The string value of this identifier or <see langword="null"/> if this is
         /// a default <see cref="PrereleaseIdentifier"/></returns>
         public override string ToString() => Value;
+
+        internal PrereleaseIdentifier NextIdentifier()
+        {
+            if (NumericValue is int numericValue)
+                return numericValue == int.MaxValue
+                    ? Hyphen
+                    : new PrereleaseIdentifier(numericValue + 1);
+
+            return new PrereleaseIdentifier(Value + "-");
+        }
     }
 }

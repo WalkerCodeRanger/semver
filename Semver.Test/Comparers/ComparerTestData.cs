@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using Semver.Test.Helpers;
+using Semver.Utility;
 
 namespace Semver.Test.Comparers
 {
@@ -101,14 +102,7 @@ namespace Semver.Test.Comparers
 #pragma warning restore CS0618 // Type or member is obsolete
         }.AsReadOnly();
 
-        public static readonly IReadOnlyList<(SemVersion, SemVersion)> VersionPairs =
-            AllPairs(VersionsInSortOrder).ToList().AsReadOnly();
-
-        public static IEnumerable<(SemVersion, SemVersion)> AllPairs(IReadOnlyList<SemVersion> versions)
-        {
-            for (var i = 0; i < versions.Count; i++)
-                for (var j = i + 1; j < versions.Count; j++)
-                    yield return (versions[i], versions[j]);
-        }
+        public static readonly IReadOnlyList<(SemVersion, SemVersion)> VersionPairs
+            = VersionsInSortOrder.AllPairs().ToReadOnlyList();
     }
 }

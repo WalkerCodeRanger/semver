@@ -5,15 +5,14 @@ using Semver.Utility;
 
 namespace Semver.Benchmarks
 {
-    public class ParsingFull : Parsing
+    public class ParsingFull : ParsingBenchmarks
     {
         private const int Seed = -217274474;
 
         protected override IReadOnlyList<string> CreateVersions()
         {
             var random = new Random(Seed);
-            return Enumerables.Generate(VersionCount,
-                                      () => random.VersionString())
+            return Enumerables.Generate(VersionCount, () => random.VersionString())
                 .ToReadOnlyList();
         }
     }

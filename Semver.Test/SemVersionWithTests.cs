@@ -6,7 +6,7 @@ namespace Semver.Test
 {
     /// <summary>
     /// Tests for the <see cref="SemVersion.With"/> and <see cref="SemVersion.WithParsedFrom"/>
-    /// method. Each field change is tested independently to avoid combinatorial explosion.
+    /// methods. Each field change is tested independently to avoid combinatorial explosion.
     /// </summary>
     public class SemVersionWithTests
     {

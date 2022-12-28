@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Semver.Comparers;
+using Semver.Utility;
 
 namespace Semver.Ranges
 {
@@ -8,18 +10,26 @@ namespace Semver.Ranges
     /// <c>x</c> such that <c>x &lt; v</c> or <c>x &lt;= v</c> depending on whether it is inclusive.
     /// A left-bounded range forms the lower limit for a version range.
     /// </summary>
-    /// <remarks>A left-bounded range allows the version bounding it to be <see langword="null"/>
-    /// since <see langword="null"/> compares as less than all versions. However, it does not allow
-    /// such ranges to be inclusive because a range cannot contain null.</remarks>
+    /// <remarks>An "unbounded" left-bounded range is represented by a lower bound of
+    /// <see langword="null"/> since <see langword="null"/> compares as less than all versions.
+    /// However, it does not allow such ranges to be inclusive because a range cannot contain null.
+    /// The <see cref="SemVersion.Min"/> (i.e. <c>0.0.0-0</c>) cannot be used instead
+    /// because it would be inclusive of prerelease.</remarks>
     [StructLayout(LayoutKind.Auto)]
-    internal class LeftBoundedRange
+    internal readonly struct LeftBoundedRange : IEquatable<LeftBoundedRange>
     {
+        public static readonly LeftBoundedRange Unbounded = new LeftBoundedRange(null, false);
+
         public LeftBoundedRange(SemVersion version, bool inclusive)
         {
 #if DEBUG
+            // dotcover disable
             if (version is null && inclusive)
-                throw new ArgumentException("Cannot be inclusive of start without start value.", nameof(inclusive));
+                throw new ArgumentException("DEBUG: Cannot be inclusive of start without start value.", nameof(inclusive));
+            // dotcover enable
 #endif
+            DebugChecks.NoMetadata(version, nameof(version));
+
             Version = version;
             Inclusive = inclusive;
         }
@@ -27,25 +37,63 @@ namespace Semver.Ranges
         public SemVersion Version { get; }
         public bool Inclusive { get; }
 
+        public bool IncludesPrerelease => Version?.IsPrerelease == true;
+
         public bool Contains(SemVersion version)
         {
             var comparison = SemVersion.ComparePrecedence(Version, version);
             return Inclusive ? comparison <= 0 : comparison < 0;
         }
 
+        public LeftBoundedRange Min(LeftBoundedRange other)
+        {
+            var comparison = SemVersion.ComparePrecedence(Version, other.Version);
+            if (comparison == 0)
+                // If the versions are equal, then inclusive will be min
+                return new LeftBoundedRange(Version, Inclusive || other.Inclusive);
+            return comparison < 0 ? this : other;
+        }
+
         public LeftBoundedRange Max(LeftBoundedRange other)
         {
             var comparison = SemVersion.ComparePrecedence(Version, other.Version);
-            if (comparison < 0) return other;
             if (comparison == 0)
                 // If the versions are equal, then non-inclusive will be max
                 return new LeftBoundedRange(Version, Inclusive && other.Inclusive);
-            return this;
+            return comparison < 0 ? other : this;
         }
 
-        public bool Overlaps(RightBoundedRange end)
+        #region Equality
+        public bool Equals(LeftBoundedRange other)
+            => Equals(Version, other.Version) && Inclusive == other.Inclusive;
+
+        public override bool Equals(object obj)
+            => obj is LeftBoundedRange other && Equals(other);
+
+        public override int GetHashCode()
+            => CombinedHashCode.Create(Version, Inclusive);
+
+        public static bool operator ==(LeftBoundedRange left, LeftBoundedRange right)
+            => left.Equals(right);
+
+        public static bool operator !=(LeftBoundedRange left, LeftBoundedRange right)
+            => !left.Equals(right);
+        #endregion
+
+        public int CompareTo(RightBoundedRange other)
         {
-            throw new NotImplementedException();
+            var comparison = SemVersion.PrecedenceComparer.Compare(Version, other.Version);
+            if (comparison != 0) return comparison;
+            return Inclusive && other.Inclusive ? 0 : 1;
         }
+
+        public int CompareTo(LeftBoundedRange other)
+        {
+            var comparison = PrecedenceComparer.Instance.Compare(Version, other.Version);
+            if (comparison != 0) return comparison;
+            return -Inclusive.CompareTo(other.Inclusive);
+        }
+
+        public override string ToString() => (Inclusive ? ">=" : ">") + (Version?.ToString() ?? "null");
     }
 }

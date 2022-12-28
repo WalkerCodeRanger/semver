@@ -25,23 +25,21 @@ namespace Semver
     public sealed class SemVersion : IComparable<SemVersion>, IComparable, IEquatable<SemVersion>
 #endif
     {
+        internal static readonly SemVersion Min = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
+        internal static readonly SemVersion MinRelease = new SemVersion(0, 0, 0);
+        internal static readonly SemVersion Max = new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue);
+
         internal const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
         private const string InvalidMajorVersionMessage = "Major version must be greater than or equal to zero.";
         private const string InvalidMinorVersionMessage = "Minor version must be greater than or equal to zero.";
         private const string InvalidPatchVersionMessage = "Patch version must be greater than or equal to zero.";
         private const string PrereleaseIdentifierIsDefaultMessage = "Prerelease identifier cannot be default/null.";
         private const string MetadataIdentifierIsDefaultMessage = "Metadata identifier cannot be default/null.";
+        // TODO include in v3.0.0 for issue #72
+        //internal const string InvalidMaxLengthMessage = "Must not be negative.";
         internal const int MaxVersionLength = 1024;
 
-        /// <remarks>
-        /// This exception is used with the <see cref="SemVersionParser.Parse"/>
-        /// method to indicate parse failure without constructing a new exception.
-        /// This exception should never be thrown or exposed outside of this
-        /// package.
-        /// </remarks>
-        private static readonly Exception ParseFailedException = new Exception("Parse Failed");
-
-        private static readonly Regex ParseEx =
+        private static readonly Regex ParseRegex =
             new Regex(@"^(?<major>\d+)" +
                 @"(?>\.(?<minor>\d+))?" +
                 @"(?>\.(?<patch>\d+))?" +
@@ -384,19 +382,20 @@ namespace Semver
             string prerelease, IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
             string metadata, IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
-#if DEBUG
-            if (major < 0) throw new ArgumentException("DEBUG: " + InvalidMajorVersionMessage, nameof(major));
-            if (minor < 0) throw new ArgumentException("DEBUG: " + InvalidMinorVersionMessage, nameof(minor));
-            if (patch < 0) throw new ArgumentException("DEBUG: " + InvalidPatchVersionMessage, nameof(patch));
-            if (prerelease is null) throw new ArgumentNullException(nameof(prerelease), "DEBUG: Value cannot be null.");
-            if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers), "DEBUG: Value cannot be null.");
-            if (prereleaseIdentifiers.Any(i => i==default)) throw new ArgumentException("DEBUG: " + PrereleaseIdentifierIsDefaultMessage, nameof(prereleaseIdentifiers));
-            if (prerelease != string.Join(".", prereleaseIdentifiers)) throw new ArgumentException($"DEBUG: must be equal to {nameof(prereleaseIdentifiers)}", nameof(prerelease));
-            if (metadata is null) throw new ArgumentNullException(nameof(metadata), "DEBUG: Value cannot be null.");
-            if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers), "DEBUG: Value cannot be null.");
-            if (metadataIdentifiers.Any(i => i == default)) throw new ArgumentException("DEBUG: " + MetadataIdentifierIsDefaultMessage, nameof(metadataIdentifiers));
-            if (metadata != string.Join(".", metadataIdentifiers)) throw new ArgumentException($"DEBUG: must be equal to {nameof(metadataIdentifiers)}", nameof(metadata));
-#endif
+            DebugChecks.IsValidVersionNumber(major, "Major", nameof(major));
+            DebugChecks.IsValidVersionNumber(minor, "Minor", nameof(minor));
+            DebugChecks.IsValidVersionNumber(patch, "Patch", nameof(patch));
+            DebugChecks.IsNotNull(prerelease, nameof(prerelease));
+            DebugChecks.IsNotNull(prerelease, nameof(prereleaseIdentifiers));
+            DebugChecks.ContainsNoDefaultValues(prereleaseIdentifiers, "Prerelease", nameof(prereleaseIdentifiers));
+            DebugChecks.AreEqualWhenJoinedWithDots(prerelease, nameof(prerelease),
+                prereleaseIdentifiers, nameof(prereleaseIdentifiers));
+            DebugChecks.IsNotNull(metadata, nameof(metadata));
+            DebugChecks.IsNotNull(metadataIdentifiers, nameof(metadataIdentifiers));
+            DebugChecks.ContainsNoDefaultValues(metadataIdentifiers, "Metadata", nameof(metadataIdentifiers));
+            DebugChecks.AreEqualWhenJoinedWithDots(metadata, nameof(metadata),
+                metadataIdentifiers, nameof(metadataIdentifiers));
+
             Major = major;
             Minor = minor;
             Patch = patch;
@@ -475,7 +474,8 @@ namespace Semver
         public static SemVersion Parse(string version, SemVersionStyles style, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
-
+            // TODO include in v3.0.0 for issue #72
+            //if (maxLength < 0) throw new ArgumentOutOfRangeException(InvalidMaxLengthMessage, nameof(maxLength));
             var ex = SemVersionParser.Parse(version, style, null, maxLength, out var semver);
 
             return ex is null ? semver : throw ex;
@@ -496,7 +496,7 @@ namespace Semver
         [Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
         public static SemVersion Parse(string version, bool strict = false)
         {
-            var match = ParseEx.Match(version);
+            var match = ParseRegex.Match(version);
             if (!match.Success)
                 throw new ArgumentException($"Invalid version '{version}'.", nameof(version));
 
@@ -539,11 +539,15 @@ namespace Semver
             out SemVersion semver, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
-            var exception = SemVersionParser.Parse(version, style, ParseFailedException, maxLength, out semver);
+            // TODO include in v3.0.0 for issue #72
+            //if (maxLength < 0) throw new ArgumentOutOfRangeException(InvalidMaxLengthMessage, nameof(maxLength));
+            var exception = SemVersionParser.Parse(version, style, Parsing.FailedException, maxLength, out semver);
 
-            // This check ensures that ParseVersion doesn't construct an exception, but always returns ParseFailedException
-            if (exception != null && exception != ParseFailedException)
-                throw new InvalidOperationException($"{nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(ParseFailedException)}", exception);
+#if DEBUG
+            // This check ensures that SemVersionParser.Parse doesn't construct an exception, but always returns ParseFailedException
+            if (exception != null && exception != Parsing.FailedException)
+                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}", exception);
+#endif
 
             return exception is null;
         }
@@ -565,7 +569,7 @@ namespace Semver
             semver = null;
             if (version is null) return false;
 
-            var match = ParseEx.Match(version);
+            var match = ParseRegex.Match(version);
             if (!match.Success) return false;
 
             if (!int.TryParse(match.Groups["major"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var major))
@@ -1156,6 +1160,13 @@ namespace Semver
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrereleaseIdentifiers"]/*'/>
         public IReadOnlyList<PrereleaseIdentifier> PrereleaseIdentifiers { get; }
 
+        /// <summary>
+        /// Whether this is a prerelease version where the prerelease version is zero (i.e. "-0").
+        /// </summary>
+        internal bool PrereleaseIsZero
+            => PrereleaseIdentifiers.Count == 1
+               && PrereleaseIdentifiers[0] == PrereleaseIdentifier.Zero;
+
         /// <summary>Whether this is a prerelease version.</summary>
         /// <value>Whether this is a prerelease version. A semantic version with
         /// prerelease identifiers is a prerelease version.</value>
@@ -1236,7 +1247,7 @@ namespace Semver
         /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
-        // TODO rename parameters to `left` and `right` to be consistent with ComparePrecedence etc.
+        // TODO v3.0.0 rename parameters to `left` and `right` to be consistent with ComparePrecedence etc.
         public static bool Equals(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return true;
@@ -1673,41 +1684,67 @@ namespace Semver
 
         #region Ranges
         /// <summary>
-        /// <para>
-        /// Checks if this version satisfies the specified range.
-        /// Uses the same range syntax as npm.
-        /// </para>
-        /// <para>
-        /// Note: It's more optimal to use the static parse methods on <see cref="NpmRange"/>
-        /// if you're gonna be testing multiple versions against the same range
-        /// to avoid having to parse the range multiple times.
-        /// </para>
+        /// Checks if this version satisfies the predicate. Typically this is called with a
+        /// <see cref="SemVersionRange"/> or <see cref="UnbrokenSemVersionRange"/>
         /// </summary>
-        /// <param name="range">The range to compare with. If the syntax is invalid the method will always return false.</param>
-        /// <param name="includeAllPrerelease"></param>
-        /// <returns>True if the version satisfies the range.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
-        public bool SatisfiesNpm(string range, bool includeAllPrerelease = false)
+        /// <param name="predicate">The predicate to evaluate. Commonly a
+        /// <see cref="SemVersionRange"/> or <see cref="UnbrokenSemVersionRange"/>.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="predicate"/> is
+        /// <see langword="null"/>.</exception>
+        public bool Satisfies(Predicate<SemVersion> predicate)
+        {
+            if (predicate is null) throw new ArgumentNullException(nameof(predicate));
+            return predicate(this);
+        }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public bool Satisfies(
+            string range,
+            SemVersionRangeOptions options,
+            int maxLength = SemVersionRange.MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
-            if (!NpmRange.TryParse(range, includeAllPrerelease, out var parsedRange))
-                return false;
 
+            var parsedRange = SemVersionRange.Parse(range, options, maxLength);
             return parsedRange.Contains(this);
         }
 
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public bool Satisfies(string range, int maxLength = SemVersionRange.MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => Satisfies(range, SemVersionRangeOptions.Strict, maxLength);
+
         /// <summary>
-        /// Checks if this version satisfies the specified range.
-        /// Uses the same syntax as npm.
+        /// Checks if this version is in the given range. Uses the same range syntax as npm.
         /// </summary>
+        /// <remarks>
+        /// It's more optimal to use the static parse methods on <see cref="SemVersionRange"/>
+        /// if you're going to be testing multiple versions against the same range
+        /// to avoid having to parse the range multiple times.
+        /// </remarks>
         /// <param name="range">The range to compare with.</param>
-        /// <returns>True if the version satisfies the range.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if version or range is null.</exception>
-        public bool Satisfies(SemVersionRangeSet range)
+        /// <param name="includeAllPrerelease"></param>
+        /// <param name="maxLength"></param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="range"/> is <see langword="null"/>.</exception>
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public bool SatisfiesNpm(string range, bool includeAllPrerelease, int maxLength = SemVersionRange.MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
-            return range.Contains(this);
+
+            var parsedRange = SemVersionRange.ParseNpm(range, includeAllPrerelease, maxLength);
+            return parsedRange.Contains(this);
         }
+
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public bool SatisfiesNpm(string range, int maxLength = SemVersionRange.MaxRangeLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => SatisfiesNpm(range, false, maxLength);
         #endregion
 
         /// <summary>

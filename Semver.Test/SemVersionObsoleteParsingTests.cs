@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Semver.Test.Helpers;
 using Xunit;
 
 namespace Semver.Test
@@ -362,7 +363,7 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null));
 #pragma warning restore CS0618 // Type or member is obsolete
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             // This is an incorrect param name, should be "version"
             Assert.Equal("input", ex.ParamName);
         }
@@ -460,7 +461,7 @@ namespace Semver.Test
 #pragma warning disable CS0618 // Type or member is obsolete
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.Parse(null, true));
 #pragma warning restore CS0618 // Type or member is obsolete
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             // This is an incorrect param name, should be "version"
             Assert.Equal("input", ex.ParamName);
         }
@@ -618,7 +619,7 @@ namespace Semver.Test
                 SemVersion _ = default(string);
 #pragma warning restore CS0618 // Type or member is obsolete
             });
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             // This is an incorrect param name, should be "version"
             Assert.Equal("input", ex.ParamName);
         }

@@ -11,7 +11,7 @@ namespace Semver.Benchmarks
     {
         private const string Value = "245413548946516575165756156751323245451984";
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public bool Standard() => Value.IsDigits();
 
         [Benchmark]

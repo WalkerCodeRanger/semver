@@ -5,7 +5,7 @@ using Semver.Utility;
 
 namespace Semver.Benchmarks
 {
-    public class ParsingPrerelease : Parsing
+    public class ParsingPrerelease : ParsingBenchmarks
     {
         private const int Seed = 37041887;
 

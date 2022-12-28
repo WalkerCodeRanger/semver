@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Semver.Test.Helpers;
 using Xunit;
 
 namespace Semver.Test
@@ -204,7 +205,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => new SemVersion(1, 2, 3, new[] { "bar", null }));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prerelease", ex.ParamName);
         }
 
@@ -264,7 +265,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => new SemVersion(1, 2, 3, metadata: new[] { "bar", null }));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadata", ex.ParamName);
         }
 

@@ -35,8 +35,6 @@ namespace Semver
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool HasStyle(this SemVersionStyles styles, SemVersionStyles flag)
-        {
-            return (styles & flag) == flag;
-        }
+            => (styles & flag) == flag;
     }
 }

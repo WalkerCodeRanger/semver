@@ -10,7 +10,7 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     public abstract class NpmRangeParsing
     {
-        protected const int NumRanges = 1000;
+        protected const int RangeCount = 1_000;
         private readonly IReadOnlyList<string> ranges;
 
         protected abstract IReadOnlyList<string> GetRanges();
@@ -20,13 +20,19 @@ namespace Semver.Benchmarks.RangeBenchmarks.Npm
             ranges = GetRanges();
         }
 
-        [Benchmark(OperationsPerInvoke = NumRanges)]
+        [Benchmark(OperationsPerInvoke = RangeCount)]
         [Arguments(false)]
         [Arguments(true)]
-        public void Parse(bool prerelease)
+        public long Parse(bool includePrerelease)
         {
-            foreach (var range in ranges)
-                NpmRange.Parse(range, prerelease);
+            // The accumulator ensures the versions aren't dead code with minimal overhead
+            long accumulator = 0;
+            for (int i = 0; i < RangeCount; i++)
+            {
+                var range = SemVersionRange.ParseNpm(ranges[i], includePrerelease);
+                accumulator += range.Count;
+            }
+            return accumulator;
         }
     }
 }

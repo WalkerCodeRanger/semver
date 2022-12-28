@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Semver.Test.Helpers;
 using Xunit;
 
 namespace Semver.Test
@@ -117,7 +118,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithPrereleaseParsedFrom(null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prerelease", ex.ParamName);
         }
 
@@ -186,7 +187,7 @@ namespace Semver.Test
         public void WithPrereleaseStringParamsFirstNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease(null, "more"));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifier", ex.ParamName);
         }
 
@@ -194,7 +195,7 @@ namespace Semver.Test
         public void WithPrereleaseStringParamsRestNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease("pre", null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
@@ -218,7 +219,7 @@ namespace Semver.Test
         public void WithPrereleaseStringParamsNullIdentifierInRest()
         {
             var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease("bar", "baz", null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
@@ -294,7 +295,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithPrerelease((IEnumerable<string>)null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
@@ -320,7 +321,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithPrerelease(new[] { "bar", null }));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
@@ -369,7 +370,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease(
                 new PrereleaseIdentifier("bar"), null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
@@ -420,7 +421,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithPrerelease((IEnumerable<PrereleaseIdentifier>)null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
 
@@ -482,7 +483,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithMetadataParsedFrom(null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadata", ex.ParamName);
         }
 
@@ -542,7 +543,7 @@ namespace Semver.Test
         public void WithMetadataStringParamsFirstNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(null, "rest"));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
 
@@ -550,7 +551,7 @@ namespace Semver.Test
         public void WithMetadataStringParamsRestNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata("bar", null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
 
@@ -575,7 +576,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithMetadata("bar", "baz", null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
 
@@ -654,7 +655,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithMetadata((IEnumerable<string>)null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
 
@@ -680,7 +681,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithMetadata(new[] { "bar", null }));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
 
@@ -730,7 +731,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithMetadata(new MetadataIdentifier("bar"), null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
 
@@ -781,7 +782,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(()
                 => Version.WithMetadata((IEnumerable<MetadataIdentifier>)null));
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
 

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Semver.Utility
 {
@@ -9,6 +11,7 @@ namespace Semver.Utility
     /// <remarks>Algorithm based on HashHelpers previously used in the core CLR.
     /// https://github.com/dotnet/coreclr/blob/456afea9fbe721e57986a21eb3b4bb1c9c7e4c56/src/System.Private.CoreLib/shared/System/Numerics/Hashing/HashHelpers.cs
     /// </remarks>
+    [StructLayout(LayoutKind.Auto)]
     internal struct CombinedHashCode
     {
         private static readonly int RandomSeed = new Random().Next(int.MinValue, int.MaxValue);
@@ -16,6 +19,14 @@ namespace Semver.Utility
         #region Create Methods
         public static CombinedHashCode Create<T1>(T1 value1)
             => new CombinedHashCode(CombineValue(RandomSeed, value1));
+
+        public static CombinedHashCode Create<T1, T2>(T1 value1, T2 value2)
+        {
+            var hash = RandomSeed;
+            hash = CombineValue(hash, value1);
+            hash = CombineValue(hash, value2);
+            return new CombinedHashCode(hash);
+        }
 
         public static CombinedHashCode Create<T1, T2, T3>(T1 value1, T2 value2, T3 value3)
         {
@@ -44,6 +55,15 @@ namespace Semver.Utility
             hash = CombineValue(hash, value3);
             hash = CombineValue(hash, value4);
             hash = CombineValue(hash, value5);
+            return new CombinedHashCode(hash);
+        }
+
+        public static CombinedHashCode CreateForItems<T>(IEnumerable<T> values)
+        {
+            var hash = RandomSeed;
+            foreach (var value in values)
+                hash = CombineValue(hash, value);
+
             return new CombinedHashCode(hash);
         }
         #endregion

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Semver.Test.Helpers;
 using Xunit;
 
 namespace Semver.Test
@@ -47,7 +48,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => new PrereleaseIdentifier(null, allowLeadingZeros));
 
-            Assert.StartsWith("Value cannot be null.", ex.Message);
+            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("value", ex.ParamName);
         }
 

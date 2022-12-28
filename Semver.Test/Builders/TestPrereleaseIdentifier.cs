@@ -1,7 +1,9 @@
 ﻿using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace Semver.Test.Builders
 {
+    [StructLayout(LayoutKind.Auto)]
     public readonly struct TestPrereleaseIdentifier
     {
         public string Value { get; }
@@ -14,14 +16,10 @@ namespace Semver.Test.Builders
         }
 
         public static implicit operator TestPrereleaseIdentifier(string value)
-        {
-            return new TestPrereleaseIdentifier(value, null);
-        }
+            => new TestPrereleaseIdentifier(value, null);
 
         public static implicit operator TestPrereleaseIdentifier(int value)
-        {
-            return new TestPrereleaseIdentifier(value.ToString(CultureInfo.InvariantCulture), value);
-        }
+            => new TestPrereleaseIdentifier(value.ToString(CultureInfo.InvariantCulture), value);
 
         public static implicit operator PrereleaseIdentifier(TestPrereleaseIdentifier identifier)
         {
