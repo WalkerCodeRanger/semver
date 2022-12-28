@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Semver.Comparers;
 using Semver.Utility;
@@ -24,11 +23,13 @@ namespace Semver.Ranges
         public LeftBoundedRange(SemVersion version, bool inclusive)
         {
 #if DEBUG
+            // dotcover disable
             if (version is null && inclusive)
                 throw new ArgumentException("DEBUG: Cannot be inclusive of start without start value.", nameof(inclusive));
-            if (version?.MetadataIdentifiers.Any() ?? false)
-                throw new ArgumentException("DEBUG: Cannot have metadata.", nameof(version));
+            // dotcover enable
 #endif
+            DebugChecks.NoMetadata(version, nameof(version));
+
             Version = version;
             Inclusive = inclusive;
         }

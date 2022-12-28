@@ -271,6 +271,17 @@ namespace Semver.Test.Ranges
                 Assert.Null(semverRange);
         }
 
+        /// <summary>
+        /// This doesn't need to check all cases, just that this overload forwards.
+        /// </summary>
+        [Fact]
+        public void TryParseWithoutOptions()
+        {
+            Assert.True(SemVersionRange.TryParse("1.*", out var range));
+
+            Assert.Equal(SemVersionRange.Create(InclusiveOfStart("1.0.0", "2.0.0-0")), range);
+        }
+
         internal static RangeParsingTestCase Valid(
             string range,
             UnbrokenSemVersionRange expected,

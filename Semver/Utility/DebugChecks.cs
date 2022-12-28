@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Semver.Ranges;
 using Semver.Ranges.Parsers;
 
@@ -63,6 +65,46 @@ namespace Semver.Utility
         {
             if (value == null)
                 throw new ArgumentNullException(paramName, "DEBUG: Value cannot be null.");
+        }
+
+        /// <summary>
+        /// This check ensures that an exception hasn't been constructed, but rather something always
+        /// returns <see cref="Parsing.FailedException"/>.
+        /// </summary>
+        [Conditional("DEBUG")]
+        public static void IsNotFailedException(Exception exception, string className, string methodName)
+        {
+            if (exception != null && exception != Parsing.FailedException)
+                throw new InvalidOperationException($"DEBUG: {className}.{methodName} returned exception other than {nameof(Parsing.FailedException)}", exception);
+        }
+
+        [Conditional("DEBUG")]
+        public static void NoMetadata(SemVersion version, string paramName)
+        {
+            if (version?.MetadataIdentifiers.Any() ?? false)
+                throw new ArgumentException("DEBUG: Cannot have metadata.", paramName);
+        }
+
+        [Conditional("DEBUG")]
+        public static void IsValidVersionNumber(int versionNumber, string kind, string paramName)
+        {
+            if (versionNumber < 0)
+                throw new ArgumentException($"DEBUG: {kind} version must be greater than or equal to zero.", paramName);
+        }
+
+        [Conditional("DEBUG")]
+        public static void ContainsNoDefaultValues<T>(IEnumerable<T> values, string kind, string paramName)
+            where T : struct
+        {
+            if (values.Any(i => EqualityComparer<T>.Default.Equals(i, default)))
+                throw new ArgumentException($"DEBUG: {kind} identifier cannot be default/null.", paramName);
+        }
+
+        [Conditional("DEBUG")]
+        public static void AreEqualWhenJoinedWithDots<T>(string value, string param1Name, IReadOnlyList<T> values, string param2Name)
+        {
+            if (value != string.Join(".", values))
+                throw new ArgumentException($"DEBUG: must be equal to {param2Name} when joined with dots.", param1Name);
         }
     }
 }

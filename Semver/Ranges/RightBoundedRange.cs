@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Semver.Comparers;
 using Semver.Utility;
@@ -21,11 +20,9 @@ namespace Semver.Ranges
 
         public RightBoundedRange(SemVersion version, bool inclusive)
         {
-#if DEBUG
-            if (version is null) throw new ArgumentNullException(nameof(version), "DEBUG: Value cannot be null.");
-            if (version.MetadataIdentifiers.Any())
-                throw new ArgumentException("DEBUG: Cannot have metadata.", nameof(version));
-#endif
+            DebugChecks.IsNotNull(version, nameof(version));
+            DebugChecks.NoMetadata(version, nameof(version));
+
             Version = version;
             Inclusive = inclusive;
         }

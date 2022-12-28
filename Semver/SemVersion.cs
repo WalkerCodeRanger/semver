@@ -382,19 +382,20 @@ namespace Semver
             string prerelease, IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
             string metadata, IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
-#if DEBUG
-            if (major < 0) throw new ArgumentException("DEBUG: " + InvalidMajorVersionMessage, nameof(major));
-            if (minor < 0) throw new ArgumentException("DEBUG: " + InvalidMinorVersionMessage, nameof(minor));
-            if (patch < 0) throw new ArgumentException("DEBUG: " + InvalidPatchVersionMessage, nameof(patch));
-            if (prerelease is null) throw new ArgumentNullException(nameof(prerelease), "DEBUG: Value cannot be null.");
-            if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers), "DEBUG: Value cannot be null.");
-            if (prereleaseIdentifiers.Any(i => i==default)) throw new ArgumentException("DEBUG: " + PrereleaseIdentifierIsDefaultMessage, nameof(prereleaseIdentifiers));
-            if (prerelease != string.Join(".", prereleaseIdentifiers)) throw new ArgumentException($"DEBUG: must be equal to {nameof(prereleaseIdentifiers)}", nameof(prerelease));
-            if (metadata is null) throw new ArgumentNullException(nameof(metadata), "DEBUG: Value cannot be null.");
-            if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers), "DEBUG: Value cannot be null.");
-            if (metadataIdentifiers.Any(i => i == default)) throw new ArgumentException("DEBUG: " + MetadataIdentifierIsDefaultMessage, nameof(metadataIdentifiers));
-            if (metadata != string.Join(".", metadataIdentifiers)) throw new ArgumentException($"DEBUG: must be equal to {nameof(metadataIdentifiers)}", nameof(metadata));
-#endif
+            DebugChecks.IsValidVersionNumber(major, "Major", nameof(major));
+            DebugChecks.IsValidVersionNumber(minor, "Minor", nameof(minor));
+            DebugChecks.IsValidVersionNumber(patch, "Patch", nameof(patch));
+            DebugChecks.IsNotNull(prerelease, nameof(prerelease));
+            DebugChecks.IsNotNull(prerelease, nameof(prereleaseIdentifiers));
+            DebugChecks.ContainsNoDefaultValues(prereleaseIdentifiers, "Prerelease", nameof(prereleaseIdentifiers));
+            DebugChecks.AreEqualWhenJoinedWithDots(prerelease, nameof(prerelease),
+                prereleaseIdentifiers, nameof(prereleaseIdentifiers));
+            DebugChecks.IsNotNull(metadata, nameof(metadata));
+            DebugChecks.IsNotNull(metadataIdentifiers, nameof(metadataIdentifiers));
+            DebugChecks.ContainsNoDefaultValues(metadataIdentifiers, "Metadata", nameof(metadataIdentifiers));
+            DebugChecks.AreEqualWhenJoinedWithDots(metadata, nameof(metadata),
+                metadataIdentifiers, nameof(metadataIdentifiers));
+
             Major = major;
             Minor = minor;
             Patch = patch;

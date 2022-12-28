@@ -9,6 +9,8 @@ namespace Semver.Test.Ranges
 {
     public class LeftBoundedRangeTests
     {
+        public static readonly SemVersion FakeVersion = Version("1.2.3");
+
         internal static readonly IReadOnlyList<LeftBoundedRange> RangesInOrder = new List<LeftBoundedRange>()
         {
             LeftBoundedRange.Unbounded,
@@ -26,7 +28,6 @@ namespace Semver.Test.Ranges
         internal static readonly IReadOnlyList<(LeftBoundedRange, LeftBoundedRange)> RangePairs
             = RangesInOrder.AllPairs().ToReadOnlyList();
 
-        public static readonly SemVersion FakeVersion = Version("1.2.3");
         internal static readonly LeftBoundedRange LeftExclusive = new LeftBoundedRange(FakeVersion, false); // 1.2.3 + epsilon
         internal static readonly LeftBoundedRange LeftInclusive = new LeftBoundedRange(FakeVersion, true); // 1.2.3
         internal static readonly RightBoundedRange RightExclusive = new RightBoundedRange(FakeVersion, false); // 1.2.3 - epsilon
@@ -57,6 +58,30 @@ namespace Semver.Test.Ranges
                 Assert.True(left.CompareTo(right) < 0, $"{left} < {right}");
                 Assert.True(right.CompareTo(left) > 0, $"{right} > {left}");
             }
+        }
+
+        [Fact]
+        public void MinAtSameVersion()
+        {
+            var inclusive = new LeftBoundedRange(FakeVersion, true);
+            var exclusive = new LeftBoundedRange(FakeVersion, false);
+
+            var max = inclusive.Min(exclusive);
+
+            Assert.Equal(inclusive, max);
+        }
+
+        [Fact]
+        public void GetHashCodeAndEquality()
+        {
+            var range1 = new LeftBoundedRange(FakeVersion, true);
+            var range2 = new LeftBoundedRange(FakeVersion, true);
+
+            Assert.True(range1.Equals(range2));
+            Assert.True(range1.Equals((object)range2));
+            Assert.Equal(range1.GetHashCode(), range2.GetHashCode());
+            Assert.True(range1 == range2);
+            Assert.False(range1 != range2);
         }
     }
 }

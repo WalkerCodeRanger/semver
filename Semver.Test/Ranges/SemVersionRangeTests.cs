@@ -491,6 +491,32 @@ namespace Semver.Test.Ranges
         }
 
         [Fact]
+        public void Indexer()
+        {
+            var range = SemVersionRange.Create(UnbrokenSemVersionRange.All);
+
+            Assert.Equal(UnbrokenSemVersionRange.All, range[0]);
+        }
+
+        [Fact]
+        public void GetHashCodeAndEquality()
+        {
+            var range1 = SemVersionRange.Parse("1.*");
+            var range2 = SemVersionRange.Parse("1.*");
+
+            Assert.NotSame(range1, range2);
+            Assert.Equal(range1.GetHashCode(), range2.GetHashCode());
+            Assert.True(range1 == range2);
+            Assert.False(range1 != range2);
+        }
+
+        [Fact]
+        public void EqualsNull()
+        {
+            Assert.False(SemVersionRange.AllRelease.Equals(null));
+        }
+
+        [Fact]
         public void ToStringOfRangeWithSingleUnbrokenRange()
         {
             var range = SemVersionRange.Parse(">= 1.2.3");

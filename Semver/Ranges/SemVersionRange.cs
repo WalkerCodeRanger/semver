@@ -145,11 +145,7 @@ namespace Semver.Ranges
 
             var exception = StandardRangeParser.Parse(range, options, Parsing.FailedException, maxLength, out semverRange);
 
-#if DEBUG
-            // This check ensures that StandardRangeParser.Parse doesn't construct an exception, but always returns ParseFailedException
-            if (exception != null && exception != Parsing.FailedException)
-                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}", exception);
-#endif
+            DebugChecks.IsNotFailedException(exception, nameof(SemVersionParser), nameof(SemVersionParser.Parse));
 
             return exception is null;
         }
@@ -201,11 +197,7 @@ namespace Semver.Ranges
 
             var exception = NpmRangeParser.Parse(range, includeAllPrerelease, Parsing.FailedException, maxLength, out semverRange);
 
-#if DEBUG
-            // This check ensures that NpmRangeParser.Parse doesn't construct an exception, but always returns ParseFailedException
-            if (exception != null && exception != Parsing.FailedException)
-                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}", exception);
-#endif
+            DebugChecks.IsNotFailedException(exception, nameof(NpmRangeParser), nameof(NpmRangeParser.Parse));
 
             return exception is null;
         }

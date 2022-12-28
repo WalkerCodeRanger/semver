@@ -9,6 +9,8 @@ namespace Semver.Test.Ranges
 {
     public class RightBoundedRangeTests
     {
+        private static readonly SemVersion FakeVersion = new SemVersion(1, 2, 3);
+
         internal static readonly IReadOnlyList<RightBoundedRange> RangesInOrder = new List<RightBoundedRange>()
         {
             new RightBoundedRange(SemVersion.Min, false),
@@ -33,6 +35,30 @@ namespace Semver.Test.Ranges
                 Assert.True(left.CompareTo(right) < 0, $"{left} < {right}");
                 Assert.True(right.CompareTo(left) > 0, $"{right} > {left}");
             }
+        }
+
+        [Fact]
+        public void MaxAtSameVersion()
+        {
+            var inclusive = new RightBoundedRange(FakeVersion, true);
+            var exclusive = new RightBoundedRange(FakeVersion, false);
+
+            var max = inclusive.Max(exclusive);
+
+            Assert.Equal(inclusive, max);
+        }
+
+        [Fact]
+        public void GetHashCodeAndEquality()
+        {
+            var range1 = new RightBoundedRange(FakeVersion, true);
+            var range2 = new RightBoundedRange(FakeVersion, true);
+
+            Assert.True(range1.Equals(range2));
+            Assert.True(range1.Equals((object)range2));
+            Assert.Equal(range1.GetHashCode(), range2.GetHashCode());
+            Assert.True(range1 == range2);
+            Assert.False(range1 != range2);
         }
     }
 }
