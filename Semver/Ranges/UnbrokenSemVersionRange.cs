@@ -20,11 +20,11 @@ namespace Semver.Ranges
         /// <see cref="End"/>, the only unique empty version is the one whose start is the max
         /// version and end is the min version.</para>
         /// </remarks>
-        public static readonly UnbrokenSemVersionRange Empty
+        public static UnbrokenSemVersionRange Empty { get; }
             = new UnbrokenSemVersionRange(new LeftBoundedRange(SemVersion.Max, false),
                 new RightBoundedRange(SemVersion.Min, false), false, false);
-        public static readonly UnbrokenSemVersionRange AllRelease = AtMost(SemVersion.Max);
-        public static readonly UnbrokenSemVersionRange All = AtMost(SemVersion.Max, true);
+        public static UnbrokenSemVersionRange AllRelease { get; } = AtMost(SemVersion.Max);
+        public static UnbrokenSemVersionRange All { get; } = AtMost(SemVersion.Max, true);
 
         #region Static Factory Methods
         public static UnbrokenSemVersionRange Equals(SemVersion version)

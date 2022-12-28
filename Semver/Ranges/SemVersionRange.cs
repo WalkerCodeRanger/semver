@@ -20,10 +20,10 @@ namespace Semver.Ranges
         internal const string InvalidOptionsMessage = "An invalid SemVersionRangeOptions value was used.";
         internal const string InvalidMaxLengthMessage = "Must not be negative.";
 
-        public static readonly SemVersionRange Empty = new SemVersionRange(ReadOnlyList<UnbrokenSemVersionRange>.Empty);
+        public static SemVersionRange Empty { get; } = new SemVersionRange(ReadOnlyList<UnbrokenSemVersionRange>.Empty);
 
-        public static readonly SemVersionRange AllRelease = new SemVersionRange(UnbrokenSemVersionRange.AllRelease);
-        public static readonly SemVersionRange All = new SemVersionRange(UnbrokenSemVersionRange.All);
+        public static SemVersionRange AllRelease { get; } = new SemVersionRange(UnbrokenSemVersionRange.AllRelease);
+        public static SemVersionRange All { get; } = new SemVersionRange(UnbrokenSemVersionRange.All);
 
         public static SemVersionRange Equals(SemVersion version)
             => Create(UnbrokenSemVersionRange.Equals(version));
