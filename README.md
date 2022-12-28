@@ -66,28 +66,28 @@ Prerelease: rc.1
 Next release version is: 1.1.0
 ```
 
-## Range checking (using NPM syntax)
+## Version Ranges
 
 ```csharp
-var range = SemVersionRangeSet.ParseNpm("^1");
-var prereleaseRange = SemVersionRangeSet.ParseNpm("^1", includeAllPrerelease: true);
+var range = SemVersionRange.Parse("^1.0.0");
+var prereleaseRange = SemVersionRange.ParseNpm("^1.0.0", SemVersionRangeOptions.IncludeAllPrerelease);
 Console.WriteLine($"Range: {range}");
 Console.WriteLine($"Prerelease range: {prereleaseRange}");
 Console.WriteLine($"Range includes version: {range.Contains(version)}");
 Console.WriteLine($"Prerelease range includes version: {prereleaseRange.Contains(version)}");
 
-// Alternative, but slower since it parses the range on every call
-Console.WriteLine(version.SatisfiesNpm("^1", includeAllPrerelease: true));
+// Alternative: another way to call SemVersionRange.Contains(version)
+version.Satisfies(range);
 
-// Alternative, is just another way to call SemVersionRangeSet.Contains(version)
-Console.WriteLine(version.Satisfies(range));
+// Alternative: slower because it parses the range on every call
+version.Satisfies("^1.0.0", SemVersionRangeOptions.IncludeAllPrerelease);
 ```
 
 Outputs:
 
 ```text
-Range: >=1.0.0 <2.0.0-0
-Prerelease range: >=1.0.0-0 <2.0.0-0
+Range: ^1.0.0
+Prerelease range: *-* ^1.0.0
 Range includes version: False
 Prerelease range includes version: True
 ```
