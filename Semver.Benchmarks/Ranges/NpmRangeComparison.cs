@@ -6,7 +6,7 @@ using Semver.Benchmarks.Builders;
 using Semver.Ranges;
 using Semver.Utility;
 
-namespace Semver.Benchmarks.RangeBenchmarks.Npm
+namespace Semver.Benchmarks.Ranges
 {
     [SimpleJob(RuntimeMoniker.Net461)]
     [SimpleJob(RuntimeMoniker.NetCoreApp21)]

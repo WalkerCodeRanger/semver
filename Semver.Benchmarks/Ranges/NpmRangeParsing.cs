@@ -3,7 +3,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Semver.Ranges;
 
-namespace Semver.Benchmarks.RangeBenchmarks.Npm
+namespace Semver.Benchmarks.Ranges
 {
     [SimpleJob(RuntimeMoniker.Net461)]
     [SimpleJob(RuntimeMoniker.NetCoreApp21)]
