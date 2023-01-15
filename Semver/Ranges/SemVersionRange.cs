@@ -101,7 +101,15 @@ namespace Semver.Ranges
             this.ranges = ranges;
         }
 
-        public bool Contains(SemVersion version) => ranges.Any(r => r.Contains(version));
+        public bool Contains(SemVersion version)
+        {
+            // Using `for` loop for better performance
+            for (var i = 0; i < ranges.Count; i++)
+                if (ranges[i].Contains(version))
+                    return true;
+
+            return false;
+        }
 
         public static implicit operator Predicate<SemVersion>(SemVersionRange range)
             => range.Contains;

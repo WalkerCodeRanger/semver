@@ -470,7 +470,7 @@ namespace Semver.Ranges
         private static SemVersion Validate(SemVersion version, string paramName)
         {
             if (version is null) throw new ArgumentNullException(paramName);
-            if (version.MetadataIdentifiers.Any()) throw new ArgumentException(InvalidMetadataMessage, paramName);
+            if (version.MetadataIdentifiers.Count > 0) throw new ArgumentException(InvalidMetadataMessage, paramName);
             return version;
         }
 

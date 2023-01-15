@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
 
@@ -108,7 +107,7 @@ namespace Semver.Ranges.Parsers
             if (exception != null) return exception;
 
             // Trim off metadata if it was allowed
-            if (semver.MetadataIdentifiers.Any())
+            if (semver.MetadataIdentifiers.Count > 0)
                 semver = semver.WithoutMetadata();
             return null;
         }

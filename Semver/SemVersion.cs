@@ -1700,6 +1700,18 @@ namespace Semver
             return predicate(this);
         }
 
+        public bool Satisfies(SemVersionRange range)
+        {
+            if (range is null) throw new ArgumentNullException(nameof(range));
+            return range.Contains(this);
+        }
+
+        public bool Satisfies(UnbrokenSemVersionRange range)
+        {
+            if (range is null) throw new ArgumentNullException(nameof(range));
+            return range.Contains(this);
+        }
+
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool Satisfies(
             string range,
