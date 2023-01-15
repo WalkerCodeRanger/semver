@@ -10,7 +10,8 @@ namespace Semver
     /// constructed version numbers are valid semantic versions without any of the
     /// optional features in the original string.</para>
     ///
-    /// <para>This enumeration supports a bitwise combination of its member values.</para>
+    /// <para>This enumeration supports a bitwise combination of its member values (e.g.
+    /// <c>SemVersionStyles.AllowWhitespace | SemVersionStyles.AllowV</c>).</para>
     /// </summary>
     [Flags]
     public enum SemVersionStyles

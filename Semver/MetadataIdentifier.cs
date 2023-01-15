@@ -217,7 +217,7 @@ namespace Semver
         /// Converts this identifier into an equivalent string value.
         /// </summary>
         /// <returns>The string value of this identifier or <see langword="null"/> if this is
-        /// a default <see cref="MetadataIdentifier"/></returns>
+        /// a default <see cref="MetadataIdentifier"/>.</returns>
         public static implicit operator string(MetadataIdentifier metadataIdentifier)
             => metadataIdentifier.Value;
 
