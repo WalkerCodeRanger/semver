@@ -606,40 +606,6 @@ namespace Semver
         }
 
         /// <summary>
-        /// Make a copy of the current instance with changed properties.
-        /// </summary>
-        /// <param name="major">The value to replace the major version number or
-        /// <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="minor">The value to replace the minor version number or
-        /// <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="patch">The value to replace the patch version number or
-        /// <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="prerelease">The value to replace the prerelease portion
-        /// or <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="build">The value to replace the build metadata or <see langword="null"/>
-        /// to leave it unchanged.</param>
-        /// <returns>The new version with changed properties.</returns>
-        /// <remarks>
-        /// The change method is intended to be called using named argument syntax, passing only
-        /// those fields to be changed.
-        /// </remarks>
-        /// <example>
-        /// To change only the patch version:
-        /// <code>var changedVersion = version.Change(patch: 4);</code>
-        /// </example>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use With() or With...() method instead.")]
-        public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
-            string prerelease = null, string build = null)
-        {
-            return new SemVersion(
-                major ?? Major,
-                minor ?? Minor,
-                patch ?? Patch,
-                prerelease ?? Prerelease,
-                build ?? Metadata);
-        }
-
-        /// <summary>
         /// Creates a copy of the current instance with multiple changed properties. If changing only
         /// one property use one of the more specific <c>WithX()</c> methods.
         /// </summary>
