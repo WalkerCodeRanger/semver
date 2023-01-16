@@ -2,7 +2,6 @@
 {
     public static class VersionBuilder
     {
-        public static SemVersion Version(string version)
-            => SemVersion.Parse(version, SemVersionStyles.Strict);
+        public static SemVersion Version(string version) => SemVersion.Parse(version);
     }
 }

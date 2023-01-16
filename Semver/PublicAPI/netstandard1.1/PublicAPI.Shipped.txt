@@ -87,11 +87,9 @@ static Semver.SemVersion.Equals(Semver.SemVersion versionA, Semver.SemVersion ve
 static Semver.SemVersion.FromVersion(System.Version version) -> Semver.SemVersion
 static Semver.SemVersion.operator !=(Semver.SemVersion left, Semver.SemVersion right) -> bool
 static Semver.SemVersion.operator ==(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.Parse(string version, bool strict = false) -> Semver.SemVersion
 static Semver.SemVersion.Parse(string version, Semver.SemVersionStyles style, int maxLength = 1024) -> Semver.SemVersion
 static Semver.SemVersion.ParsedFrom(int major, int minor = 0, int patch = 0, string prerelease = "", string metadata = "", bool allowLeadingZeros = false) -> Semver.SemVersion
 static Semver.SemVersion.PrecedenceComparer.get -> Semver.Comparers.ISemVersionComparer
 static Semver.SemVersion.PrecedenceEquals(Semver.SemVersion left, Semver.SemVersion right) -> bool
 static Semver.SemVersion.SortOrderComparer.get -> Semver.Comparers.ISemVersionComparer
-static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, bool strict = false) -> bool
 static Semver.SemVersion.TryParse(string version, Semver.SemVersionStyles style, out Semver.SemVersion semver, int maxLength = 1024) -> bool

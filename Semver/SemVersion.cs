@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 #if SERIALIZABLE
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 #endif
-using System.Text.RegularExpressions;
 using Semver.Comparers;
 using Semver.Ranges;
 using Semver.Utility;
@@ -40,19 +38,6 @@ namespace Semver
         //internal const string InvalidMaxLengthMessage = "Must not be negative.";
         internal const int MaxVersionLength = 1024;
 
-        private static readonly Regex ParseRegex =
-            new Regex(@"^(?<major>\d+)" +
-                @"(?>\.(?<minor>\d+))?" +
-                @"(?>\.(?<patch>\d+))?" +
-                @"(?>\-(?<pre>[0-9A-Za-z\-\.]+))?" +
-                @"(?>\+(?<metadata>[0-9A-Za-z\-\.]+))?$",
-#if COMPILED_REGEX
-                RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture,
-#else
-                RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture,
-#endif
-                TimeSpan.FromSeconds(0.5));
-
 #if SERIALIZABLE
         /// <summary>
         /// Deserialize a <see cref="SemVersion"/>.
@@ -61,9 +46,7 @@ namespace Semver
         private SemVersion(SerializationInfo info, StreamingContext context)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-#pragma warning disable CS0618 // Type or member is obsolete
-            var semVersion = Parse(info.GetString("SemVersion"), true);
-#pragma warning restore CS0618 // Type or member is obsolete
+            var semVersion = Parse(info.GetString("SemVersion"), SemVersionStyles.Strict);
             Major = semVersion.Major;
             Minor = semVersion.Minor;
             Patch = semVersion.Patch;
@@ -444,46 +427,10 @@ namespace Semver
             return ex is null ? semver : throw ex;
         }
 
-        /// <summary>
-        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/> equivalent.
-        /// </summary>
-        /// <param name="version">The version string.</param>
-        /// <param name="strict">If set to <see langword="true"/>, minor and patch version are required;
-        /// otherwise they are optional.</param>
-        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
-        /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing minor
-        /// or patch version numbers when <paramref name="strict"/> is <see langword="true"/>.</exception>
-        /// <exception cref="OverflowException">The major, minor, or patch version number is larger
-        /// than <see cref="int.MaxValue"/>.</exception>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
-        public static SemVersion Parse(string version, bool strict = false)
-        {
-            var match = ParseRegex.Match(version);
-            if (!match.Success)
-                throw new ArgumentException($"Invalid version '{version}'.", nameof(version));
-
-            var major = int.Parse(match.Groups["major"].Value, CultureInfo.InvariantCulture);
-
-            var minorMatch = match.Groups["minor"];
-            int minor = 0;
-            if (minorMatch.Success)
-                minor = int.Parse(minorMatch.Value, CultureInfo.InvariantCulture);
-            else if (strict)
-                throw new InvalidOperationException("Invalid version (no minor version given in strict mode)");
-
-            var patchMatch = match.Groups["patch"];
-            int patch = 0;
-            if (patchMatch.Success)
-                patch = int.Parse(patchMatch.Value, CultureInfo.InvariantCulture);
-            else if (strict)
-                throw new InvalidOperationException("Invalid version (no patch version given in strict mode)");
-
-            var prerelease = match.Groups["pre"].Value;
-            var metadata = match.Groups["metadata"].Value;
-
-            return new SemVersion(major, minor, patch, prerelease, metadata);
-        }
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static SemVersion Parse(string version, int maxLength = MaxVersionLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => Parse(version, SemVersionStyles.Strict, maxLength);
 
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
@@ -518,53 +465,10 @@ namespace Semver
             return exception is null;
         }
 
-        /// <summary>
-        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
-        /// equivalent. The return value indicates whether the conversion succeeded.
-        /// </summary>
-        /// <param name="version">The version string.</param>
-        /// <param name="semver">When this method returns, contains a <see cref="SemVersion"/> instance equivalent
-        /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
-        /// version string was invalid.</param>
-        /// <param name="strict">If set to <see langword="true"/>, minor and patch version numbers are required;
-        /// otherwise they are optional.</param>
-        /// <returns><see langword="false"/> when an invalid version string is passed, otherwise <see langword="true"/>.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
-        public static bool TryParse(string version, out SemVersion semver, bool strict = false)
-        {
-            semver = null;
-            if (version is null) return false;
-
-            var match = ParseRegex.Match(version);
-            if (!match.Success) return false;
-
-            if (!int.TryParse(match.Groups["major"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var major))
-                return false;
-
-            var minorMatch = match.Groups["minor"];
-            int minor = 0;
-            if (minorMatch.Success)
-            {
-                if (!int.TryParse(minorMatch.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out minor))
-                    return false;
-            }
-            else if (strict) return false;
-
-            var patchMatch = match.Groups["patch"];
-            int patch = 0;
-            if (patchMatch.Success)
-            {
-                if (!int.TryParse(patchMatch.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out patch))
-                    return false;
-            }
-            else if (strict) return false;
-
-            var prerelease = match.Groups["pre"].Value;
-            var metadata = match.Groups["metadata"].Value;
-
-            semver = new SemVersion(major, minor, patch, prerelease, metadata);
-            return true;
-        }
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParse(string version, out SemVersion semver, int maxLength = MaxVersionLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => TryParse(version, SemVersionStyles.Strict, out semver, maxLength);
 
         /// <summary>
         /// Creates a copy of the current instance with multiple changed properties. If changing only

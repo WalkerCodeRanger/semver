@@ -12,13 +12,13 @@ namespace Semver.Test.Ranges
         private const string MinVersion = "0.0.0-0";
         private const string MinReleaseVersion = "0.0.0";
         private static readonly SemVersion VersionWithMetadata
-            = SemVersion.Parse("1.2.3-foo+metadata", SemVersionStyles.Strict);
+            = SemVersion.Parse("1.2.3-foo+metadata");
         private static readonly SemVersion FakeVersion = new SemVersion(1, 2, 3);
 
         [Fact]
         public void MinVersionIsZeroWithZeroPrerelease()
         {
-            Assert.Equal(SemVersion.Parse("0.0.0-0", SemVersionStyles.Strict), SemVersion.Min);
+            Assert.Equal(SemVersion.Parse("0.0.0-0"), SemVersion.Min);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace Semver.Test.Ranges
         [MemberData(nameof(FullRangeOfVersions))]
         public void EmptyDoesNotContain(string version)
         {
-            Assert.False(UnbrokenSemVersionRange.Empty.Contains(SemVersion.Parse(version, SemVersionStyles.Strict)));
+            Assert.False(UnbrokenSemVersionRange.Empty.Contains(SemVersion.Parse(version)));
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Semver.Test.Ranges
         [MemberData(nameof(FullRangeOfVersions))]
         public void AllReleaseContains(string version)
         {
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(!semVersion.IsPrerelease, UnbrokenSemVersionRange.AllRelease.Contains(semVersion));
         }
 
@@ -96,7 +96,7 @@ namespace Semver.Test.Ranges
         [MemberData(nameof(FullRangeOfVersions))]
         public void AllContains(string version)
         {
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.True(UnbrokenSemVersionRange.All.Contains(semVersion));
         }
 
@@ -132,7 +132,7 @@ namespace Semver.Test.Ranges
         public void EqualsContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.Equals(new SemVersion(1, 2, 3));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -150,7 +150,7 @@ namespace Semver.Test.Ranges
         public void EqualsPrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.Equals(SemVersion.ParsedFrom(1, 2, 3, "5"));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -187,7 +187,7 @@ namespace Semver.Test.Ranges
         public void GreaterThanContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.GreaterThan(new SemVersion(1, 2, 3));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -207,7 +207,7 @@ namespace Semver.Test.Ranges
         {
             var range = UnbrokenSemVersionRange.GreaterThan(new SemVersion(1, 2, 3),
                             includeAllPrerelease: true);
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -226,7 +226,7 @@ namespace Semver.Test.Ranges
         public void GreaterThanPrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.GreaterThan(SemVersion.ParsedFrom(1, 2, 3, "5"));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -263,7 +263,7 @@ namespace Semver.Test.Ranges
         public void AtLeastContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.AtLeast(new SemVersion(1, 2, 3));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -282,7 +282,7 @@ namespace Semver.Test.Ranges
         public void AtLeastIncludingAllPrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.AtLeast(new SemVersion(1, 2, 3), includeAllPrerelease: true);
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -301,7 +301,7 @@ namespace Semver.Test.Ranges
         public void AtLeastPrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.AtLeast(SemVersion.ParsedFrom(1, 2, 3, "5"));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -338,7 +338,7 @@ namespace Semver.Test.Ranges
         public void LessThanContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.LessThan(new SemVersion(1, 2, 3));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -358,7 +358,7 @@ namespace Semver.Test.Ranges
         {
             var range = UnbrokenSemVersionRange.LessThan(new SemVersion(1, 2, 3),
                             includeAllPrerelease: true);
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -377,7 +377,7 @@ namespace Semver.Test.Ranges
         public void LessThanPrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.LessThan(SemVersion.ParsedFrom(1, 2, 3, "5"));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -414,7 +414,7 @@ namespace Semver.Test.Ranges
         public void AtMostContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.AtMost(new SemVersion(1, 2, 3));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -433,7 +433,7 @@ namespace Semver.Test.Ranges
         public void AtMostIncludingAllPrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.AtMost(new SemVersion(1, 2, 3), includeAllPrerelease: true);
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -452,7 +452,7 @@ namespace Semver.Test.Ranges
         public void AtMostPrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.AtMost(SemVersion.ParsedFrom(1, 2, 3, "5"));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -515,7 +515,7 @@ namespace Semver.Test.Ranges
         public void InclusiveContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.Inclusive(new SemVersion(1, 2, 3), new SemVersion(4, 5, 6));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -543,7 +543,7 @@ namespace Semver.Test.Ranges
         {
             var range = UnbrokenSemVersionRange.Inclusive(new SemVersion(1, 2, 3), new SemVersion(4, 5, 6),
                             includeAllPrerelease: true);
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -570,7 +570,7 @@ namespace Semver.Test.Ranges
         public void InclusivePrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.Inclusive(SemVersion.ParsedFrom(1, 2, 3, "5"), SemVersion.ParsedFrom(4, 5, 6, "5"));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -641,7 +641,7 @@ namespace Semver.Test.Ranges
         public void InclusiveOfStartContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.InclusiveOfStart(new SemVersion(1, 2, 3), new SemVersion(4, 5, 6));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -669,7 +669,7 @@ namespace Semver.Test.Ranges
         {
             var range = UnbrokenSemVersionRange.InclusiveOfStart(new SemVersion(1, 2, 3), new SemVersion(4, 5, 6),
                             includeAllPrerelease: true);
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -696,7 +696,7 @@ namespace Semver.Test.Ranges
         public void InclusiveOfStartPrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.InclusiveOfStart(SemVersion.ParsedFrom(1, 2, 3, "5"), SemVersion.ParsedFrom(4, 5, 6, "5"));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -759,7 +759,7 @@ namespace Semver.Test.Ranges
         public void InclusiveOfEndContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.InclusiveOfEnd(new SemVersion(1, 2, 3), new SemVersion(4, 5, 6));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -787,7 +787,7 @@ namespace Semver.Test.Ranges
         {
             var range = UnbrokenSemVersionRange.InclusiveOfEnd(new SemVersion(1, 2, 3), new SemVersion(4, 5, 6),
                             includeAllPrerelease: true);
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -814,7 +814,7 @@ namespace Semver.Test.Ranges
         public void InclusiveOfEndPrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.InclusiveOfEnd(SemVersion.ParsedFrom(1, 2, 3, "5"), SemVersion.ParsedFrom(4, 5, 6, "5"));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -877,7 +877,7 @@ namespace Semver.Test.Ranges
         public void ExclusiveContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.Exclusive(new SemVersion(1, 2, 3), new SemVersion(4, 5, 6));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -905,7 +905,7 @@ namespace Semver.Test.Ranges
         {
             var range = UnbrokenSemVersionRange.Exclusive(new SemVersion(1, 2, 3), new SemVersion(4, 5, 6),
                             includeAllPrerelease: true);
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -932,7 +932,7 @@ namespace Semver.Test.Ranges
         public void ExclusivePrereleaseContains(string version, bool expected)
         {
             var range = UnbrokenSemVersionRange.Exclusive(SemVersion.ParsedFrom(1, 2, 3, "5"), SemVersion.ParsedFrom(4, 5, 6, "5"));
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 
@@ -958,7 +958,7 @@ namespace Semver.Test.Ranges
         {
             var range = UnbrokenSemVersionRange.LessThan(SemVersion.MinRelease,
                             includeAllPrerelease: true);
-            var semVersion = SemVersion.Parse(version, SemVersionStyles.Strict);
+            var semVersion = SemVersion.Parse(version);
             Assert.Equal(expected, range.Contains(semVersion));
         }
 

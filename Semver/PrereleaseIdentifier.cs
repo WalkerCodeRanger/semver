@@ -27,9 +27,7 @@ namespace Semver
     ///
     /// <para>Invalid prerelease identifiers including arbitrary Unicode characters, empty string,
     /// and numeric identifiers with leading zero can currently be produced by the
-    /// <see cref="SemVersion(int, int, int, string, string)"/> constructor and the obsolete
-    /// <see cref="SemVersion.Parse(string,bool)"/> and
-    /// <see cref="SemVersion.TryParse(string,out SemVersion,bool)"/> methods. Such alphanumeric
+    /// <see cref="SemVersion(int, int, int, string, string)"/> constructor. Such alphanumeric
     /// identifiers are compared via an ordinal string comparision. Numeric identifiers with
     /// leading zeros are considered equal (e.g. '<c>15</c>' is equal to '<c>015</c>').
     /// </para>

@@ -15,6 +15,41 @@ namespace Semver.Test
     /// </summary>
     public class SemVersionParsingTests
     {
+        /// <summary>
+        /// This a very long but valid version number to test parsing long version numbers. It is
+        /// generated using a random number generator seeded with specific value so that the same
+        /// version string will be generated each time.
+        /// </summary>
+        public static readonly string LongValidVersionString = BuildLongVersion();
+
+        private static string BuildLongVersion()
+        {
+            var s = new StringBuilder(2_000_100);
+            s.Append(int.MaxValue);
+            s.Append('.');
+            s.Append(int.MaxValue);
+            s.Append('.');
+            s.Append(int.MaxValue);
+            s.Append('-');
+            var random = new Random(1545743217);
+            AppendLabel(s, 1_000_000, random);
+            s.Append('+');
+            AppendLabel(s, 1_000_000, random);
+            return s.ToString();
+        }
+
+        private static void AppendLabel(StringBuilder s, int length, Random random)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789-.0";
+
+            for (var i = 0; i < length; i++)
+            {
+                var startOfIdentifier = s[s.Length - 1] == '.';
+                var validChars = startOfIdentifier ? chars.Length - 2 : chars.Length;
+                s.Append(chars[random.Next(0, validChars)]);
+            }
+        }
+
         public static readonly TheoryData<SemVersionStyles> InvalidSemVersionStyles = new TheoryData<SemVersionStyles>()
         {
             // Optional minor flag without optional patch flag
@@ -422,8 +457,8 @@ namespace Semver.Test
         [Fact]
         public void ParseLongVersionTest()
         {
-            SemVersion.Parse(SemVersionObsoleteParsingTests.LongValidVersionString, Strict, maxLength: int.MaxValue);
-            SemVersion.TryParse(SemVersionObsoleteParsingTests.LongValidVersionString, Strict, out _, maxLength: int.MaxValue);
+            SemVersion.Parse(LongValidVersionString, Strict, maxLength: int.MaxValue);
+            SemVersion.TryParse(LongValidVersionString, Strict, out _, maxLength: int.MaxValue);
         }
 
         private static void AssertVersionEqual(SemVersion version, ParsingTestCase testCase)
