@@ -25,7 +25,6 @@ Semver.PrereleaseIdentifier.PrereleaseIdentifier(int value) -> void
 Semver.PrereleaseIdentifier.PrereleaseIdentifier(string value, bool allowLeadingZeros = false) -> void
 Semver.PrereleaseIdentifier.Value.get -> string
 Semver.SemVersion
-Semver.SemVersion.Build.get -> string
 Semver.SemVersion.CompareByPrecedence(Semver.SemVersion other) -> int
 Semver.SemVersion.ComparePrecedenceTo(Semver.SemVersion other) -> int
 Semver.SemVersion.CompareSortOrderTo(Semver.SemVersion other) -> int

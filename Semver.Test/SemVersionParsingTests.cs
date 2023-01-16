@@ -438,9 +438,6 @@ namespace Semver.Test
             Assert.Equal(!isPrerelease, version.IsRelease);
             Assert.Equal(testCase.MetadataIdentifiers, version.MetadataIdentifiers);
             Assert.Equal(string.Join(".", testCase.MetadataIdentifiers), version.Metadata);
-#pragma warning disable 618 // Obsolete Warning
-            Assert.Equal(string.Join(".", testCase.MetadataIdentifiers), version.Build);
-#pragma warning restore 618
         }
 
         /// <summary>

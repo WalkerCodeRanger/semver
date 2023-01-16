@@ -1120,14 +1120,6 @@ namespace Semver
         public bool IsRelease => Prerelease.Length == 0;
 
         /// <summary>The build metadata for this version.</summary>
-        /// <value>
-        /// The build metadata for this version or empty string if there is no build metadata.
-        /// </value>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="MetadataIdentifiers"]/*'/>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This property is obsolete. Use Metadata instead.")]
-        public string Build => Metadata;
-
-        /// <summary>The build metadata for this version.</summary>
         /// <value>The build metadata for this version or empty string if there
         /// is no metadata.</value>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="MetadataIdentifiers"]/*'/>

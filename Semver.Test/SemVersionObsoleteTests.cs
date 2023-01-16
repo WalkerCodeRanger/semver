@@ -131,21 +131,5 @@ namespace Semver.Test
             Assert.Equal(expectedMetadataIdentifiers, v.MetadataIdentifiers);
         }
         #endregion
-
-        [Theory]
-        [InlineData(1, 2, 3, "a", "b")]
-        [InlineData(1, 2, 3, "A-Z.a-z.0-9", "A-Z.a-z.0-9")]
-        [InlineData(1, 2, 3, "a", "😞")]
-        [InlineData(1, 2, 3, "a", "b..c")]
-        [InlineData(1, 2, 3, "a", null)]
-        [InlineData(1, 2, 3, "a", "-")]
-        public void BuildTest(int major, int minor, int patch, string prerelease, string metadata)
-        {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var v = new SemVersion(major, minor, patch, prerelease, metadata);
-
-            Assert.Equal(metadata ?? "", v.Build);
-#pragma warning restore CS0618 // Type or member is obsolete
-        }
     }
 }
