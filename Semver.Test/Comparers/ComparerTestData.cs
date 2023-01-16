@@ -18,6 +18,7 @@ namespace Semver.Test.Comparers
     /// </summary>
     public static class ComparerTestData
     {
+        // TODO this could use string now
         public static readonly IReadOnlyList<SemVersion> VersionsInSortOrder = new List<SemVersion>()
         {
             SemVersion.ParsedFrom(0),

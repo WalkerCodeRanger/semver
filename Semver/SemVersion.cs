@@ -989,7 +989,7 @@ namespace Semver
         /// </returns>
         public override string ToString()
         {
-            // Assume all separators ("..-+"), at most 2 extra chars
+            // Assume all separators ("..-+"), at most 4 extra chars
             var estimatedLength = 4 + Major.DecimalDigits()
                                     + Minor.DecimalDigits()
                                     + Patch.DecimalDigits()
