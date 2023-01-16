@@ -1020,12 +1020,11 @@ namespace Semver
         /// <returns><see langword="true"/> if the two versions are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
-        // TODO v3.0.0 rename parameters to `left` and `right` to be consistent with ComparePrecedence etc.
-        public static bool Equals(SemVersion versionA, SemVersion versionB)
+        public static bool Equals(SemVersion left, SemVersion right)
         {
-            if (ReferenceEquals(versionA, versionB)) return true;
-            if (versionA is null || versionB is null) return false;
-            return versionA.Equals(versionB);
+            if (ReferenceEquals(left, right)) return true;
+            if (left is null || right is null) return false;
+            return left.Equals(right);
         }
 
         /// <summary>Determines whether the given object is equal to this version.</summary>
