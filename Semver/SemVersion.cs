@@ -126,30 +126,6 @@ namespace Semver
         /// <param name="major">The major version number.</param>
         /// <param name="minor">The minor version number.</param>
         /// <param name="patch">The patch version number.</param>
-        /// <param name="prerelease">The prerelease portion (e.g. "alpha.5").</param>
-        /// <param name="build">The build metadata (e.g. "nightly.232").</param>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This constructor is obsolete. Use another constructor or SemVersion.ParsedFrom() instead.")]
-        public SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "")
-        {
-            Major = major;
-            Minor = minor;
-            Patch = patch;
-
-            prerelease = prerelease ?? "";
-            Prerelease = prerelease;
-            PrereleaseIdentifiers = prerelease.SplitAndMapToReadOnlyList('.', PrereleaseIdentifier.CreateLoose);
-
-            build = build ?? "";
-            Metadata = build;
-            MetadataIdentifiers = build.SplitAndMapToReadOnlyList('.', MetadataIdentifier.CreateLoose);
-        }
-
-        /// <summary>
-        /// Constructs a new instance of the <see cref="SemVersion" /> class.
-        /// </summary>
-        /// <param name="major">The major version number.</param>
-        /// <param name="minor">The minor version number.</param>
-        /// <param name="patch">The patch version number.</param>
         /// <param name="prerelease">The prerelease identifiers.</param>
         /// <param name="metadata">The build metadata identifiers.</param>
         /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,

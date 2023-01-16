@@ -39,7 +39,6 @@ Semver.SemVersion.PrecedenceEquals(Semver.SemVersion other) -> bool
 Semver.SemVersion.Prerelease.get -> string
 Semver.SemVersion.PrereleaseIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.PrereleaseIdentifier>
 Semver.SemVersion.SemVersion(int major) -> void
-Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "") -> void
 Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier> prerelease = null, System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier> metadata = null) -> void
 Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, System.Collections.Generic.IEnumerable<string> prerelease = null, System.Collections.Generic.IEnumerable<string> metadata = null) -> void
 Semver.SemVersion.SemVersion(int major, int minor) -> void

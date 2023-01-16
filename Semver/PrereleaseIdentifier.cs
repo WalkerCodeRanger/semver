@@ -24,13 +24,6 @@ namespace Semver
     /// <see cref="PrereleaseIdentifier"/> with a <see langword="null"/> value. However, the
     /// <see cref="Semver"/> namespace types do not accept and will not return such a
     /// <see cref="PrereleaseIdentifier"/>.</para>
-    ///
-    /// <para>Invalid prerelease identifiers including arbitrary Unicode characters, empty string,
-    /// and numeric identifiers with leading zero can currently be produced by the
-    /// <see cref="SemVersion(int, int, int, string, string)"/> constructor. Such alphanumeric
-    /// identifiers are compared via an ordinal string comparision. Numeric identifiers with
-    /// leading zeros are considered equal (e.g. '<c>15</c>' is equal to '<c>015</c>').
-    /// </para>
     /// </remarks>
     public readonly struct PrereleaseIdentifier : IEquatable<PrereleaseIdentifier>, IComparable<PrereleaseIdentifier>, IComparable
     {

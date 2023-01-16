@@ -21,72 +21,57 @@ namespace Semver.Test
     {
         public static readonly IReadOnlyList<SemVersion> VersionsInSortOrder = new List<SemVersion>()
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            new SemVersion(-2),
-            new SemVersion(-1, -1),
-            new SemVersion(-1),
-            new SemVersion(0, -1),
-            new SemVersion(0, 0, -1),
-            new SemVersion(0),
-            new SemVersion(0, 0, 1, "13"),
-            new SemVersion(0, 0, 1, "."),
-            new SemVersion(0, 0, 1, ".."),
-            new SemVersion(0, 0, 1, ".a"),
-            new SemVersion(0, 0, 1, "b"),
-            new SemVersion(0, 0, 1, "gamma.12.87"),
-            new SemVersion(0, 0, 1, "gamma.12.87.1"),
-            new SemVersion(0, 0, 1, "gamma.12.87.99"),
-            new SemVersion(0, 0, 1, "gamma.12.87.-"),
-            new SemVersion(0, 0, 1, "gamma.12.87.X"),
-            new SemVersion(0, 0, 1, "gamma.12.88"),
-            new SemVersion(0, 0, 1),
-            new SemVersion(0, 0, 1, "", "12"),
-            new SemVersion(0, 0, 1, "", "."),
-            new SemVersion(0, 0, 1, "", ".."),
-            new SemVersion(0, 0, 1, "", ".a"),
-            new SemVersion(0, 0, 1, "", "bu"),
-            new SemVersion(0, 0, 1, "", "build.12"),
-            new SemVersion(0, 0, 1, "", "build.12.2"),
-            new SemVersion(0, 0, 1, "", "build.13"),
-            new SemVersion(0, 0, 1, "", "build.-"),
-            new SemVersion(0, 0, 1, "", "uiui"),
-            new SemVersion(0, 1, 1),
-            new SemVersion(0, 2, 1),
-            new SemVersion(1, 0, 0, "alpha"),
-            new SemVersion(1, 0, 0, "alpha", "dev.123"),
-            new SemVersion(1, 0, 0, "alpha", "😞"),
-            new SemVersion(1, 0, 0, "alpha.1"),
-            new SemVersion(1, 0, 0, "alpha.-"),
-            new SemVersion(1, 0, 0, "alpha.beta"),
-            new SemVersion(1, 0, 0, "beta"),
-            new SemVersion(1, 0, 0, "beta", "dev.123"),
-            new SemVersion(1, 0, 0, "beta.2"),
-            new SemVersion(1, 0, 0, "beta.11"),
-            new SemVersion(1, 0, 0, "rc.1"),
-            new SemVersion(1, 0, 0, "😞"),
-            new SemVersion(1),
-            new SemVersion(1, 0, 0, "", "CA6B10F"),
-            new SemVersion(1, 0, 10, "alpha"),
-            new SemVersion(1, 2, 0, "alpha", "dev"),
-            new SemVersion(1, 2, 0, "nightly"),
-            new SemVersion(1, 2, 0, "nightly", "dev"),
-            new SemVersion(1, 2, 0, "nightly2"),
-            new SemVersion(1, 2),
-            new SemVersion(1, 2, 0, "", "nightly"),
-            new SemVersion(1, 2, 1, "-1"), // Doesn't match spec (issue #69)
-            new SemVersion(1, 2, 1, "0"),
-            new SemVersion(1, 2, 1, "99"),
-            new SemVersion(1, 2, 1, "-"),
-            new SemVersion(1, 2, 1, "-a"),
-            new SemVersion(1, 2, 1, "0A"),
-            new SemVersion(1, 2, 1, "A"),
-            new SemVersion(1, 2, 1, "a"),
-            new SemVersion(1, 2, 1),
-            new SemVersion(1, 4),
-            new SemVersion(2),
-            new SemVersion(2, 1),
-            new SemVersion(2, 1, 1),
-#pragma warning restore CS0618 // Type or member is obsolete
+            SemVersion.ParsedFrom(0),
+            SemVersion.ParsedFrom(0, 0, 1, "13"),
+            SemVersion.ParsedFrom(0, 0, 1, "b"),
+            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.87"),
+            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.87.1"),
+            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.87.99"),
+            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.87.-"),
+            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.87.X"),
+            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.88"),
+            SemVersion.ParsedFrom(0, 0, 1),
+            SemVersion.ParsedFrom(0, 0, 1, "", "12"),
+            SemVersion.ParsedFrom(0, 0, 1, "", "bu"),
+            SemVersion.ParsedFrom(0, 0, 1, "", "build.12"),
+            SemVersion.ParsedFrom(0, 0, 1, "", "build.12.2"),
+            SemVersion.ParsedFrom(0, 0, 1, "", "build.13"),
+            SemVersion.ParsedFrom(0, 0, 1, "", "build.-"),
+            SemVersion.ParsedFrom(0, 0, 1, "", "uiui"),
+            SemVersion.ParsedFrom(0, 1, 1),
+            SemVersion.ParsedFrom(0, 2, 1),
+            SemVersion.ParsedFrom(1, 0, 0, "alpha"),
+            SemVersion.ParsedFrom(1, 0, 0, "alpha", "dev.123"),
+            SemVersion.ParsedFrom(1, 0, 0, "alpha.1"),
+            SemVersion.ParsedFrom(1, 0, 0, "alpha.-"),
+            SemVersion.ParsedFrom(1, 0, 0, "alpha.beta"),
+            SemVersion.ParsedFrom(1, 0, 0, "beta"),
+            SemVersion.ParsedFrom(1, 0, 0, "beta", "dev.123"),
+            SemVersion.ParsedFrom(1, 0, 0, "beta.2"),
+            SemVersion.ParsedFrom(1, 0, 0, "beta.11"),
+            SemVersion.ParsedFrom(1, 0, 0, "rc.1"),
+            SemVersion.ParsedFrom(1),
+            SemVersion.ParsedFrom(1, 0, 0, "", "CA6B10F"),
+            SemVersion.ParsedFrom(1, 0, 10, "alpha"),
+            SemVersion.ParsedFrom(1, 2, 0, "alpha", "dev"),
+            SemVersion.ParsedFrom(1, 2, 0, "nightly"),
+            SemVersion.ParsedFrom(1, 2, 0, "nightly", "dev"),
+            SemVersion.ParsedFrom(1, 2, 0, "nightly2"),
+            SemVersion.ParsedFrom(1, 2),
+            SemVersion.ParsedFrom(1, 2, 0, "", "nightly"),
+            SemVersion.ParsedFrom(1, 2, 1, "-1"), // Doesn't match spec (issue #69)
+            SemVersion.ParsedFrom(1, 2, 1, "0"),
+            SemVersion.ParsedFrom(1, 2, 1, "99"),
+            SemVersion.ParsedFrom(1, 2, 1, "-"),
+            SemVersion.ParsedFrom(1, 2, 1, "-a"),
+            SemVersion.ParsedFrom(1, 2, 1, "0A"),
+            SemVersion.ParsedFrom(1, 2, 1, "A"),
+            SemVersion.ParsedFrom(1, 2, 1, "a"),
+            SemVersion.ParsedFrom(1, 2, 1),
+            SemVersion.ParsedFrom(1, 4),
+            SemVersion.ParsedFrom(2),
+            SemVersion.ParsedFrom(2, 1),
+            SemVersion.ParsedFrom(2, 1, 1),
         }.AsReadOnly();
 
         public static readonly IReadOnlyList<(SemVersion, SemVersion)> VersionPairs
@@ -99,9 +84,8 @@ namespace Semver.Test
             foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
-#pragma warning disable CS0618 // Type or member is obsolete
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
                 Assert.True(v.Equals(identical), v.ToString());
             }
         }
@@ -172,9 +156,8 @@ namespace Semver.Test
             foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
-#pragma warning disable CS0618 // Type or member is obsolete
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
                 Assert.True(v.GetHashCode() == identical.GetHashCode(), v.ToString());
             }
         }
@@ -194,9 +177,8 @@ namespace Semver.Test
             foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
-#pragma warning disable CS0618 // Type or member is obsolete
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
                 Assert.True(v == identical, v.ToString());
             }
         }
@@ -258,9 +240,8 @@ namespace Semver.Test
             foreach (var v in VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
-#pragma warning disable CS0618 // Type or member is obsolete
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
                 Assert.False(v != identical, v.ToString());
             }
         }

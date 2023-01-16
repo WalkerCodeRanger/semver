@@ -15,9 +15,8 @@ namespace Semver.Test.Comparers
             foreach (var v in ComparerTestData.VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
-#pragma warning disable CS0618 // Type or member is obsolete
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
                 Assert.True(Comparer.Equals(v, identical), v.ToString());
             }
         }
@@ -55,9 +54,8 @@ namespace Semver.Test.Comparers
             foreach (var v in ComparerTestData.VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
-#pragma warning disable CS0618 // Type or member is obsolete
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
                 Assert.True(Comparer.GetHashCode(v) == Comparer.GetHashCode(identical), v.ToString());
             }
         }
@@ -78,9 +76,8 @@ namespace Semver.Test.Comparers
             foreach (var v in ComparerTestData.VersionsInSortOrder)
             {
                 // Construct an identical version, but different instance
-#pragma warning disable CS0618 // Type or member is obsolete
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
                 Assert.True(Comparer.Compare(v, identical) == 0, v.ToString());
             }
         }

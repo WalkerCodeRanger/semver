@@ -17,10 +17,6 @@ namespace Semver
     /// <see cref="MetadataIdentifier"/> with a <see langword="null"/> value. However, the
     /// <see cref="Semver"/> namespace types do not accept and will not return such a
     /// <see cref="MetadataIdentifier"/>.</para>
-    ///
-    /// <para>Invalid metadata identifiers including arbitrary Unicode characters and empty string can
-    /// currently be produced by the <see cref="SemVersion(int, int, int, string, string)"/>
-    /// constructor. Such identifiers are compared via an ordinal string comparision.</para>
     /// </remarks>
     public readonly struct MetadataIdentifier : IEquatable<MetadataIdentifier>, IComparable<MetadataIdentifier>, IComparable
     {
