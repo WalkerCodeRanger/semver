@@ -33,8 +33,7 @@ namespace Semver
         private const string InvalidPatchVersionMessage = "Patch version must be greater than or equal to zero.";
         private const string PrereleaseIdentifierIsDefaultMessage = "Prerelease identifier cannot be default/null.";
         private const string MetadataIdentifierIsDefaultMessage = "Metadata identifier cannot be default/null.";
-        // TODO include in v3.0.0 for issue #72
-        //internal const string InvalidMaxLengthMessage = "Must not be negative.";
+        private const string InvalidMaxLengthMessage = "Must not be negative.";
         internal const int MaxVersionLength = 1024;
 
 #if SERIALIZABLE
@@ -407,8 +406,7 @@ namespace Semver
         public static SemVersion Parse(string version, SemVersionStyles style, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
-            // TODO include in v3.0.0 for issue #72
-            //if (maxLength < 0) throw new ArgumentOutOfRangeException(InvalidMaxLengthMessage, nameof(maxLength));
+            if (maxLength < 0) throw new ArgumentOutOfRangeException(nameof(maxLength), InvalidMaxLengthMessage);
             var ex = SemVersionParser.Parse(version, style, null, maxLength, out var semver);
 
             return ex is null ? semver : throw ex;
@@ -439,8 +437,7 @@ namespace Semver
             out SemVersion semver, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
-            // TODO include in v3.0.0 for issue #72
-            //if (maxLength < 0) throw new ArgumentOutOfRangeException(InvalidMaxLengthMessage, nameof(maxLength));
+            if (maxLength < 0) throw new ArgumentOutOfRangeException(nameof(maxLength), InvalidMaxLengthMessage);
             var exception = SemVersionParser.Parse(version, style, Parsing.FailedException, maxLength, out semver);
 
 #if DEBUG

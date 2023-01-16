@@ -378,12 +378,10 @@ namespace Semver.Test
         [MemberData(nameof(InvalidMaxLength))]
         public void ParseWithInvalidMaxLength(int maxLength)
         {
-            // TODO change in v3.0.0 for issue #72
-            var ex = Assert.Throws<FormatException>(() => SemVersion.Parse("ignored", Strict, maxLength));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => SemVersion.Parse("ignored", Strict, maxLength));
 
-            var expected = ExceptionMessages.InjectValue(ExceptionMessages.TooLongVersion, maxLength.ToString());
-            expected = ExceptionMessages.InjectVersion(expected, "ignored");
-            Assert.Equal(expected, ex.Message);
+            Assert.StartsWith(ExceptionMessages.InvalidMaxLengthStart, ex.Message);
+            Assert.Equal("maxLength", ex.ParamName);
         }
 
         [Theory]
@@ -429,11 +427,10 @@ namespace Semver.Test
         [MemberData(nameof(InvalidMaxLength))]
         public void TryParseWithInvalidMaxLength(int maxLength)
         {
-            // TODO change in v3.0.0 for issue #72
-            var result = SemVersion.TryParse("1.2.3", Strict, out var version, maxLength);
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => SemVersion.TryParse("ignored", Strict, out _, maxLength));
 
-            Assert.False(result);
-            Assert.Null(version);
+            Assert.StartsWith(ExceptionMessages.InvalidMaxLengthStart, ex.Message);
+            Assert.Equal("maxLength", ex.ParamName);
         }
 
         [Theory]
