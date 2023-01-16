@@ -332,44 +332,6 @@ namespace Semver
         }
 
         /// <summary>
-        /// Constructs a new instance of the <see cref="SemVersion"/> class from
-        /// a <see cref="Version"/>.
-        /// </summary>
-        /// <param name="version"><see cref="Version"/> used to initialize
-        /// the major, minor, and patch version numbers and the build metadata.</param>
-        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is null.</exception>
-        /// <remarks>Constructs a <see cref="SemVersion"/> with the same major and
-        /// minor version numbers. The patch version number will be the fourth component
-        /// of the <paramref name="version"/>. The build meta data will contain the third component
-        /// of the <paramref name="version"/> if it is greater than zero.</remarks>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This constructor is obsolete. Use SemVersion.FromVersion() instead.")]
-        public SemVersion(Version version)
-        {
-            if (version == null)
-                throw new ArgumentNullException(nameof(version));
-
-            Major = version.Major;
-            Minor = version.Minor;
-
-            if (version.Revision >= 0)
-                Patch = version.Revision;
-
-            Prerelease = "";
-            PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
-
-            if (version.Build > 0)
-            {
-                Metadata = version.Build.ToString(CultureInfo.InvariantCulture);
-                MetadataIdentifiers = new List<MetadataIdentifier>(1) { MetadataIdentifier.CreateUnsafe(Metadata) }.AsReadOnly();
-            }
-            else
-            {
-                Metadata = "";
-                MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
-            }
-        }
-
-        /// <summary>
         /// Construct a <see cref="SemVersion"/> from its proper parts.
         /// </summary>
         /// <remarks>Parameter validation is not performed. The <paramref name="major"/>,

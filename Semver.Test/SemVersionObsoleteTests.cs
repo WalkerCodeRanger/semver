@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
+﻿using System.Linq;
 using Semver.Test.Helpers;
 using Xunit;
 
@@ -149,102 +147,6 @@ namespace Semver.Test
             Assert.Equal(metadata ?? "", v.Build);
 #pragma warning restore CS0618 // Type or member is obsolete
         }
-
-        #region System.Version
-        [Theory]
-        [InlineData(0, 0, 0, 0)]
-        [InlineData(1, 1, 1, 1)]
-        [InlineData(1, 2, 0, 3)]
-        [InlineData(1, 2, 4, 3)]
-        public void ConstructSemVersionFromSystemVersionTest(int major, int minor, int build, int revision)
-        {
-            var nonSemanticVersion = new Version(major, minor, build, revision);
-
-#pragma warning disable 618
-            var v = new SemVersion(nonSemanticVersion);
-#pragma warning restore 618
-
-            Assert.Equal(major, v.Major);
-            Assert.Equal(minor, v.Minor);
-            Assert.Equal(revision, v.Patch);
-            Assert.Equal("", v.Prerelease);
-            Assert.Empty(v.PrereleaseIdentifiers);
-            if (build > 0)
-            {
-                var metadata = build.ToString(CultureInfo.InvariantCulture);
-                Assert.Equal(metadata, v.Metadata);
-                Assert.Equal(new[] { new MetadataIdentifier(metadata) }, v.MetadataIdentifiers);
-            }
-            else
-            {
-                Assert.Equal("", v.Metadata);
-                Assert.Empty(v.MetadataIdentifiers);
-            }
-        }
-
-        [Theory]
-        [InlineData(0, 0, 0)]
-        [InlineData(1, 1, 1)]
-        [InlineData(1, 2, 0)]
-        [InlineData(1, 2, 4)]
-        public void ConstructSemVersionFromSystemVersionWithUndefinedRevisionTest(int major, int minor, int build)
-        {
-            var nonSemanticVersion = new Version(major, minor, build);
-
-#pragma warning disable 618
-            var v = new SemVersion(nonSemanticVersion);
-#pragma warning restore 618
-
-            Assert.Equal(major, v.Major);
-            Assert.Equal(minor, v.Minor);
-            Assert.Equal(0, v.Patch);
-            Assert.Equal("", v.Prerelease);
-            Assert.Empty(v.PrereleaseIdentifiers);
-            if (build > 0)
-            {
-                var metadata = build.ToString(CultureInfo.InvariantCulture);
-                Assert.Equal(metadata, v.Metadata);
-                Assert.Equal(new[] { new MetadataIdentifier(metadata) }, v.MetadataIdentifiers);
-            }
-            else
-            {
-                Assert.Equal("", v.Metadata);
-                Assert.Empty(v.MetadataIdentifiers);
-            }
-        }
-
-        [Theory]
-        [InlineData(0, 0)]
-        [InlineData(1, 1)]
-        [InlineData(1, 2)]
-        public void ConstructSemVersionFromSystemVersionWithUndefinedBuildRevisionTest(int major, int minor)
-        {
-            var nonSemanticVersion = new Version(major, minor);
-
-#pragma warning disable 618
-            var v = new SemVersion(nonSemanticVersion);
-#pragma warning restore 618
-
-            Assert.Equal(major, v.Major);
-            Assert.Equal(minor, v.Minor);
-            Assert.Equal(0, v.Patch);
-            Assert.Equal("", v.Prerelease);
-            Assert.Empty(v.PrereleaseIdentifiers);
-            Assert.Equal("", v.Metadata);
-            Assert.Empty(v.MetadataIdentifiers);
-        }
-
-        [Fact]
-        public void ConstructSemVersionFromNullSystemVersionTest()
-        {
-#pragma warning disable 618
-            var ex = Assert.Throws<ArgumentNullException>(() => new SemVersion(null));
-#pragma warning restore 618
-
-            Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
-            Assert.Equal("version", ex.ParamName);
-        }
-        #endregion
 
         #region Change
         [Fact]
