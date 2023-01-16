@@ -9,23 +9,23 @@ namespace Semver.Test.Comparers
         private static readonly ISemVersionComparer Comparer = SortOrderComparer.Instance;
 
         #region Equals
-        [Fact]
-        public void EqualsIdenticalTest()
+        [Theory]
+        [MemberData(nameof(ComparerTestData.VersionsInSortOrder), MemberType = typeof(ComparerTestData))]
+        public void EqualsIdenticalTest(string version)
         {
-            foreach (var v in ComparerTestData.VersionsInSortOrder)
-            {
-                // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
-                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
-                Assert.True(Comparer.Equals(v, identical), v.ToString());
-            }
+            var v = SemVersion.Parse(version);
+            // Construct an identical version, but different instance
+            var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                v.PrereleaseIdentifiers, v.MetadataIdentifiers);
+            Assert.True(Comparer.Equals(v, identical), v.ToString());
         }
 
-        [Fact]
-        public void EqualsSameTest()
+        [Theory]
+        [MemberData(nameof(ComparerTestData.VersionsInSortOrder), MemberType = typeof(ComparerTestData))]
+        public void EqualsSameTest(string version)
         {
-            foreach (var v in ComparerTestData.VersionsInSortOrder)
-                Assert.True(Comparer.Equals(v, v), v.ToString());
+            var v = SemVersion.Parse(version);
+            Assert.True(Comparer.Equals(v, v), v.ToString());
         }
 
         [Fact]
@@ -36,28 +36,31 @@ namespace Semver.Test.Comparers
         }
 
         [Fact]
-        public void EqualsNullTest()
+        public void EqualsNullNullTest()
         {
             Assert.True(Comparer.Equals(null, null));
-            foreach (var v in ComparerTestData.VersionsInSortOrder)
-            {
-                Assert.False(Comparer.Equals(v, null), $"Equals({v}, null)");
-                Assert.False(Comparer.Equals(null, v), $"Equals(null, {v})");
-            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ComparerTestData.VersionsInSortOrder), MemberType = typeof(ComparerTestData))]
+        public void EqualsNullTest(string version)
+        {
+            var v = SemVersion.Parse(version);
+            Assert.False(Comparer.Equals(v, null), $"Equals({v}, null)");
+            Assert.False(Comparer.Equals(null, v), $"Equals(null, {v})");
         }
         #endregion
 
         #region GetHashCode
-        [Fact]
-        public void GetHashCodeIdenticalTest()
+        [Theory]
+        [MemberData(nameof(ComparerTestData.VersionsInSortOrder), MemberType = typeof(ComparerTestData))]
+        public void GetHashCodeIdenticalTest(string version)
         {
-            foreach (var v in ComparerTestData.VersionsInSortOrder)
-            {
-                // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
-                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
-                Assert.True(Comparer.GetHashCode(v) == Comparer.GetHashCode(identical), v.ToString());
-            }
+            var v = SemVersion.Parse(version);
+            // Construct an identical version, but different instance
+            var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                v.PrereleaseIdentifiers, v.MetadataIdentifiers);
+            Assert.True(Comparer.GetHashCode(v) == Comparer.GetHashCode(identical), v.ToString());
         }
 
         [Fact]
@@ -70,23 +73,23 @@ namespace Semver.Test.Comparers
         #endregion
 
         #region CompareTo
-        [Fact]
-        public void CompareIdenticalTest()
+        [Theory]
+        [MemberData(nameof(ComparerTestData.VersionsInSortOrder), MemberType = typeof(ComparerTestData))]
+        public void CompareIdenticalTest(string version)
         {
-            foreach (var v in ComparerTestData.VersionsInSortOrder)
-            {
-                // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
-                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
-                Assert.True(Comparer.Compare(v, identical) == 0, v.ToString());
-            }
+            var v = SemVersion.Parse(version);
+            // Construct an identical version, but different instance
+            var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                v.PrereleaseIdentifiers, v.MetadataIdentifiers);
+            Assert.True(Comparer.Compare(v, identical) == 0, v.ToString());
         }
 
-        [Fact]
-        public void CompareSameTest()
+        [Theory]
+        [MemberData(nameof(ComparerTestData.VersionsInSortOrder), MemberType = typeof(ComparerTestData))]
+        public void CompareSameTest(string version)
         {
-            foreach (var v in ComparerTestData.VersionsInSortOrder)
-                Assert.True(Comparer.Compare(v, v) == 0, v.ToString());
+            var v = SemVersion.Parse(version);
+            Assert.True(Comparer.Compare(v, v) == 0, v.ToString());
         }
 
         [Fact]
