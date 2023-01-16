@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
@@ -48,24 +47,6 @@ namespace Semver
         /// otherwise <see langword="null"/>.</value>
         /// <remarks>The numeric value of a prerelease identifier will never be negative.</remarks>
         public int? NumericValue { get; }
-
-        /// <summary>
-        /// Construct a potentially invalid <see cref="PrereleaseIdentifier"/>.
-        /// </summary>
-        /// <exception cref="ArgumentNullException">The <paramref name="value"/> parameter is <see langword="null"/>.</exception>
-        /// <remarks>This should be used only by the <see cref="SemVersion"/> constructor that
-        /// still accepts illegal values.</remarks>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete]
-        internal static PrereleaseIdentifier CreateLoose(string value)
-        {
-            DebugChecks.IsNotNull(value, nameof(value));
-
-            // Avoid parsing some non-ASCII digits as a number by checking that they are all digits
-            if (value.IsDigits() && int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out var numericValue))
-                return new PrereleaseIdentifier(value, numericValue);
-
-            return new PrereleaseIdentifier(value, null);
-        }
 
         /// <summary>
         /// Construct a <see cref="PrereleaseIdentifier"/> without checking that any of the invariants

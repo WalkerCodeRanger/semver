@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
 
@@ -26,20 +25,6 @@ namespace Semver
         /// <value>The string value of this metadata identifier or <see langword="null"/> if this is
         /// a default <see cref="MetadataIdentifier"/>.</value>
         public string Value { get; }
-
-        /// <summary>
-        /// Construct a potentially invalid <see cref="MetadataIdentifier"/>.
-        /// </summary>
-        /// <exception cref="ArgumentNullException">The <paramref name="value"/> parameter is <see langword="null"/>.</exception>
-        /// <remarks>This should only be used by the <see cref="SemVersion"/> constructor that
-        /// still accepts illegal values.</remarks>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete]
-        internal static MetadataIdentifier CreateLoose(string value)
-        {
-            DebugChecks.IsNotNull(value, nameof(value));
-
-            return new MetadataIdentifier(value, UnsafeOverload.Marker);
-        }
 
         /// <summary>
         /// Constructs a <see cref="MetadataIdentifier"/> without checking that any of the invariants
