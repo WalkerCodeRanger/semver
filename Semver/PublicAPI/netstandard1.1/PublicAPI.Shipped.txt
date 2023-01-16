@@ -93,7 +93,6 @@ static Semver.SemVersion.ComparePrecedence(Semver.SemVersion left, Semver.SemVer
 static Semver.SemVersion.CompareSortOrder(Semver.SemVersion left, Semver.SemVersion right) -> int
 static Semver.SemVersion.Equals(Semver.SemVersion versionA, Semver.SemVersion versionB) -> bool
 static Semver.SemVersion.FromVersion(System.Version version) -> Semver.SemVersion
-static Semver.SemVersion.implicit operator Semver.SemVersion(string version) -> Semver.SemVersion
 static Semver.SemVersion.operator !=(Semver.SemVersion left, Semver.SemVersion right) -> bool
 static Semver.SemVersion.operator <(Semver.SemVersion left, Semver.SemVersion right) -> bool
 static Semver.SemVersion.operator <=(Semver.SemVersion left, Semver.SemVersion right) -> bool

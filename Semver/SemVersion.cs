@@ -1848,17 +1848,5 @@ namespace Semver
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
             => SatisfiesNpm(range, false, maxLength);
         #endregion
-
-        /// <summary>
-        /// Implicit conversion from <see cref="string"/> to <see cref="SemVersion"/>.
-        /// </summary>
-        /// <param name="version">The semantic version.</param>
-        /// <returns>The <see cref="SemVersion"/> object.</returns>
-        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
-        /// <exception cref="OverflowException">The major, minor, or patch version number is larger than <see cref="int.MaxValue"/>.</exception>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Implicit conversion from string is obsolete. Use Parse() or TryParse() method instead.")]
-        public static implicit operator SemVersion(string version)
-            => Parse(version);
     }
 }
