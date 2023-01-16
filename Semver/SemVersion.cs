@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 #if SERIALIZABLE
@@ -73,9 +72,12 @@ namespace Semver
         /// Constructs a new instance of the <see cref="SemVersion" /> class.
         /// </summary>
         /// <param name="major">The major version number.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/> version
+        /// number is negative.</exception>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
         public SemVersion(int major)
         {
+            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             Major = major;
             Minor = 0;
             Patch = 0;
@@ -90,9 +92,13 @@ namespace Semver
         /// </summary>
         /// <param name="major">The major version number.</param>
         /// <param name="minor">The minor version number.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/> or
+        /// <paramref name="minor"/> version number is negative.</exception>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
         public SemVersion(int major, int minor)
         {
+            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
             Major = major;
             Minor = minor;
             Patch = 0;
@@ -108,9 +114,14 @@ namespace Semver
         /// <param name="major">The major version number.</param>
         /// <param name="minor">The minor version number.</param>
         /// <param name="patch">The patch version number.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
+        /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
         public SemVersion(int major, int minor, int patch)
         {
+            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
+            if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
             Major = major;
             Minor = minor;
             Patch = patch;
@@ -128,7 +139,7 @@ namespace Semver
         /// <param name="patch">The patch version number.</param>
         /// <param name="prerelease">The prerelease identifiers.</param>
         /// <param name="metadata">The build metadata identifiers.</param>
-        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
         public SemVersion(int major, int minor = 0, int patch = 0,
@@ -193,7 +204,7 @@ namespace Semver
         /// <param name="patch">The patch version number.</param>
         /// <param name="prerelease">The prerelease identifiers.</param>
         /// <param name="metadata">The build metadata identifiers.</param>
-        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentNullException">One of the prerelease or metadata identifiers is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
@@ -256,7 +267,7 @@ namespace Semver
         /// <param name="metadata">The build metadata (e.g. "nightly.232").</param>
         /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading
         /// zeros will be removed.</param>
-        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
@@ -456,7 +467,7 @@ namespace Semver
         /// <param name="prerelease">The value to replace the prerelease identifiers or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="metadata">The value to replace the build metadata identifiers or <see langword="null"/> to leave it unchanged.</param>
         /// <returns>The new version with changed properties.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
@@ -541,7 +552,7 @@ namespace Semver
         /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading
         /// zeros will be removed.</param>
         /// <returns>The new version with changed properties.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading

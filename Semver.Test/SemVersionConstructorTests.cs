@@ -16,7 +16,7 @@ namespace Semver.Test
 
         /// <summary>
         /// This test shows that named arguments will resolve to a constructor with few parameters
-        /// rather than one with more parameters that might be obsolete.
+        /// rather than one with more parameters.
         /// </summary>
         [Fact]
         public void NamedArgumentsResolveToShortestConstructor()
@@ -30,8 +30,6 @@ namespace Semver.Test
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
-        // TODO Negative versions should be invalid and throw argument exceptions (issue#41)
-        [InlineData(-1)]
         public void ConstructWithMajorTest(int major)
         {
             var v = new SemVersion(major);
@@ -44,15 +42,22 @@ namespace Semver.Test
             Assert.Equal("", v.Metadata);
             Assert.Empty(v.MetadataIdentifiers);
         }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(int.MinValue)]
+        public void ConstructWithMajorInvalidTest(int major)
+        {
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new SemVersion(major));
+
+            Assert.StartsWith(InvalidMajorVersionMessage, ex.Message);
+            Assert.Equal("major", ex.ParamName);
+        }
         #endregion
 
         #region SemVersion(int major, int minor)
         [Theory]
         [InlineData(1, 2)]
-        // TODO Negative versions should be invalid and throw argument exceptions (issue#41)
-        [InlineData(-1, 0)]
-        [InlineData(0, -1)]
-        [InlineData(-1, -1)]
         public void ConstructWithMajorMinorTest(int major, int minor)
         {
             var v = new SemVersion(major, minor);
@@ -65,16 +70,28 @@ namespace Semver.Test
             Assert.Equal("", v.Metadata);
             Assert.Empty(v.MetadataIdentifiers);
         }
+
+        [Theory]
+        [InlineData(-1, 0, InvalidMajorVersionMessage, "major")]
+        [InlineData(int.MinValue, -1, InvalidMajorVersionMessage, "major")]
+        [InlineData(0, -1, InvalidMinorVersionMessage, "minor")]
+        [InlineData(42, int.MinValue, InvalidMinorVersionMessage, "minor")]
+        public void ConstructWithMajorMinorInvalidTest(
+            int major,
+            int minor,
+            string expectedMessage,
+            string expectedParamName)
+        {
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new SemVersion(major, minor));
+
+            Assert.StartsWith(expectedMessage, ex.Message);
+            Assert.Equal(expectedParamName, ex.ParamName);
+        }
         #endregion
 
         #region SemVersion(int major, int minor, int patch)
         [Theory]
         [InlineData(1, 2, 3)]
-        // TODO Negative versions should be invalid and throw argument exceptions (issue#41)
-        [InlineData(-1, 0, 0)]
-        [InlineData(0, -1, 0)]
-        [InlineData(0, 0, -1)]
-        [InlineData(-1, -1, -1)]
         public void ConstructWithMajorMinorPatchTest(int major, int minor, int patch)
         {
             var v = new SemVersion(major, minor, patch);
@@ -86,6 +103,26 @@ namespace Semver.Test
             Assert.Empty(v.PrereleaseIdentifiers);
             Assert.Equal("", v.Metadata);
             Assert.Empty(v.MetadataIdentifiers);
+        }
+
+        [Theory]
+        [InlineData(-1, 0, 0, InvalidMajorVersionMessage, "major")]
+        [InlineData(int.MinValue, -1, -1, InvalidMajorVersionMessage, "major")]
+        [InlineData(0, -1, 0, InvalidMinorVersionMessage, "minor")]
+        [InlineData(0, int.MinValue, -1, InvalidMinorVersionMessage, "minor")]
+        [InlineData(0, 0, -1, InvalidPatchVersionMessage, "patch")]
+        [InlineData(0, 0, int.MinValue, InvalidPatchVersionMessage, "patch")]
+        public void ConstructWithMajorMinorPatchInvalidTest(
+            int major,
+            int minor,
+            int patch,
+            string expectedMessage,
+            string expectedParamName)
+        {
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new SemVersion(major, minor, patch));
+
+            Assert.StartsWith(expectedMessage, ex.Message);
+            Assert.Equal(expectedParamName, ex.ParamName);
         }
         #endregion
 
