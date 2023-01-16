@@ -20,35 +20,118 @@ namespace Semver.Ranges
         internal const string InvalidOptionsMessage = "An invalid SemVersionRangeOptions value was used.";
         internal const string InvalidMaxLengthMessage = "Must not be negative.";
 
+        /// <summary>
+        /// The empty range that contains no versions.
+        /// </summary>
+        /// <value>The empty range that contains no versions.</value>
         public static SemVersionRange Empty { get; } = new SemVersionRange(ReadOnlyList<UnbrokenSemVersionRange>.Empty);
 
+        /// <summary>
+        /// The range that contains all release versions but no prerelease versions.
+        /// </summary>
+        /// <value>The range that contains all release versions but no prerelease versions.</value>
         public static SemVersionRange AllRelease { get; } = new SemVersionRange(UnbrokenSemVersionRange.AllRelease);
+
+        /// <summary>
+        /// The range that contains both all release and prerelease versions.
+        /// </summary>
+        /// <value>The range that contains both all release and prerelease versions.</value>
         public static SemVersionRange All { get; } = new SemVersionRange(UnbrokenSemVersionRange.All);
 
+        /// <summary>
+        /// Construct a range containing only a single version.
+        /// </summary>
+        /// <param name="version">The version the range should contain.</param>
+        /// <returns>A range containing only the given version.</returns>
         public static SemVersionRange Equals(SemVersion version)
             => Create(UnbrokenSemVersionRange.Equals(version));
 
+        /// <summary>
+        /// Construct a range containing versions greater than the given version.
+        /// </summary>
+        /// <param name="version">The range will contain all versions greater than this.</param>
+        /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
+        /// than just those matching the given version if it is prerelease.</param>
+        /// <returns>A range containing versions greater than the given version.</returns>
         public static SemVersionRange GreaterThan(SemVersion version, bool includeAllPrerelease = false)
             => Create(UnbrokenSemVersionRange.GreaterThan(version, includeAllPrerelease));
 
+        /// <summary>
+        /// Construct a range containing versions equal to or greater than the given version.
+        /// </summary>
+        /// <param name="version">The range will contain all versions greater than or equal to this.</param>
+        /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
+        /// than just those matching the given version if it is prerelease.</param>
+        /// <returns>A range containing versions greater than or equal to the given version.</returns>
         public static SemVersionRange AtLeast(SemVersion version, bool includeAllPrerelease = false)
              => Create(UnbrokenSemVersionRange.AtLeast(version, includeAllPrerelease));
 
+        /// <summary>
+        /// Construct a range containing versions less than the given version.
+        /// </summary>
+        /// <param name="version">The range will contain all versions less than this.</param>
+        /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
+        /// than just those matching the given version if it is prerelease.</param>
+        /// <returns>A range containing versions less than the given version.</returns>
         public static SemVersionRange LessThan(SemVersion version, bool includeAllPrerelease = false)
              => Create(UnbrokenSemVersionRange.LessThan(version, includeAllPrerelease));
 
+        /// <summary>
+        /// Construct a range containing versions equal to or less than the given version.
+        /// </summary>
+        /// <param name="version">The range will contain all versions less than or equal to this.</param>
+        /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
+        /// than just those matching the given version if it is prerelease.</param>
+        /// <returns>A range containing versions less than or equal to the given version.</returns>
         public static SemVersionRange AtMost(SemVersion version, bool includeAllPrerelease = false)
             => Create(UnbrokenSemVersionRange.AtMost(version, includeAllPrerelease));
 
+        /// <summary>
+        /// Construct a range containing all versions between the given versions including those versions.
+        /// </summary>
+        /// <param name="start">The range will contain only versions greater than or equal to this.</param>
+        /// <param name="end">The range will contain only versions less than or equal to this.</param>
+        /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
+        /// than just those matching the given version if it is prerelease.</param>
+        /// <returns>A range containing versions between the given versions including those versions.</returns>
         public static SemVersionRange Inclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(UnbrokenSemVersionRange.Inclusive(start, end, includeAllPrerelease));
 
+        /// <summary>
+        /// Construct a range containing all versions between the given versions including the start
+        /// but not the end.
+        /// </summary>
+        /// <param name="start">The range will contain only versions greater than or equal to this.</param>
+        /// <param name="end">The range will contain only versions less than this.</param>
+        /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
+        /// than just those matching the given version if it is prerelease.</param>
+        /// <returns>A range containing versions between the given versions including the start but
+        /// not the end.</returns>
         public static SemVersionRange InclusiveOfStart(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(UnbrokenSemVersionRange.InclusiveOfStart(start, end, includeAllPrerelease));
 
+        /// <summary>
+        /// Construct a range containing all versions between the given versions including the end but
+        /// not the start.
+        /// </summary>
+        /// <param name="start">The range will contain only versions greater than this.</param>
+        /// <param name="end">The range will contain only versions less than or equal to this.</param>
+        /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
+        /// than just those matching the given version if it is prerelease.</param>
+        /// <returns>A range containing versions between the given versions including the end but
+        /// not the start.</returns>
         public static SemVersionRange InclusiveOfEnd(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(UnbrokenSemVersionRange.InclusiveOfEnd(start, end, includeAllPrerelease));
 
+        /// <summary>
+        /// Construct a range containing all versions between the given versions excluding those versions.
+        /// </summary>
+        /// <param name="start">The range will contain only versions greater than this.</param>
+        /// <param name="end">The range will contain only versions less than this.</param>
+        /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
+        /// than just those matching the given version if it is prerelease.</param>
+        /// <returns>A range containing versions between the given versions including the end but
+        /// not the start.</returns>
         public static SemVersionRange Exclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(UnbrokenSemVersionRange.Exclusive(start, end, includeAllPrerelease));
 
@@ -80,9 +163,23 @@ namespace Semver.Ranges
             return new SemVersionRange(ranges.AsReadOnly());
         }
 
+        /// <summary>
+        /// Construct a range that joins the given <see cref="UnbrokenSemVersionRange"/>s. It will
+        /// contain all versions contained by any of the given unbroken ranges.
+        /// </summary>
+        /// <param name="ranges">The unbroken ranges to join into a single range.</param>
+        /// <returns>A range that joins the given <see cref="UnbrokenSemVersionRange"/>s. It will
+        /// contain all versions contained by any of the given unbroken ranges.</returns>
         public static SemVersionRange Create(IEnumerable<UnbrokenSemVersionRange> ranges)
             => Create((ranges ?? throw new ArgumentNullException(nameof(ranges))).ToList());
 
+        /// <summary>
+        /// Construct a range that joins the given <see cref="UnbrokenSemVersionRange"/>s. It will
+        /// contain all versions contained by any of the given unbroken ranges.
+        /// </summary>
+        /// <param name="ranges">The unbroken ranges to join into a single range.</param>
+        /// <returns>A range that joins the given <see cref="UnbrokenSemVersionRange"/>s. It will
+        /// contain all versions contained by any of the given unbroken ranges.</returns>
         public static SemVersionRange Create(params UnbrokenSemVersionRange[] ranges)
             => Create((ranges ?? throw new ArgumentNullException(nameof(ranges))).ToList());
 
@@ -101,6 +198,12 @@ namespace Semver.Ranges
             this.ranges = ranges;
         }
 
+        /// <summary>
+        /// Determine whether this range contains the given version.
+        /// </summary>
+        /// <param name="version">The version to test against the range.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
         public bool Contains(SemVersion version)
         {
             // Using `for` loop for better performance
@@ -111,6 +214,12 @@ namespace Semver.Ranges
             return false;
         }
 
+        /// <summary>
+        /// Convert this range into a predicate function indicating whether a version is contained
+        /// in the range.
+        /// </summary>
+        /// <param name="range">The range to convert into a predicate function.</param>
+        /// <returns>A predicate that indicates whether a given version is contained in this range.</returns>
         public static implicit operator Predicate<SemVersion>(SemVersionRange range)
             => range.Contains;
 
@@ -220,12 +329,29 @@ namespace Semver.Ranges
         #endregion
 
         #region IReadOnlyList<UnbrokenSemVersionRange>
+        /// <summary>
+        /// The number of <see cref="UnbrokenSemVersionRange"/> that make up this range.
+        /// </summary>
         public int Count => ranges.Count;
 
+        /// <summary>
+        /// Get the <see cref="UnbrokenSemVersionRange"/> making up this range at the given index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the <see cref="UnbrokenSemVersionRange"/> to
+        /// get.</param>
+        /// <returns>The <see cref="UnbrokenSemVersionRange"/> making up this range at the given
+        /// index.</returns>
         public UnbrokenSemVersionRange this[int index] => ranges[index];
 
+        /// <summary>
+        /// Get an enumerator that iterates through the <see cref="UnbrokenSemVersionRange"/>s
+        /// making up this range.
+        /// </summary>
+        /// <returns>An enumerator that iterates through the <see cref="UnbrokenSemVersionRange"/>s
+        /// making up this range.</returns>
         public IEnumerator<UnbrokenSemVersionRange> GetEnumerator() => ranges.GetEnumerator();
 
+        /// <inheritdoc />
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         #endregion
 
