@@ -29,6 +29,8 @@ Semver.Ranges.UnbrokenSemVersionRange.Equals(Semver.Ranges.UnbrokenSemVersionRan
 Semver.Ranges.UnbrokenSemVersionRange.IncludeAllPrerelease.get -> bool
 Semver.Ranges.UnbrokenSemVersionRange.Start.get -> Semver.SemVersion
 Semver.Ranges.UnbrokenSemVersionRange.StartInclusive.get -> bool
+Semver.SemVersion.Satisfies(Semver.Ranges.SemVersionRange range) -> bool
+Semver.SemVersion.Satisfies(Semver.Ranges.UnbrokenSemVersionRange range) -> bool
 Semver.SemVersion.Satisfies(string range, int maxLength = 2048) -> bool
 Semver.SemVersion.Satisfies(string range, Semver.Ranges.SemVersionRangeOptions options, int maxLength = 2048) -> bool
 Semver.SemVersion.Satisfies(System.Predicate<Semver.SemVersion> predicate) -> bool
