@@ -1683,14 +1683,12 @@ namespace Semver
             => Equals(left, right) || Compare(left, right) < 0;
         #endregion
 
-        #region Ranges
+        #region Satisfies
         /// <summary>
-        /// Checks if this version satisfies the predicate. Typically this is called with a
-        /// <see cref="SemVersionRange"/> or <see cref="UnbrokenSemVersionRange"/>
+        /// Checks if this version satisfies the given predicate.
         /// </summary>
-        /// <param name="predicate">The predicate to evaluate. Commonly a
-        /// <see cref="SemVersionRange"/> or <see cref="UnbrokenSemVersionRange"/>.</param>
-        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// <param name="predicate">The predicate to evaluate on this version.</param>
+        /// <returns><see langword="true"/> if the version satisfies the predicate,
         /// otherwise <see langword="false"/>.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="predicate"/> is
         /// <see langword="null"/>.</exception>
@@ -1700,18 +1698,58 @@ namespace Semver
             return predicate(this);
         }
 
+        /// <summary>
+        /// Checks if this version is contained in the given range.
+        /// </summary>
+        /// <param name="range">The range to evaluate.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
         public bool Satisfies(SemVersionRange range)
         {
             if (range is null) throw new ArgumentNullException(nameof(range));
             return range.Contains(this);
         }
 
+        /// <summary>
+        /// Checks if this version is contained in the given unbroken range.
+        /// </summary>
+        /// <param name="range">The unbroken range to evaluate.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
         public bool Satisfies(UnbrokenSemVersionRange range)
         {
             if (range is null) throw new ArgumentNullException(nameof(range));
             return range.Contains(this);
         }
 
+        /// <summary>
+        /// Checks if this version is contained in the given range string.
+        /// </summary>
+        /// <param name="range">The range to parse and evaluate.</param>
+        /// <param name="options">A bitwise combination of enumeration values that indicates the style
+        /// elements that can be present in <paramref name="range"/>. The overload without this
+        /// parameter defaults to <see cref="SemVersionRangeOptions.Strict"/>.</param>
+        /// <param name="maxLength">The maximum length of <paramref name="range"/> that should be
+        /// parsed. This prevents attacks using very long range strings.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="options"/> is not a valid
+        /// <see cref="SemVersionRangeOptions"/> value.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
+        /// zero.</exception>
+        /// <exception cref="FormatException">The <paramref name="range"/> is invalid or not in a
+        /// format compliant with <paramref name="options"/>.</exception>
+        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
+        /// is too large for an <see cref="Int32"/>.</exception>
+        /// <remarks>If checks against a range will be performed repeatedly, it is much more
+        /// efficient to parse the range into a <see cref="SemVersionRange"/> once and use that
+        /// object to repeatedly check for containment.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool Satisfies(
             string range,
@@ -1725,25 +1763,53 @@ namespace Semver
             return parsedRange.Contains(this);
         }
 
+        /// <summary>
+        /// Checks if this version is contained in the given range string. The range is parsed using
+        /// <see cref="SemVersionRangeOptions.Strict"/>.
+        /// </summary>
+        /// <param name="range">The range to parse and evaluate.</param>
+        /// <param name="maxLength">The maximum length of <paramref name="range"/> that should be
+        /// parsed. This prevents attacks using very long range strings.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
+        /// zero.</exception>
+        /// <exception cref="FormatException">The <paramref name="range"/> is invalid or not in a
+        /// format compliant with <see cref="SemVersionRangeOptions.Strict"/>.</exception>
+        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
+        /// is too large for an <see cref="Int32"/>.</exception>
+        /// <remarks>If checks against a range will be performed repeatedly, it is much more
+        /// efficient to parse the range into a <see cref="SemVersionRange"/> once and use that
+        /// object to repeatedly check for containment.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool Satisfies(string range, int maxLength = SemVersionRange.MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
             => Satisfies(range, SemVersionRangeOptions.Strict, maxLength);
 
         /// <summary>
-        /// Checks if this version is in the given range. Uses the same range syntax as npm.
+        /// Checks if this version is contained in the given npm format range string.
         /// </summary>
-        /// <remarks>
-        /// It's more optimal to use the static parse methods on <see cref="SemVersionRange"/>
-        /// if you're going to be testing multiple versions against the same range
-        /// to avoid having to parse the range multiple times.
-        /// </remarks>
-        /// <param name="range">The range to compare with.</param>
-        /// <param name="includeAllPrerelease"></param>
-        /// <param name="maxLength"></param>
+        /// <param name="range">The npm format range to parse and evaluate.</param>
+        /// <param name="includeAllPrerelease">Whether to include all prerelease versions satisfying
+        /// the bounds in the range or to only include prerelease versions when it matches a bound
+        /// that explicitly includes prerelease versions.</param>
+        /// <param name="maxLength">The maximum length of <paramref name="range"/> that should be
+        /// parsed. This prevents attacks using very long range strings.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="range"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
+        /// zero.</exception>
+        /// <exception cref="FormatException">The <paramref name="range"/> is invalid.</exception>
+        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
+        /// is too large for an <see cref="Int32"/>.</exception>
+        /// <remarks>If checks against a range will be performed repeatedly, it is much more
+        /// efficient to parse the range into a <see cref="SemVersionRange"/> once using
+        /// <see cref="SemVersionRange.ParseNpm(string,bool,int)"/> and use that object to
+        /// repeatedly check for containment.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool SatisfiesNpm(string range, bool includeAllPrerelease, int maxLength = SemVersionRange.MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -1754,6 +1820,26 @@ namespace Semver
             return parsedRange.Contains(this);
         }
 
+        /// <summary>
+        /// Checks if this version is contained in the given npm format range string. Does not
+        /// include all prerelease when parsing the range.
+        /// </summary>
+        /// <param name="range">The npm format range to parse and evaluate.</param>
+        /// <param name="maxLength">The maximum length of <paramref name="range"/> that should be
+        /// parsed. This prevents attacks using very long range strings.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
+        /// zero.</exception>
+        /// <exception cref="FormatException">The <paramref name="range"/> is invalid.</exception>
+        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
+        /// is too large for an <see cref="Int32"/>.</exception>
+        /// <remarks>If checks against a range will be performed repeatedly, it is much more
+        /// efficient to parse the range into a <see cref="SemVersionRange"/> once using
+        /// <see cref="SemVersionRange.ParseNpm(string,int)"/> and use that object to
+        /// repeatedly check for containment.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool SatisfiesNpm(string range, int maxLength = SemVersionRange.MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
