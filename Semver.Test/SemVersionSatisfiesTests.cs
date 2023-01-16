@@ -19,7 +19,8 @@ namespace Semver.Test
         [Fact]
         public void SatisfiesNullPredicate()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => FakeVersion.Satisfies(null));
+            var ex = Assert.Throws<ArgumentNullException>(
+                () => FakeVersion.Satisfies((Predicate<SemVersion>)null));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("predicate", ex.ParamName);
