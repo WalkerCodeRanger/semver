@@ -530,12 +530,15 @@ namespace Semver
         /// <param name="version">The version string.</param>
         /// <param name="style">A bitwise combination of enumeration values that indicates the style
         /// elements that can be present in <paramref name="version"/>. The preferred value to use
-        /// is <see cref="SemVersionStyles.Strict"/>.</param>4
+        /// is <see cref="SemVersionStyles.Strict"/>.</param>
         /// <param name="semver">When this method returns, contains a <see cref="SemVersion"/> instance equivalent
         /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
         /// version string was invalid.</param>
         /// <param name="maxLength">The maximum length of <paramref name="version"/> that should be
         /// parsed. This prevents attacks using very long version strings.</param>
+        /// <returns><see langword="false"/> when an invalid version string is passed, otherwise <see langword="true"/>.</returns>
+        /// <exception cref="ArgumentException"><paramref name="style"/> is not a valid
+        /// <see cref="SemVersionStyles"/> value.</exception>
         public static bool TryParse(string version, SemVersionStyles style,
             out SemVersion semver, int maxLength = MaxVersionLength)
         {
@@ -563,7 +566,7 @@ namespace Semver
         /// version string was invalid.</param>
         /// <param name="strict">If set to <see langword="true"/>, minor and patch version numbers are required;
         /// otherwise they are optional.</param>
-        /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
+        /// <returns><see langword="false"/> when an invalid version string is passed, otherwise <see langword="true"/>.</returns>
         [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
         public static bool TryParse(string version, out SemVersion semver, bool strict = false)
         {
@@ -1245,7 +1248,7 @@ namespace Semver
         /// <summary>
         /// Determines whether two semantic versions are equal.
         /// </summary>
-        /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the two versions are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
         // TODO v3.0.0 rename parameters to `left` and `right` to be consistent with ComparePrecedence etc.
@@ -1340,7 +1343,7 @@ namespace Semver
         /// <summary>
         /// Determines whether two semantic versions are equal.
         /// </summary>
-        /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the two versions are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
         public static bool operator ==(SemVersion left, SemVersion right) => Equals(left, right);
@@ -1348,7 +1351,7 @@ namespace Semver
         /// <summary>
         /// Determines whether two semantic versions are <em>not</em> equal.
         /// </summary>
-        /// <returns><see langword="true"/> if the two values are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the two versions are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
         public static bool operator !=(SemVersion left, SemVersion right) => !Equals(left, right);
