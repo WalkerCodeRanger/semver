@@ -10,14 +10,6 @@ versioning spec from [semver.org](http://semver.org).
 
 API docs for the most recent release are available online at [semver-nuget.org](https://semver-nuget.org/).
 
-## Installation
-
-With the NuGet console:
-
-```powershell
-Install-Package semver
-```
-
 ## Parsing
 
 ```csharp
@@ -71,7 +63,7 @@ Next release version is: 1.1.0
 
 ```csharp
 var range = SemVersionRange.Parse("^1.0.0");
-var prereleaseRange = SemVersionRange.ParseNpm("^1.0.0", SemVersionRangeOptions.IncludeAllPrerelease);
+var prereleaseRange = SemVersionRange.ParseNpm("^1.0.0", includeAllPrerelease: true);
 Console.WriteLine($"Range: {range}");
 Console.WriteLine($"Prerelease range: {prereleaseRange}");
 Console.WriteLine($"Range includes version: {range.Contains(version)}");
@@ -81,14 +73,14 @@ Console.WriteLine($"Prerelease range includes version: {prereleaseRange.Contains
 version.Satisfies(range);
 
 // Alternative: slower because it parses the range on every call
-version.Satisfies("^1.0.0", SemVersionRangeOptions.IncludeAllPrerelease);
+version.SatisfiesNpm("^1.0.0", includeAllPrerelease: true)
 ```
 
 Outputs:
 
 ```text
-Range: ^1.0.0
-Prerelease range: *-* ^1.0.0
+Range: 1.*
+Prerelease range: *-* 1.*
 Range includes version: False
 Prerelease range includes version: True
 ```
