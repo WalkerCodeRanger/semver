@@ -14,7 +14,6 @@
 3. Download the nupkg and snupkg files from the assets tab of Appveyor.
 4. Upload those to NuGet with the new readme from the readme branch.
    * Remove the build and NuGet status from the top of the readme before putting it in NuGet.
-   * Also remove the main title.
 
 ## After Publishing a Release
 
