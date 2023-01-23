@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
 
@@ -36,7 +37,7 @@ namespace Semver
         /// <exception cref="ArgumentNullException">The <paramref name="value"/> parameter is <see langword="null"/>.</exception>
         /// <remarks>This should only be used by the <see cref="SemVersion"/> constructor that
         /// still accepts illegal values.</remarks>
-        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete]
         internal static MetadataIdentifier CreateLoose(string value)
         {
             DebugChecks.IsNotNull(value, nameof(value));
@@ -216,7 +217,7 @@ namespace Semver
         /// Converts this identifier into an equivalent string value.
         /// </summary>
         /// <returns>The string value of this identifier or <see langword="null"/> if this is
-        /// a default <see cref="MetadataIdentifier"/></returns>
+        /// a default <see cref="MetadataIdentifier"/>.</returns>
         public static implicit operator string(MetadataIdentifier metadataIdentifier)
             => metadataIdentifier.Value;
 

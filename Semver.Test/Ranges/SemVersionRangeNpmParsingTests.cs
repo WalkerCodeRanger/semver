@@ -104,6 +104,7 @@ namespace Semver.Test.Ranges
             Valid("1.2 - 2.3.4", Inclusive("1.2.0", "2.3.4")),
             Valid("1.2.3 - 2.3", InclusiveOfStart("1.2.3", "2.4.0-0")),
             Valid("1.2.3 - 2", InclusiveOfStart("1.2.3", "3.0.0-0")),
+            Valid("1.2.0 - 1.0.0", UnbrokenSemVersionRange.Empty),
             Invalid("1.0.0 - 2.a.*", ExceptionMessages.InvalidCharacterInMinor, "a", "2.a.*"),
             Invalid(">1.0.0 - 2.0.0", ExceptionMessages.UnexpectedInHyphenRange, ">"),
             Invalid(">1.0.0 1.5.0 - 2.0.0", ExceptionMessages.UnexpectedInHyphenRange, ">"),

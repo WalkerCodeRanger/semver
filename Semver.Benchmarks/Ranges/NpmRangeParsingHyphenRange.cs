@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Semver.Benchmarks.Builders;
 using Semver.Utility;
 
-namespace Semver.Benchmarks.RangeBenchmarks.Npm
+namespace Semver.Benchmarks.Ranges
 {
     public class NpmRangeParsingHyphenRange : NpmRangeParsing
     {

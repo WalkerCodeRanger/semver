@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -144,7 +145,7 @@ namespace Semver
         /// <param name="patch">The patch version number.</param>
         /// <param name="prerelease">The prerelease portion (e.g. "alpha.5").</param>
         /// <param name="build">The build metadata (e.g. "nightly.232").</param>
-        [Obsolete("This constructor is obsolete. Use another constructor or SemVersion.ParsedFrom() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This constructor is obsolete. Use another constructor or SemVersion.ParsedFrom() instead.")]
         public SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "")
         {
             Major = major;
@@ -341,7 +342,7 @@ namespace Semver
         /// minor version numbers. The patch version number will be the fourth component
         /// of the <paramref name="version"/>. The build meta data will contain the third component
         /// of the <paramref name="version"/> if it is greater than zero.</remarks>
-        [Obsolete("This constructor is obsolete. Use SemVersion.FromVersion() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This constructor is obsolete. Use SemVersion.FromVersion() instead.")]
         public SemVersion(Version version)
         {
             if (version == null)
@@ -493,7 +494,7 @@ namespace Semver
         /// or patch version numbers when <paramref name="strict"/> is <see langword="true"/>.</exception>
         /// <exception cref="OverflowException">The major, minor, or patch version number is larger
         /// than <see cref="int.MaxValue"/>.</exception>
-        [Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
         public static SemVersion Parse(string version, bool strict = false)
         {
             var match = ParseRegex.Match(version);
@@ -529,12 +530,15 @@ namespace Semver
         /// <param name="version">The version string.</param>
         /// <param name="style">A bitwise combination of enumeration values that indicates the style
         /// elements that can be present in <paramref name="version"/>. The preferred value to use
-        /// is <see cref="SemVersionStyles.Strict"/>.</param>4
+        /// is <see cref="SemVersionStyles.Strict"/>.</param>
         /// <param name="semver">When this method returns, contains a <see cref="SemVersion"/> instance equivalent
         /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
         /// version string was invalid.</param>
         /// <param name="maxLength">The maximum length of <paramref name="version"/> that should be
         /// parsed. This prevents attacks using very long version strings.</param>
+        /// <returns><see langword="false"/> when an invalid version string is passed, otherwise <see langword="true"/>.</returns>
+        /// <exception cref="ArgumentException"><paramref name="style"/> is not a valid
+        /// <see cref="SemVersionStyles"/> value.</exception>
         public static bool TryParse(string version, SemVersionStyles style,
             out SemVersion semver, int maxLength = MaxVersionLength)
         {
@@ -562,8 +566,8 @@ namespace Semver
         /// version string was invalid.</param>
         /// <param name="strict">If set to <see langword="true"/>, minor and patch version numbers are required;
         /// otherwise they are optional.</param>
-        /// <returns><see langword="false"/> when a invalid version string is passed, otherwise <see langword="true"/>.</returns>
-        [Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
+        /// <returns><see langword="false"/> when an invalid version string is passed, otherwise <see langword="true"/>.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
         public static bool TryParse(string version, out SemVersion semver, bool strict = false)
         {
             semver = null;
@@ -630,7 +634,7 @@ namespace Semver
         /// </list>
         /// </returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Method is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static int Compare(SemVersion versionA, SemVersion versionB)
         {
             if (ReferenceEquals(versionA, versionB)) return 0;
@@ -661,7 +665,7 @@ namespace Semver
         /// To change only the patch version:
         /// <code>var changedVersion = version.Change(patch: 4);</code>
         /// </example>
-        [Obsolete("Method is obsolete. Use With() or With...() method instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use With() or With...() method instead.")]
         public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
             string prerelease = null, string build = null)
         {
@@ -1192,7 +1196,7 @@ namespace Semver
         /// The build metadata for this version or empty string if there is no build metadata.
         /// </value>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="MetadataIdentifiers"]/*'/>
-        [Obsolete("This property is obsolete. Use Metadata instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This property is obsolete. Use Metadata instead.")]
         public string Build => Metadata;
 
         /// <summary>The build metadata for this version.</summary>
@@ -1244,7 +1248,7 @@ namespace Semver
         /// <summary>
         /// Determines whether two semantic versions are equal.
         /// </summary>
-        /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the two versions are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
         // TODO v3.0.0 rename parameters to `left` and `right` to be consistent with ComparePrecedence etc.
@@ -1321,7 +1325,7 @@ namespace Semver
         /// </summary>
         /// <param name="other">The semantic version to compare to.</param>
         /// <returns><see langword="true"/> if the version precedences are equal.</returns>
-        [Obsolete("Method is obsolete. Use PrecedenceEquals() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use PrecedenceEquals() instead.")]
         public bool PrecedenceMatches(SemVersion other) => CompareByPrecedence(other) == 0;
 
         /// <summary>
@@ -1339,7 +1343,7 @@ namespace Semver
         /// <summary>
         /// Determines whether two semantic versions are equal.
         /// </summary>
-        /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the two versions are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
         public static bool operator ==(SemVersion left, SemVersion right) => Equals(left, right);
@@ -1347,7 +1351,7 @@ namespace Semver
         /// <summary>
         /// Determines whether two semantic versions are <em>not</em> equal.
         /// </summary>
-        /// <returns><see langword="true"/> if the two values are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
+        /// <returns><see langword="true"/> if the two versions are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
         public static bool operator !=(SemVersion left, SemVersion right) => !Equals(left, right);
@@ -1518,7 +1522,7 @@ namespace Semver
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
         /// <exception cref="InvalidCastException">The <paramref name="obj"/> is not a <see cref="SemVersion"/>.</exception>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
         public int CompareTo(object obj) => CompareTo((SemVersion)obj);
 
         /// <summary>
@@ -1527,7 +1531,7 @@ namespace Semver
         /// </summary>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
         public int CompareTo(SemVersion other)
         {
             var r = CompareByPrecedence(other);
@@ -1579,7 +1583,7 @@ namespace Semver
         /// in ASCII sort order. A longer series of prerelease identifiers follows a shorter series
         /// if all the preceding identifiers are equal.</para>
         /// </remarks>
-        [Obsolete("Method is obsolete. Use ComparePrecedenceTo() or CompareSortOrderTo() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use ComparePrecedenceTo() or CompareSortOrderTo() instead.")]
         public int CompareByPrecedence(SemVersion other)
         {
             if (other is null)
@@ -1597,7 +1601,7 @@ namespace Semver
             return CompareComponents(Prerelease, other.Prerelease, true);
         }
 
-        [Obsolete]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete]
         private static int CompareComponents(string a, string b, bool nonEmptyIsLower = false)
         {
             var aEmpty = string.IsNullOrEmpty(a);
@@ -1647,7 +1651,7 @@ namespace Semver
         /// <returns><see langword="true"/> if <paramref name="left"/> follows <paramref name="right"/>
         /// in the sort order; otherwise <see langword="false"/>.</returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator >(SemVersion left, SemVersion right)
             => Compare(left, right) > 0;
 
@@ -1657,7 +1661,7 @@ namespace Semver
         /// <returns><see langword="true"/> if <paramref name="left"/> follows or is equal to
         /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator >=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) > 0;
 
@@ -1667,7 +1671,7 @@ namespace Semver
         /// <returns><see langword="true"/> if <paramref name="left"/> precedes <paramref name="right"/>
         /// in the sort order; otherwise <see langword="false"/>.</returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator <(SemVersion left, SemVersion right)
             => Compare(left, right) < 0;
 
@@ -1677,21 +1681,19 @@ namespace Semver
         /// <returns><see langword="true"/> if <paramref name="left"/> precedes or is equal to
         /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
         public static bool operator <=(SemVersion left, SemVersion right)
             => Equals(left, right) || Compare(left, right) < 0;
         #endregion
 
-        #region Ranges
+        #region Satisfies
         /// <summary>
-        /// Checks if this version satisfies the predicate. Typically this is called with a
-        /// <see cref="SemVersionRange"/> or <see cref="UnbrokenSemVersionRange"/>
+        /// Checks if this version satisfies the given predicate.
         /// </summary>
-        /// <param name="predicate">The predicate to evaluate. Commonly a
-        /// <see cref="SemVersionRange"/> or <see cref="UnbrokenSemVersionRange"/>.</param>
-        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// <param name="predicate">The predicate to evaluate on this version.</param>
+        /// <returns><see langword="true"/> if the version satisfies the predicate,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="predicate"/> is
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is
         /// <see langword="null"/>.</exception>
         public bool Satisfies(Predicate<SemVersion> predicate)
         {
@@ -1699,6 +1701,58 @@ namespace Semver
             return predicate(this);
         }
 
+        /// <summary>
+        /// Checks if this version is contained in the given range.
+        /// </summary>
+        /// <param name="range">The range to evaluate.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
+        public bool Satisfies(SemVersionRange range)
+        {
+            if (range is null) throw new ArgumentNullException(nameof(range));
+            return range.Contains(this);
+        }
+
+        /// <summary>
+        /// Checks if this version is contained in the given unbroken range.
+        /// </summary>
+        /// <param name="range">The unbroken range to evaluate.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
+        public bool Satisfies(UnbrokenSemVersionRange range)
+        {
+            if (range is null) throw new ArgumentNullException(nameof(range));
+            return range.Contains(this);
+        }
+
+        /// <summary>
+        /// Checks if this version is contained in the given range.
+        /// </summary>
+        /// <param name="range">The range to parse and evaluate.</param>
+        /// <param name="options">A bitwise combination of enumeration values that indicates the style
+        /// elements that can be present in <paramref name="range"/>. The overload without this
+        /// parameter defaults to <see cref="SemVersionRangeOptions.Strict"/>.</param>
+        /// <param name="maxLength">The maximum length of <paramref name="range"/> that should be
+        /// parsed. This prevents attacks using very long range strings.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="options"/> is not a valid
+        /// <see cref="SemVersionRangeOptions"/> value.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
+        /// zero.</exception>
+        /// <exception cref="FormatException">The <paramref name="range"/> is invalid or not in a
+        /// format compliant with <paramref name="options"/>.</exception>
+        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
+        /// is too large for an <see cref="Int32"/>.</exception>
+        /// <remarks>If checks against a range will be performed repeatedly, it is much more
+        /// efficient to parse the range into a <see cref="SemVersionRange"/> once and use that
+        /// object to repeatedly check for containment.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool Satisfies(
             string range,
@@ -1712,25 +1766,53 @@ namespace Semver
             return parsedRange.Contains(this);
         }
 
+        /// <summary>
+        /// Checks if this version is contained in the given range. The range is parsed using
+        /// <see cref="SemVersionRangeOptions.Strict"/>.
+        /// </summary>
+        /// <param name="range">The range to parse and evaluate.</param>
+        /// <param name="maxLength">The maximum length of <paramref name="range"/> that should be
+        /// parsed. This prevents attacks using very long range strings.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
+        /// zero.</exception>
+        /// <exception cref="FormatException">The <paramref name="range"/> is invalid or not in a
+        /// format compliant with <see cref="SemVersionRangeOptions.Strict"/>.</exception>
+        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
+        /// is too large for an <see cref="Int32"/>.</exception>
+        /// <remarks>If checks against a range will be performed repeatedly, it is much more
+        /// efficient to parse the range into a <see cref="SemVersionRange"/> once and use that
+        /// object to repeatedly check for containment.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool Satisfies(string range, int maxLength = SemVersionRange.MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
             => Satisfies(range, SemVersionRangeOptions.Strict, maxLength);
 
         /// <summary>
-        /// Checks if this version is in the given range. Uses the same range syntax as npm.
+        /// Checks if this version is contained in the given range in npm format.
         /// </summary>
-        /// <remarks>
-        /// It's more optimal to use the static parse methods on <see cref="SemVersionRange"/>
-        /// if you're going to be testing multiple versions against the same range
-        /// to avoid having to parse the range multiple times.
-        /// </remarks>
-        /// <param name="range">The range to compare with.</param>
-        /// <param name="includeAllPrerelease"></param>
-        /// <param name="maxLength"></param>
+        /// <param name="range">The npm format range to parse and evaluate.</param>
+        /// <param name="includeAllPrerelease">Whether to include all prerelease versions satisfying
+        /// the bounds in the range or to only include prerelease versions when it matches a bound
+        /// that explicitly includes prerelease versions.</param>
+        /// <param name="maxLength">The maximum length of <paramref name="range"/> that should be
+        /// parsed. This prevents attacks using very long range strings.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="range"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
+        /// zero.</exception>
+        /// <exception cref="FormatException">The <paramref name="range"/> is invalid.</exception>
+        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
+        /// is too large for an <see cref="Int32"/>.</exception>
+        /// <remarks>If checks against a range will be performed repeatedly, it is much more
+        /// efficient to parse the range into a <see cref="SemVersionRange"/> once using
+        /// <see cref="SemVersionRange.ParseNpm(string,bool,int)"/> and use that object to
+        /// repeatedly check for containment.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool SatisfiesNpm(string range, bool includeAllPrerelease, int maxLength = SemVersionRange.MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -1741,6 +1823,26 @@ namespace Semver
             return parsedRange.Contains(this);
         }
 
+        /// <summary>
+        /// Checks if this version is contained in the given range in npm format. Does not include
+        /// all prerelease when parsing the range.
+        /// </summary>
+        /// <param name="range">The npm format range to parse and evaluate.</param>
+        /// <param name="maxLength">The maximum length of <paramref name="range"/> that should be
+        /// parsed. This prevents attacks using very long range strings.</param>
+        /// <returns><see langword="true"/> if the version is contained in the range,
+        /// otherwise <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
+        /// <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
+        /// zero.</exception>
+        /// <exception cref="FormatException">The <paramref name="range"/> is invalid.</exception>
+        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
+        /// is too large for an <see cref="Int32"/>.</exception>
+        /// <remarks>If checks against a range will be performed repeatedly, it is much more
+        /// efficient to parse the range into a <see cref="SemVersionRange"/> once using
+        /// <see cref="SemVersionRange.ParseNpm(string,int)"/> and use that object to
+        /// repeatedly check for containment.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool SatisfiesNpm(string range, int maxLength = SemVersionRange.MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -1755,7 +1857,7 @@ namespace Semver
         /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
         /// <exception cref="OverflowException">The major, minor, or patch version number is larger than <see cref="int.MaxValue"/>.</exception>
-        [Obsolete("Implicit conversion from string is obsolete. Use Parse() or TryParse() method instead.")]
+        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Implicit conversion from string is obsolete. Use Parse() or TryParse() method instead.")]
         public static implicit operator SemVersion(string version)
             => Parse(version);
     }
