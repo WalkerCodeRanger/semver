@@ -56,7 +56,7 @@ namespace Semver.Test
             Assert.False(version.Satisfies(range));
 
             // Alternative: slower because it parses the range on every call
-            Assert.True(version.Satisfies("^1.0.0", SemVersionRangeOptions.IncludeAllPrerelease));
+            Assert.True(version.SatisfiesNpm("^1.0.0", includeAllPrerelease: true));
         }
     }
 }
