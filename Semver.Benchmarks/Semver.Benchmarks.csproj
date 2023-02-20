@@ -20,18 +20,25 @@
         <Compile Include="..\Semver\*.cs">
             <Link>LocalVersion\%(RecursiveDir)%(FileName)%(Extension)</Link>
         </Compile>
-        <Compile Include="..\Semver\Utility\*.cs">
+        <Compile Include="..\Semver\Utility\**\*.cs">
             <Link>LocalVersion\%(RecursiveDir)\Utility\%(FileName)%(Extension)</Link>
         </Compile>
-        <Compile Include="..\Semver\Comparers\*.cs">
+        <Compile Include="..\Semver\Comparers\**\*.cs">
             <Link>LocalVersion\%(RecursiveDir)\Comparers\%(FileName)%(Extension)</Link>
         </Compile>
         <Compile Include="..\Semver\Parsing\**\*.cs">
             <Link>LocalVersion\Ranges\%(RecursiveDir)%(FileName)%(Extension)</Link>
         </Compile>
+        <Compile Include="..\Semver\Ranges\**\*.cs">
+            <Link>LocalVersion\Ranges\%(RecursiveDir)%(FileName)%(Extension)</Link>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Remove="..\Semver\LeftBoundedRange.cs" />
       <Compile Remove="..\Semver\Ranges\Npm\NpmComparator.cs" />
+      <Compile Remove="..\Semver\RightBoundedRange.cs" />
+      <Compile Remove="..\Semver\SemVersionParser.cs" />
+      <Compile Remove="..\Semver\SemVersionParsingOptions.cs" />
     </ItemGroup>
 </Project>

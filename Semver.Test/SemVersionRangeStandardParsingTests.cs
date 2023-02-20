@@ -5,7 +5,7 @@ using Xunit;
 using static Semver.SemVersionRangeOptions;
 using static Semver.Test.Builders.UnbrokenSemVersionRangeBuilder;
 
-namespace Semver.Test.Ranges
+namespace Semver.Test
 {
     public class SemVersionRangeStandardParsingTests
     {

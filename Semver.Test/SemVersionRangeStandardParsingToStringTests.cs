@@ -2,7 +2,7 @@
 using Xunit;
 using static Semver.SemVersionRangeOptions;
 
-namespace Semver.Test.Ranges
+namespace Semver.Test
 {
     /// <summary>
     /// It was difficult to ensure that the <see cref="SemVersionRange.ToString"/> would output

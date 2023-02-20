@@ -2,7 +2,7 @@
 using Xunit;
 using static Semver.SemVersionRangeOptions;
 
-namespace Semver.Test.Ranges.Parsers
+namespace Semver.Test.Parsing
 {
     public class GeneralRangeParserTests
     {

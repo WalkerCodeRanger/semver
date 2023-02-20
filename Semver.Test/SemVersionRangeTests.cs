@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Semver.Ranges;
 using Semver.Test.Helpers;
 using Xunit;
 
-namespace Semver.Test.Ranges
+namespace Semver.Test
 {
     public class SemVersionRangeTests
     {
