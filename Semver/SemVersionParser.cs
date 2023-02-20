@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Semver.Ranges;
 using Semver.Ranges.Parsers;
 using Semver.Utility;
 

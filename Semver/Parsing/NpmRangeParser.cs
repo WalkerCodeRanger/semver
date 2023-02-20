@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Semver.Utility;
-using static Semver.Ranges.Parsers.GeneralRangeParser;
 
 namespace Semver.Ranges.Parsers
 {
@@ -45,8 +44,8 @@ namespace Semver.Ranges.Parsers
             if (range is null) return ex ?? new ArgumentNullException(nameof(range));
             if (range.Length > maxLength) return ex ?? RangeError.TooLong(range, maxLength);
 
-            var unbrokenRanges = new List<UnbrokenSemVersionRange>(CountSplitOnOrOperator(range));
-            foreach (var segment in SplitOnOrOperator(range))
+            var unbrokenRanges = new List<UnbrokenSemVersionRange>(GeneralRangeParser.CountSplitOnOrOperator(range));
+            foreach (var segment in GeneralRangeParser.SplitOnOrOperator(range))
             {
                 var exception = ParseUnbrokenRange(segment, rangeOptions, ex, maxLength, out var unbrokenRange);
                 if (exception is null)
@@ -84,7 +83,7 @@ namespace Semver.Ranges.Parsers
             else
             {
                 // Parse off leading whitespace
-                ParseOptionalWhitespace(ref segment);
+                GeneralRangeParser.ParseOptionalWhitespace(ref segment);
 
                 // Handle empty string ranges
                 if (segment.IsEmpty)
@@ -170,14 +169,14 @@ namespace Semver.Ranges.Parsers
             wildcardVersion = WildcardVersion.None;
 
             // Parse off leading whitespace from before hyphen segment
-            ParseOptionalWhitespace(ref segment);
+            GeneralRangeParser.ParseOptionalWhitespace(ref segment);
 
             // Check for missing version number
             if (segment.Length == 0)
                 return ex ?? RangeError.MissingVersionInHyphenRange(segment.Source);
 
             // Check for invalid chars, like an operator, before the version
-            if (!IsPossibleVersionChar(segment[0], rangeOptions))
+            if (!GeneralRangeParser.IsPossibleVersionChar(segment[0], rangeOptions))
                 return ex ?? RangeError.UnexpectedInHyphenRange(segment[0].ToString());
 
             // Now parse the actual version number
@@ -186,7 +185,7 @@ namespace Semver.Ranges.Parsers
             if (exception != null) return exception;
 
             // Parse off trailing whitespace from before hyphen segment
-            ParseOptionalWhitespace(ref segment);
+            GeneralRangeParser.ParseOptionalWhitespace(ref segment);
 
             if (segment.Length != 0) return ex ?? RangeError.UnexpectedInHyphenRange(segment.ToString());
 
@@ -221,14 +220,14 @@ namespace Semver.Ranges.Parsers
             var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;
 
-            ParseOptionalWhitespace(ref segment);
+            GeneralRangeParser.ParseOptionalWhitespace(ref segment);
 
             var versionSegment = segment;
             exception = ParseNpmVersion(ref segment, rangeOptions, ex, maxLength,
                             out var semver, out var wildcardVersion);
             if (exception != null) return exception;
 
-            ParseOptionalWhitespace(ref segment);
+            GeneralRangeParser.ParseOptionalWhitespace(ref segment);
 
             switch (@operator)
             {
@@ -306,7 +305,7 @@ namespace Semver.Ranges.Parsers
             out SemVersion semver,
             out WildcardVersion wildcardVersion)
         {
-            var exception = ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
+            var exception = GeneralRangeParser.ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
                 out semver, out wildcardVersion);
             if (exception != null) return exception;
             if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
@@ -466,7 +465,7 @@ namespace Semver.Ranges.Parsers
             ref StringSegment segment, Exception ex, out StandardOperator @operator)
         {
             var end = 0;
-            while (end < segment.Length && IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.AllowMetadata)) end++;
+            while (end < segment.Length && GeneralRangeParser.IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.AllowMetadata)) end++;
             var opSegment = segment.Subsegment(0, end);
             segment = segment.Subsegment(end);
 

@@ -1,7 +1,6 @@
-﻿using Semver.Ranges;
-using Semver.Ranges.Parsers;
+﻿using Semver.Ranges.Parsers;
 using Xunit;
-using static Semver.Ranges.SemVersionRangeOptions;
+using static Semver.SemVersionRangeOptions;
 
 namespace Semver.Test.Ranges.Parsers
 {

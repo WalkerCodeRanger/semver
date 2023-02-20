@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Semver.Comparers;
 using Semver.Utility;
 
-namespace Semver.Ranges
+namespace Semver
 {
     /// <summary>
     /// A range of versions that is bounded only on the left. That is a range defined by some version
