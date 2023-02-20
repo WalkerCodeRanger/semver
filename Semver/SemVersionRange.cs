@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
+using Semver.Ranges;
 using Semver.Ranges.Parsers;
 using Semver.Utility;
 
-namespace Semver.Ranges
+namespace Semver
 {
     /// <summary>
     /// A range of <see cref="SemVersion"/> values. A range can have gaps in it and may include only
