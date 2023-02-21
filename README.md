@@ -4,18 +4,11 @@
 A Semantic Version Library for .Net
 ===================================
 
-This library implements the `SemVersion` class, which
-complies with v2.0.0 of the spec from [semver.org](http://semver.org).
+Create, parse, and manipulate semantic version numbers with the `SemVersion` class and semantic
+version ranges with the `SemVersionRange` class. This library complies with v2.0.0 of the semantic
+versioning spec from [semver.org](http://semver.org).
 
 API docs for the most recent release are available online at [semver-nuget.org](https://semver-nuget.org/).
-
-## Installation
-
-With the NuGet console:
-
-```powershell
-Install-Package semver
-```
 
 ## Parsing
 
@@ -64,4 +57,30 @@ Outputs:
 Current: 1.1.0-rc.1+nightly.2345
 Prerelease: rc.1
 Next release version is: 1.1.0
+```
+
+## Version Ranges
+
+```csharp
+var range = SemVersionRange.Parse("^1.0.0");
+var prereleaseRange = SemVersionRange.ParseNpm("^1.0.0", includeAllPrerelease: true);
+Console.WriteLine($"Range: {range}");
+Console.WriteLine($"Prerelease range: {prereleaseRange}");
+Console.WriteLine($"Range includes version {version}: {range.Contains(version)}");
+Console.WriteLine($"Prerelease range includes version {version}: {prereleaseRange.Contains(version)}");
+
+// Alternative: another way to call SemVersionRange.Contains(version)
+version.Satisfies(range);
+
+// Alternative: slower because it parses the range on every call
+version.SatisfiesNpm("^1.0.0", includeAllPrerelease: true)
+```
+
+Outputs:
+
+```text
+Range: 1.*
+Prerelease range: *-* 1.*
+Range includes version 1.1.0-rc.1+e471d15: False
+Prerelease range includes version 1.1.0-rc.1+e471d15: True
 ```
