@@ -1,5 +1,4 @@
-﻿using Semver.Ranges;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 
 namespace Semver.Test

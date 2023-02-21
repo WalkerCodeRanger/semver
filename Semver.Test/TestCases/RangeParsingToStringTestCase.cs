@@ -1,6 +1,4 @@
-﻿using Semver.Ranges;
-
-namespace Semver.Test.TestCases
+﻿namespace Semver.Test.TestCases
 {
     /// <summary>
     /// Test case for parsing a range and then converting it back to a string.

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Semver.Ranges.Parsers;
 using Semver.Utility;
 
-namespace Semver
+namespace Semver.Parsing
 {
     /// <summary>
     /// Parsing for <see cref="SemVersion"/>

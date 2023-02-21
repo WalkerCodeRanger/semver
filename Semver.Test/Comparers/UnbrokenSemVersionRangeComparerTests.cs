@@ -1,5 +1,4 @@
 ﻿using Semver.Comparers;
-using Semver.Ranges;
 using Xunit;
 
 namespace Semver.Test.Comparers

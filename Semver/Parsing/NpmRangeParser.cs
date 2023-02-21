@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Semver.Ranges;
 using Semver.Utility;
 
-namespace Semver.Ranges.Parsers
+namespace Semver.Parsing
 {
     internal static class NpmRangeParser
     {

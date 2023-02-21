@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
 
-namespace Semver.Ranges.Parsers
+namespace Semver.Parsing
 {
     internal static class GeneralRangeParser
     {

@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
-using Semver.Ranges;
-using Semver.Ranges.Parsers;
 using Semver.Utility;
 
 namespace Semver

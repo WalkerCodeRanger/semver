@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Semver.Utility;
 
-namespace Semver.Ranges.Parsers
+namespace Semver.Parsing
 {
     internal static class PrereleaseIdentifiers
     {
