@@ -15,7 +15,7 @@
         {
             Range = range;
             IncludeAllPrerelease = includeAllPrerelease;
-            Version = SemVersion.Parse(version, SemVersionStyles.Strict);
+            Version = SemVersion.Parse(version);
             VersionIncluded = versionIncluded;
         }
 

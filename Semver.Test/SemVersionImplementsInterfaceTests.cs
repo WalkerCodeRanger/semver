@@ -11,18 +11,6 @@ namespace Semver.Test
     public class SemVersionImplementsInterfaceTests
     {
         [Fact]
-        public void SemVersionImplementsIComparable()
-        {
-            Assert.IsAssignableFrom<IComparable>(new SemVersion(1));
-        }
-
-        [Fact]
-        public void SemVersionImplementsIComparableSemVersion()
-        {
-            Assert.IsAssignableFrom<IComparable<SemVersion>>(new SemVersion(1));
-        }
-
-        [Fact]
         public void SemVersionImplementsIEquatableSemVersion()
         {
             Assert.IsAssignableFrom<IEquatable<SemVersion>>(new SemVersion(1));

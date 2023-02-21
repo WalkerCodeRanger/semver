@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
 
@@ -17,10 +16,6 @@ namespace Semver
     /// <see cref="MetadataIdentifier"/> with a <see langword="null"/> value. However, the
     /// <see cref="Semver"/> namespace types do not accept and will not return such a
     /// <see cref="MetadataIdentifier"/>.</para>
-    ///
-    /// <para>Invalid metadata identifiers including arbitrary Unicode characters and empty string can
-    /// currently be produced by the <see cref="SemVersion(int, int, int, string, string)"/>
-    /// constructor. Such identifiers are compared via an ordinal string comparision.</para>
     /// </remarks>
     public readonly struct MetadataIdentifier : IEquatable<MetadataIdentifier>, IComparable<MetadataIdentifier>, IComparable
     {
@@ -30,20 +25,6 @@ namespace Semver
         /// <value>The string value of this metadata identifier or <see langword="null"/> if this is
         /// a default <see cref="MetadataIdentifier"/>.</value>
         public string Value { get; }
-
-        /// <summary>
-        /// Construct a potentially invalid <see cref="MetadataIdentifier"/>.
-        /// </summary>
-        /// <exception cref="ArgumentNullException">The <paramref name="value"/> parameter is <see langword="null"/>.</exception>
-        /// <remarks>This should only be used by the <see cref="SemVersion"/> constructor that
-        /// still accepts illegal values.</remarks>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete]
-        internal static MetadataIdentifier CreateLoose(string value)
-        {
-            DebugChecks.IsNotNull(value, nameof(value));
-
-            return new MetadataIdentifier(value, UnsafeOverload.Marker);
-        }
 
         /// <summary>
         /// Constructs a <see cref="MetadataIdentifier"/> without checking that any of the invariants

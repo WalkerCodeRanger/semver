@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 #if SERIALIZABLE
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 #endif
-using System.Text.RegularExpressions;
 using Semver.Comparers;
 using Semver.Parsing;
 using Semver.Utility;
@@ -21,9 +18,9 @@ namespace Semver
     /// </summary>
 #if SERIALIZABLE
     [Serializable]
-    public sealed class SemVersion : IComparable<SemVersion>, IComparable, IEquatable<SemVersion>, ISerializable
+    public sealed class SemVersion : IEquatable<SemVersion>, ISerializable
 #else
-    public sealed class SemVersion : IComparable<SemVersion>, IComparable, IEquatable<SemVersion>
+    public sealed class SemVersion : IEquatable<SemVersion>
 #endif
     {
         internal static readonly SemVersion Min = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
@@ -36,22 +33,8 @@ namespace Semver
         private const string InvalidPatchVersionMessage = "Patch version must be greater than or equal to zero.";
         private const string PrereleaseIdentifierIsDefaultMessage = "Prerelease identifier cannot be default/null.";
         private const string MetadataIdentifierIsDefaultMessage = "Metadata identifier cannot be default/null.";
-        // TODO include in v3.0.0 for issue #72
-        //internal const string InvalidMaxLengthMessage = "Must not be negative.";
+        private const string InvalidMaxLengthMessage = "Must not be negative.";
         internal const int MaxVersionLength = 1024;
-
-        private static readonly Regex ParseRegex =
-            new Regex(@"^(?<major>\d+)" +
-                @"(?>\.(?<minor>\d+))?" +
-                @"(?>\.(?<patch>\d+))?" +
-                @"(?>\-(?<pre>[0-9A-Za-z\-\.]+))?" +
-                @"(?>\+(?<metadata>[0-9A-Za-z\-\.]+))?$",
-#if COMPILED_REGEX
-                RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.ExplicitCapture,
-#else
-                RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture,
-#endif
-                TimeSpan.FromSeconds(0.5));
 
 #if SERIALIZABLE
         /// <summary>
@@ -61,9 +44,7 @@ namespace Semver
         private SemVersion(SerializationInfo info, StreamingContext context)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-#pragma warning disable CS0618 // Type or member is obsolete
-            var semVersion = Parse(info.GetString("SemVersion"), true);
-#pragma warning restore CS0618 // Type or member is obsolete
+            var semVersion = Parse(info.GetString("SemVersion"), SemVersionStyles.Strict);
             Major = semVersion.Major;
             Minor = semVersion.Minor;
             Patch = semVersion.Patch;
@@ -90,9 +71,12 @@ namespace Semver
         /// Constructs a new instance of the <see cref="SemVersion" /> class.
         /// </summary>
         /// <param name="major">The major version number.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/> version
+        /// number is negative.</exception>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
         public SemVersion(int major)
         {
+            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             Major = major;
             Minor = 0;
             Patch = 0;
@@ -107,9 +91,13 @@ namespace Semver
         /// </summary>
         /// <param name="major">The major version number.</param>
         /// <param name="minor">The minor version number.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/> or
+        /// <paramref name="minor"/> version number is negative.</exception>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
         public SemVersion(int major, int minor)
         {
+            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
             Major = major;
             Minor = minor;
             Patch = 0;
@@ -125,9 +113,14 @@ namespace Semver
         /// <param name="major">The major version number.</param>
         /// <param name="minor">The minor version number.</param>
         /// <param name="patch">The patch version number.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
+        /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
         public SemVersion(int major, int minor, int patch)
         {
+            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
+            if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
             Major = major;
             Minor = minor;
             Patch = patch;
@@ -143,33 +136,9 @@ namespace Semver
         /// <param name="major">The major version number.</param>
         /// <param name="minor">The minor version number.</param>
         /// <param name="patch">The patch version number.</param>
-        /// <param name="prerelease">The prerelease portion (e.g. "alpha.5").</param>
-        /// <param name="build">The build metadata (e.g. "nightly.232").</param>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This constructor is obsolete. Use another constructor or SemVersion.ParsedFrom() instead.")]
-        public SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "")
-        {
-            Major = major;
-            Minor = minor;
-            Patch = patch;
-
-            prerelease = prerelease ?? "";
-            Prerelease = prerelease;
-            PrereleaseIdentifiers = prerelease.SplitAndMapToReadOnlyList('.', PrereleaseIdentifier.CreateLoose);
-
-            build = build ?? "";
-            Metadata = build;
-            MetadataIdentifiers = build.SplitAndMapToReadOnlyList('.', MetadataIdentifier.CreateLoose);
-        }
-
-        /// <summary>
-        /// Constructs a new instance of the <see cref="SemVersion" /> class.
-        /// </summary>
-        /// <param name="major">The major version number.</param>
-        /// <param name="minor">The minor version number.</param>
-        /// <param name="patch">The patch version number.</param>
         /// <param name="prerelease">The prerelease identifiers.</param>
         /// <param name="metadata">The build metadata identifiers.</param>
-        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
         public SemVersion(int major, int minor = 0, int patch = 0,
@@ -234,7 +203,7 @@ namespace Semver
         /// <param name="patch">The patch version number.</param>
         /// <param name="prerelease">The prerelease identifiers.</param>
         /// <param name="metadata">The build metadata identifiers.</param>
-        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentNullException">One of the prerelease or metadata identifiers is <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
@@ -297,7 +266,7 @@ namespace Semver
         /// <param name="metadata">The build metadata (e.g. "nightly.232").</param>
         /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading
         /// zeros will be removed.</param>
-        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
@@ -329,44 +298,6 @@ namespace Semver
 
             return new SemVersion(major, minor, patch,
                 prerelease, prereleaseIdentifiers, metadata, metadataIdentifiers);
-        }
-
-        /// <summary>
-        /// Constructs a new instance of the <see cref="SemVersion"/> class from
-        /// a <see cref="Version"/>.
-        /// </summary>
-        /// <param name="version"><see cref="Version"/> used to initialize
-        /// the major, minor, and patch version numbers and the build metadata.</param>
-        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is null.</exception>
-        /// <remarks>Constructs a <see cref="SemVersion"/> with the same major and
-        /// minor version numbers. The patch version number will be the fourth component
-        /// of the <paramref name="version"/>. The build meta data will contain the third component
-        /// of the <paramref name="version"/> if it is greater than zero.</remarks>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This constructor is obsolete. Use SemVersion.FromVersion() instead.")]
-        public SemVersion(Version version)
-        {
-            if (version == null)
-                throw new ArgumentNullException(nameof(version));
-
-            Major = version.Major;
-            Minor = version.Minor;
-
-            if (version.Revision >= 0)
-                Patch = version.Revision;
-
-            Prerelease = "";
-            PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
-
-            if (version.Build > 0)
-            {
-                Metadata = version.Build.ToString(CultureInfo.InvariantCulture);
-                MetadataIdentifiers = new List<MetadataIdentifier>(1) { MetadataIdentifier.CreateUnsafe(Metadata) }.AsReadOnly();
-            }
-            else
-            {
-                Metadata = "";
-                MetadataIdentifiers = ReadOnlyList<MetadataIdentifier>.Empty;
-            }
         }
 
         /// <summary>
@@ -475,53 +406,16 @@ namespace Semver
         public static SemVersion Parse(string version, SemVersionStyles style, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
-            // TODO include in v3.0.0 for issue #72
-            //if (maxLength < 0) throw new ArgumentOutOfRangeException(InvalidMaxLengthMessage, nameof(maxLength));
+            if (maxLength < 0) throw new ArgumentOutOfRangeException(nameof(maxLength), InvalidMaxLengthMessage);
             var ex = SemVersionParser.Parse(version, style, null, maxLength, out var semver);
 
             return ex is null ? semver : throw ex;
         }
 
-        /// <summary>
-        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/> equivalent.
-        /// </summary>
-        /// <param name="version">The version string.</param>
-        /// <param name="strict">If set to <see langword="true"/>, minor and patch version are required;
-        /// otherwise they are optional.</param>
-        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException">The <paramref name="version"/> has an invalid format.</exception>
-        /// <exception cref="InvalidOperationException">The <paramref name="version"/> is missing minor
-        /// or patch version numbers when <paramref name="strict"/> is <see langword="true"/>.</exception>
-        /// <exception cref="OverflowException">The major, minor, or patch version number is larger
-        /// than <see cref="int.MaxValue"/>.</exception>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use Parse() overload with SemVersionStyles instead.")]
-        public static SemVersion Parse(string version, bool strict = false)
-        {
-            var match = ParseRegex.Match(version);
-            if (!match.Success)
-                throw new ArgumentException($"Invalid version '{version}'.", nameof(version));
-
-            var major = int.Parse(match.Groups["major"].Value, CultureInfo.InvariantCulture);
-
-            var minorMatch = match.Groups["minor"];
-            int minor = 0;
-            if (minorMatch.Success)
-                minor = int.Parse(minorMatch.Value, CultureInfo.InvariantCulture);
-            else if (strict)
-                throw new InvalidOperationException("Invalid version (no minor version given in strict mode)");
-
-            var patchMatch = match.Groups["patch"];
-            int patch = 0;
-            if (patchMatch.Success)
-                patch = int.Parse(patchMatch.Value, CultureInfo.InvariantCulture);
-            else if (strict)
-                throw new InvalidOperationException("Invalid version (no patch version given in strict mode)");
-
-            var prerelease = match.Groups["pre"].Value;
-            var metadata = match.Groups["metadata"].Value;
-
-            return new SemVersion(major, minor, patch, prerelease, metadata);
-        }
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static SemVersion Parse(string version, int maxLength = MaxVersionLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => Parse(version, SemVersionStyles.Strict, maxLength);
 
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
@@ -543,8 +437,7 @@ namespace Semver
             out SemVersion semver, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
-            // TODO include in v3.0.0 for issue #72
-            //if (maxLength < 0) throw new ArgumentOutOfRangeException(InvalidMaxLengthMessage, nameof(maxLength));
+            if (maxLength < 0) throw new ArgumentOutOfRangeException(nameof(maxLength), InvalidMaxLengthMessage);
             var exception = SemVersionParser.Parse(version, style, VersionParsing.FailedException, maxLength, out semver);
 
 #if DEBUG
@@ -556,126 +449,10 @@ namespace Semver
             return exception is null;
         }
 
-        /// <summary>
-        /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
-        /// equivalent. The return value indicates whether the conversion succeeded.
-        /// </summary>
-        /// <param name="version">The version string.</param>
-        /// <param name="semver">When this method returns, contains a <see cref="SemVersion"/> instance equivalent
-        /// to the version string passed in, if the version string was valid, or <see langword="null"/> if the
-        /// version string was invalid.</param>
-        /// <param name="strict">If set to <see langword="true"/>, minor and patch version numbers are required;
-        /// otherwise they are optional.</param>
-        /// <returns><see langword="false"/> when an invalid version string is passed, otherwise <see langword="true"/>.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use TryParse() overload with SemVersionStyles instead.")]
-        public static bool TryParse(string version, out SemVersion semver, bool strict = false)
-        {
-            semver = null;
-            if (version is null) return false;
-
-            var match = ParseRegex.Match(version);
-            if (!match.Success) return false;
-
-            if (!int.TryParse(match.Groups["major"].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var major))
-                return false;
-
-            var minorMatch = match.Groups["minor"];
-            int minor = 0;
-            if (minorMatch.Success)
-            {
-                if (!int.TryParse(minorMatch.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out minor))
-                    return false;
-            }
-            else if (strict) return false;
-
-            var patchMatch = match.Groups["patch"];
-            int patch = 0;
-            if (patchMatch.Success)
-            {
-                if (!int.TryParse(patchMatch.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out patch))
-                    return false;
-            }
-            else if (strict) return false;
-
-            var prerelease = match.Groups["pre"].Value;
-            var metadata = match.Groups["metadata"].Value;
-
-            semver = new SemVersion(major, minor, patch, prerelease, metadata);
-            return true;
-        }
-
-        /// <summary>
-        /// Compares two versions and indicates whether the first precedes, follows, or is
-        /// equal to the other in the sort order. Note that sort order is more specific than precedence order.
-        /// </summary>
-        /// <returns>
-        /// An integer that indicates whether <paramref name="versionA"/> precedes, follows, or
-        /// is equal to <paramref name="versionB"/> in the sort order.
-        /// <list type="table">
-        ///     <listheader>
-        ///         <term>Value</term>
-        ///         <description>Condition</description>
-        ///     </listheader>
-        ///     <item>
-        ///         <term>Less than zero</term>
-        ///         <description><paramref name="versionA"/> precedes <paramref name="versionB"/> in the sort order.</description>
-        ///     </item>
-        ///     <item>
-        ///         <term>Zero</term>
-        ///         <description><paramref name="versionA"/> is equal to <paramref name="versionB"/>.</description>
-        ///     </item>
-        ///     <item>
-        ///         <term>Greater than zero</term>
-        ///         <description>
-        ///             <paramref name="versionA"/> follows <paramref name="versionB"/> in the sort order
-        ///             or <paramref name="versionB"/> is <see langword="null" />.
-        ///         </description>
-        ///     </item>
-        /// </list>
-        /// </returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
-        public static int Compare(SemVersion versionA, SemVersion versionB)
-        {
-            if (ReferenceEquals(versionA, versionB)) return 0;
-            if (versionA is null) return -1;
-            if (versionB is null) return 1;
-            return versionA.CompareTo(versionB);
-        }
-
-        /// <summary>
-        /// Make a copy of the current instance with changed properties.
-        /// </summary>
-        /// <param name="major">The value to replace the major version number or
-        /// <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="minor">The value to replace the minor version number or
-        /// <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="patch">The value to replace the patch version number or
-        /// <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="prerelease">The value to replace the prerelease portion
-        /// or <see langword="null"/> to leave it unchanged.</param>
-        /// <param name="build">The value to replace the build metadata or <see langword="null"/>
-        /// to leave it unchanged.</param>
-        /// <returns>The new version with changed properties.</returns>
-        /// <remarks>
-        /// The change method is intended to be called using named argument syntax, passing only
-        /// those fields to be changed.
-        /// </remarks>
-        /// <example>
-        /// To change only the patch version:
-        /// <code>var changedVersion = version.Change(patch: 4);</code>
-        /// </example>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use With() or With...() method instead.")]
-        public SemVersion Change(int? major = null, int? minor = null, int? patch = null,
-            string prerelease = null, string build = null)
-        {
-            return new SemVersion(
-                major ?? Major,
-                minor ?? Minor,
-                patch ?? Patch,
-                prerelease ?? Prerelease,
-                build ?? Metadata);
-        }
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public static bool TryParse(string version, out SemVersion semver, int maxLength = MaxVersionLength)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+            => TryParse(version, SemVersionStyles.Strict, out semver, maxLength);
 
         /// <summary>
         /// Creates a copy of the current instance with multiple changed properties. If changing only
@@ -687,7 +464,7 @@ namespace Semver
         /// <param name="prerelease">The value to replace the prerelease identifiers or <see langword="null"/> to leave it unchanged.</param>
         /// <param name="metadata">The value to replace the build metadata identifiers or <see langword="null"/> to leave it unchanged.</param>
         /// <returns>The new version with changed properties.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
@@ -772,7 +549,7 @@ namespace Semver
         /// <param name="allowLeadingZeros">Allow leading zeros in numeric prerelease identifiers. Leading
         /// zeros will be removed.</param>
         /// <returns>The new version with changed properties.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">A <paramref name="major"/>,
+        /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
@@ -1192,14 +969,6 @@ namespace Semver
         public bool IsRelease => Prerelease.Length == 0;
 
         /// <summary>The build metadata for this version.</summary>
-        /// <value>
-        /// The build metadata for this version or empty string if there is no build metadata.
-        /// </value>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="MetadataIdentifiers"]/*'/>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This property is obsolete. Use Metadata instead.")]
-        public string Build => Metadata;
-
-        /// <summary>The build metadata for this version.</summary>
         /// <value>The build metadata for this version or empty string if there
         /// is no metadata.</value>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="MetadataIdentifiers"]/*'/>
@@ -1220,7 +989,7 @@ namespace Semver
         /// </returns>
         public override string ToString()
         {
-            // Assume all separators ("..-+"), at most 2 extra chars
+            // Assume all separators ("..-+"), at most 4 extra chars
             var estimatedLength = 4 + Major.DecimalDigits()
                                     + Minor.DecimalDigits()
                                     + Patch.DecimalDigits()
@@ -1251,12 +1020,11 @@ namespace Semver
         /// <returns><see langword="true"/> if the two versions are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
-        // TODO v3.0.0 rename parameters to `left` and `right` to be consistent with ComparePrecedence etc.
-        public static bool Equals(SemVersion versionA, SemVersion versionB)
+        public static bool Equals(SemVersion left, SemVersion right)
         {
-            if (ReferenceEquals(versionA, versionB)) return true;
-            if (versionA is null || versionB is null) return false;
-            return versionA.Equals(versionB);
+            if (ReferenceEquals(left, right)) return true;
+            if (left is null || right is null) return false;
+            return left.Equals(right);
         }
 
         /// <summary>Determines whether the given object is equal to this version.</summary>
@@ -1318,15 +1086,6 @@ namespace Semver
                    && Minor == other.Minor
                    && Patch == other.Patch;
         }
-
-        /// <summary>
-        /// Determines whether two semantic versions have the same precedence. Versions
-        /// that differ only by build metadata have the same precedence.
-        /// </summary>
-        /// <param name="other">The semantic version to compare to.</param>
-        /// <returns><see langword="true"/> if the version precedences are equal.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use PrecedenceEquals() instead.")]
-        public bool PrecedenceMatches(SemVersion other) => CompareByPrecedence(other) == 0;
 
         /// <summary>
         /// Gets a hash code for this instance.
@@ -1513,177 +1272,6 @@ namespace Semver
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
         public static int CompareSortOrder(SemVersion left, SemVersion right)
             => SortOrderComparer.Compare(left, right);
-
-        /// <summary>
-        /// Compares this version to an <see cref="Object"/> and indicates whether this instance
-        /// precedes, follows, or is equal to the object in the sort order. Note that sort order
-        /// is more specific than precedence order.
-        /// </summary>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
-        /// <exception cref="InvalidCastException">The <paramref name="obj"/> is not a <see cref="SemVersion"/>.</exception>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
-        public int CompareTo(object obj) => CompareTo((SemVersion)obj);
-
-        /// <summary>
-        /// Compares two versions and indicates whether this instance precedes, follows, or is
-        /// equal to the other in the sort order. Note that sort order is more specific than precedence order.
-        /// </summary>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="CompareToReturns"]/*'/>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use CompareSortOrderTo() or ComparePrecedenceTo() instead.")]
-        public int CompareTo(SemVersion other)
-        {
-            var r = CompareByPrecedence(other);
-            if (r != 0) return r;
-
-            // If other is null, CompareByPrecedence() returns 1
-            return CompareComponents(Metadata, other.Metadata);
-        }
-
-        /// <summary>
-        /// Compares two versions and indicates whether this instance precedes, follows, or is in the same
-        /// position as the other in the precedence order. Versions that differ only by build metadata
-        /// have the same precedence.
-        /// </summary>
-        /// <returns>
-        /// An integer that indicates whether this instance precedes, follows, or is in the same
-        /// position as <paramref name="other"/> in the precedence order.
-        /// <list type="table">
-        ///     <listheader>
-        ///         <term>Value</term>
-        ///         <description>Condition</description>
-        ///     </listheader>
-        ///     <item>
-        ///         <term>Less than zero</term>
-        ///         <description>This instance precedes <paramref name="other"/> in the precedence order.</description>
-        ///     </item>
-        ///     <item>
-        ///         <term>Zero</term>
-        ///         <description>This instance has the same precedence as <paramref name="other"/>.</description>
-        ///     </item>
-        ///     <item>
-        ///         <term>Greater than zero</term>
-        ///         <description>
-        ///             This instance follows <paramref name="other"/> in the precedence order
-        ///             or <paramref name="other"/> is <see langword="null" />.
-        ///         </description>
-        ///     </item>
-        /// </list>
-        /// </returns>
-        /// <remarks>
-        /// <para>Precedence order is determined by comparing the major, minor, patch, and prerelease
-        /// portion in order from left to right. Versions that differ only by build metadata have the
-        /// same precedence. The major, minor, and patch version numbers are compared numerically. A
-        /// prerelease version precedes a release version.</para>
-        ///
-        /// <para>The prerelease portion is compared by comparing each prerelease identifier from
-        /// left to right. Numeric prerelease identifiers precede alphanumeric identifiers. Numeric
-        /// identifiers are compared numerically. Alphanumeric identifiers are compared lexically
-        /// in ASCII sort order. A longer series of prerelease identifiers follows a shorter series
-        /// if all the preceding identifiers are equal.</para>
-        /// </remarks>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Method is obsolete. Use ComparePrecedenceTo() or CompareSortOrderTo() instead.")]
-        public int CompareByPrecedence(SemVersion other)
-        {
-            if (other is null)
-                return 1;
-
-            var r = Major.CompareTo(other.Major);
-            if (r != 0) return r;
-
-            r = Minor.CompareTo(other.Minor);
-            if (r != 0) return r;
-
-            r = Patch.CompareTo(other.Patch);
-            if (r != 0) return r;
-
-            return CompareComponents(Prerelease, other.Prerelease, true);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete]
-        private static int CompareComponents(string a, string b, bool nonEmptyIsLower = false)
-        {
-            var aEmpty = string.IsNullOrEmpty(a);
-            var bEmpty = string.IsNullOrEmpty(b);
-            if (aEmpty && bEmpty)
-                return 0;
-
-            if (aEmpty)
-                return nonEmptyIsLower ? 1 : -1;
-            if (bEmpty)
-                return nonEmptyIsLower ? -1 : 1;
-
-            var aComps = a.Split('.');
-            var bComps = b.Split('.');
-
-            var minLen = Math.Min(aComps.Length, bComps.Length);
-            for (int i = 0; i < minLen; i++)
-            {
-                var ac = aComps[i];
-                var bc = bComps[i];
-                var aIsNum = int.TryParse(ac, out var aNum);
-                var bIsNum = int.TryParse(bc, out var bNum);
-                int r;
-                if (aIsNum && bIsNum)
-                {
-                    r = aNum.CompareTo(bNum);
-                    if (r != 0) return r;
-                }
-                else
-                {
-                    if (aIsNum)
-                        return -1;
-                    if (bIsNum)
-                        return 1;
-                    r = string.CompareOrdinal(ac, bc);
-                    if (r != 0)
-                        return r;
-                }
-            }
-
-            return aComps.Length.CompareTo(bComps.Length);
-        }
-
-        /// <summary>
-        /// Compares two versions by sort order. Note that sort order is more specific than precedence order.
-        /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="left"/> follows <paramref name="right"/>
-        /// in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
-        public static bool operator >(SemVersion left, SemVersion right)
-            => Compare(left, right) > 0;
-
-        /// <summary>
-        /// Compares two versions by sort order. Note that sort order is more specific than precedence order.
-        /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="left"/> follows or is equal to
-        /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
-        public static bool operator >=(SemVersion left, SemVersion right)
-            => Equals(left, right) || Compare(left, right) > 0;
-
-        /// <summary>
-        /// Compares two versions by sort order. Note that sort order is more specific than precedence order.
-        /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="left"/> precedes <paramref name="right"/>
-        /// in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
-        public static bool operator <(SemVersion left, SemVersion right)
-            => Compare(left, right) < 0;
-
-        /// <summary>
-        /// Compares two versions by sort order. Note that sort order is more specific than precedence order.
-        /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="left"/> precedes or is equal to
-        /// <paramref name="right"/> in the sort order; otherwise <see langword="false"/>.</returns>
-        /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Operator is obsolete. Use CompareSortOrder() or ComparePrecedence() instead.")]
-        public static bool operator <=(SemVersion left, SemVersion right)
-            => Equals(left, right) || Compare(left, right) < 0;
         #endregion
 
         #region Satisfies
@@ -1848,17 +1436,5 @@ namespace Semver
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
             => SatisfiesNpm(range, false, maxLength);
         #endregion
-
-        /// <summary>
-        /// Implicit conversion from <see cref="string"/> to <see cref="SemVersion"/>.
-        /// </summary>
-        /// <param name="version">The semantic version.</param>
-        /// <returns>The <see cref="SemVersion"/> object.</returns>
-        /// <exception cref="ArgumentNullException">The <paramref name="version"/> is <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException">The version number has an invalid format.</exception>
-        /// <exception cref="OverflowException">The major, minor, or patch version number is larger than <see cref="int.MaxValue"/>.</exception>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Implicit conversion from string is obsolete. Use Parse() or TryParse() method instead.")]
-        public static implicit operator SemVersion(string version)
-            => Parse(version);
     }
 }

@@ -13,19 +13,13 @@ namespace Semver.Test
     public class SemVersionTests
     {
         [Theory]
-        [InlineData(1, 2, 3, "A-Z.a-z.0-9", "A-Z.a-z.0-9", true)]
-        [InlineData(1, 2, 3, "-", "b", true)]
-        [InlineData(1, 2, 3, ".", "b", true)]
-        [InlineData(1, 2, 3, "..", "b", true)]
-        [InlineData(1, 2, 3, "01", "b", true)]
-        [InlineData(1, 2, 3, "😞", "b", true)]
-        [InlineData(1, 2, 3, "", "b", false)]
-        [InlineData(1, 2, 3, null, "b", false)]
-        public void IsPrereleaseAndIsReleaseTest(int major, int minor, int patch, string prerelease, string metadata, bool expected)
+        [InlineData("1.2.3-A-Z.a-z.0-9+A-Z.a-z.0-9", true)]
+        [InlineData("1.2.3--+b", true)]
+        [InlineData("1.2.3-1+b", true)]
+        [InlineData("1.2.3+b", false)]
+        public void IsPrereleaseAndIsReleaseTest(string version, bool expected)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var v = new SemVersion(major, minor, patch, prerelease, metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+            var v = SemVersion.Parse(version);
 
             Assert.True(expected == v.IsPrerelease, $"({v}).IsPrerelease");
             Assert.True(expected != v.IsRelease, $"({v}).IsRelease");
@@ -132,33 +126,12 @@ namespace Semver.Test
         }
 
         [Theory]
-        [InlineData(-1, 0, 0, "A-Z.a-z.0-9", "A-Z.a-z.0-9")]
-        [InlineData(0, -1, 0, "", "")]
-        [InlineData(0, 0, -1, "alpha", "")]
-        [InlineData(-1, -1, -1, "", "build.42")]
-        public void ToVersionFromNegativeTest(int major, int minor, int patch, string prerelease, string metadata)
+        [InlineData("1.2.3-A-Z.a-z.0-9+A-Z.a-z.0-9")]
+        [InlineData("1.2.3--+b")]
+        [InlineData("1.2.3-1+b")]
+        public void ToVersionFromPrereleaseTest(string version)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var v = new SemVersion(major, minor, patch, prerelease, metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-            var ex = Assert.Throws<InvalidOperationException>(() => v.ToVersion());
-
-            Assert.Equal("Negative version numbers can't be converted to System.Version.", ex.Message);
-        }
-
-        [Theory]
-        [InlineData(1, 2, 3, "A-Z.a-z.0-9", "A-Z.a-z.0-9")]
-        [InlineData(1, 2, 3, "-", "b")]
-        [InlineData(1, 2, 3, ".", "b")]
-        [InlineData(1, 2, 3, "..", "b")]
-        [InlineData(1, 2, 3, "01", "b")]
-        [InlineData(1, 2, 3, "😞", "b")]
-        public void ToVersionFromPrereleaseTest(int major, int minor, int patch, string prerelease, string metadata)
-        {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var v = new SemVersion(major, minor, patch, prerelease, metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+            var v = SemVersion.Parse(version);
 
             var ex = Assert.Throws<InvalidOperationException>(() => v.ToVersion());
 
@@ -166,17 +139,11 @@ namespace Semver.Test
         }
 
         [Theory]
-        [InlineData(1, 2, 3, "", "A-Z.a-z.0-9")]
-        [InlineData(1, 2, 3, "", "😞")]
-        [InlineData(1, 2, 3, "", ".")]
-        [InlineData(1, 2, 3, "", "..b")]
-        [InlineData(1, 2, 3, "", "-")]
-        [InlineData(1, 2, 3, "", "b..c")]
-        public void ToVersionFromMetadataTest(int major, int minor, int patch, string prerelease, string metadata)
+        [InlineData("1.2.3+A-Z.a-z.0-9")]
+        [InlineData("1.2.3+-")]
+        public void ToVersionFromMetadataTest(string version)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var v = new SemVersion(major, minor, patch, prerelease, metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+            var v = SemVersion.Parse(version);
 
             var ex = Assert.Throws<InvalidOperationException>(() => v.ToVersion());
 
@@ -185,27 +152,21 @@ namespace Semver.Test
         #endregion
 
         [Theory]
-        [InlineData(1, 2, 3, "a", "b", "1.2.3-a+b")]
-        [InlineData(1, 2, 3, "a", "", "1.2.3-a")]
-        [InlineData(1, 2, 3, "", "b", "1.2.3+b")]
-        [InlineData(1, 2, 3, "", "", "1.2.3")]
-        [InlineData(1, 2, 0, "", "", "1.2.0")]
-        [InlineData(1, 0, 0, "", "", "1.0.0")]
-        [InlineData(0, 0, 0, "", "", "0.0.0")]
-        [InlineData(6, 20, 31, "beta-x.2", "dev-mha.120", "6.20.31-beta-x.2+dev-mha.120")]
-        [InlineData(-1, 0, 0, "", "", "-1.0.0")]
-        [InlineData(0, -1, 0, "", "", "0.-1.0")]
-        [InlineData(0, 0, -1, "", "", "0.0.-1")]
-        [InlineData(-1, -1, -1, "", "", "-1.-1.-1")]
-        public void ToStringTest(int major, int minor, int patch, string prerelease, string metadata, string expected)
+        [InlineData("1.2.3-a+b")]
+        [InlineData("1.2.3-a")]
+        [InlineData("1.2.3+b")]
+        [InlineData("1.2.3")]
+        [InlineData("1.2.0")]
+        [InlineData("1.0.0")]
+        [InlineData("0.0.0")]
+        [InlineData("6.20.31-beta-x.2+dev-mha.120")]
+        public void ToStringTest(string version)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var v = new SemVersion(major, minor, patch, prerelease, metadata);
-#pragma warning restore CS0618 // Type or member is obsolete
+            var v = SemVersion.Parse(version);
 
             var actual = v.ToString();
 
-            Assert.Equal(expected, actual);
+            Assert.Equal(version, actual);
         }
 
 #if SERIALIZABLE

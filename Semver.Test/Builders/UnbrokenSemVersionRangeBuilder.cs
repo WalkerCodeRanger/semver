@@ -7,34 +7,34 @@
         public static readonly UnbrokenSemVersionRange AllRelease = UnbrokenSemVersionRange.AllRelease;
 
         public static UnbrokenSemVersionRange EqualsVersion(string version)
-            => UnbrokenSemVersionRange.Equals(SemVersion.Parse(version, SemVersionStyles.Strict));
+            => UnbrokenSemVersionRange.Equals(SemVersion.Parse(version));
 
         public static UnbrokenSemVersionRange Inclusive(string start, string end, bool includeAllPrerelease = false)
-            => UnbrokenSemVersionRange.Inclusive(SemVersion.Parse(start, SemVersionStyles.Strict),
-                SemVersion.Parse(end, SemVersionStyles.Strict), includeAllPrerelease);
+            => UnbrokenSemVersionRange.Inclusive(SemVersion.Parse(start),
+                SemVersion.Parse(end), includeAllPrerelease);
 
         public static UnbrokenSemVersionRange InclusiveOfStart(string start, string end, bool includeAllPrerelease = false)
-            => UnbrokenSemVersionRange.InclusiveOfStart(SemVersion.Parse(start, SemVersionStyles.Strict),
-                SemVersion.Parse(end, SemVersionStyles.Strict), includeAllPrerelease);
+            => UnbrokenSemVersionRange.InclusiveOfStart(SemVersion.Parse(start),
+                SemVersion.Parse(end), includeAllPrerelease);
 
         public static UnbrokenSemVersionRange InclusiveOfEnd(string start, string end, bool includeAllPrerelease = false)
-            => UnbrokenSemVersionRange.InclusiveOfEnd(SemVersion.Parse(start, SemVersionStyles.Strict),
-                SemVersion.Parse(end, SemVersionStyles.Strict), includeAllPrerelease);
+            => UnbrokenSemVersionRange.InclusiveOfEnd(SemVersion.Parse(start),
+                SemVersion.Parse(end), includeAllPrerelease);
 
         public static UnbrokenSemVersionRange Exclusive(string start, string end, bool includeAllPrerelease = false)
-            => UnbrokenSemVersionRange.Exclusive(SemVersion.Parse(start, SemVersionStyles.Strict),
-                SemVersion.Parse(end, SemVersionStyles.Strict), includeAllPrerelease);
+            => UnbrokenSemVersionRange.Exclusive(SemVersion.Parse(start),
+                SemVersion.Parse(end), includeAllPrerelease);
 
         public static UnbrokenSemVersionRange GreaterThan(string version, bool includeAllPrerelease = false)
-            => UnbrokenSemVersionRange.GreaterThan(SemVersion.Parse(version, SemVersionStyles.Strict), includeAllPrerelease);
+            => UnbrokenSemVersionRange.GreaterThan(SemVersion.Parse(version), includeAllPrerelease);
 
         public static UnbrokenSemVersionRange AtLeast(string version, bool includeAllPrerelease = false)
-            => UnbrokenSemVersionRange.AtLeast(SemVersion.Parse(version, SemVersionStyles.Strict), includeAllPrerelease);
+            => UnbrokenSemVersionRange.AtLeast(SemVersion.Parse(version), includeAllPrerelease);
 
         public static UnbrokenSemVersionRange LessThan(string version, bool includeAllPrerelease = false)
-            => UnbrokenSemVersionRange.LessThan(SemVersion.Parse(version, SemVersionStyles.Strict), includeAllPrerelease);
+            => UnbrokenSemVersionRange.LessThan(SemVersion.Parse(version), includeAllPrerelease);
 
         public static UnbrokenSemVersionRange AtMost(string version, bool includeAllPrerelease = false)
-            => UnbrokenSemVersionRange.AtMost(SemVersion.Parse(version, SemVersionStyles.Strict), includeAllPrerelease);
+            => UnbrokenSemVersionRange.AtMost(SemVersion.Parse(version), includeAllPrerelease);
     }
 }

@@ -76,3 +76,6 @@ static Semver.UnbrokenSemVersionRange.InclusiveOfStart(Semver.SemVersion start, 
 static Semver.UnbrokenSemVersionRange.LessThan(Semver.SemVersion version, bool includeAllPrerelease = false) -> Semver.UnbrokenSemVersionRange
 static Semver.UnbrokenSemVersionRange.operator !=(Semver.UnbrokenSemVersionRange left, Semver.UnbrokenSemVersionRange right) -> bool
 static Semver.UnbrokenSemVersionRange.operator ==(Semver.UnbrokenSemVersionRange left, Semver.UnbrokenSemVersionRange right) -> bool
+static Semver.SemVersion.Equals(Semver.SemVersion left, Semver.SemVersion right) -> bool
+static Semver.SemVersion.Parse(string version, int maxLength = 1024) -> Semver.SemVersion
+static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, int maxLength = 1024) -> bool

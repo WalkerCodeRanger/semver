@@ -12,23 +12,6 @@ namespace Semver.Test
         [InlineData("042")]
         [InlineData("hello")]
         [InlineData("2147483648")] // int.MaxValue + 1
-        [InlineData("hello@")]
-        [InlineData("")]
-        public void CreateLoose(string value)
-        {
-#pragma warning disable CS0612 // Type or member is obsolete
-            var identifier = MetadataIdentifier.CreateLoose(value);
-#pragma warning restore CS0612 // Type or member is obsolete
-
-            Assert.Equal(value, identifier.Value);
-        }
-
-        [Theory]
-        [InlineData("ident")]
-        [InlineData("42")]
-        [InlineData("042")]
-        [InlineData("hello")]
-        [InlineData("2147483648")] // int.MaxValue + 1
         public void CreateUnsafe(string value)
         {
             var identifier = MetadataIdentifier.CreateUnsafe(value);
@@ -100,14 +83,6 @@ namespace Semver.Test
                 {new MetadataIdentifier("045"), new MetadataIdentifier("45"), false},
                 {new MetadataIdentifier("2147483648"), new MetadataIdentifier("2147483648"), true}, // int.MaxValue + 1
                 {default, default, true},
-#pragma warning disable CS0612 // Type or member is obsolete
-                {default, MetadataIdentifier.CreateLoose(""), false},
-                {MetadataIdentifier.CreateLoose(""), MetadataIdentifier.CreateLoose(""), true},
-                {MetadataIdentifier.CreateLoose("@"), MetadataIdentifier.CreateLoose("@"), true},
-                // CreateLoose creates identifiers equal to the regular constructor
-                {MetadataIdentifier.CreateLoose("loose"), new MetadataIdentifier("loose"), true},
-                {MetadataIdentifier.CreateLoose("10053"), new MetadataIdentifier("10053"), true},
-#pragma warning restore CS0612 // Type or member is obsolete
             };
 
         [Theory]
@@ -165,9 +140,7 @@ namespace Semver.Test
         [InlineData("a", "a", 0)]
         [InlineData("a", "b", -1)]
         [InlineData("b", "a", 1)]
-        [InlineData(null, "", -1)]
         [InlineData(null, null, 0)]
-        [InlineData("", null, 1)]
         [InlineData("a", "aa", -1)]
         [InlineData("aa", "aa", 0)]
         [InlineData("aa", "ab", -1)]
@@ -177,8 +150,8 @@ namespace Semver.Test
         [InlineData("beta", "rc", -1)] // Case that causes -16 for string comparison
         public void CompareTo(string left, string right, int expected)
         {
-            var leftIdentifier = CreateLooseOrDefault(left);
-            var rightIdentifier = CreateLooseOrDefault(right);
+            var leftIdentifier = CreateOrDefault(left);
+            var rightIdentifier = CreateOrDefault(right);
 
             Assert.Equal(expected, leftIdentifier.CompareTo(rightIdentifier));
         }
@@ -197,23 +170,21 @@ namespace Semver.Test
 
         [Theory]
         [InlineData("a")]
-        [InlineData("")]
         [InlineData(null)]
         public void CompareToNullObject(string value)
         {
-            var comparison = CreateLooseOrDefault(value).CompareTo(null);
+            var comparison = CreateOrDefault(value).CompareTo(null);
 
             Assert.Equal(1, comparison);
         }
 
         [Theory]
         [InlineData("a")]
-        [InlineData("")]
         [InlineData(null)]
         public void CompareToObject(string value)
         {
             var ex = Assert.Throws<ArgumentException>(()
-                => CreateLooseOrDefault(value).CompareTo(new object()));
+                => CreateOrDefault(value).CompareTo(new object()));
 
             Assert.StartsWith("Object must be of type MetadataIdentifier.", ex.Message);
             Assert.Equal("value", ex.ParamName);
@@ -221,16 +192,13 @@ namespace Semver.Test
         #endregion
 
         [Theory]
-        [InlineData("042")]
         [InlineData("0A")]
         [InlineData("123")]
         [InlineData("1-2")]
-        [InlineData("@")]
-        [InlineData("")]
         [InlineData(null)]
         public void ImplicitConversionToString(string value)
         {
-            var identifier = CreateLooseOrDefault(value);
+            var identifier = CreateOrDefault(value);
 
             string convertedValue = identifier;
 
@@ -238,28 +206,23 @@ namespace Semver.Test
         }
 
         [Theory]
-        [InlineData("042")]
         [InlineData("0A")]
         [InlineData("123")]
         [InlineData("1-2")]
-        [InlineData("@")]
-        [InlineData("")]
         [InlineData(null)]
         public void ToStringTest(string value)
         {
-            var identifier = CreateLooseOrDefault(value);
+            var identifier = CreateOrDefault(value);
 
             string convertedValue = identifier.ToString();
 
             Assert.Equal(value, convertedValue);
         }
 
-        private static MetadataIdentifier CreateLooseOrDefault(string value)
+        private static MetadataIdentifier CreateOrDefault(string value)
         {
             if (value is null) return default;
-#pragma warning disable CS0612 // Type or member is obsolete
-            return MetadataIdentifier.CreateLoose(value);
-#pragma warning restore CS0612 // Type or member is obsolete
+            return new MetadataIdentifier(value);
         }
     }
 }

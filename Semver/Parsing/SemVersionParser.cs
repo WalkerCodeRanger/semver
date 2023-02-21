@@ -56,8 +56,7 @@ namespace Semver.Parsing
             out SemVersion semver)
         {
             DebugChecks.IsValid(style, nameof(style));
-            // TODO include in v3.0.0 for issue #72
-            // DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
+            DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
 
             if (version != null)
                 return Parse(version, style, SemVersionParsingOptions.None, ex, maxLength, out semver, out _);
@@ -87,8 +86,7 @@ namespace Semver.Parsing
             out WildcardVersion wildcardVersion)
         {
             DebugChecks.IsValid(style, nameof(style));
-            // TODO include in v3.0.0 for issue #72
-            // DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
+            DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
 
             // Assign once so it doesn't have to be done any time parse fails
             semver = null;

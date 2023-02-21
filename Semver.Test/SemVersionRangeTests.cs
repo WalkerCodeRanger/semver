@@ -10,7 +10,7 @@ namespace Semver.Test
     public class SemVersionRangeTests
     {
         private static readonly SemVersion VersionWithMetadata
-            = SemVersion.Parse("1.2.3-foo+metadata", SemVersionStyles.Strict);
+            = SemVersion.Parse("1.2.3-foo+metadata");
         private static readonly SemVersion FakeVersion = new SemVersion(1, 2, 3);
         private static readonly SemVersion FakeStartVersion = new SemVersion(1, 2, 3);
         private static readonly SemVersion FakeEndVersion = new SemVersion(2, 3, 4);

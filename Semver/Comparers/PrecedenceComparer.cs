@@ -18,30 +18,11 @@ namespace Semver.Comparers
             if (x is null || y is null) return false;
 
             return x.Major == y.Major && x.Minor == y.Minor && x.Patch == y.Patch
-                   && Equals(x.PrereleaseIdentifiers, y.PrereleaseIdentifiers);
-        }
-
-        private static bool Equals(
-            IReadOnlyList<PrereleaseIdentifier> xIdentifiers,
-            IReadOnlyList<PrereleaseIdentifier> yIdentifiers)
-        {
-            if (xIdentifiers.Count != yIdentifiers.Count) return false;
-
-            for (int i = 0; i < xIdentifiers.Count; i++)
-                if (xIdentifiers[i] != yIdentifiers[i])
-                    return false;
-
-            return true;
+                   && x.Prerelease == y.Prerelease;
         }
 
         public int GetHashCode(SemVersion v)
-        {
-            var hash = CombinedHashCode.Create(v.Major, v.Minor, v.Patch);
-            foreach (var identifier in v.PrereleaseIdentifiers)
-                hash.Add(identifier);
-
-            return hash;
-        }
+            => CombinedHashCode.Create(v.Major, v.Minor, v.Patch, v.Prerelease);
 
         public override int Compare(SemVersion x, SemVersion y)
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
@@ -24,15 +23,6 @@ namespace Semver
     /// <see cref="PrereleaseIdentifier"/> with a <see langword="null"/> value. However, the
     /// <see cref="Semver"/> namespace types do not accept and will not return such a
     /// <see cref="PrereleaseIdentifier"/>.</para>
-    ///
-    /// <para>Invalid prerelease identifiers including arbitrary Unicode characters, empty string,
-    /// and numeric identifiers with leading zero can currently be produced by the
-    /// <see cref="SemVersion(int, int, int, string, string)"/> constructor and the obsolete
-    /// <see cref="SemVersion.Parse(string,bool)"/> and
-    /// <see cref="SemVersion.TryParse(string,out SemVersion,bool)"/> methods. Such alphanumeric
-    /// identifiers are compared via an ordinal string comparision. Numeric identifiers with
-    /// leading zeros are considered equal (e.g. '<c>15</c>' is equal to '<c>015</c>').
-    /// </para>
     /// </remarks>
     public readonly struct PrereleaseIdentifier : IEquatable<PrereleaseIdentifier>, IComparable<PrereleaseIdentifier>, IComparable
     {
@@ -57,24 +47,6 @@ namespace Semver
         /// otherwise <see langword="null"/>.</value>
         /// <remarks>The numeric value of a prerelease identifier will never be negative.</remarks>
         public int? NumericValue { get; }
-
-        /// <summary>
-        /// Construct a potentially invalid <see cref="PrereleaseIdentifier"/>.
-        /// </summary>
-        /// <exception cref="ArgumentNullException">The <paramref name="value"/> parameter is <see langword="null"/>.</exception>
-        /// <remarks>This should be used only by the <see cref="SemVersion"/> constructor that
-        /// still accepts illegal values.</remarks>
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete]
-        internal static PrereleaseIdentifier CreateLoose(string value)
-        {
-            DebugChecks.IsNotNull(value, nameof(value));
-
-            // Avoid parsing some non-ASCII digits as a number by checking that they are all digits
-            if (value.IsDigits() && int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out var numericValue))
-                return new PrereleaseIdentifier(value, numericValue);
-
-            return new PrereleaseIdentifier(value, null);
-        }
 
         /// <summary>
         /// Construct a <see cref="PrereleaseIdentifier"/> without checking that any of the invariants

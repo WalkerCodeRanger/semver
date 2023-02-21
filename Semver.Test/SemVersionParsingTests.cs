@@ -15,6 +15,41 @@ namespace Semver.Test
     /// </summary>
     public class SemVersionParsingTests
     {
+        /// <summary>
+        /// This a very long but valid version number to test parsing long version numbers. It is
+        /// generated using a random number generator seeded with specific value so that the same
+        /// version string will be generated each time.
+        /// </summary>
+        public static readonly string LongValidVersionString = BuildLongVersion();
+
+        private static string BuildLongVersion()
+        {
+            var s = new StringBuilder(2_000_100);
+            s.Append(int.MaxValue);
+            s.Append('.');
+            s.Append(int.MaxValue);
+            s.Append('.');
+            s.Append(int.MaxValue);
+            s.Append('-');
+            var random = new Random(1545743217);
+            AppendLabel(s, 1_000_000, random);
+            s.Append('+');
+            AppendLabel(s, 1_000_000, random);
+            return s.ToString();
+        }
+
+        private static void AppendLabel(StringBuilder s, int length, Random random)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789-.0";
+
+            for (var i = 0; i < length; i++)
+            {
+                var startOfIdentifier = s[s.Length - 1] == '.';
+                var validChars = startOfIdentifier ? chars.Length - 2 : chars.Length;
+                s.Append(chars[random.Next(0, validChars)]);
+            }
+        }
+
         public static readonly TheoryData<SemVersionStyles> InvalidSemVersionStyles = new TheoryData<SemVersionStyles>()
         {
             // Optional minor flag without optional patch flag
@@ -343,12 +378,10 @@ namespace Semver.Test
         [MemberData(nameof(InvalidMaxLength))]
         public void ParseWithInvalidMaxLength(int maxLength)
         {
-            // TODO change in v3.0.0 for issue #72
-            var ex = Assert.Throws<FormatException>(() => SemVersion.Parse("ignored", Strict, maxLength));
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => SemVersion.Parse("ignored", Strict, maxLength));
 
-            var expected = ExceptionMessages.InjectValue(ExceptionMessages.TooLongVersion, maxLength.ToString());
-            expected = ExceptionMessages.InjectVersion(expected, "ignored");
-            Assert.Equal(expected, ex.Message);
+            Assert.StartsWith(ExceptionMessages.InvalidMaxLengthStart, ex.Message);
+            Assert.Equal("maxLength", ex.ParamName);
         }
 
         [Theory]
@@ -394,11 +427,10 @@ namespace Semver.Test
         [MemberData(nameof(InvalidMaxLength))]
         public void TryParseWithInvalidMaxLength(int maxLength)
         {
-            // TODO change in v3.0.0 for issue #72
-            var result = SemVersion.TryParse("1.2.3", Strict, out var version, maxLength);
+            var ex = Assert.Throws<ArgumentOutOfRangeException>(() => SemVersion.TryParse("ignored", Strict, out _, maxLength));
 
-            Assert.False(result);
-            Assert.Null(version);
+            Assert.StartsWith(ExceptionMessages.InvalidMaxLengthStart, ex.Message);
+            Assert.Equal("maxLength", ex.ParamName);
         }
 
         [Theory]
@@ -422,8 +454,8 @@ namespace Semver.Test
         [Fact]
         public void ParseLongVersionTest()
         {
-            SemVersion.Parse(SemVersionObsoleteParsingTests.LongValidVersionString, Strict, maxLength: int.MaxValue);
-            SemVersion.TryParse(SemVersionObsoleteParsingTests.LongValidVersionString, Strict, out _, maxLength: int.MaxValue);
+            SemVersion.Parse(LongValidVersionString, Strict, maxLength: int.MaxValue);
+            SemVersion.TryParse(LongValidVersionString, Strict, out _, maxLength: int.MaxValue);
         }
 
         private static void AssertVersionEqual(SemVersion version, ParsingTestCase testCase)
@@ -438,9 +470,6 @@ namespace Semver.Test
             Assert.Equal(!isPrerelease, version.IsRelease);
             Assert.Equal(testCase.MetadataIdentifiers, version.MetadataIdentifiers);
             Assert.Equal(string.Join(".", testCase.MetadataIdentifiers), version.Metadata);
-#pragma warning disable 618 // Obsolete Warning
-            Assert.Equal(string.Join(".", testCase.MetadataIdentifiers), version.Build);
-#pragma warning restore 618
         }
 
         /// <summary>

@@ -25,13 +25,8 @@ Semver.PrereleaseIdentifier.PrereleaseIdentifier(int value) -> void
 Semver.PrereleaseIdentifier.PrereleaseIdentifier(string value, bool allowLeadingZeros = false) -> void
 Semver.PrereleaseIdentifier.Value.get -> string
 Semver.SemVersion
-Semver.SemVersion.Build.get -> string
-Semver.SemVersion.Change(int? major = null, int? minor = null, int? patch = null, string prerelease = null, string build = null) -> Semver.SemVersion
-Semver.SemVersion.CompareByPrecedence(Semver.SemVersion other) -> int
 Semver.SemVersion.ComparePrecedenceTo(Semver.SemVersion other) -> int
 Semver.SemVersion.CompareSortOrderTo(Semver.SemVersion other) -> int
-Semver.SemVersion.CompareTo(object obj) -> int
-Semver.SemVersion.CompareTo(Semver.SemVersion other) -> int
 Semver.SemVersion.Equals(Semver.SemVersion other) -> bool
 Semver.SemVersion.IsPrerelease.get -> bool
 Semver.SemVersion.IsRelease.get -> bool
@@ -41,16 +36,13 @@ Semver.SemVersion.MetadataIdentifiers.get -> System.Collections.Generic.IReadOnl
 Semver.SemVersion.Minor.get -> int
 Semver.SemVersion.Patch.get -> int
 Semver.SemVersion.PrecedenceEquals(Semver.SemVersion other) -> bool
-Semver.SemVersion.PrecedenceMatches(Semver.SemVersion other) -> bool
 Semver.SemVersion.Prerelease.get -> string
 Semver.SemVersion.PrereleaseIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.PrereleaseIdentifier>
 Semver.SemVersion.SemVersion(int major) -> void
-Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, string prerelease = "", string build = "") -> void
 Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier> prerelease = null, System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier> metadata = null) -> void
 Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, System.Collections.Generic.IEnumerable<string> prerelease = null, System.Collections.Generic.IEnumerable<string> metadata = null) -> void
 Semver.SemVersion.SemVersion(int major, int minor) -> void
 Semver.SemVersion.SemVersion(int major, int minor, int patch) -> void
-Semver.SemVersion.SemVersion(System.Version version) -> void
 Semver.SemVersion.ToVersion() -> System.Version
 Semver.SemVersion.With(int? major = null, int? minor = null, int? patch = null, System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier> prerelease = null, System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier> metadata = null) -> Semver.SemVersion
 Semver.SemVersion.WithMajor(int major) -> Semver.SemVersion
@@ -88,23 +80,14 @@ static Semver.MetadataIdentifier.operator ==(Semver.MetadataIdentifier left, Sem
 static Semver.PrereleaseIdentifier.implicit operator string(Semver.PrereleaseIdentifier prereleaseIdentifier) -> string
 static Semver.PrereleaseIdentifier.operator !=(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
 static Semver.PrereleaseIdentifier.operator ==(Semver.PrereleaseIdentifier left, Semver.PrereleaseIdentifier right) -> bool
-static Semver.SemVersion.Compare(Semver.SemVersion versionA, Semver.SemVersion versionB) -> int
 static Semver.SemVersion.ComparePrecedence(Semver.SemVersion left, Semver.SemVersion right) -> int
 static Semver.SemVersion.CompareSortOrder(Semver.SemVersion left, Semver.SemVersion right) -> int
-static Semver.SemVersion.Equals(Semver.SemVersion versionA, Semver.SemVersion versionB) -> bool
 static Semver.SemVersion.FromVersion(System.Version version) -> Semver.SemVersion
-static Semver.SemVersion.implicit operator Semver.SemVersion(string version) -> Semver.SemVersion
 static Semver.SemVersion.operator !=(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.operator <(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.operator <=(Semver.SemVersion left, Semver.SemVersion right) -> bool
 static Semver.SemVersion.operator ==(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.operator >(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.operator >=(Semver.SemVersion left, Semver.SemVersion right) -> bool
-static Semver.SemVersion.Parse(string version, bool strict = false) -> Semver.SemVersion
 static Semver.SemVersion.Parse(string version, Semver.SemVersionStyles style, int maxLength = 1024) -> Semver.SemVersion
 static Semver.SemVersion.ParsedFrom(int major, int minor = 0, int patch = 0, string prerelease = "", string metadata = "", bool allowLeadingZeros = false) -> Semver.SemVersion
 static Semver.SemVersion.PrecedenceComparer.get -> Semver.Comparers.ISemVersionComparer
 static Semver.SemVersion.PrecedenceEquals(Semver.SemVersion left, Semver.SemVersion right) -> bool
 static Semver.SemVersion.SortOrderComparer.get -> Semver.Comparers.ISemVersionComparer
-static Semver.SemVersion.TryParse(string version, out Semver.SemVersion semver, bool strict = false) -> bool
 static Semver.SemVersion.TryParse(string version, Semver.SemVersionStyles style, out Semver.SemVersion semver, int maxLength = 1024) -> bool
