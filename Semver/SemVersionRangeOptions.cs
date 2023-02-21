@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Semver.Ranges
+namespace Semver
 {
     /// <summary>
     /// <para>Determines the parsing options and allowed styles of range and version strings passed

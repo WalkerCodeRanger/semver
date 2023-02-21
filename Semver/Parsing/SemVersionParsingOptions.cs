@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Semver
+namespace Semver.Parsing
 {
     /// <summary>
     /// Options beyond the <see cref="SemVersionStyles"/> for version parsing used by range parsing.

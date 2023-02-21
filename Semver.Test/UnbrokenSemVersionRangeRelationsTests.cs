@@ -1,9 +1,8 @@
-﻿using Semver.Ranges;
-using Semver.Test.TestCases;
+﻿using Semver.Test.TestCases;
 using Xunit;
 using static Semver.Test.Builders.UnbrokenSemVersionRangeBuilder;
 
-namespace Semver.Test.Ranges
+namespace Semver.Test
 {
     public class UnbrokenSemVersionRangeRelationsTests
     {

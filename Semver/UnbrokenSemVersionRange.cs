@@ -2,17 +2,20 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
+using Semver.Ranges;
 using Semver.Utility;
 
-namespace Semver.Ranges
+namespace Semver
 {
     /// <summary>
     /// A range of <see cref="SemVersion"/> values with no gaps. The more general and flexible range
     /// class <see cref="SemVersionRange"/> is typically used instead. It combines multiple
-    /// <see cref="UnbrokenSemVersionRange"/>s. This can be used directly if it is important to
-    /// reflect that something must be a range with no gaps in it.
+    /// <see cref="UnbrokenSemVersionRange"/>s. <see cref="UnbrokenSemVersionRange"/> can be used
+    /// directly if it is important to reflect that something must be a range with no gaps in it.
     /// </summary>
-    ///
+    /// <remarks>An <see cref="UnbrokenSemVersionRange"/> is represented as an interval between two
+    /// versions, the <see cref="Start"/> and <see cref="End"/>. For each, that version may or may
+    /// not be included.</remarks>
     public sealed class UnbrokenSemVersionRange : IEquatable<UnbrokenSemVersionRange>
     {
         /// <summary>
@@ -99,7 +102,7 @@ namespace Semver.Ranges
         /// <param name="start">The range will contain only versions greater than or equal to this.</param>
         /// <param name="end">The range will contain only versions less than or equal to this.</param>
         /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
-        /// than just those matching the given version if it is prerelease.</param>
+        /// than just those matching the given versions if they are prerelease.</param>
         /// <returns>A range containing versions between the given versions including those versions.</returns>
         public static UnbrokenSemVersionRange Inclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(Validate(start, nameof(start)), true,
@@ -112,7 +115,7 @@ namespace Semver.Ranges
         /// <param name="start">The range will contain only versions greater than or equal to this.</param>
         /// <param name="end">The range will contain only versions less than this.</param>
         /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
-        /// than just those matching the given version if it is prerelease.</param>
+        /// than just those matching the given versions if they are prerelease.</param>
         /// <returns>A range containing versions between the given versions including the start but
         /// not the end.</returns>
         public static UnbrokenSemVersionRange InclusiveOfStart(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
@@ -126,7 +129,7 @@ namespace Semver.Ranges
         /// <param name="start">The range will contain only versions greater than this.</param>
         /// <param name="end">The range will contain only versions less than or equal to this.</param>
         /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
-        /// than just those matching the given version if it is prerelease.</param>
+        /// than just those matching the given versions if they are prerelease.</param>
         /// <returns>A range containing versions between the given versions including the end but
         /// not the start.</returns>
         public static UnbrokenSemVersionRange InclusiveOfEnd(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
@@ -139,7 +142,7 @@ namespace Semver.Ranges
         /// <param name="start">The range will contain only versions greater than this.</param>
         /// <param name="end">The range will contain only versions less than this.</param>
         /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
-        /// than just those matching the given version if it is prerelease.</param>
+        /// than just those matching the given versions if they are prerelease.</param>
         /// <returns>A range containing versions between the given versions including the end but
         /// not the start.</returns>
         public static UnbrokenSemVersionRange Exclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)

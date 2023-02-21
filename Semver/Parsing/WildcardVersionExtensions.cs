@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Semver.Ranges.Parsers
+namespace Semver.Parsing
 {
     internal static class WildcardVersionExtensions
     {

@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Security.Permissions;
 #endif
 using Semver.Comparers;
-using Semver.Ranges;
+using Semver.Parsing;
 using Semver.Utility;
 
 namespace Semver
@@ -438,12 +438,12 @@ namespace Semver
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
             if (maxLength < 0) throw new ArgumentOutOfRangeException(nameof(maxLength), InvalidMaxLengthMessage);
-            var exception = SemVersionParser.Parse(version, style, Parsing.FailedException, maxLength, out semver);
+            var exception = SemVersionParser.Parse(version, style, VersionParsing.FailedException, maxLength, out semver);
 
 #if DEBUG
             // This check ensures that SemVersionParser.Parse doesn't construct an exception, but always returns ParseFailedException
-            if (exception != null && exception != Parsing.FailedException)
-                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}", exception);
+            if (exception != null && exception != VersionParsing.FailedException)
+                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(VersionParsing.FailedException)}", exception);
 #endif
 
             return exception is null;
@@ -1281,7 +1281,7 @@ namespace Semver
         /// <param name="predicate">The predicate to evaluate on this version.</param>
         /// <returns><see langword="true"/> if the version satisfies the predicate,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="predicate"/> is
+        /// <exception cref="ArgumentNullException"><paramref name="predicate"/> is
         /// <see langword="null"/>.</exception>
         public bool Satisfies(Predicate<SemVersion> predicate)
         {
@@ -1295,7 +1295,7 @@ namespace Semver
         /// <param name="range">The range to evaluate.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
         /// <see langword="null"/>.</exception>
         public bool Satisfies(SemVersionRange range)
         {
@@ -1309,7 +1309,7 @@ namespace Semver
         /// <param name="range">The unbroken range to evaluate.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
         /// <see langword="null"/>.</exception>
         public bool Satisfies(UnbrokenSemVersionRange range)
         {
@@ -1318,7 +1318,7 @@ namespace Semver
         }
 
         /// <summary>
-        /// Checks if this version is contained in the given range string.
+        /// Checks if this version is contained in the given range.
         /// </summary>
         /// <param name="range">The range to parse and evaluate.</param>
         /// <param name="options">A bitwise combination of enumeration values that indicates the style
@@ -1328,7 +1328,7 @@ namespace Semver
         /// parsed. This prevents attacks using very long range strings.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
         /// <see langword="null"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="options"/> is not a valid
         /// <see cref="SemVersionRangeOptions"/> value.</exception>
@@ -1355,7 +1355,7 @@ namespace Semver
         }
 
         /// <summary>
-        /// Checks if this version is contained in the given range string. The range is parsed using
+        /// Checks if this version is contained in the given range. The range is parsed using
         /// <see cref="SemVersionRangeOptions.Strict"/>.
         /// </summary>
         /// <param name="range">The range to parse and evaluate.</param>
@@ -1363,7 +1363,7 @@ namespace Semver
         /// parsed. This prevents attacks using very long range strings.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
         /// <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
         /// zero.</exception>
@@ -1380,7 +1380,7 @@ namespace Semver
             => Satisfies(range, SemVersionRangeOptions.Strict, maxLength);
 
         /// <summary>
-        /// Checks if this version is contained in the given npm format range string.
+        /// Checks if this version is contained in the given range in npm format.
         /// </summary>
         /// <param name="range">The npm format range to parse and evaluate.</param>
         /// <param name="includeAllPrerelease">Whether to include all prerelease versions satisfying
@@ -1390,7 +1390,7 @@ namespace Semver
         /// parsed. This prevents attacks using very long range strings.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
         /// <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
         /// zero.</exception>
@@ -1412,15 +1412,15 @@ namespace Semver
         }
 
         /// <summary>
-        /// Checks if this version is contained in the given npm format range string. Does not
-        /// include all prerelease when parsing the range.
+        /// Checks if this version is contained in the given range in npm format. Does not include
+        /// all prerelease when parsing the range.
         /// </summary>
         /// <param name="range">The npm format range to parse and evaluate.</param>
         /// <param name="maxLength">The maximum length of <paramref name="range"/> that should be
         /// parsed. This prevents attacks using very long range strings.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="range"/> is
+        /// <exception cref="ArgumentNullException"><paramref name="range"/> is
         /// <see langword="null"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
         /// zero.</exception>

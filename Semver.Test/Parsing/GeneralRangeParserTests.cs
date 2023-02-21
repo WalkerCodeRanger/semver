@@ -1,9 +1,8 @@
-﻿using Semver.Ranges;
-using Semver.Ranges.Parsers;
+﻿using Semver.Parsing;
 using Xunit;
-using static Semver.Ranges.SemVersionRangeOptions;
+using static Semver.SemVersionRangeOptions;
 
-namespace Semver.Test.Ranges.Parsers
+namespace Semver.Test.Parsing
 {
     public class GeneralRangeParserTests
     {

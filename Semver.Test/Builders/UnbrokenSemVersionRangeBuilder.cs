@@ -1,6 +1,4 @@
-﻿using Semver.Ranges;
-
-namespace Semver.Test.Builders
+﻿namespace Semver.Test.Builders
 {
     public static class UnbrokenSemVersionRangeBuilder
     {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Semver.Ranges;
 using Semver.Utility;
-using static Semver.Ranges.Parsers.GeneralRangeParser;
 
-namespace Semver.Ranges.Parsers
+namespace Semver.Parsing
 {
     internal static class StandardRangeParser
     {
@@ -28,8 +28,8 @@ namespace Semver.Ranges.Parsers
             if (range is null) return ex ?? new ArgumentNullException(nameof(range));
             if (range.Length > maxLength) return ex ?? RangeError.TooLong(range, maxLength);
 
-            var unbrokenRanges = new List<UnbrokenSemVersionRange>(CountSplitOnOrOperator(range));
-            foreach (var segment in SplitOnOrOperator(range))
+            var unbrokenRanges = new List<UnbrokenSemVersionRange>(GeneralRangeParser.CountSplitOnOrOperator(range));
+            foreach (var segment in GeneralRangeParser.SplitOnOrOperator(range))
             {
                 var exception = ParseUnbrokenRange(segment, rangeOptions, ex, maxLength, out var unbrokenRange);
                 if (exception is null)
@@ -53,7 +53,7 @@ namespace Semver.Ranges.Parsers
             unbrokenRange = null;
 
             // Parse off leading whitespace
-            var exception = ParseOptionalSpaces(ref segment, ex);
+            var exception = GeneralRangeParser.ParseOptionalSpaces(ref segment, ex);
             if (exception != null) return exception;
 
             // Reject empty string ranges
@@ -100,18 +100,18 @@ namespace Semver.Ranges.Parsers
             var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;
 
-            exception = ParseOptionalSpaces(ref segment, ex);
+            exception = GeneralRangeParser.ParseOptionalSpaces(ref segment, ex);
             if (exception != null) return exception;
 
             var versionSegment = segment;
-            exception = ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
+            exception = GeneralRangeParser.ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
                             out var semver, out var wildcardVersion);
             if (exception != null) return exception;
 
             if (@operator != StandardOperator.None && wildcardVersion != WildcardVersion.None)
                 return ex ?? RangeError.WildcardNotSupportedWithOperator(segment.Source);
 
-            exception = ParseOptionalSpaces(ref segment, ex);
+            exception = GeneralRangeParser.ParseOptionalSpaces(ref segment, ex);
             if (exception != null) return exception;
 
             switch (@operator)
@@ -254,7 +254,7 @@ namespace Semver.Ranges.Parsers
             ref StringSegment segment, Exception ex, out StandardOperator @operator)
         {
             var end = 0;
-            while (end < segment.Length && IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.Strict)) end++;
+            while (end < segment.Length && GeneralRangeParser.IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.Strict)) end++;
             var opSegment = segment.Subsegment(0, end);
             segment = segment.Subsegment(end);
 

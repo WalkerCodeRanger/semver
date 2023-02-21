@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
-using Semver.Ranges.Parsers;
+using Semver.Parsing;
 using Semver.Utility;
 
-namespace Semver.Ranges
+namespace Semver
 {
     /// <summary>
     /// A range of <see cref="SemVersion"/> values. A range can have gaps in it and may include only
@@ -92,7 +92,7 @@ namespace Semver.Ranges
         /// <param name="start">The range will contain only versions greater than or equal to this.</param>
         /// <param name="end">The range will contain only versions less than or equal to this.</param>
         /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
-        /// than just those matching the given version if it is prerelease.</param>
+        /// than just those matching the given versions if they are prerelease.</param>
         /// <returns>A range containing versions between the given versions including those versions.</returns>
         public static SemVersionRange Inclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
             => Create(UnbrokenSemVersionRange.Inclusive(start, end, includeAllPrerelease));
@@ -104,7 +104,7 @@ namespace Semver.Ranges
         /// <param name="start">The range will contain only versions greater than or equal to this.</param>
         /// <param name="end">The range will contain only versions less than this.</param>
         /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
-        /// than just those matching the given version if it is prerelease.</param>
+        /// than just those matching the given versions if they are prerelease.</param>
         /// <returns>A range containing versions between the given versions including the start but
         /// not the end.</returns>
         public static SemVersionRange InclusiveOfStart(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
@@ -117,7 +117,7 @@ namespace Semver.Ranges
         /// <param name="start">The range will contain only versions greater than this.</param>
         /// <param name="end">The range will contain only versions less than or equal to this.</param>
         /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
-        /// than just those matching the given version if it is prerelease.</param>
+        /// than just those matching the given versions if they are prerelease.</param>
         /// <returns>A range containing versions between the given versions including the end but
         /// not the start.</returns>
         public static SemVersionRange InclusiveOfEnd(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
@@ -129,7 +129,7 @@ namespace Semver.Ranges
         /// <param name="start">The range will contain only versions greater than this.</param>
         /// <param name="end">The range will contain only versions less than this.</param>
         /// <param name="includeAllPrerelease">Include all prerelease versions in the range rather
-        /// than just those matching the given version if it is prerelease.</param>
+        /// than just those matching the given versions if they are prerelease.</param>
         /// <returns>A range containing versions between the given versions including the end but
         /// not the start.</returns>
         public static SemVersionRange Exclusive(SemVersion start, SemVersion end, bool includeAllPrerelease = false)
@@ -317,7 +317,7 @@ namespace Semver.Ranges
             if (maxLength < 0)
                 throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
 
-            var exception = StandardRangeParser.Parse(range, options, Parsing.FailedException, maxLength, out semverRange);
+            var exception = StandardRangeParser.Parse(range, options, VersionParsing.FailedException, maxLength, out semverRange);
 
             DebugChecks.IsNotFailedException(exception, nameof(SemVersionParser), nameof(SemVersionParser.Parse));
 
@@ -429,7 +429,7 @@ namespace Semver.Ranges
             if (maxLength < 0)
                 throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
 
-            var exception = NpmRangeParser.Parse(range, includeAllPrerelease, Parsing.FailedException, maxLength, out semverRange);
+            var exception = NpmRangeParser.Parse(range, includeAllPrerelease, VersionParsing.FailedException, maxLength, out semverRange);
 
             DebugChecks.IsNotFailedException(exception, nameof(NpmRangeParser), nameof(NpmRangeParser.Parse));
 
@@ -484,6 +484,12 @@ namespace Semver.Ranges
         /// making up this range.</returns>
         public IEnumerator<UnbrokenSemVersionRange> GetEnumerator() => ranges.GetEnumerator();
 
+        /// <summary>
+        /// Get an enumerator that iterates through the <see cref="UnbrokenSemVersionRange"/>s
+        /// making up this range.
+        /// </summary>
+        /// <returns>An enumerator that iterates through the <see cref="UnbrokenSemVersionRange"/>s
+        /// making up this range.</returns>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         #endregion
 

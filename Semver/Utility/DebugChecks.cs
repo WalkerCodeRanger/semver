@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Semver.Ranges;
-using Semver.Ranges.Parsers;
+using Semver.Parsing;
 
 namespace Semver.Utility
 {
@@ -69,13 +68,13 @@ namespace Semver.Utility
 
         /// <summary>
         /// This check ensures that an exception hasn't been constructed, but rather something always
-        /// returns <see cref="Parsing.FailedException"/>.
+        /// returns <see cref="VersionParsing.FailedException"/>.
         /// </summary>
         [Conditional("DEBUG")]
         public static void IsNotFailedException(Exception exception, string className, string methodName)
         {
-            if (exception != null && exception != Parsing.FailedException)
-                throw new InvalidOperationException($"DEBUG: {className}.{methodName} returned exception other than {nameof(Parsing.FailedException)}", exception);
+            if (exception != null && exception != VersionParsing.FailedException)
+                throw new InvalidOperationException($"DEBUG: {className}.{methodName} returned exception other than {nameof(VersionParsing.FailedException)}", exception);
         }
 
         [Conditional("DEBUG")]
