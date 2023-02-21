@@ -429,7 +429,7 @@ namespace Semver
                 {
                     // Caret ranges like ^1.2.3 and ^1.2.3-rc
                     // Subtract instead of add to avoid overflow
-                    if (Start.Major == End.Major - 1 && End.Minor == 0 && End.Patch == 0)
+                    if (Start.Major == End.Major - 1 && End is { Minor: 0, Patch: 0 })
                     {
                         result = (includesPrereleaseNotCoveredByEnds ? "*-* ^" : "^") + Start;
                         return true;
@@ -456,7 +456,7 @@ namespace Semver
                 var leftPrerelease = LeftBound.Version.PrereleaseIdentifiers;
                 var rightPrerelease = RightBound.Version.PrereleaseIdentifiers;
                 if (leftPrerelease.Count < 2
-                    || leftPrerelease[leftPrerelease.Count-1] != PrereleaseIdentifier.Zero
+                    || leftPrerelease[^1] != PrereleaseIdentifier.Zero
                     || leftPrerelease.Count - 1 != rightPrerelease.Count)
                     return false;
 
@@ -466,8 +466,8 @@ namespace Semver
                         return false;
 
                 // And the prerelease identifiers must have the correct relationship
-                if (leftPrerelease[leftPrerelease.Count - 2].NextIdentifier()
-                    != rightPrerelease[rightPrerelease.Count - 1])
+                if (leftPrerelease[^2].NextIdentifier()
+                    != rightPrerelease[^1])
                     return false;
 
                 var originalPrerelease = string.Join(".", leftPrerelease.Take(leftPrerelease.Count-1));
@@ -545,13 +545,8 @@ namespace Semver
             }
 
             // Make sure we include prerelease at the end
-            if (other.RightBound.IncludesPrerelease)
-            {
-                if (!(End?.IsPrerelease ?? false)
-                    || !End.MajorMinorPatchEquals(other.End)) return false;
-            }
-
-            return true;
+            return !other.RightBound.IncludesPrerelease
+                   || (End.IsPrerelease && End.MajorMinorPatchEquals(other.End));
         }
 
         /// <summary>

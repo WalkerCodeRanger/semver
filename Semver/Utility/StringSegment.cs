@@ -113,7 +113,7 @@ namespace Semver.Utility
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public StringSegment EmptySubsegment() => new StringSegment(Source, Offset, 0);
+        public StringSegment EmptySubsegment() => new(Source, Offset, 0);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int IndexOf(char value)

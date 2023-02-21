@@ -481,11 +481,11 @@ namespace Semver
         {
             // Note: It is tempting to null coalesce first, but then this method would report invalid
             // arguments on invalid SemVersion instances.
-            if (major is int majorInt && majorInt < 0)
+            if (major is < 0)
                 throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
-            if (minor is int minorInt && minorInt < 0)
+            if (minor is < 0)
                 throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
-            if (patch is int patchInt && patchInt < 0)
+            if (patch is < 0)
                 throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
 
             IReadOnlyList<PrereleaseIdentifier>? prereleaseIdentifiers = null;
@@ -805,7 +805,7 @@ namespace Semver
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         public SemVersion WithMetadata(string metadataIdentifier, params string[] metadataIdentifiers)
         {
-            if (metadataIdentifier is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
+            if (metadataIdentifier is null) throw new ArgumentNullException(nameof(metadataIdentifier));
             if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
             var identifiers = metadataIdentifiers
                               .Prepend(metadataIdentifier)

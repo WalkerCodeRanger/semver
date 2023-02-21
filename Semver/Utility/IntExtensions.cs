@@ -18,16 +18,19 @@ namespace Semver.Utility
         /// </remarks>
         public static int DecimalDigits(this int n)
         {
-            if (n < 10) return 1;
-            if (n < 100) return 2;
-            if (n < 1_000) return 3;
-            if (n < 10_000) return 4;
-            if (n < 100_000) return 5;
-            if (n < 1_000_000) return 6;
-            if (n < 10_000_000) return 7;
-            if (n < 100_000_000) return 8;
-            if (n < 1_000_000_000) return 9;
-            return 10;
+            return n switch
+            {
+                < 10 => 1,
+                < 100 => 2,
+                < 1_000 => 3,
+                < 10_000 => 4,
+                < 100_000 => 5,
+                < 1_000_000 => 6,
+                < 10_000_000 => 7,
+                < 100_000_000 => 8,
+                < 1_000_000_000 => 9,
+                _ => 10
+            };
         }
     }
 }
