@@ -9,32 +9,36 @@ configuration: Release
 init:
 - ps: |
     git config --global core.autocrlf true
-    Write-Host "Appveyor build version: $env:APPVEYOR_BUILD_VERSION"
-    $version = $env:APPVEYOR_BUILD_VERSION
+    Write-Host "Original Appveyor build version: $env:APPVEYOR_BUILD_VERSION"
+    $env:PACKAGE_VERSION = $env:APPVEYOR_BUILD_VERSION
+    $appveyor_build_version = $env:APPVEYOR_BUILD_VERSION
     $env:GIT_HASH=$env:APPVEYOR_REPO_COMMIT.Substring(0, 10)
     Write-Host "Git commit hash: $env:GIT_HASH"
     If ($env:APPVEYOR_REPO_TAG -and ($env:APPVEYOR_REPO_TAG_NAME -match "^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"))
     {
-        $version=$env:APPVEYOR_REPO_TAG_NAME.Substring(1)
-        Write-Host "Tagged version: $version"
+        $env:PACKAGE_VERSION=$env:APPVEYOR_REPO_TAG_NAME.Substring(1)
+        $appveyor_build_version="$env:PACKAGE_VERSION ($env:APPVEYOR_BUILD_NUMBER)"
+        Write-Host "Tagged version: $env:PACKAGE_VERSION"
+        Write-Host "New build version: $appveyor_build_version"
     }
-    $version_split_at_hyphen = $version -split '-'
+    $version_split_at_hyphen = $env:PACKAGE_VERSION -split '-'
     $major_minor_patch = $version_split_at_hyphen[0]
     $major_minor_patch_split = $major_minor_patch -split '\.'
     $major = $major_minor_patch_split[0]
     $env:ASSEMBLY_VERSION = "$major.0.0.0"
     $env:FILE_VERSION = "$major_minor_patch.0"
-    $env:INFORMATIONAL_Version = "$version+$env:GIT_HASH"
-    Write-Host "Computed package version: $version"
+    $env:INFORMATIONAL_Version = "$env:PACKAGE_VERSION+$env:GIT_HASH"
+    Write-Host "Computed package version: $env:PACKAGE_VERSION"
     Write-Host "Computed assembly version: $env:ASSEMBLY_VERSION"
     Write-Host "Computed file version: $env:FILE_VERSION"
     Write-Host "Computed info version: $env:INFORMATIONAL_Version"
-    Update-AppveyorBuild -Version "$version"
+    Update-AppveyorBuild -Version "$appveyor_build_version"
 
 dotnet_csproj:
   patch: true
   file: '**\Semver.csproj'
-  package_version: '{version}'
+  version: '$(PACKAGE_VERSION)'
+  package_version: '$(PACKAGE_VERSION)'
   assembly_version: '$(ASSEMBLY_VERSION)'
   file_version: '$(FILE_VERSION)'
   informational_version: "$(INFORMATIONAL_Version)"
