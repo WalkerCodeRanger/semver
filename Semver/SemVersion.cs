@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-#if SERIALIZABLE
 using System.Runtime.Serialization;
 using System.Security.Permissions;
-#endif
+using System.Text;
 using Semver.Comparers;
 using Semver.Parsing;
 using Semver.Utility;
@@ -16,12 +14,8 @@ namespace Semver
     /// A semantic version number. Conforms with v2.0.0 of semantic versioning
     /// (<a href="https://semver.org">semver.org</a>).
     /// </summary>
-#if SERIALIZABLE
     [Serializable]
     public sealed class SemVersion : IEquatable<SemVersion>, ISerializable
-#else
-    public sealed class SemVersion : IEquatable<SemVersion>
-#endif
     {
         internal static readonly SemVersion Min = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
         internal static readonly SemVersion MinRelease = new SemVersion(0, 0, 0);
@@ -36,7 +30,6 @@ namespace Semver
         private const string InvalidMaxLengthMessage = "Must not be negative.";
         internal const int MaxVersionLength = 1024;
 
-#if SERIALIZABLE
         /// <summary>
         /// Deserialize a <see cref="SemVersion"/>.
         /// </summary>
@@ -65,7 +58,6 @@ namespace Semver
             if (info == null) throw new ArgumentNullException(nameof(info));
             info.AddValue("SemVersion", ToString());
         }
-#endif
 
         /// <summary>
         /// Constructs a new instance of the <see cref="SemVersion" /> class.

@@ -31,10 +31,6 @@
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' != 'netstandard1.1' ">
-    <DefineConstants>$(DefineConstants);SERIALIZABLE;COMPILED_REGEX</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="JetBrains.dotCover.MSBuild" Version="1.0.5-alpha">
       <PrivateAssets>all</PrivateAssets>
