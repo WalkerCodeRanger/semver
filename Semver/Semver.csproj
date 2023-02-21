@@ -5,7 +5,7 @@
     <Copyright>Copyright © 2013 Max Hauser, Jeff Walker</Copyright>
     <AssemblyTitle>Semantic versioning</AssemblyTitle>
     <Authors>Max Hauser, Jeff Walker</Authors>
-    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
     <NoWarn>$(NoWarn);CS1591;CA1303</NoWarn>

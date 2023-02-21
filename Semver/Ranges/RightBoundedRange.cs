@@ -67,7 +67,7 @@ namespace Semver.Ranges
         public bool Equals(RightBoundedRange other)
             => Equals(Version, other.Version) && Inclusive == other.Inclusive;
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is RightBoundedRange other && Equals(other);
 
         public override int GetHashCode()

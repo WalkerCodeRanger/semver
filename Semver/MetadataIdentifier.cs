@@ -185,7 +185,7 @@ namespace Semver
         /// <exception cref="ArgumentException"><paramref name="value"/> is not a <see cref="MetadataIdentifier"/>.</exception>
         /// <remarks>Identifiers are compared lexically in ASCII sort order. Invalid identifiers are
         /// compared via an ordinal string comparision.</remarks>
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             if (value is null) return 1;
             return value is MetadataIdentifier other

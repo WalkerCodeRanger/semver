@@ -38,7 +38,7 @@ namespace Semver
         private SemVersion(SerializationInfo info, StreamingContext context)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
-            var semVersion = Parse(info.GetString("SemVersion"), SemVersionStyles.Strict);
+            var semVersion = Parse(info.GetString("SemVersion")!, SemVersionStyles.Strict);
             Major = semVersion.Major;
             Minor = semVersion.Minor;
             Patch = semVersion.Patch;
@@ -53,7 +53,9 @@ namespace Semver
         /// </summary>
         /// <param name="info">The <see cref="SerializationInfo"/> to populate with data.</param>
         /// <param name="context">The destination (see <see cref="SerializationInfo"/>) for this serialization.</param>
+#if !NET5_0_OR_GREATER
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+#endif
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null) throw new ArgumentNullException(nameof(info));
@@ -569,11 +571,11 @@ namespace Semver
         {
             // Note: It is tempting to null coalesce first, but then this method would report invalid
             // arguments on invalid SemVersion instances.
-            if (major is int majorInt && majorInt < 0)
+            if (major is < 0)
                 throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
-            if (minor is int minorInt && minorInt < 0)
+            if (minor is < 0)
                 throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
-            if (patch is int patchInt && patchInt < 0)
+            if (patch is < 0)
                 throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
 
             var prereleaseIdentifiers = prerelease?.SplitAndMapToReadOnlyList('.',
@@ -581,7 +583,7 @@ namespace Semver
             var metadataIdentifiers = metadata?.SplitAndMapToReadOnlyList('.',
                 i => new MetadataIdentifier(i, nameof(metadata)));
 
-            if (allowLeadingZeros && prerelease != null)
+            if (allowLeadingZeros && prereleaseIdentifiers != null)
                 // Leading zeros may have been removed, need to reconstruct the prerelease string
                 prerelease = string.Join(".", prereleaseIdentifiers);
 

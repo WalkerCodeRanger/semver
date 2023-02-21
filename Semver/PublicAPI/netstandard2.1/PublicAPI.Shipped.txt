@@ -16,14 +16,14 @@ override Semver.UnbrokenSemVersionRange.GetHashCode() -> int
 override Semver.UnbrokenSemVersionRange.ToString() -> string!
 Semver.Comparers.ISemVersionComparer
 Semver.MetadataIdentifier
-Semver.MetadataIdentifier.CompareTo(object! value) -> int
+Semver.MetadataIdentifier.CompareTo(object? value) -> int
 Semver.MetadataIdentifier.CompareTo(Semver.MetadataIdentifier value) -> int
 Semver.MetadataIdentifier.Equals(Semver.MetadataIdentifier value) -> bool
 Semver.MetadataIdentifier.MetadataIdentifier() -> void
 Semver.MetadataIdentifier.MetadataIdentifier(string! value) -> void
 Semver.MetadataIdentifier.Value.get -> string!
 Semver.PrereleaseIdentifier
-Semver.PrereleaseIdentifier.CompareTo(object! value) -> int
+Semver.PrereleaseIdentifier.CompareTo(object? value) -> int
 Semver.PrereleaseIdentifier.CompareTo(Semver.PrereleaseIdentifier value) -> int
 Semver.PrereleaseIdentifier.Equals(Semver.PrereleaseIdentifier value) -> bool
 Semver.PrereleaseIdentifier.NumericValue.get -> int?

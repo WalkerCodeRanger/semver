@@ -16,14 +16,17 @@ namespace Semver.Comparers
     internal sealed class UnbrokenSemVersionRangeComparer : Comparer<UnbrokenSemVersionRange>
     {
         #region Singleton
-        public static readonly UnbrokenSemVersionRangeComparer Instance = new UnbrokenSemVersionRangeComparer();
+        public static readonly UnbrokenSemVersionRangeComparer Instance = new();
 
         private UnbrokenSemVersionRangeComparer() { }
         #endregion
 
-        // TODO shouldn't this take nullable?
-        public override int Compare(UnbrokenSemVersionRange x, UnbrokenSemVersionRange y)
+        public override int Compare(UnbrokenSemVersionRange? x, UnbrokenSemVersionRange? y)
         {
+            if (ReferenceEquals(x, y)) return 0; // covers both null case
+            if (x is null) return -1;
+            if (y is null) return 1;
+
             var comparison = x.LeftBound.CompareTo(y.LeftBound);
             if (comparison != 0) return comparison;
             comparison = -x.RightBound.CompareTo(y.RightBound);

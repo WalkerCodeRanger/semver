@@ -306,7 +306,7 @@ namespace Semver
         /// considered equal (e.g. '<c>15</c>' is equal to '<c>015</c>'). Alphanumeric identifiers are
         /// compared lexically in ASCII sort order. Invalid alphanumeric identifiers are
         /// compared via an ordinal string comparision.</remarks>
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             if (value is null) return 1;
             return value is PrereleaseIdentifier other
