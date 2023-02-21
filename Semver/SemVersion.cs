@@ -412,10 +412,7 @@ namespace Semver
             return ex is null ? semver : throw ex;
         }
 
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
-        public static SemVersion Parse(string version, int maxLength = MaxVersionLength)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
-            => Parse(version, SemVersionStyles.Strict, maxLength);
+        public static SemVersion Parse(string version, int maxLength = MaxVersionLength) => Parse(version, SemVersionStyles.Strict, maxLength);
 
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
@@ -449,10 +446,7 @@ namespace Semver
             return exception is null;
         }
 
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
-        public static bool TryParse(string version, out SemVersion semver, int maxLength = MaxVersionLength)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
-            => TryParse(version, SemVersionStyles.Strict, out semver, maxLength);
+        public static bool TryParse(string version, out SemVersion semver, int maxLength = MaxVersionLength) => TryParse(version, SemVersionStyles.Strict, out semver, maxLength);
 
         /// <summary>
         /// Creates a copy of the current instance with multiple changed properties. If changing only
@@ -1341,12 +1335,10 @@ namespace Semver
         /// <remarks>If checks against a range will be performed repeatedly, it is much more
         /// efficient to parse the range into a <see cref="SemVersionRange"/> once and use that
         /// object to repeatedly check for containment.</remarks>
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool Satisfies(
             string range,
             SemVersionRangeOptions options,
             int maxLength = SemVersionRange.MaxRangeLength)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
 
@@ -1374,9 +1366,7 @@ namespace Semver
         /// <remarks>If checks against a range will be performed repeatedly, it is much more
         /// efficient to parse the range into a <see cref="SemVersionRange"/> once and use that
         /// object to repeatedly check for containment.</remarks>
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool Satisfies(string range, int maxLength = SemVersionRange.MaxRangeLength)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
             => Satisfies(range, SemVersionRangeOptions.Strict, maxLength);
 
         /// <summary>
@@ -1401,9 +1391,7 @@ namespace Semver
         /// efficient to parse the range into a <see cref="SemVersionRange"/> once using
         /// <see cref="SemVersionRange.ParseNpm(string,bool,int)"/> and use that object to
         /// repeatedly check for containment.</remarks>
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool SatisfiesNpm(string range, bool includeAllPrerelease, int maxLength = SemVersionRange.MaxRangeLength)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             if (range == null) throw new ArgumentNullException(nameof(range));
 
@@ -1431,9 +1419,7 @@ namespace Semver
         /// efficient to parse the range into a <see cref="SemVersionRange"/> once using
         /// <see cref="SemVersionRange.ParseNpm(string,int)"/> and use that object to
         /// repeatedly check for containment.</remarks>
-#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public bool SatisfiesNpm(string range, int maxLength = SemVersionRange.MaxRangeLength)
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
             => SatisfiesNpm(range, false, maxLength);
         #endregion
     }
