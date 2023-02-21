@@ -412,7 +412,8 @@ namespace Semver
             return ex is null ? semver : throw ex;
         }
 
-        public static SemVersion Parse(string version, int maxLength = MaxVersionLength) => Parse(version, SemVersionStyles.Strict, maxLength);
+        public static SemVersion Parse(string version, int maxLength = MaxVersionLength)
+            => Parse(version, SemVersionStyles.Strict, maxLength);
 
         /// <summary>
         /// Converts the string representation of a semantic version to its <see cref="SemVersion"/>
@@ -446,7 +447,8 @@ namespace Semver
             return exception is null;
         }
 
-        public static bool TryParse(string version, out SemVersion semver, int maxLength = MaxVersionLength) => TryParse(version, SemVersionStyles.Strict, out semver, maxLength);
+        public static bool TryParse(string version, out SemVersion semver, int maxLength = MaxVersionLength)
+            => TryParse(version, SemVersionStyles.Strict, out semver, maxLength);
 
         /// <summary>
         /// Creates a copy of the current instance with multiple changed properties. If changing only
