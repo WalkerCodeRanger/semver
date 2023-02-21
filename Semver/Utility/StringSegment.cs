@@ -9,6 +9,7 @@ namespace Semver.Utility
     /// <summary>
     /// An efficient representation of a section of a string
     /// </summary>
+    // TODO switch to ReadOnlySpan<char>
     [StructLayout(LayoutKind.Auto)]
     internal readonly struct StringSegment
     {
