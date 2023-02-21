@@ -189,7 +189,7 @@ namespace Semver
         /// otherwise <see langword="false"/>.</returns>
         /// <remarks>Numeric identifiers with leading zeros are considered equal (e.g. '<c>15</c>'
         /// is equal to '<c>015</c>').</remarks>
-        public override bool Equals(object value)
+        public override bool Equals(object? value)
             => value is PrereleaseIdentifier other && Equals(other);
 
         /// <summary>Gets a hash code for this identifier.</summary>

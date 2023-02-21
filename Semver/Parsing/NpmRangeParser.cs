@@ -12,12 +12,12 @@ namespace Semver.Parsing
               | SemVersionRangeOptions.AllowMetadata
               | SemVersionRangeOptions.OptionalMinorPatch;
 
-        public static Exception Parse(
-            string range,
+        public static Exception? Parse(
+            string? range,
             bool includeAllPrerelease,
-            Exception ex,
+            Exception? ex,
             int maxLength,
-            out SemVersionRange semverRange)
+            out SemVersionRange? semverRange)
         {
             var options = StandardRangeOptions;
             if (includeAllPrerelease)
@@ -25,12 +25,12 @@ namespace Semver.Parsing
             return Parse(range, options, ex, maxLength, out semverRange);
         }
 
-        private static Exception Parse(
-            string range,
+        private static Exception? Parse(
+            string? range,
             SemVersionRangeOptions rangeOptions,
-            Exception ex,
+            Exception? ex,
             int maxLength,
-            out SemVersionRange semverRange)
+            out SemVersionRange? semverRange)
         {
             DebugChecks.IsValid(rangeOptions, nameof(rangeOptions));
             DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
@@ -49,22 +49,22 @@ namespace Semver.Parsing
             foreach (var segment in GeneralRangeParser.SplitOnOrOperator(range))
             {
                 var exception = ParseUnbrokenRange(segment, rangeOptions, ex, maxLength, out var unbrokenRange);
-                if (exception is null)
-                    unbrokenRanges.Add(unbrokenRange);
-                else
-                    return exception;
+                if (!(exception is null)) return exception;
+                DebugChecks.IsNotNull(unbrokenRange, nameof(unbrokenRange));
+
+                unbrokenRanges.Add(unbrokenRange);
             }
 
             semverRange = SemVersionRange.Create(unbrokenRanges);
             return null;
         }
 
-        private static Exception ParseUnbrokenRange(
+        private static Exception? ParseUnbrokenRange(
             StringSegment segment,
             SemVersionRangeOptions rangeOptions,
-            Exception ex,
+            Exception? ex,
             int maxLength,
-            out UnbrokenSemVersionRange unbrokenRange)
+            out UnbrokenSemVersionRange? unbrokenRange)
         {
             // Assign null once so it doesn't have to be done any time parse fails
             unbrokenRange = null;
@@ -135,12 +135,12 @@ namespace Semver.Parsing
             return false;
         }
 
-        private static Exception ParseHyphenRange(
+        private static Exception? ParseHyphenRange(
             StringSegment beforeHyphenSegment,
             StringSegment afterHyphenSegment,
             SemVersionRangeOptions rangeOptions,
             bool includeAllPrerelease,
-            Exception ex,
+            Exception? ex,
             int maxLength,
             ref LeftBoundedRange leftBound,
             ref RightBoundedRange rightBound)
@@ -148,21 +148,23 @@ namespace Semver.Parsing
             var exception = ParseHyphenSegment(beforeHyphenSegment, rangeOptions, ex, maxLength,
                 out var semver1, out var wildcardVersion1);
             if (exception != null) return exception;
+            DebugChecks.IsNotNull(semver1, nameof(semver1));
 
             exception = ParseHyphenSegment(afterHyphenSegment, rangeOptions, ex, maxLength,
                 out var semver2, out var wildcardVersion2);
             if (exception != null) return exception;
+            DebugChecks.IsNotNull(semver2, nameof(semver2));
 
             WildcardLowerBound(includeAllPrerelease, ref leftBound, semver1, wildcardVersion1);
             return WildcardUpperBound(ex, ref rightBound, afterHyphenSegment, semver2, wildcardVersion2);
         }
 
-        private static Exception ParseHyphenSegment(
+        private static Exception? ParseHyphenSegment(
             StringSegment segment,
             SemVersionRangeOptions rangeOptions,
-            Exception ex,
+            Exception? ex,
             int maxLength,
-            out SemVersion semver,
+            out SemVersion? semver,
             out WildcardVersion wildcardVersion)
         {
             // Assign null once so it doesn't have to be done any time parse fails
@@ -207,11 +209,11 @@ namespace Semver.Parsing
         /// of <see cref="int"/>. Finally, if these equivalent ranges were supported they would also
         /// need special case handling in the <see cref="UnbrokenSemVersionRange.ToString"/> method.
         /// </para></remarks>
-        private static Exception ParseComparison(
+        private static Exception? ParseComparison(
             ref StringSegment segment,
             SemVersionRangeOptions rangeOptions,
             bool includeAllPrerelease,
-            Exception ex,
+            Exception? ex,
             int maxLength,
             ref LeftBoundedRange leftBound,
             ref RightBoundedRange rightBound)
@@ -227,6 +229,7 @@ namespace Semver.Parsing
             exception = ParseNpmVersion(ref segment, rangeOptions, ex, maxLength,
                             out var semver, out var wildcardVersion);
             if (exception != null) return exception;
+            DebugChecks.IsNotNull(semver, nameof(semver));
 
             GeneralRangeParser.ParseOptionalWhitespace(ref segment);
 
@@ -298,17 +301,18 @@ namespace Semver.Parsing
             }
         }
 
-        public static Exception ParseNpmVersion(
+        public static Exception? ParseNpmVersion(
             ref StringSegment segment,
             SemVersionRangeOptions rangeOptions,
-            Exception ex,
+            Exception? ex,
             int maxLength,
-            out SemVersion semver,
+            out SemVersion? semver,
             out WildcardVersion wildcardVersion)
         {
             var exception = GeneralRangeParser.ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
                 out semver, out wildcardVersion);
             if (exception != null) return exception;
+            DebugChecks.IsNotNull(semver, nameof(semver));
             if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
                 return ex ?? RangeError.PrereleaseNotSupportedWithWildcardVersion(segment.Source);
             // Remove the metadata the npm ranges allow (note we always allow metadata even though
@@ -320,9 +324,9 @@ namespace Semver.Parsing
         /// <summary>
         /// The greater than operator taking into account the wildcard.
         /// </summary>
-        private static Exception GreaterThan(
+        private static Exception? GreaterThan(
             bool includeAllPrerelease,
-            Exception ex,
+            Exception? ex,
             ref LeftBoundedRange leftBound,
             StringSegment versionSegment,
             SemVersion semver,
@@ -371,7 +375,7 @@ namespace Semver.Parsing
         /// <summary>
         /// The less than operator taking into account the wildcard.
         /// </summary>
-        private static Exception LessThan(
+        private static Exception? LessThan(
             ref RightBoundedRange rightBound,
             SemVersion semver,
             WildcardVersion wildcardVersion)
@@ -427,8 +431,8 @@ namespace Semver.Parsing
             leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
         }
 
-        private static Exception WildcardUpperBound(
-            Exception ex,
+        private static Exception? WildcardUpperBound(
+            Exception? ex,
             ref RightBoundedRange rightBound,
             StringSegment versionSegment,
             SemVersion semver,
@@ -462,8 +466,8 @@ namespace Semver.Parsing
             }
         }
 
-        private static Exception ParseOperator(
-            ref StringSegment segment, Exception ex, out StandardOperator @operator)
+        private static Exception? ParseOperator(
+            ref StringSegment segment, Exception? ex, out StandardOperator @operator)
         {
             var end = 0;
             while (end < segment.Length && GeneralRangeParser.IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.AllowMetadata)) end++;

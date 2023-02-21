@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Semver.Comparers;
 using Semver.Utility;
@@ -20,7 +21,7 @@ namespace Semver.Ranges
     {
         public static readonly LeftBoundedRange Unbounded = new LeftBoundedRange(null, false);
 
-        public LeftBoundedRange(SemVersion version, bool inclusive)
+        public LeftBoundedRange(SemVersion? version, bool inclusive)
         {
 #if DEBUG
             // dotcover disable
@@ -34,7 +35,9 @@ namespace Semver.Ranges
             Inclusive = inclusive;
         }
 
-        public SemVersion Version { get; }
+        public SemVersion? Version { get; }
+
+        [MemberNotNullWhen(true, "Version")]
         public bool Inclusive { get; }
 
         public bool IncludesPrerelease => Version?.IsPrerelease == true;
@@ -82,14 +85,14 @@ namespace Semver.Ranges
 
         public int CompareTo(RightBoundedRange other)
         {
-            var comparison = SemVersion.PrecedenceComparer.Compare(Version, other.Version);
+            var comparison = SemVersion.PrecedenceComparer.Compare(Version!, other.Version);
             if (comparison != 0) return comparison;
             return Inclusive && other.Inclusive ? 0 : 1;
         }
 
         public int CompareTo(LeftBoundedRange other)
         {
-            var comparison = PrecedenceComparer.Instance.Compare(Version, other.Version);
+            var comparison = PrecedenceComparer.Instance.Compare(Version!, other.Version!);
             if (comparison != 0) return comparison;
             return -Inclusive.CompareTo(other.Inclusive);
         }

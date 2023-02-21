@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
@@ -154,7 +155,7 @@ namespace Semver
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static UnbrokenSemVersionRange Create(
-            SemVersion startVersion,
+            SemVersion? startVersion,
             bool startInclusive,
             SemVersion endVersion,
             bool endInclusive,
@@ -213,7 +214,7 @@ namespace Semver
         /// prerelease.
         /// </summary>
         private readonly bool allPrereleaseCoveredByEnds;
-        private string toStringCache;
+        private string? toStringCache;
 
         /// <summary>
         /// The start, left limit, or minimum of this range. Can be <see langword="null"/>.
@@ -222,7 +223,7 @@ namespace Semver
         /// <remarks>Ranges with no lower bound have a <see cref="Start"/> value
         /// of <see langword="null"/>. This ensures that they do not unintentionally include any
         /// prerelease versions.</remarks>
-        public SemVersion Start => LeftBound.Version;
+        public SemVersion? Start => LeftBound.Version;
 
         /// <summary>
         /// Whether this range includes the <see cref="Start"/> value.
@@ -230,6 +231,7 @@ namespace Semver
         /// <value>Whether this range includes the <see cref="Start"/> value.</value>
         /// <remarks>When <see cref="Start"/> is <see langword="null"/>, <see cref="StartInclusive"/>
         /// will always be <see langword="false"/>.</remarks>
+        [MemberNotNullWhen(true, "Start")]
         public bool StartInclusive => LeftBound.Inclusive;
 
         /// <summary>
@@ -258,7 +260,7 @@ namespace Semver
         /// <param name="version">The version to test against the range.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        public bool Contains(SemVersion version)
+        public bool Contains(SemVersion? version)
         {
             if (version is null) throw new ArgumentNullException(nameof(version));
 
@@ -286,7 +288,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the this range;
         /// otherwise <see langword="false"/>.</returns>
-        public bool Equals(UnbrokenSemVersionRange other)
+        public bool Equals(UnbrokenSemVersionRange? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -300,7 +302,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this range;
         /// otherwise <see langword="false"/>.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is UnbrokenSemVersionRange other && Equals(other);
 
         /// <summary>
@@ -317,7 +319,7 @@ namespace Semver
         /// Determines whether two version ranges are equal.
         /// </summary>
         /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(UnbrokenSemVersionRange left, UnbrokenSemVersionRange right)
+        public static bool operator ==(UnbrokenSemVersionRange? left, UnbrokenSemVersionRange? right)
             => Equals(left, right);
 
         /// <summary>
@@ -326,7 +328,7 @@ namespace Semver
         /// expressed in different ways and so not be equal.
         /// </summary>
         /// <returns><see langword="true"/> if the two ranges are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
-        public static bool operator !=(UnbrokenSemVersionRange left, UnbrokenSemVersionRange right)
+        public static bool operator !=(UnbrokenSemVersionRange? left, UnbrokenSemVersionRange? right)
             => !Equals(left, right);
         #endregion
 
@@ -342,7 +344,7 @@ namespace Semver
         /// with "<c>*-*</c>". This includes all prerelease versions because it matches all prerelease
         /// versions.</remarks>
         public override string ToString()
-            => toStringCache ?? (toStringCache = ToStringInternal());
+            => toStringCache ??= ToStringInternal();
 
         private string ToStringInternal()
         {
@@ -351,7 +353,7 @@ namespace Semver
                 return "<0.0.0-0";
 
             // Simple Equals ranges
-            if (LeftBound.Inclusive && RightBound.Inclusive && SemVersion.Equals(Start, End))
+            if (StartInclusive && RightBound.Inclusive && SemVersion.Equals(Start, End))
                 return Start.ToString();
 
             var includesPrereleaseNotCoveredByEnds = IncludeAllPrerelease && !allPrereleaseCoveredByEnds;
@@ -376,10 +378,10 @@ namespace Semver
             return includesPrereleaseNotCoveredByEnds ? "*-* " + range : range;
         }
 
-        private bool TryToSpecialString(bool includesPrereleaseNotCoveredByEnds, out string result)
+        private bool TryToSpecialString(bool includesPrereleaseNotCoveredByEnds, [NotNullWhen(true)] out string? result)
         {
             // Most special ranges follow the pattern '>=X.Y.Z <P.Q.R-0'
-            if (LeftBound.Inclusive && !RightBound.Inclusive && End.PrereleaseIsZero)
+            if (StartInclusive && !RightBound.Inclusive && End.PrereleaseIsZero)
             {
                 // Wildcard Ranges like 2.*, 2.*-*, 2.3.*, and 2.3.*-*
                 if (Start.Patch == 0 && End.Patch == 0 && (!Start.IsPrerelease || Start.PrereleaseIsZero))
@@ -448,7 +450,7 @@ namespace Semver
             result = null;
 
             // Wildcards with prerelease follow the pattern >=X.Y.Z-φ.α.0 <X.Y.Z-φ.β
-            if (LeftBound.Inclusive && !RightBound.Inclusive
+            if (StartInclusive && !RightBound.Inclusive
                 && LeftBound.Version?.MajorMinorPatchEquals(RightBound.Version) == true
                 && LeftBound.Version.IsPrerelease && RightBound.Version.IsPrerelease)
             {
@@ -557,7 +559,7 @@ namespace Semver
         /// Try to union this range with the other. This is a complex operation because it must
         /// account for prerelease versions that may be accepted at the endpoints of the ranges.
         /// </summary>
-        internal bool TryUnion(UnbrokenSemVersionRange other, out UnbrokenSemVersionRange union)
+        internal bool TryUnion(UnbrokenSemVersionRange other, [NotNullWhen(true)] out UnbrokenSemVersionRange? union)
         {
             // First deal with simple containment. This handles cases where the containing range
             // includes all prerelease that aren't handled with the union below. It also handles

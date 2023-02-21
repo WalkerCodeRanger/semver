@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
@@ -134,13 +135,13 @@ namespace Semver
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
         public SemVersion(int major, int minor = 0, int patch = 0,
-            IEnumerable<PrereleaseIdentifier> prerelease = null,
-            IEnumerable<MetadataIdentifier> metadata = null)
+            IEnumerable<PrereleaseIdentifier>? prerelease = null,
+            IEnumerable<MetadataIdentifier>? metadata = null)
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
             if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
-            IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers;
+            IReadOnlyList<PrereleaseIdentifier>? prereleaseIdentifiers;
             if (prerelease is null)
                 prereleaseIdentifiers = null;
             else
@@ -150,7 +151,7 @@ namespace Semver
                     throw new ArgumentException(PrereleaseIdentifierIsDefaultMessage, nameof(prerelease));
             }
 
-            IReadOnlyList<MetadataIdentifier> metadataIdentifiers;
+            IReadOnlyList<MetadataIdentifier>? metadataIdentifiers;
             if (metadata is null)
                 metadataIdentifiers = null;
             else
@@ -205,8 +206,8 @@ namespace Semver
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
         /// for <see cref="Int32"/>.</exception>
         public SemVersion(int major, int minor = 0, int patch = 0,
-            IEnumerable<string> prerelease = null,
-            IEnumerable<string> metadata = null)
+            IEnumerable<string>? prerelease = null,
+            IEnumerable<string>? metadata = null)
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
@@ -401,7 +402,11 @@ namespace Semver
             if (maxLength < 0) throw new ArgumentOutOfRangeException(nameof(maxLength), InvalidMaxLengthMessage);
             var ex = SemVersionParser.Parse(version, style, null, maxLength, out var semver);
 
-            return ex is null ? semver : throw ex;
+            if (!(ex is null))
+                throw ex;
+            DebugChecks.IsNotNull(semver, nameof(semver));
+
+            return semver;
         }
 
         public static SemVersion Parse(string version, int maxLength = MaxVersionLength)
@@ -423,8 +428,8 @@ namespace Semver
         /// <returns><see langword="false"/> when an invalid version string is passed, otherwise <see langword="true"/>.</returns>
         /// <exception cref="ArgumentException"><paramref name="style"/> is not a valid
         /// <see cref="SemVersionStyles"/> value.</exception>
-        public static bool TryParse(string version, SemVersionStyles style,
-            out SemVersion semver, int maxLength = MaxVersionLength)
+        public static bool TryParse(string? version, SemVersionStyles style,
+            [NotNullWhen(true)] out SemVersion? semver, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
             if (maxLength < 0) throw new ArgumentOutOfRangeException(nameof(maxLength), InvalidMaxLengthMessage);
@@ -439,7 +444,7 @@ namespace Semver
             return exception is null;
         }
 
-        public static bool TryParse(string version, out SemVersion semver, int maxLength = MaxVersionLength)
+        public static bool TryParse(string? version, [NotNullWhen(true)] out SemVersion? semver, int maxLength = MaxVersionLength)
             => TryParse(version, SemVersionStyles.Strict, out semver, maxLength);
 
         /// <summary>
@@ -469,8 +474,8 @@ namespace Semver
             int? major = null,
             int? minor = null,
             int? patch = null,
-            IEnumerable<PrereleaseIdentifier> prerelease = null,
-            IEnumerable<MetadataIdentifier> metadata = null)
+            IEnumerable<PrereleaseIdentifier>? prerelease = null,
+            IEnumerable<MetadataIdentifier>? metadata = null)
         {
             // Note: It is tempting to null coalesce first, but then this method would report invalid
             // arguments on invalid SemVersion instances.
@@ -481,8 +486,8 @@ namespace Semver
             if (patch is int patchInt && patchInt < 0)
                 throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
 
-            IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers = null;
-            string prereleaseString = null;
+            IReadOnlyList<PrereleaseIdentifier>? prereleaseIdentifiers = null;
+            string? prereleaseString = null;
             if (prerelease != null)
             {
                 prereleaseIdentifiers = prerelease.ToReadOnlyList();
@@ -497,8 +502,8 @@ namespace Semver
                     prereleaseString = string.Join(".", prereleaseIdentifiers);
             }
 
-            IReadOnlyList<MetadataIdentifier> metadataIdentifiers = null;
-            string metadataString = null;
+            IReadOnlyList<MetadataIdentifier>? metadataIdentifiers = null;
+            string? metadataString = null;
             if (metadata != null)
             {
                 metadataIdentifiers = metadata.ToReadOnlyList();
@@ -558,8 +563,8 @@ namespace Semver
             int? major = null,
             int? minor = null,
             int? patch = null,
-            string prerelease = null,
-            string metadata = null,
+            string? prerelease = null,
+            string? metadata = null,
             bool allowLeadingZeros = false)
         {
             // Note: It is tempting to null coalesce first, but then this method would report invalid
@@ -1008,7 +1013,7 @@ namespace Semver
         /// <returns><see langword="true"/> if the two versions are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
-        public static bool Equals(SemVersion left, SemVersion right)
+        public static bool Equals(SemVersion? left, SemVersion? right)
         {
             if (ReferenceEquals(left, right)) return true;
             if (left is null || right is null) return false;
@@ -1020,7 +1025,7 @@ namespace Semver
         /// otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is SemVersion version && Equals(version);
 
         /// <summary>
@@ -1030,7 +1035,7 @@ namespace Semver
         /// otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
-        public bool Equals(SemVersion other)
+        public bool Equals(SemVersion? other)
         {
             if (other is null)
                 return false;
@@ -1052,8 +1057,8 @@ namespace Semver
         /// <param name="other">The semantic version to compare to.</param>
         /// <returns><see langword="true"/> if the version precedences are equal, otherwise
         /// <see langword="false"/>.</returns>
-        public bool PrecedenceEquals(SemVersion other)
-            => PrecedenceComparer.Compare(this, other) == 0;
+        public bool PrecedenceEquals(SemVersion? other)
+            => PrecedenceComparer.Compare(this, other!) == 0;
 
         /// <summary>
         /// Determines whether two semantic versions have the same precedence. Versions that differ
@@ -1061,10 +1066,10 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if the version precedences are equal, otherwise
         /// <see langword="false"/>.</returns>
-        public static bool PrecedenceEquals(SemVersion left, SemVersion right)
-            => PrecedenceComparer.Compare(left, right) == 0;
+        public static bool PrecedenceEquals(SemVersion? left, SemVersion? right)
+            => PrecedenceComparer.Compare(left!, right!) == 0;
 
-        internal bool MajorMinorPatchEquals(SemVersion other)
+        internal bool MajorMinorPatchEquals(SemVersion? other)
         {
             if (other is null) return false;
 
@@ -1093,7 +1098,7 @@ namespace Semver
         /// <returns><see langword="true"/> if the two versions are equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
-        public static bool operator ==(SemVersion left, SemVersion right) => Equals(left, right);
+        public static bool operator ==(SemVersion? left, SemVersion? right) => Equals(left, right);
 
         /// <summary>
         /// Determines whether two semantic versions are <em>not</em> equal.
@@ -1101,7 +1106,7 @@ namespace Semver
         /// <returns><see langword="true"/> if the two versions are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not be equal.</remarks>
-        public static bool operator !=(SemVersion left, SemVersion right) => !Equals(left, right);
+        public static bool operator !=(SemVersion? left, SemVersion? right) => !Equals(left, right);
         #endregion
 
         #region Comparison
@@ -1223,8 +1228,8 @@ namespace Semver
         /// </list>
         /// </returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrecedenceOrder"]/*'/>
-        public static int ComparePrecedence(SemVersion left, SemVersion right)
-            => PrecedenceComparer.Compare(left, right);
+        public static int ComparePrecedence(SemVersion? left, SemVersion? right)
+            => PrecedenceComparer.Compare(left!, right!);
 
         /// <summary>
         /// Compares two versions and indicates whether the first precedes, follows, or is equal to
@@ -1258,8 +1263,8 @@ namespace Semver
         /// </list>
         /// </returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        public static int CompareSortOrder(SemVersion left, SemVersion right)
-            => SortOrderComparer.Compare(left, right);
+        public static int CompareSortOrder(SemVersion? left, SemVersion? right)
+            => SortOrderComparer.Compare(left!, right!);
         #endregion
 
         #region Satisfies

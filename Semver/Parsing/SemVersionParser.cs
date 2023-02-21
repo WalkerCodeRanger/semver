@@ -48,12 +48,12 @@ namespace Semver.Parsing
         /// </summary>
         /// <remarks>This does not validate the <paramref name="style"/> or <paramref name="maxLength"/>
         /// parameter values. That must be done in the calling method.</remarks>
-        public static Exception Parse(
-            string version,
+        public static Exception? Parse(
+            string? version,
             SemVersionStyles style,
-            Exception ex,
+            Exception? ex,
             int maxLength,
-            out SemVersion semver)
+            out SemVersion? semver)
         {
             DebugChecks.IsValid(style, nameof(style));
             DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
@@ -76,13 +76,13 @@ namespace Semver.Parsing
         /// </summary>
         /// <remarks>This does not validate the <paramref name="style"/> or <paramref name="maxLength"/>
         /// parameter values. That must be done in the calling method.</remarks>
-        public static Exception Parse(
+        public static Exception? Parse(
             StringSegment version,
             SemVersionStyles style,
             SemVersionParsingOptions options,
-            Exception ex,
+            Exception? ex,
             int maxLength,
-            out SemVersion semver,
+            out SemVersion? semver,
             out WildcardVersion wildcardVersion)
         {
             DebugChecks.IsValid(style, nameof(style));
@@ -161,7 +161,7 @@ namespace Semver.Parsing
             }
 
             // Parse prerelease version
-            string prerelease;
+            string? prerelease;
             IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers;
             if (prereleaseSegment.Length > 0)
             {
@@ -169,6 +169,7 @@ namespace Semver.Parsing
                 parseEx = ParsePrerelease(version, prereleaseSegment, allowLeadingZeros, options, ex,
                             out prerelease, out prereleaseIdentifiers, out var prereleaseIsWildcard);
                 if (parseEx != null) return parseEx;
+                DebugChecks.IsNotNull(prerelease, nameof(prerelease));
                 if (prereleaseIsWildcard) wildcardVersion |= WildcardVersion.PrereleaseWildcard;
             }
             else
@@ -201,11 +202,11 @@ namespace Semver.Parsing
             return null;
         }
 
-        private static Exception ParseLeadingWhitespace(
+        private static Exception? ParseLeadingWhitespace(
             StringSegment version,
             ref StringSegment segment,
             SemVersionStyles style,
-            Exception ex)
+            Exception? ex)
         {
             var oldLength = segment.Length;
 
@@ -223,11 +224,11 @@ namespace Semver.Parsing
             return null;
         }
 
-        private static Exception ParseLeadingV(
+        private static Exception? ParseLeadingV(
             StringSegment version,
             ref StringSegment segment,
             SemVersionStyles style,
-            Exception ex)
+            Exception? ex)
         {
             // This is safe because the check for all whitespace ensures there is at least one more char
             var leadChar = segment[0];
@@ -248,7 +249,7 @@ namespace Semver.Parsing
             return null;
         }
 
-        private static Exception ParseVersionNumber(
+        private static Exception? ParseVersionNumber(
             string kind, // i.e. Major, Minor, or Patch
             StringSegment version,
             IEnumerator<StringSegment> versionNumbers,
@@ -256,7 +257,7 @@ namespace Semver.Parsing
             bool optional,
             bool wildcardRequired,
             SemVersionParsingOptions options,
-            Exception ex,
+            Exception? ex,
             out int number,
             out bool isWildcard)
         {
@@ -272,14 +273,14 @@ namespace Semver.Parsing
             return null;
         }
 
-        private static Exception ParseVersionNumber(
+        private static Exception? ParseVersionNumber(
             string kind, // i.e. Major, Minor, or Patch
             StringSegment version,
             StringSegment segment,
             bool allowLeadingZeros,
             bool wildcardRequired,
             SemVersionParsingOptions options,
-            Exception ex,
+            Exception? ex,
             out int number,
             out bool isWildcard)
         {
@@ -337,13 +338,13 @@ namespace Semver.Parsing
             return null;
         }
 
-        private static Exception ParsePrerelease(
+        private static Exception? ParsePrerelease(
             StringSegment version,
             StringSegment segment,
             bool allowLeadingZero,
             SemVersionParsingOptions options,
-            Exception ex,
-            out string prerelease,
+            Exception? ex,
+            out string? prerelease,
             out IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
             out bool isWildcard)
         {
@@ -418,10 +419,10 @@ namespace Semver.Parsing
             return null;
         }
 
-        private static Exception ParseMetadata(
+        private static Exception? ParseMetadata(
             StringSegment version,
             StringSegment segment,
-            Exception ex,
+            Exception? ex,
             out string metadata,
             out IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {

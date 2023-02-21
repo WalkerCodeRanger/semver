@@ -68,7 +68,7 @@ namespace Semver.Parsing
         /// <summary>
         /// Parse optional spaces from the beginning of the segment.
         /// </summary>
-        public static Exception ParseOptionalSpaces(ref StringSegment segment, Exception ex)
+        public static Exception? ParseOptionalSpaces(ref StringSegment segment, Exception? ex)
         {
             segment = segment.TrimStartSpaces();
 
@@ -86,13 +86,13 @@ namespace Semver.Parsing
         /// <summary>
         /// Parse a version number from the beginning of the segment.
         /// </summary>
-        public static Exception ParseVersion(
+        public static Exception? ParseVersion(
             ref StringSegment segment,
             SemVersionRangeOptions rangeOptions,
             SemVersionParsingOptions parseOptions,
-            Exception ex,
+            Exception? ex,
             int maxLength,
-            out SemVersion semver,
+            out SemVersion? semver,
             out WildcardVersion wildcardVersion)
         {
             // The SemVersionParser assumes there is nothing following the version number. To reuse
@@ -105,6 +105,7 @@ namespace Semver.Parsing
             var exception = SemVersionParser.Parse(version, rangeOptions.ToStyles(), parseOptions, ex,
                 maxLength, out semver, out wildcardVersion);
             if (exception != null) return exception;
+            DebugChecks.IsNotNull(semver, nameof(semver));
 
             // Trim off metadata if it was allowed
             if (semver.MetadataIdentifiers.Count > 0)

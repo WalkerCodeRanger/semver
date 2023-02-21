@@ -60,7 +60,8 @@ namespace Semver.Utility
         }
 
         [Conditional("DEBUG")]
-        public static void IsNotNull<T>(T value, string paramName)
+        public static void IsNotNull<T>([NotNull] T? value, string paramName)
+            where T : class
         {
             if (value == null)
                 throw new ArgumentNullException(paramName, "DEBUG: Value cannot be null.");
@@ -71,14 +72,14 @@ namespace Semver.Utility
         /// returns <see cref="VersionParsing.FailedException"/>.
         /// </summary>
         [Conditional("DEBUG")]
-        public static void IsNotFailedException(Exception exception, string className, string methodName)
+        public static void IsNotFailedException(Exception? exception, string className, string methodName)
         {
             if (exception != null && exception != VersionParsing.FailedException)
                 throw new InvalidOperationException($"DEBUG: {className}.{methodName} returned exception other than {nameof(VersionParsing.FailedException)}", exception);
         }
 
         [Conditional("DEBUG")]
-        public static void NoMetadata(SemVersion version, string paramName)
+        public static void NoMetadata(SemVersion? version, string paramName)
         {
             if (version?.MetadataIdentifiers.Any() ?? false)
                 throw new ArgumentException("DEBUG: Cannot have metadata.", paramName);

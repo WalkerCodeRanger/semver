@@ -12,7 +12,7 @@ namespace Semver.Comparers
         private SortOrderComparer() { }
         #endregion
 
-        public bool Equals(SemVersion x, SemVersion y)
+        public bool Equals(SemVersion? x, SemVersion? y)
         {
             if (ReferenceEquals(x, y)) return true;
             if (x is null || y is null) return false;
@@ -25,12 +25,15 @@ namespace Semver.Comparers
         public int GetHashCode(SemVersion v)
             => CombinedHashCode.Create(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
 
-        public override int Compare(SemVersion x, SemVersion y)
+        public override int Compare(SemVersion? x, SemVersion? y)
         {
             if (ReferenceEquals(x, y)) return 0; // covers both null case
 
-            var comparison = PrecedenceComparer.Instance.Compare(x, y);
+            var comparison = PrecedenceComparer.Instance.Compare(x!, y!);
             if (comparison != 0) return comparison;
+
+            DebugChecks.IsNotNull(x, nameof(x));
+            DebugChecks.IsNotNull(y, nameof(y));
 
             var xMetadataIdentifiers = x.MetadataIdentifiers;
             var yMetadataIdentifiers = y.MetadataIdentifiers;

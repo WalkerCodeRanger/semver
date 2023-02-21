@@ -8,12 +8,12 @@ namespace Semver.Parsing
 {
     internal static class StandardRangeParser
     {
-        public static Exception Parse(
-            string range,
+        public static Exception? Parse(
+            string? range,
             SemVersionRangeOptions rangeOptions,
-            Exception ex,
+            Exception? ex,
             int maxLength,
-            out SemVersionRange semverRange)
+            out SemVersionRange? semverRange)
         {
             DebugChecks.IsValid(rangeOptions, nameof(rangeOptions));
             DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
@@ -32,22 +32,22 @@ namespace Semver.Parsing
             foreach (var segment in GeneralRangeParser.SplitOnOrOperator(range))
             {
                 var exception = ParseUnbrokenRange(segment, rangeOptions, ex, maxLength, out var unbrokenRange);
-                if (exception is null)
-                    unbrokenRanges.Add(unbrokenRange);
-                else
-                    return exception;
+                if (!(exception is null)) return exception;
+                DebugChecks.IsNotNull(unbrokenRange, nameof(unbrokenRange));
+
+                unbrokenRanges.Add(unbrokenRange);
             }
 
             semverRange = SemVersionRange.Create(unbrokenRanges);
             return null;
         }
 
-        private static Exception ParseUnbrokenRange(
+        private static Exception? ParseUnbrokenRange(
             StringSegment segment,
             SemVersionRangeOptions rangeOptions,
-            Exception ex,
+            Exception? ex,
             int maxLength,
-            out UnbrokenSemVersionRange unbrokenRange)
+            out UnbrokenSemVersionRange? unbrokenRange)
         {
             // Assign null once so it doesn't have to be done any time parse fails
             unbrokenRange = null;
@@ -86,11 +86,11 @@ namespace Semver.Parsing
         /// of <see cref="int"/>. Finally, if these equivalent ranges were supported they would also
         /// need special case handling in the <see cref="UnbrokenSemVersionRange.ToString"/> method.
         /// </para></remarks>
-        private static Exception ParseComparison(
+        private static Exception? ParseComparison(
             ref StringSegment segment,
             SemVersionRangeOptions rangeOptions,
             ref bool includeAllPrerelease,
-            Exception ex,
+            Exception? ex,
             int maxLength,
             ref LeftBoundedRange leftBound,
             ref RightBoundedRange rightBound)
@@ -107,6 +107,7 @@ namespace Semver.Parsing
             exception = GeneralRangeParser.ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
                             out var semver, out var wildcardVersion);
             if (exception != null) return exception;
+            DebugChecks.IsNotNull(semver, nameof(semver));
 
             if (@operator != StandardOperator.None && wildcardVersion != WildcardVersion.None)
                 return ex ?? RangeError.WildcardNotSupportedWithOperator(segment.Source);
@@ -212,8 +213,8 @@ namespace Semver.Parsing
             return new LeftBoundedRange(semver, true);
         }
 
-        private static Exception PrereleaseWildcardUpperBound(
-            Exception ex,
+        private static Exception? PrereleaseWildcardUpperBound(
+            Exception? ex,
             ref RightBoundedRange rightBound,
             StringSegment versionSegment,
             SemVersion semver,
@@ -250,8 +251,8 @@ namespace Semver.Parsing
             yield return lastIdentifier.NextIdentifier();
         }
 
-        private static Exception ParseOperator(
-            ref StringSegment segment, Exception ex, out StandardOperator @operator)
+        private static Exception? ParseOperator(
+            ref StringSegment segment, Exception? ex, out StandardOperator @operator)
         {
             var end = 0;
             while (end < segment.Length && GeneralRangeParser.IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.Strict)) end++;

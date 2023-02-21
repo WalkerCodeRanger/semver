@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
@@ -210,7 +211,7 @@ namespace Semver
         /// <param name="version">The version to test against the range.</param>
         /// <returns><see langword="true"/> if the version is contained in the range,
         /// otherwise <see langword="false"/>.</returns>
-        public bool Contains(SemVersion version)
+        public bool Contains(SemVersion? version)
         {
             // Using `for` loop for better performance
             for (var i = 0; i < ranges.Count; i++)
@@ -263,6 +264,7 @@ namespace Semver
 
             var ex = StandardRangeParser.Parse(range, options, null, maxLength, out var semverRange);
             if (ex != null) throw ex;
+            DebugChecks.IsNotNull(semverRange, nameof(semverRange));
             return semverRange;
         }
 
@@ -307,9 +309,10 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than zero.</exception>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static bool TryParse(
-            string range,
+            string? range,
             SemVersionRangeOptions options,
-            out SemVersionRange semverRange,
+            [NotNullWhen(true)]
+            out SemVersionRange? semverRange,
             int maxLength = MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
@@ -339,8 +342,9 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than zero.</exception>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static bool TryParse(
-            string range,
-            out SemVersionRange semverRange,
+            string? range,
+            [NotNullWhen(true)]
+            out SemVersionRange? semverRange,
             int maxLength = MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
             => TryParse(range, SemVersionRangeOptions.Strict, out semverRange, maxLength);
@@ -377,6 +381,7 @@ namespace Semver
 
             var ex = NpmRangeParser.Parse(range, includeAllPrerelease, null, maxLength, out var semverRange);
             if (ex != null) throw ex;
+            DebugChecks.IsNotNull(semverRange, nameof(semverRange));
             return semverRange;
         }
 
@@ -421,9 +426,10 @@ namespace Semver
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static bool TryParseNpm(
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
-            string range,
+            string? range,
             bool includeAllPrerelease,
-            out SemVersionRange semverRange,
+            [NotNullWhen(true)]
+            out SemVersionRange? semverRange,
             int maxLength = MaxRangeLength)
         {
             if (maxLength < 0)
@@ -454,8 +460,9 @@ namespace Semver
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static bool TryParseNpm(
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
-            string range,
-            out SemVersionRange semverRange,
+            string? range,
+            [NotNullWhen(true)]
+            out SemVersionRange? semverRange,
             int maxLength = MaxRangeLength)
             => TryParseNpm(range, false, out semverRange, maxLength);
         #endregion
@@ -501,7 +508,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the this range;
         /// otherwise <see langword="false"/>.</returns>
-        public bool Equals(SemVersionRange other)
+        public bool Equals(SemVersionRange? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -515,7 +522,7 @@ namespace Semver
         /// </summary>
         /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this range;
         /// otherwise <see langword="false"/>.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is SemVersionRange other && Equals(other);
 
         /// <summary>
@@ -533,7 +540,7 @@ namespace Semver
         /// different ways and so not be equal.
         /// </summary>
         /// <returns><see langword="true"/> if the two values are equal, otherwise <see langword="false"/>.</returns>
-        public static bool operator ==(SemVersionRange left, SemVersionRange right)
+        public static bool operator ==(SemVersionRange? left, SemVersionRange? right)
             => Equals(left, right);
 
         /// <summary>
@@ -542,7 +549,7 @@ namespace Semver
         /// expressed in different ways and so not be equal.
         /// </summary>
         /// <returns><see langword="true"/> if the two ranges are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
-        public static bool operator !=(SemVersionRange left, SemVersionRange right)
+        public static bool operator !=(SemVersionRange? left, SemVersionRange? right)
             => !Equals(left, right);
         #endregion
 

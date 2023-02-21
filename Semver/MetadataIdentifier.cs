@@ -99,7 +99,7 @@ namespace Semver
         /// <summary>Determines whether the given object is equal to this identifier.</summary>
         /// <returns><see langword="true"/> if <paramref name="value"/> is equal to the this identifier;
         /// otherwise <see langword="false"/>.</returns>
-        public override bool Equals(object value)
+        public override bool Equals(object? value)
             => value is MetadataIdentifier other && Equals(other);
 
         /// <summary>Gets a hash code for this identifier.</summary>

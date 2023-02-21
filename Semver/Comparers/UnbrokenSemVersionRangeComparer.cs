@@ -21,6 +21,7 @@ namespace Semver.Comparers
         private UnbrokenSemVersionRangeComparer() { }
         #endregion
 
+        // TODO shouldn't this take nullable?
         public override int Compare(UnbrokenSemVersionRange x, UnbrokenSemVersionRange y)
         {
             var comparison = x.LeftBound.CompareTo(y.LeftBound);
