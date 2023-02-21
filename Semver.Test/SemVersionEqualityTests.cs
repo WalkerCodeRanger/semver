@@ -6,18 +6,15 @@ using Xunit;
 namespace Semver.Test
 {
     /// <summary>
-    /// Tests of any comparison or equality related functionality of <see cref="SemVersion"/>.
-    /// This includes both standard comparison and precedence comparison. It also includes
+    /// Tests of any equality related functionality of <see cref="SemVersion"/>. It also includes
     /// <see cref="SemVersion.GetHashCode()"/> because this is connected to equality.
     ///
-    /// Because it is possible to construct invalid semver versions, the comparison
-    /// tests must be based off constructing <see cref="SemVersion"/> rather than just
-    /// using semver strings. The approach used is to work from a list of versions
+    /// For historical reasons, the approach used is to work from a list of versions
     /// in their correct order and then compare versions within the list. To
     /// avoid issues with xUnit serialization of <see cref="SemVersion"/>, this
     /// is done within the test rather than using theory data.
     /// </summary>
-    public class SemVersionObsoleteComparisonTests
+    public class SemVersionEqualityTests
     {
         // TODO this could use string now
         public static readonly IReadOnlyList<SemVersion> VersionsInSortOrder = new List<SemVersion>()
