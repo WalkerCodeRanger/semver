@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Semver.Ranges;
 
 namespace Semver.Comparers
 {

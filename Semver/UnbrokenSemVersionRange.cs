@@ -2,9 +2,10 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
+using Semver.Ranges;
 using Semver.Utility;
 
-namespace Semver.Ranges
+namespace Semver
 {
     /// <summary>
     /// A range of <see cref="SemVersion"/> values with no gaps. The more general and flexible range

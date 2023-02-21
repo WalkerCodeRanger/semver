@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using static Semver.Ranges.SemVersionRangeOptions;
+using static Semver.SemVersionRangeOptions;
 
-namespace Semver.Ranges
+namespace Semver
 {
     internal static class SemVersionRangeOptionsExtensions
     {

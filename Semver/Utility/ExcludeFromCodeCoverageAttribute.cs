@@ -1,5 +1,7 @@
-﻿#if NETSTANDARD1_1
-namespace System.Diagnostics.CodeAnalysis
+﻿using System;
+
+#if NETSTANDARD1_1
+namespace Semver.Utility
 {
     /// <summary>
     /// Specifies that the attributed code should be excluded from code coverage information.

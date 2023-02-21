@@ -1,12 +1,11 @@
 ﻿using System;
-using Semver.Ranges;
 using Semver.Test.Helpers;
 using Semver.Test.TestCases;
 using Xunit;
-using static Semver.Ranges.SemVersionRangeOptions;
+using static Semver.SemVersionRangeOptions;
 using static Semver.Test.Builders.UnbrokenSemVersionRangeBuilder;
 
-namespace Semver.Test.Ranges
+namespace Semver.Test
 {
     public class SemVersionRangeStandardParsingTests
     {

@@ -1,9 +1,8 @@
-﻿using Semver.Ranges;
-using Semver.Test.TestCases;
+﻿using Semver.Test.TestCases;
 using Xunit;
-using static Semver.Ranges.SemVersionRangeOptions;
+using static Semver.SemVersionRangeOptions;
 
-namespace Semver.Test.Ranges
+namespace Semver.Test
 {
     /// <summary>
     /// It was difficult to ensure that the <see cref="SemVersionRange.ToString"/> would output

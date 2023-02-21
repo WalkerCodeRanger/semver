@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Semver.Ranges.Parsers
+namespace Semver.Parsing
 {
     [Flags]
     internal enum WildcardVersion : byte

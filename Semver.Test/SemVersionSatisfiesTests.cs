@@ -1,5 +1,4 @@
 ﻿using System;
-using Semver.Ranges;
 using Semver.Test.Helpers;
 using Xunit;
 

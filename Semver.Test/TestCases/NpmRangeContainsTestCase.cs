@@ -1,6 +1,4 @@
-﻿using Semver.Ranges;
-
-namespace Semver.Test.TestCases
+﻿namespace Semver.Test.TestCases
 {
     /// <summary>
     /// An individual test case for whether an npm range contains a version

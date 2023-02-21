@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using Semver.Ranges.Parsers;
+using Semver.Parsing;
 
 namespace Semver.Utility
 {

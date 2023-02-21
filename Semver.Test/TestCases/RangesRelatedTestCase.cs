@@ -1,6 +1,4 @@
-﻿using Semver.Ranges;
-
-namespace Semver.Test.TestCases
+﻿namespace Semver.Test.TestCases
 {
     public class RangesRelatedTestCase
     {
