@@ -532,7 +532,12 @@ namespace Semver
         /// A hash code for this instance, suitable for use in hashing algorithms
         /// and data structures like a hash table.
         /// </returns>
-        public override int GetHashCode() => CombinedHashCode.CreateForItems(ranges);
+        public override int GetHashCode()
+        {
+            var hashcode = new HashCode();
+            foreach (var range in ranges) hashcode.Add(range);
+            return hashcode.ToHashCode();
+        }
 
         /// <summary>
         /// Determines whether two version ranges are equal. Due to the complexity of ranges, it may

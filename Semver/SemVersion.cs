@@ -1092,7 +1092,7 @@ namespace Semver
         /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
         /// versions with the same precedence may not have the same hash code.</remarks>
         public override int GetHashCode()
-            => CombinedHashCode.Create(Major, Minor, Patch, Prerelease, Metadata);
+            => HashCode.Combine(Major, Minor, Patch, Prerelease, Metadata);
 
         /// <summary>
         /// Determines whether two semantic versions are equal.

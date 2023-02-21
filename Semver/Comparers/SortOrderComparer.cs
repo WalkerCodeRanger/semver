@@ -23,7 +23,7 @@ namespace Semver.Comparers
         }
 
         public int GetHashCode(SemVersion v)
-            => CombinedHashCode.Create(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+            => HashCode.Combine(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
 
         public override int Compare(SemVersion? x, SemVersion? y)
         {

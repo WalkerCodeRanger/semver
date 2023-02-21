@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Semver.Utility;
 
 namespace Semver.Comparers
 {
@@ -22,7 +21,7 @@ namespace Semver.Comparers
         }
 
         public int GetHashCode(SemVersion v)
-            => CombinedHashCode.Create(v.Major, v.Minor, v.Patch, v.Prerelease);
+            => HashCode.Combine(v.Major, v.Minor, v.Patch, v.Prerelease);
 
         public override int Compare(SemVersion? x, SemVersion? y)
         {

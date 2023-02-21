@@ -71,7 +71,7 @@ namespace Semver.Ranges
             => obj is RightBoundedRange other && Equals(other);
 
         public override int GetHashCode()
-            => CombinedHashCode.Create(Version, Inclusive);
+            => HashCode.Combine(Version, Inclusive);
 
         public static bool operator ==(RightBoundedRange left, RightBoundedRange right)
             => left.Equals(right);

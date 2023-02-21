@@ -198,8 +198,8 @@ namespace Semver
         /// '<c>15</c>' has the same hash code as '<c>015</c>').</remarks>
         public override int GetHashCode()
         {
-            if (NumericValue is int numericValue) return CombinedHashCode.Create(numericValue);
-            return CombinedHashCode.Create(Value);
+            if (NumericValue is int numericValue) return HashCode.Combine(numericValue);
+            return HashCode.Combine(Value);
         }
 
         /// <summary>

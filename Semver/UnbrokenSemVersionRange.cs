@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
 using Semver.Ranges;
-using Semver.Utility;
 
 namespace Semver
 {
@@ -313,7 +312,7 @@ namespace Semver
         /// and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
-            => CombinedHashCode.Create(LeftBound, RightBound, IncludeAllPrerelease);
+            => HashCode.Combine(LeftBound, RightBound, IncludeAllPrerelease);
 
         /// <summary>
         /// Determines whether two version ranges are equal.

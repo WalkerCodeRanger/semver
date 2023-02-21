@@ -104,7 +104,7 @@ namespace Semver
 
         /// <summary>Gets a hash code for this identifier.</summary>
         /// <returns>A hash code for this identifier.</returns>
-        public override int GetHashCode() => CombinedHashCode.Create(Value);
+        public override int GetHashCode() => HashCode.Combine(Value);
 
         /// <summary>
         /// Determines whether two identifiers are equal.
