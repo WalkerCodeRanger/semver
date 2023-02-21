@@ -49,7 +49,7 @@ namespace Semver.Test
             console.WriteLine($"Range: {range}");
             console.WriteLine($"Prerelease range: {prereleaseRange}");
             console.WriteLine($"Range includes version {version}: {range.Contains(version)}");
-            console.WriteLine($"Prerelease range includes version: {prereleaseRange.Contains(version)}");
+            console.WriteLine($"Prerelease range includes version {version}: {prereleaseRange.Contains(version)}");
 
             // Alternative: another way to call SemVersionRange.Contains(version)
             Assert.False(version.Satisfies(range));
