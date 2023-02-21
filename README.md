@@ -67,7 +67,7 @@ var prereleaseRange = SemVersionRange.ParseNpm("^1.0.0", includeAllPrerelease: t
 Console.WriteLine($"Range: {range}");
 Console.WriteLine($"Prerelease range: {prereleaseRange}");
 Console.WriteLine($"Range includes version {version}: {range.Contains(version)}");
-Console.WriteLine($"Prerelease range includes version: {prereleaseRange.Contains(version)}");
+Console.WriteLine($"Prerelease range includes version {version}: {prereleaseRange.Contains(version)}");
 
 // Alternative: another way to call SemVersionRange.Contains(version)
 version.Satisfies(range);
@@ -82,5 +82,5 @@ Outputs:
 Range: 1.*
 Prerelease range: *-* 1.*
 Range includes version 1.1.0-rc.1+e471d15: False
-Prerelease range includes version: True
+Prerelease range includes version 1.1.0-rc.1+e471d15: True
 ```
