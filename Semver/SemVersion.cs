@@ -545,12 +545,12 @@ namespace Semver
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
             // TODO include in v3.0.0 for issue #72
             //if (maxLength < 0) throw new ArgumentOutOfRangeException(InvalidMaxLengthMessage, nameof(maxLength));
-            var exception = SemVersionParser.Parse(version, style, Parsing.FailedException, maxLength, out semver);
+            var exception = SemVersionParser.Parse(version, style, VersionParsing.FailedException, maxLength, out semver);
 
 #if DEBUG
             // This check ensures that SemVersionParser.Parse doesn't construct an exception, but always returns ParseFailedException
-            if (exception != null && exception != Parsing.FailedException)
-                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(Parsing.FailedException)}", exception);
+            if (exception != null && exception != VersionParsing.FailedException)
+                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(VersionParsing.FailedException)}", exception);
 #endif
 
             return exception is null;

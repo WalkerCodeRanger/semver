@@ -48,7 +48,7 @@ namespace Semver.Test
             var prereleaseRange = SemVersionRange.ParseNpm("^1.0.0", includeAllPrerelease: true);
             console.WriteLine($"Range: {range}");
             console.WriteLine($"Prerelease range: {prereleaseRange}");
-            console.WriteLine($"Range includes version: {range.Contains(version)}");
+            console.WriteLine($"Range includes version {version}: {range.Contains(version)}");
             console.WriteLine($"Prerelease range includes version: {prereleaseRange.Contains(version)}");
 
             // Alternative: another way to call SemVersionRange.Contains(version)

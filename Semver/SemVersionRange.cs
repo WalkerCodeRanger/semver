@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
+using Semver.Parsing;
 using Semver.Utility;
 
 namespace Semver
@@ -316,7 +317,7 @@ namespace Semver
             if (maxLength < 0)
                 throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
 
-            var exception = StandardRangeParser.Parse(range, options, Parsing.FailedException, maxLength, out semverRange);
+            var exception = StandardRangeParser.Parse(range, options, VersionParsing.FailedException, maxLength, out semverRange);
 
             DebugChecks.IsNotFailedException(exception, nameof(SemVersionParser), nameof(SemVersionParser.Parse));
 
@@ -428,7 +429,7 @@ namespace Semver
             if (maxLength < 0)
                 throw new ArgumentOutOfRangeException(nameof(maxLength), maxLength, InvalidMaxLengthMessage);
 
-            var exception = NpmRangeParser.Parse(range, includeAllPrerelease, Parsing.FailedException, maxLength, out semverRange);
+            var exception = NpmRangeParser.Parse(range, includeAllPrerelease, VersionParsing.FailedException, maxLength, out semverRange);
 
             DebugChecks.IsNotFailedException(exception, nameof(NpmRangeParser), nameof(NpmRangeParser.Parse));
 
