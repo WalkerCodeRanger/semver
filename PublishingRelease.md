@@ -24,7 +24,8 @@ These steps only need to be done for a non-prerelease version.
 1. Create a release from the tag on github.
    * Write up the changes in that version.
    * Attach the nupkg and snupkg files to the release in github.
-2. Create a new `vX.Y.Z-readme` branch for the next version.
-3. Mark the milestone, and any included issues, done with the current date.
-4. Update the `PublicAPI` files to reflect the newly published APIs
-5. Update the benchmark to reference the new version as the previous version.
+2. Update `appveyor.yml` with the new version number so builds will be assigned proper versions.
+3. Create a new `vX.Y.Z-readme` branch for the next version.
+4. Mark the milestone, and any included issues, done with the current date.
+5. Update the `PublicAPI` files to reflect the newly published APIs
+6. Update the benchmark to reference the new version as the previous version.
