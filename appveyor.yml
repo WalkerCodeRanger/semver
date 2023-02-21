@@ -22,11 +22,7 @@ init:
     $major_minor_patch = $version_split_at_hyphen[0]
     $major_minor_patch_split = $major_minor_patch -split '\.'
     $major = $major_minor_patch_split[0]
-    $minor = "0"
-    # Because 2.0.6 was released, all future 2.X versions must be 2.1.0.0 assembly version
-    # but future versions should be X.0.0.0
-    If ($major -eq "2") { $minor = "1" }
-    $env:ASSEMBLY_VERSION = "$major.$minor.0.0"
+    $env:ASSEMBLY_VERSION = "$major.0.0.0"
     $env:FILE_VERSION = "$major_minor_patch.0"
     $env:INFORMATIONAL_Version = "$version+$env:GIT_HASH"
     Write-Host "Computed package version: $version"
