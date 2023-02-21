@@ -41,6 +41,7 @@ init:
 dotnet_csproj:
   patch: true
   file: '**\Semver.csproj'
+  version: '$(PACKAGE_VERSION)'
   package_version: '$(PACKAGE_VERSION)'
   assembly_version: '$(ASSEMBLY_VERSION)'
   file_version: '$(FILE_VERSION)'
