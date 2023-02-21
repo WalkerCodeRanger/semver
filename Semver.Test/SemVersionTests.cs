@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Semver.Test.Helpers;
 using Xunit;
@@ -169,7 +168,6 @@ namespace Semver.Test
             Assert.Equal(version, actual);
         }
 
-#if SERIALIZABLE
         [Fact]
         public void SerializationTest()
         {
@@ -178,29 +176,15 @@ namespace Semver.Test
             using (var ms = new MemoryStream())
             {
                 var bf = new BinaryFormatter();
+#pragma warning disable SYSLIB0011 // BinaryFormatter serialization is obsolete
                 bf.Serialize(ms, semVer);
                 ms.Position = 0;
                 semVerSerializedDeserialized = (SemVersion)bf.Deserialize(ms);
+#pragma warning restore SYSLIB0011
             }
             Assert.Equal(semVer, semVerSerializedDeserialized);
             Assert.Equal(semVer.PrereleaseIdentifiers, semVerSerializedDeserialized.PrereleaseIdentifiers);
             Assert.Equal(semVer.MetadataIdentifiers, semVerSerializedDeserialized.MetadataIdentifiers);
         }
-#else
-        [Fact]
-        public void SerializationNotSupportedTest()
-        {
-            var semVer = SemVersion.ParsedFrom(1, 2, 3, "alpha", "dev");
-            using (var ms = new MemoryStream())
-            {
-                var bf = new BinaryFormatter();
-                var ex = Assert.Throws<SerializationException>(() => bf.Serialize(ms, semVer));
-                // The CI build ends up with a different assembly name, so it can't be hardcoded
-                var assemblyName = typeof(SemVersion).Assembly.FullName;
-                string expectedMessage = $"Type 'Semver.SemVersion' in Assembly '{assemblyName}' is not marked as serializable.";
-                Assert.Equal(expectedMessage, ex.Message);
-            }
-        }
-#endif
     }
 }

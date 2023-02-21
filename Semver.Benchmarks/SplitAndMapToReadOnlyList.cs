@@ -8,9 +8,9 @@ using Semver.Utility;
 
 namespace Semver.Benchmarks
 {
-    [SimpleJob(RuntimeMoniker.Net461)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.Net462)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+    [SimpleJob(RuntimeMoniker.Net60)]
     public class SplitAndMapToReadOnlyList
     {
         /// <remarks>Values of different length. The final one is chosen to be long enough to require

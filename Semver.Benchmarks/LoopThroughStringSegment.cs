@@ -9,9 +9,9 @@ namespace Semver.Benchmarks
 {
     /// <remarks>Shows that a for loop through the characters of a string segment is much faster
     /// than enumerating them since the compiler has no loop optimizer for this case.</remarks>
-    [SimpleJob(RuntimeMoniker.Net461)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.Net462)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+    [SimpleJob(RuntimeMoniker.Net60)]
     public class LoopThroughStringSegment
     {
         private static readonly StringSegment Value = "245413548946516575165756156751323245451984";

@@ -5,9 +5,9 @@ using Previous = previous::Semver;
 
 namespace Semver.Benchmarks
 {
-    [SimpleJob(RuntimeMoniker.Net461)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.Net462)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+    [SimpleJob(RuntimeMoniker.Net60)]
     public class SemVersionParsedFrom
     {
         private const string Prerelease = "asdf.24534634.sdfdg.02343sd";

@@ -2,7 +2,6 @@
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using Semver.Ranges;
 
 namespace Semver.Benchmarks.Ranges
 {
@@ -11,9 +10,9 @@ namespace Semver.Benchmarks.Ranges
     /// on the performance of <see cref="SemVersionRange.Contains"/>. In .NET Core, even using a
     /// <c>for</c> loop rather than <c>foreach</c> helps.
     /// </remarks>
-    [SimpleJob(RuntimeMoniker.Net461)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.Net462)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+    [SimpleJob(RuntimeMoniker.Net60)]
     public class RangeContains
     {
         /// <summary>

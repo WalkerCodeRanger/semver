@@ -6,9 +6,9 @@ using Semver.Utility;
 
 namespace Semver.Benchmarks
 {
-    [SimpleJob(RuntimeMoniker.Net461)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.Net462)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+    [SimpleJob(RuntimeMoniker.Net60)]
     public class DecimalDigits
     {
         [Params(99, 999, 999_999, int.MaxValue)]

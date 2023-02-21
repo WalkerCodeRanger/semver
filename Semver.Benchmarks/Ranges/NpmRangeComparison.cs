@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Semver.Benchmarks.Builders;
-using Semver.Ranges;
 using Semver.Utility;
 
 namespace Semver.Benchmarks.Ranges
 {
-    [SimpleJob(RuntimeMoniker.Net461)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp21)]
+    [SimpleJob(RuntimeMoniker.Net462)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
+    [SimpleJob(RuntimeMoniker.Net60)]
     public class NpmRangeComparison
     {
         private const int RangeCount = 1_000;
