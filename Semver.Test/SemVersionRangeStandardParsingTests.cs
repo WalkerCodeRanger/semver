@@ -72,6 +72,7 @@ namespace Semver.Test
             Valid("^0.2.3-rc", InclusiveOfStart("0.2.3-rc", "0.3.0-0")),
             Valid("^0.0.3", InclusiveOfStart("0.0.3", "0.0.4-0")),
             Valid("^0.0.3-rc", InclusiveOfStart("0.0.3-rc", "0.0.4-0")),
+            Valid(">=4.0.0", IncludeAllPrerelease, AtLeast("4.0.0", true)),
 
             // Wildcard versions
             Valid("*", AllRelease),

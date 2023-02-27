@@ -147,6 +147,7 @@ namespace Semver.Test
             Valid("^1.x", InclusiveOfStart("1.0.0", "2.0.0-0")),
             Valid("^1.x", true, InclusiveOfStart("1.0.0-0", "2.0.0-0", true)),
             Valid("^0.x", InclusiveOfStart("0.0.0", "1.0.0-0")),
+            Valid("^4", true, InclusiveOfStart("4.0.0-0", "5.0.0-0", true)),
             Valid("^*", AllRelease),
             Valid("^*", true, All),
 
