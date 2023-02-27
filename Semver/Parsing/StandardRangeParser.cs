@@ -255,11 +255,12 @@ namespace Semver.Parsing
             ref StringSegment segment, Exception? ex, out StandardOperator @operator)
         {
             var end = 0;
-            while (end < segment.Length && GeneralRangeParser.IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.Strict)) end++;
-            var opSegment = segment.Subsegment(0, end);
+            while (end < segment.Length && GeneralRangeParser.IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.Strict))
+                end++;
+            var opSpan = segment.AsSpan()[..end];
             segment = segment.Subsegment(end);
 
-            if (opSegment.Length == 0)
+            if (opSpan.Length == 0)
             {
                 @operator = StandardOperator.None;
                 return null;
@@ -267,12 +268,12 @@ namespace Semver.Parsing
 
             // Assign invalid once so it doesn't have to be done any time parse fails
             @operator = 0;
-            if (opSegment.Length > 2
-                || (opSegment.Length == 2 && opSegment[1] != '='))
-                return ex ?? RangeError.InvalidOperator(opSegment.AsSpan());
+            if (opSpan.Length > 2
+                || (opSpan.Length == 2 && opSpan[1] != '='))
+                return ex ?? RangeError.InvalidOperator(opSpan);
 
-            var firstChar = opSegment[0];
-            var isOrEqual = opSegment.Length == 2; // Already checked for second char != '='
+            var firstChar = opSpan[0];
+            var isOrEqual = opSpan.Length == 2; // Already checked for second char != '='
             switch (firstChar)
             {
                 case '=' when !isOrEqual:
@@ -297,7 +298,7 @@ namespace Semver.Parsing
                     @operator = StandardOperator.Caret;
                     return null;
                 default:
-                    return ex ?? RangeError.InvalidOperator(opSegment.AsSpan());
+                    return ex ?? RangeError.InvalidOperator(opSpan);
             }
         }
 
