@@ -544,7 +544,7 @@ namespace Semver.Test
         {
             var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(null, "rest"));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
-            Assert.Equal("metadataIdentifiers", ex.ParamName);
+            Assert.Equal("metadataIdentifier", ex.ParamName);
         }
 
         [Fact]
