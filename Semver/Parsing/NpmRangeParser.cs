@@ -486,7 +486,7 @@ namespace Semver.Parsing
                 || (opSegment.Length == 2
                     && opSegment[1] != '='
                     && !(opSegment[0] == '~' && opSegment[1] == '>')))
-                return ex ?? RangeError.InvalidOperator(opSegment);
+                return ex ?? RangeError.InvalidOperator(opSegment.AsSpan());
 
             var firstChar = opSegment[0];
             var isOrEqual = opSegment.Length == 2 && opSegment[1] == '=';
@@ -515,11 +515,11 @@ namespace Semver.Parsing
                     @operator = StandardOperator.Caret;
                     return null;
                 default:
-                    return ex ?? RangeError.InvalidOperator(opSegment);
+                    return ex ?? RangeError.InvalidOperator(opSegment.AsSpan());
             }
         }
 
         private static readonly SemVersionParsingOptions ParsingOptions
-            = new SemVersionParsingOptions(true, false, true, c => c == 'x' || c == 'X' || c == '*');
+            = new SemVersionParsingOptions(true, false, true, c => c is 'x' or 'X' or '*');
     }
 }

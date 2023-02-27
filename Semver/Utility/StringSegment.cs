@@ -49,6 +49,8 @@ namespace Semver.Utility
             }
         }
 
+        public ReadOnlySpan<char> AsSpan() => Source.AsSpan().Slice(Offset, Length);
+
         public StringSegment TrimStartSpaces()
         {
             var start = Offset;
@@ -197,12 +199,10 @@ namespace Semver.Utility
 
         public string ToStringLimitLength()
         {
-            if (Length > DisplayLimit) return Subsegment(0, DisplayLimit - 3) + "...";
+            if (Length > Display.Limit) return Subsegment(0, Display.Limit - 3) + "...";
 
             return ToString();
         }
-
-        private const int DisplayLimit = 100;
 
 #if DEBUG
         [ExcludeFromCodeCoverage]

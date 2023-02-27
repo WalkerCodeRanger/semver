@@ -96,12 +96,10 @@ namespace Semver.Utility
 
         public static string LimitLength(this string value)
         {
-            if (value.Length > DisplayLimit)
-                return value.Substring(0, DisplayLimit - 3) + "...";
+            if (value.Length > Display.Limit)
+                return value.Substring(0, Display.Limit - 3) + "...";
 
             return value;
         }
-
-        private const int DisplayLimit = 100;
     }
 }

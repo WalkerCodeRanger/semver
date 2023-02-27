@@ -29,7 +29,7 @@ namespace Semver.Parsing
             => NewFormatException(TooLongMessage, range.LimitLength(), maxLength);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Exception InvalidOperator(StringSegment @operator)
+        public static Exception InvalidOperator(ReadOnlySpan<char> @operator)
             => NewFormatException(InvalidOperatorMessage, @operator.ToStringLimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
