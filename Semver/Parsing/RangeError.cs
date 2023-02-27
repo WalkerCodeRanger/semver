@@ -41,8 +41,8 @@ namespace Semver.Parsing
             => NewFormatException(MissingComparisonMessage, position, range.LimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Exception MaxVersion(StringSegment version)
-            => NewFormatException(MaxVersionMessage, version.TrimEndWhitespace().ToStringLimitLength());
+        public static Exception MaxVersion(ReadOnlySpan<char> version)
+            => NewFormatException(MaxVersionMessage, version.TrimEnd().ToStringLimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception WildcardNotSupportedWithOperator(string range)

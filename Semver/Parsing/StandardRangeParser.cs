@@ -138,17 +138,17 @@ namespace Semver.Parsing
                     int major = 0, minor = 0, patch = 0;
                     if (semver.Major != 0)
                     {
-                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
+                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
                         major = semver.Major + 1;
                     }
                     else if (semver.Minor != 0)
                     {
-                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
+                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
                         minor = semver.Minor + 1;
                     }
                     else
                     {
-                        if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
+                        if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
                         patch = semver.Patch + 1;
                     }
 
@@ -159,7 +159,7 @@ namespace Semver.Parsing
                     return null;
                 case StandardOperator.Tilde:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
+                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
                     rightBound = rightBound.Min(new RightBoundedRange(
                         semver.With(minor: semver.Minor + 1, patch: 0, prerelease: PrereleaseIdentifiers.Zero),
                         false));
@@ -180,7 +180,7 @@ namespace Semver.Parsing
                             return null;
                         case WildcardVersion.MinorPatchWildcard:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
-                            if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
+                            if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
                             rightBound = rightBound.Min(new RightBoundedRange(
                                 new SemVersion(semver.Major + 1, 0, 0,
                                     "0", PrereleaseIdentifiers.Zero,
@@ -188,7 +188,7 @@ namespace Semver.Parsing
                             return null;
                         case WildcardVersion.PatchWildcard:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
-                            if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
+                            if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
                             rightBound = rightBound.Min(new RightBoundedRange(
                                 new SemVersion(semver.Major, semver.Minor + 1, 0,
                                     "0", PrereleaseIdentifiers.Zero,
@@ -228,7 +228,7 @@ namespace Semver.Parsing
                         PrereleaseWildcardUpperBoundPrereleaseIdentifiers(semver.PrereleaseIdentifiers));
                 else
                 {
-                    if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
+                    if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
                     semver = new SemVersion(semver.Major, semver.Minor, semver.Patch + 1,
                         "0", PrereleaseIdentifiers.Zero, "", ReadOnlyList<MetadataIdentifier>.Empty);
                 }
@@ -246,7 +246,7 @@ namespace Semver.Parsing
             for (int i = 0; i < identifiers.Count - 1; i++)
                 yield return identifiers[i];
 
-            var lastIdentifier = identifiers[identifiers.Count - 1];
+            var lastIdentifier = identifiers[^1];
 
             yield return lastIdentifier.NextIdentifier();
         }
@@ -269,7 +269,7 @@ namespace Semver.Parsing
             @operator = 0;
             if (opSegment.Length > 2
                 || (opSegment.Length == 2 && opSegment[1] != '='))
-                return ex ?? RangeError.InvalidOperator(opSegment);
+                return ex ?? RangeError.InvalidOperator(opSegment.AsSpan());
 
             var firstChar = opSegment[0];
             var isOrEqual = opSegment.Length == 2; // Already checked for second char != '='
@@ -297,7 +297,7 @@ namespace Semver.Parsing
                     @operator = StandardOperator.Caret;
                     return null;
                 default:
-                    return ex ?? RangeError.InvalidOperator(opSegment);
+                    return ex ?? RangeError.InvalidOperator(opSegment.AsSpan());
             }
         }
 
