@@ -252,17 +252,17 @@ namespace Semver.Parsing
                     int major = 0, minor = 0, patch = 0;
                     if (semver.Major != 0 || wildcardVersion == WildcardVersion.MinorPatchWildcard)
                     {
-                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         major = semver.Major + 1;
                     }
                     else if (semver.Minor != 0 || wildcardVersion == WildcardVersion.PatchWildcard)
                     {
-                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         minor = semver.Minor + 1;
                     }
                     else
                     {
-                        if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                        if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         patch = semver.Patch + 1;
                     }
 
@@ -278,14 +278,14 @@ namespace Semver.Parsing
                     WildcardLowerBound(includeAllPrerelease, ref leftBound, semver, wildcardVersion);
                     if (wildcardVersion == WildcardVersion.MinorPatchWildcard)
                     {
-                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         rightBound = rightBound.Min(new RightBoundedRange(
                             new SemVersion(semver.Major + 1, 0, 0, "0", PrereleaseIdentifiers.Zero, "",
                                 ReadOnlyList<MetadataIdentifier>.Empty), false));
                     }
                     else
                     {
-                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         rightBound = rightBound.Min(new RightBoundedRange(
                             semver.With(minor: semver.Minor + 1, patch: 0, prerelease: PrereleaseIdentifiers.Zero),
                             false));
@@ -343,7 +343,7 @@ namespace Semver.Parsing
                     return null;
                 case WildcardVersion.MinorPatchWildcard:
                 {
-                    if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                    if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                     var prereleaseString = includeAllPrerelease ? "0" : "";
                     var prerelease = includeAllPrerelease ? PrereleaseIdentifiers.Zero : ReadOnlyList<PrereleaseIdentifier>.Empty;
                     semver = new SemVersion(semver.Major + 1, 0, 0, prereleaseString, prerelease,
@@ -353,7 +353,7 @@ namespace Semver.Parsing
                 }
                 case WildcardVersion.PatchWildcard:
                 {
-                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                     var prereleaseString = includeAllPrerelease ? "0" : "";
                     var prerelease = includeAllPrerelease ? PrereleaseIdentifiers.Zero : ReadOnlyList<PrereleaseIdentifier>.Empty;
                     semver = new SemVersion(semver.Major, semver.Minor + 1, 0, prereleaseString, prerelease,
@@ -449,13 +449,13 @@ namespace Semver.Parsing
                     // No further bounds placed
                     return null;
                 case WildcardVersion.MinorPatchWildcard:
-                    if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                    if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                     rightBound = rightBound.Min(new RightBoundedRange(
                         new SemVersion(semver.Major + 1, 0, 0, "0", PrereleaseIdentifiers.Zero, "",
                             ReadOnlyList<MetadataIdentifier>.Empty), false));
                     return null;
                 case WildcardVersion.PatchWildcard:
-                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                     rightBound = rightBound.Min(new RightBoundedRange(
                         new SemVersion(semver.Major, semver.Minor + 1, 0, "0", PrereleaseIdentifiers.Zero, "",
                             ReadOnlyList<MetadataIdentifier>.Empty), false));
@@ -486,7 +486,7 @@ namespace Semver.Parsing
                 || (opSegment.Length == 2
                     && opSegment[1] != '='
                     && !(opSegment[0] == '~' && opSegment[1] == '>')))
-                return ex ?? RangeError.InvalidOperator(opSegment.AsSpan());
+                return ex ?? RangeError.InvalidOperator(opSegment);
 
             var firstChar = opSegment[0];
             var isOrEqual = opSegment.Length == 2 && opSegment[1] == '=';
@@ -515,11 +515,11 @@ namespace Semver.Parsing
                     @operator = StandardOperator.Caret;
                     return null;
                 default:
-                    return ex ?? RangeError.InvalidOperator(opSegment.AsSpan());
+                    return ex ?? RangeError.InvalidOperator(opSegment);
             }
         }
 
         private static readonly SemVersionParsingOptions ParsingOptions
-            = new SemVersionParsingOptions(true, false, true, c => c is 'x' or 'X' or '*');
+            = new SemVersionParsingOptions(true, false, true, c => c == 'x' || c == 'X' || c == '*');
     }
 }

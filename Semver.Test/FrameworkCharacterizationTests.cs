@@ -68,6 +68,7 @@ namespace Semver.Test
             Assert.Equal(42, 42.GetHashCode());
         }
 
+#if NETCOREAPP
         [Fact]
         public void HashCodeCombineInt()
         {
@@ -79,6 +80,7 @@ namespace Semver.Test
         {
             Assert.NotEqual(0, HashCode.Combine<object>(null));
         }
+#endif
 
         private const string InvalidNumberStyleMessageStart = "An undefined NumberStyles value is being used.";
         private const string InvalidFormatMessage = "Input string was not in a correct format.";

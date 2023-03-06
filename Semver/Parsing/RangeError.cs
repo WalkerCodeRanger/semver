@@ -29,7 +29,7 @@ namespace Semver.Parsing
             => NewFormatException(TooLongMessage, range.LimitLength(), maxLength);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Exception InvalidOperator(ReadOnlySpan<char> @operator)
+        public static Exception InvalidOperator(StringSegment @operator)
             => NewFormatException(InvalidOperatorMessage, @operator.ToStringLimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -41,8 +41,8 @@ namespace Semver.Parsing
             => NewFormatException(MissingComparisonMessage, position, range.LimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Exception MaxVersion(ReadOnlySpan<char> version)
-            => NewFormatException(MaxVersionMessage, version.TrimEnd().ToStringLimitLength());
+        public static Exception MaxVersion(StringSegment version)
+            => NewFormatException(MaxVersionMessage, version.TrimEndWhitespace().ToStringLimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception WildcardNotSupportedWithOperator(string range)

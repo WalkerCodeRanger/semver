@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Semver.Utility;
 
 namespace Semver.Parsing
 {

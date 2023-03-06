@@ -97,9 +97,7 @@ namespace Semver.Parsing
         {
             DebugChecks.IsNotEmpty(segment, nameof(segment));
 
-            var chars = segment.AsMemory();
-            var exception = ParseOperator(ref chars, ex, out var @operator);
-            segment = chars.ToSegment();
+            var exception = ParseOperator(ref segment, ex, out var @operator);
             if (exception != null) return exception;
 
             exception = GeneralRangeParser.ParseOptionalSpaces(ref segment, ex);
@@ -140,17 +138,17 @@ namespace Semver.Parsing
                     int major = 0, minor = 0, patch = 0;
                     if (semver.Major != 0)
                     {
-                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         major = semver.Major + 1;
                     }
                     else if (semver.Minor != 0)
                     {
-                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         minor = semver.Minor + 1;
                     }
                     else
                     {
-                        if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                        if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         patch = semver.Patch + 1;
                     }
 
@@ -161,7 +159,7 @@ namespace Semver.Parsing
                     return null;
                 case StandardOperator.Tilde:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                     rightBound = rightBound.Min(new RightBoundedRange(
                         semver.With(minor: semver.Minor + 1, patch: 0, prerelease: PrereleaseIdentifiers.Zero),
                         false));
@@ -182,7 +180,7 @@ namespace Semver.Parsing
                             return null;
                         case WildcardVersion.MinorPatchWildcard:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
-                            if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                            if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                             rightBound = rightBound.Min(new RightBoundedRange(
                                 new SemVersion(semver.Major + 1, 0, 0,
                                     "0", PrereleaseIdentifiers.Zero,
@@ -190,7 +188,7 @@ namespace Semver.Parsing
                             return null;
                         case WildcardVersion.PatchWildcard:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
-                            if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                            if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                             rightBound = rightBound.Min(new RightBoundedRange(
                                 new SemVersion(semver.Major, semver.Minor + 1, 0,
                                     "0", PrereleaseIdentifiers.Zero,
@@ -230,7 +228,7 @@ namespace Semver.Parsing
                         PrereleaseWildcardUpperBoundPrereleaseIdentifiers(semver.PrereleaseIdentifiers));
                 else
                 {
-                    if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment.AsSpan());
+                    if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                     semver = new SemVersion(semver.Major, semver.Minor, semver.Patch + 1,
                         "0", PrereleaseIdentifiers.Zero, "", ReadOnlyList<MetadataIdentifier>.Empty);
                 }
@@ -248,21 +246,20 @@ namespace Semver.Parsing
             for (int i = 0; i < identifiers.Count - 1; i++)
                 yield return identifiers[i];
 
-            var lastIdentifier = identifiers[^1];
+            var lastIdentifier = identifiers[identifiers.Count - 1];
 
             yield return lastIdentifier.NextIdentifier();
         }
 
         private static Exception? ParseOperator(
-            ref ReadOnlyMemory<char> chars, Exception? ex, out StandardOperator @operator)
+            ref StringSegment segment, Exception? ex, out StandardOperator @operator)
         {
             var end = 0;
-            while (end < chars.Length && GeneralRangeParser.IsPossibleOperatorChar(chars.Span[end], SemVersionRangeOptions.Strict))
-                end++;
-            var opChars = chars.Span[..end];
-            chars = chars[end..];
+            while (end < segment.Length && GeneralRangeParser.IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.Strict)) end++;
+            var opSegment = segment.Subsegment(0, end);
+            segment = segment.Subsegment(end);
 
-            if (opChars.Length == 0)
+            if (opSegment.Length == 0)
             {
                 @operator = StandardOperator.None;
                 return null;
@@ -270,12 +267,12 @@ namespace Semver.Parsing
 
             // Assign invalid once so it doesn't have to be done any time parse fails
             @operator = 0;
-            if (opChars.Length > 2
-                || (opChars.Length == 2 && opChars[1] != '='))
-                return ex ?? RangeError.InvalidOperator(opChars);
+            if (opSegment.Length > 2
+                || (opSegment.Length == 2 && opSegment[1] != '='))
+                return ex ?? RangeError.InvalidOperator(opSegment);
 
-            var firstChar = opChars[0];
-            var isOrEqual = opChars.Length == 2; // Already checked for second char != '='
+            var firstChar = opSegment[0];
+            var isOrEqual = opSegment.Length == 2; // Already checked for second char != '='
             switch (firstChar)
             {
                 case '=' when !isOrEqual:
@@ -300,7 +297,7 @@ namespace Semver.Parsing
                     @operator = StandardOperator.Caret;
                     return null;
                 default:
-                    return ex ?? RangeError.InvalidOperator(opChars);
+                    return ex ?? RangeError.InvalidOperator(opSegment);
             }
         }
 
