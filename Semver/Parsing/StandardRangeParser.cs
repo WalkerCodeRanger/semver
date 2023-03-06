@@ -97,7 +97,9 @@ namespace Semver.Parsing
         {
             DebugChecks.IsNotEmpty(segment, nameof(segment));
 
-            var exception = ParseOperator(ref segment, ex, out var @operator);
+            var chars = segment.AsMemory();
+            var exception = ParseOperator(ref chars, ex, out var @operator);
+            segment = chars.ToSegment();
             if (exception != null) return exception;
 
             exception = GeneralRangeParser.ParseOptionalSpaces(ref segment, ex);
@@ -252,15 +254,15 @@ namespace Semver.Parsing
         }
 
         private static Exception? ParseOperator(
-            ref StringSegment segment, Exception? ex, out StandardOperator @operator)
+            ref ReadOnlyMemory<char> chars, Exception? ex, out StandardOperator @operator)
         {
             var end = 0;
-            while (end < segment.Length && GeneralRangeParser.IsPossibleOperatorChar(segment[end], SemVersionRangeOptions.Strict))
+            while (end < chars.Length && GeneralRangeParser.IsPossibleOperatorChar(chars.Span[end], SemVersionRangeOptions.Strict))
                 end++;
-            var opSpan = segment.AsSpan()[..end];
-            segment = segment.Subsegment(end);
+            var opChars = chars.Span[..end];
+            chars = chars[end..];
 
-            if (opSpan.Length == 0)
+            if (opChars.Length == 0)
             {
                 @operator = StandardOperator.None;
                 return null;
@@ -268,12 +270,12 @@ namespace Semver.Parsing
 
             // Assign invalid once so it doesn't have to be done any time parse fails
             @operator = 0;
-            if (opSpan.Length > 2
-                || (opSpan.Length == 2 && opSpan[1] != '='))
-                return ex ?? RangeError.InvalidOperator(opSpan);
+            if (opChars.Length > 2
+                || (opChars.Length == 2 && opChars[1] != '='))
+                return ex ?? RangeError.InvalidOperator(opChars);
 
-            var firstChar = opSpan[0];
-            var isOrEqual = opSpan.Length == 2; // Already checked for second char != '='
+            var firstChar = opChars[0];
+            var isOrEqual = opChars.Length == 2; // Already checked for second char != '='
             switch (firstChar)
             {
                 case '=' when !isOrEqual:
@@ -298,7 +300,7 @@ namespace Semver.Parsing
                     @operator = StandardOperator.Caret;
                     return null;
                 default:
-                    return ex ?? RangeError.InvalidOperator(opSpan);
+                    return ex ?? RangeError.InvalidOperator(opChars);
             }
         }
 

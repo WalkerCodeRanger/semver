@@ -51,6 +51,8 @@ namespace Semver.Utility
 
         public ReadOnlySpan<char> AsSpan() => Source.AsSpan().Slice(Offset, Length);
 
+        public ReadOnlyMemory<char> AsMemory() => Source.AsMemory().Slice(Offset, Length);
+
         public StringSegment TrimStartSpaces()
         {
             var start = Offset;
