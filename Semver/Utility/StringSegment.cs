@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using SysStringSegment = Microsoft.Extensions.Primitives.StringSegment;
 
 namespace Semver.Utility
 {
     /// <summary>
     /// An efficient representation of a section of a string
     /// </summary>
-    // TODO switch to ReadOnlySpan<char>
+    // TODO switch to Microsoft.Extensions.Primitives.StringSegment
     [StructLayout(LayoutKind.Auto)]
     internal readonly struct StringSegment
     {
@@ -201,6 +202,12 @@ namespace Semver.Utility
 
             return ToString();
         }
+
+        public static implicit operator SysStringSegment(StringSegment segment)
+            => new SysStringSegment(segment.Source, segment.Offset, segment.Length);
+
+        public static explicit operator StringSegment(SysStringSegment segment)
+            => new StringSegment(segment.Buffer!, segment.Offset, segment.Length);
 
         private const int DisplayLimit = 100;
 
