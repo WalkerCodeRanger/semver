@@ -1033,7 +1033,7 @@ namespace Semver
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         public SemVersion WithMetadata(string metadataIdentifier, params string[] metadataIdentifiers)
         {
-            if (metadataIdentifier is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
+            if (metadataIdentifier is null) throw new ArgumentNullException(nameof(metadataIdentifier));
             if (metadataIdentifiers is null) throw new ArgumentNullException(nameof(metadataIdentifiers));
             var identifiers = metadataIdentifiers
                               .Prepend(metadataIdentifier)
