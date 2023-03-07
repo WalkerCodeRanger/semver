@@ -231,7 +231,8 @@ namespace Semver.Parsing
             SemVersionStyles style,
             Exception ex)
         {
-            // This is safe because the check for all whitespace ensures there is at least one more char
+            if (segment.IsEmpty) return null;
+
             var leadChar = segment[0];
             switch (leadChar)
             {
