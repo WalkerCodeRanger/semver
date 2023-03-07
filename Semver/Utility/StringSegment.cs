@@ -99,7 +99,7 @@ namespace Semver.Utility
         public StringSegment Subsegment(int start, int length)
         {
 #if DEBUG
-            ValidateIndex(start, nameof(start));
+            ValidateSliceIndex(start, nameof(start));
             ValidateLength(start, length, nameof(length));
 #endif
             return new StringSegment(Source, Offset + start, length);
@@ -108,7 +108,7 @@ namespace Semver.Utility
         public StringSegment Subsegment(int start)
         {
 #if DEBUG
-            ValidateIndex(start, nameof(start));
+            ValidateSliceIndex(start, nameof(start));
 #endif
             return new StringSegment(Source, Offset + start, Length - start);
         }
@@ -127,7 +127,7 @@ namespace Semver.Utility
         public int IndexOf(char value, int startIndex)
         {
 #if DEBUG
-            ValidateIndex(startIndex, nameof(startIndex));
+            ValidateSliceIndex(startIndex, nameof(startIndex));
 #endif
             var i = Source.IndexOf(value, Offset + startIndex, Length - startIndex);
             return i < 0 ? i : i - Offset;
@@ -137,7 +137,7 @@ namespace Semver.Utility
         public int IndexOf(char value, int startIndex, int count)
         {
 #if DEBUG
-            ValidateIndex(startIndex, nameof(startIndex));
+            ValidateSliceIndex(startIndex, nameof(startIndex));
             ValidateLength(startIndex, count, nameof(count));
 #endif
             var i = Source.IndexOf(value, Offset + startIndex, count);
@@ -214,6 +214,13 @@ namespace Semver.Utility
 #if DEBUG
         [ExcludeFromCodeCoverage]
         private void ValidateIndex(int i, string paramName)
+        {
+            if (i < 0) throw new ArgumentOutOfRangeException(paramName, i, "DEBUG: Cannot be negative.");
+            if (i >= Length) throw new ArgumentOutOfRangeException(paramName, i, $"DEBUG: Cannot be >= length {Length}.");
+        }
+
+        [ExcludeFromCodeCoverage]
+        private void ValidateSliceIndex(int i, string paramName)
         {
             if (i < 0) throw new ArgumentOutOfRangeException(paramName, i, "DEBUG: Cannot be negative.");
             if (i > Length) throw new ArgumentOutOfRangeException(paramName, i, $"DEBUG: Cannot be > length {Length}.");
