@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Primitives;
 using Semver.Ranges;
 using Semver.Utility;
 
@@ -87,7 +88,7 @@ namespace Semver.Parsing
                 GeneralRangeParser.ParseOptionalWhitespace(ref segment);
 
                 // Handle empty string ranges
-                if (segment.IsEmpty)
+                if (segment.IsEmpty())
                 {
                     unbrokenRange = includeAllPrerelease
                         ? UnbrokenSemVersionRange.All
@@ -95,7 +96,7 @@ namespace Semver.Parsing
                     return null;
                 }
 
-                while (!segment.IsEmpty)
+                while (!segment.IsEmpty())
                 {
                     var exception = ParseComparison(ref segment, rangeOptions, includeAllPrerelease, ex, maxLength,
                         ref start, ref end);
@@ -176,7 +177,7 @@ namespace Semver.Parsing
 
             // Check for missing version number
             if (segment.Length == 0)
-                return ex ?? RangeError.MissingVersionInHyphenRange(segment.Source);
+                return ex ?? RangeError.MissingVersionInHyphenRange(segment.Buffer!);
 
             // Check for invalid chars, like an operator, before the version
             if (!GeneralRangeParser.IsPossibleVersionChar(segment[0], rangeOptions))
@@ -314,7 +315,7 @@ namespace Semver.Parsing
             if (exception != null) return exception;
             DebugChecks.IsNotNull(semver, nameof(semver));
             if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
-                return ex ?? RangeError.PrereleaseNotSupportedWithWildcardVersion(segment.Source);
+                return ex ?? RangeError.PrereleaseNotSupportedWithWildcardVersion(segment.Buffer!);
             // Remove the metadata the npm ranges allow (note we always allow metadata even though
             // npm rejects it for partial versions)
             semver = semver.WithoutMetadata();

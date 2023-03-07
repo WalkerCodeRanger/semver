@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using Semver.Utility;
+using Microsoft.Extensions.Primitives;
 
 namespace Semver.Benchmarks
 {
@@ -53,7 +53,7 @@ namespace Semver.Benchmarks
         {
             var end = segment.Offset + segment.Length;
             for (int i = segment.Offset; i < end; i++)
-                yield return segment.Source[i];
+                yield return segment.Buffer[i];
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -61,7 +61,7 @@ namespace Semver.Benchmarks
         {
             var end = segment.Offset + segment.Length;
             for (int i = segment.Offset; i < end; i++)
-                action(segment.Source[i]);
+                action(segment.Buffer[i]);
         }
     }
 }

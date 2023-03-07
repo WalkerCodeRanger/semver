@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Primitives;
 using Semver.Utility;
 
 namespace Semver.Parsing
@@ -112,7 +113,7 @@ namespace Semver.Parsing
 
             // Take of trailing whitespace and remember that there was trailing whitespace
             var lengthWithTrailingWhitespace = mainSegment.Length;
-            mainSegment = mainSegment.TrimEndWhitespace();
+            mainSegment = mainSegment.TrimEnd();
             var hasTrailingWhitespace = lengthWithTrailingWhitespace > mainSegment.Length;
 
             // Now break the version number down into segments.
@@ -211,7 +212,7 @@ namespace Semver.Parsing
             var oldLength = segment.Length;
 
             // Skip leading whitespace
-            segment = segment.TrimStartWhitespace();
+            segment = segment.TrimStart();
 
             // Error if all whitespace
             if (segment.Length == 0)
@@ -230,7 +231,7 @@ namespace Semver.Parsing
             SemVersionStyles style,
             Exception? ex)
         {
-            if (segment.IsEmpty) return null;
+            if (segment.IsEmpty()) return null;
 
             var leadChar = segment[0];
             switch (leadChar)

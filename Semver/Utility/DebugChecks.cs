@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Microsoft.Extensions.Primitives;
 using Semver.Parsing;
 
 namespace Semver.Utility
@@ -55,7 +56,7 @@ namespace Semver.Utility
         [Conditional("DEBUG")]
         public static void IsNotEmpty(StringSegment segment, string paramName)
         {
-            if (segment.IsEmpty)
+            if (segment.IsEmpty())
                 throw new ArgumentException("DEBUG: Cannot be empty", paramName);
         }
 

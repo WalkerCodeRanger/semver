@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Primitives;
 using Semver.Ranges;
 using Semver.Utility;
 
@@ -57,12 +58,12 @@ namespace Semver.Parsing
             if (exception != null) return exception;
 
             // Reject empty string ranges
-            if (segment.IsEmpty) return ex ?? RangeError.MissingComparison(segment.Offset, segment.Source);
+            if (segment.IsEmpty()) return ex ?? RangeError.MissingComparison(segment.Offset, segment.Buffer!);
 
             var start = LeftBoundedRange.Unbounded;
             var end = RightBoundedRange.Unbounded;
             var includeAllPrerelease = rangeOptions.HasOption(SemVersionRangeOptions.IncludeAllPrerelease);
-            while (!segment.IsEmpty)
+            while (!segment.IsEmpty())
             {
                 exception = ParseComparison(ref segment, rangeOptions, ref includeAllPrerelease, ex, maxLength, ref start, ref end);
                 if (exception != null) return exception;
@@ -110,7 +111,7 @@ namespace Semver.Parsing
             DebugChecks.IsNotNull(semver, nameof(semver));
 
             if (@operator != StandardOperator.None && wildcardVersion != WildcardVersion.None)
-                return ex ?? RangeError.WildcardNotSupportedWithOperator(segment.Source);
+                return ex ?? RangeError.WildcardNotSupportedWithOperator(segment.Buffer!);
 
             exception = GeneralRangeParser.ParseOptionalSpaces(ref segment, ex);
             if (exception != null) return exception;
@@ -169,7 +170,7 @@ namespace Semver.Parsing
                     includeAllPrerelease |= prereleaseWildcard;
                     wildcardVersion.RemoveOption(WildcardVersion.PrereleaseWildcard);
                     if (wildcardVersion != WildcardVersion.None && semver.IsPrerelease)
-                        return ex ?? RangeError.PrereleaseNotSupportedWithWildcardVersion(segment.Source);
+                        return ex ?? RangeError.PrereleaseNotSupportedWithWildcardVersion(segment.Buffer!);
                     switch (wildcardVersion)
                     {
                         case WildcardVersion.None:

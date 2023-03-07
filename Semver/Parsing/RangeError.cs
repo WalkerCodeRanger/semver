@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Primitives;
 using Semver.Utility;
 
 namespace Semver.Parsing
@@ -42,7 +43,7 @@ namespace Semver.Parsing
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception MaxVersion(StringSegment version)
-            => NewFormatException(MaxVersionMessage, version.TrimEndWhitespace().ToStringLimitLength());
+            => NewFormatException(MaxVersionMessage, version.TrimEnd().ToStringLimitLength());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Exception WildcardNotSupportedWithOperator(string range)

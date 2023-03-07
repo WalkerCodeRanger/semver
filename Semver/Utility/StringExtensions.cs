@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Primitives;
 
 namespace Semver.Utility
 {
@@ -87,7 +88,7 @@ namespace Semver.Utility
                 if (value[start] != '0')
                     break;
 
-            return value.Substring(start);
+            return value[start..];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -96,12 +97,10 @@ namespace Semver.Utility
 
         public static string LimitLength(this string value)
         {
-            if (value.Length > DisplayLimit)
-                return value.Substring(0, DisplayLimit - 3) + "...";
+            if (value.Length > Display.Limit)
+                return value.Substring(0, Display.Limit - 3) + "...";
 
             return value;
         }
-
-        private const int DisplayLimit = 100;
     }
 }

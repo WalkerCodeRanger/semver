@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Primitives;
 using Semver.Utility;
 
 namespace Semver.Parsing
@@ -73,7 +74,7 @@ namespace Semver.Parsing
             segment = segment.TrimStartSpaces();
 
             if (segment.Length > 0 && char.IsWhiteSpace(segment[0]))
-                return ex ?? RangeError.InvalidWhitespace(segment.Offset, segment.Source);
+                return ex ?? RangeError.InvalidWhitespace(segment.Offset, segment.Buffer!);
             return null;
         }
 
@@ -81,7 +82,7 @@ namespace Semver.Parsing
         /// Parse optional whitespace from the beginning of the segment.
         /// </summary>
         public static void ParseOptionalWhitespace(ref StringSegment segment)
-            => segment = segment.TrimStartWhitespace();
+            => segment = segment.TrimStart();
 
         /// <summary>
         /// Parse a version number from the beginning of the segment.
