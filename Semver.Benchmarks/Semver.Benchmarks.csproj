@@ -6,9 +6,9 @@
     <StartupObject>Semver.Benchmarks.Program</StartupObject>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>9.0</LangVersion>
-	<Nullable>enable</Nullable>
-	<Authors>Jeff Walker</Authors>
-	<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <Nullable>enable</Nullable>
+    <Authors>Jeff Walker</Authors>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
     <ItemGroup>
