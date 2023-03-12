@@ -68,12 +68,12 @@ namespace Semver.Test
         [InlineData("a0", false, "a0", null)]
         [InlineData("0-1", false, "0-1", null)]
         [InlineData("-1", false, "-1", null)]
-        [InlineData("0", false, "0", 0u)]
-        [InlineData("1", false, "1", 1u)]
-        [InlineData("00", true, "0", 0u)]
-        [InlineData("01", true, "1", 1u)]
+        [InlineData("0", false, "0", 0uL)]
+        [InlineData("1", false, "1", 1uL)]
+        [InlineData("00", true, "0", 0uL)]
+        [InlineData("01", true, "1", 1uL)]
         // int.MaxValue + 1
-        [InlineData("2147483648", false, "2147483648", 2147483648)]
+        [InlineData("2147483648", false, "2147483648", 2147483648uL)]
         // long.MaxValue + 1
         [InlineData("9223372036854775808", false, "9223372036854775808", 9223372036854775808)]
         public void ConstructWithString(string value, bool allowLeadingZeros,
