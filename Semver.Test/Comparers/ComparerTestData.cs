@@ -83,16 +83,6 @@ namespace Semver.Test.Comparers
             "2.1.1",
         };
         
-        public static readonly TheoryData<string,string> VersionPairs = CreateVersionParisTheoryData();
-
-        private static TheoryData<string, string> CreateVersionParisTheoryData()
-        {
-            var pairs = VersionsInSortOrder.Select(v => (string)v[0]).ToReadOnlyList().AllPairs();
-            var theoryData = new TheoryData<string, string>();
-            foreach (var (left, right) in pairs)
-                theoryData.Add(left, right);
-
-            return theoryData;
-        }
+        public static readonly TheoryData<string,string> VersionPairs = VersionsInSortOrder.AllPairs();
     }
 }

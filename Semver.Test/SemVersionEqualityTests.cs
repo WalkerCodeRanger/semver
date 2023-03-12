@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Semver.Test.Comparers;
 using Semver.Test.Helpers;
-using Semver.Utility;
 using Xunit;
 
 namespace Semver.Test
@@ -8,98 +7,74 @@ namespace Semver.Test
     /// <summary>
     /// Tests of any equality related functionality of <see cref="SemVersion"/>. It also includes
     /// <see cref="SemVersion.GetHashCode()"/> because this is connected to equality.
-    ///
-    /// For historical reasons, the approach used is to work from a list of versions
-    /// in their correct order and then compare versions within the list. To
-    /// avoid issues with xUnit serialization of <see cref="SemVersion"/>, this
-    /// is done within the test rather than using theory data.
     /// </summary>
     public class SemVersionEqualityTests
     {
-        // TODO this could use string now
-        public static readonly IReadOnlyList<SemVersion> VersionsInSortOrder = new List<SemVersion>()
+        public static readonly TheoryData<string> Versions = new TheoryData<string>()
         {
-            SemVersion.ParsedFrom(0),
-            SemVersion.ParsedFrom(0, 0, 1, "13"),
-            SemVersion.ParsedFrom(0, 0, 1, "b"),
-            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.87"),
-            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.87.1"),
-            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.87.99"),
-            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.87.-"),
-            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.87.X"),
-            SemVersion.ParsedFrom(0, 0, 1, "gamma.12.88"),
-            SemVersion.ParsedFrom(0, 0, 1),
-            SemVersion.ParsedFrom(0, 0, 1, "", "12"),
-            SemVersion.ParsedFrom(0, 0, 1, "", "bu"),
-            SemVersion.ParsedFrom(0, 0, 1, "", "build.12"),
-            SemVersion.ParsedFrom(0, 0, 1, "", "build.12.2"),
-            SemVersion.ParsedFrom(0, 0, 1, "", "build.13"),
-            SemVersion.ParsedFrom(0, 0, 1, "", "build.-"),
-            SemVersion.ParsedFrom(0, 0, 1, "", "uiui"),
-            SemVersion.ParsedFrom(0, 1, 1),
-            SemVersion.ParsedFrom(0, 2, 1),
-            SemVersion.ParsedFrom(1, 0, 0, "alpha"),
-            SemVersion.ParsedFrom(1, 0, 0, "alpha", "dev.123"),
-            SemVersion.ParsedFrom(1, 0, 0, "alpha.1"),
-            SemVersion.ParsedFrom(1, 0, 0, "alpha.-"),
-            SemVersion.ParsedFrom(1, 0, 0, "alpha.beta"),
-            SemVersion.ParsedFrom(1, 0, 0, "beta"),
-            SemVersion.ParsedFrom(1, 0, 0, "beta", "dev.123"),
-            SemVersion.ParsedFrom(1, 0, 0, "beta.2"),
-            SemVersion.ParsedFrom(1, 0, 0, "beta.11"),
-            SemVersion.ParsedFrom(1, 0, 0, "rc.1"),
-            SemVersion.ParsedFrom(1),
-            SemVersion.ParsedFrom(1, 0, 0, "", "CA6B10F"),
-            SemVersion.ParsedFrom(1, 0, 10, "alpha"),
-            SemVersion.ParsedFrom(1, 2, 0, "alpha", "dev"),
-            SemVersion.ParsedFrom(1, 2, 0, "nightly"),
-            SemVersion.ParsedFrom(1, 2, 0, "nightly", "dev"),
-            SemVersion.ParsedFrom(1, 2, 0, "nightly2"),
-            SemVersion.ParsedFrom(1, 2),
-            SemVersion.ParsedFrom(1, 2, 0, "", "nightly"),
-            SemVersion.ParsedFrom(1, 2, 1, "-1"), // Doesn't match spec (issue #69)
-            SemVersion.ParsedFrom(1, 2, 1, "0"),
-            SemVersion.ParsedFrom(1, 2, 1, "99"),
-            SemVersion.ParsedFrom(1, 2, 1, "-"),
-            SemVersion.ParsedFrom(1, 2, 1, "-a"),
-            SemVersion.ParsedFrom(1, 2, 1, "0A"),
-            SemVersion.ParsedFrom(1, 2, 1, "A"),
-            SemVersion.ParsedFrom(1, 2, 1, "a"),
-            SemVersion.ParsedFrom(1, 2, 1),
-            SemVersion.ParsedFrom(1, 4),
-            SemVersion.ParsedFrom(2),
-            SemVersion.ParsedFrom(2, 1),
-            SemVersion.ParsedFrom(2, 1, 1),
-        }.AsReadOnly();
+            "0.0.0",
+            "0.0.1-13",
+            "0.0.1-b",
+            "0.0.1-gamma.12.87",
+            "0.0.1-gamma.12.87.1",
+            "0.0.1-gamma.12.87.99",
+            "0.0.1-gamma.12.87.-",
+            "0.0.1-gamma.12.87.X",
+            "0.0.1-gamma.12.88",
+            "0.0.1",
+            "0.0.1+12",
+            "0.0.1+b",
+            "0.0.1+build.-",
+            "0.0.1+build.12",
+            "0.0.1+build.12.2",
+            "0.0.1+build.13",
+            "0.0.1+uiui",
+            "0.1.1",
+            "0.2.1",
+            "1.0.0-alpha",
+            "1.0.0-alpha+dev.123",
+            "1.0.0-beta",
+            "1.0.0",
+            "1.0.0+CA6B10F",
+            "1.2.1-0",
+            "1.2.1-1",
+            "1.2.1--",
+            "1.2.1--1", // Is alphanumeric instead of numeric
+            "1.2.1-a",
+            "1.2.3+a.000001",
+            "1.2.3+a.01",
+            "1.2.3+a.1",
+        };
 
-        public static readonly IReadOnlyList<(SemVersion, SemVersion)> VersionPairs
-            = VersionsInSortOrder.AllPairs().ToReadOnlyList();
+        public static readonly TheoryData<string, string> VersionPairs = Versions.AllPairs();
 
         #region Equals
-        [Fact]
-        public void EqualsIdenticalTest()
+        [Theory]
+        [MemberData(nameof(Versions))]
+        public void EqualsIdenticalTest(string version)
         {
-            foreach (var v in VersionsInSortOrder)
-            {
-                // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+            var v = SemVersion.Parse(version);
+            // Construct an identical version, but different instance
+            var identical = new SemVersion(v.Major, v.Minor, v.Patch,
                     v.PrereleaseIdentifiers, v.MetadataIdentifiers);
-                Assert.True(v.Equals(identical), v.ToString());
-            }
+            Assert.True(v.Equals(identical), v.ToString());
         }
 
-        [Fact]
-        public void EqualsSameTest()
+        [Theory]
+        [MemberData(nameof(Versions))]
+        public void EqualsSameTest(string version)
         {
-            foreach (var version in VersionsInSortOrder)
-                Assert.True(version.Equals(version), version.ToString());
+            var v = SemVersion.Parse(version);
+            Assert.True(v.Equals(v), v.ToString());
         }
 
-        [Fact]
-        public void EqualsDifferentTest()
+        [Theory]
+        [MemberData(nameof(VersionPairs))]
+        public void EqualsDifferentTest(string left, string right)
         {
-            foreach (var (v1, v2) in VersionPairs)
-                Assert.False(v1.Equals(v2), $"({v1}).Equals({v2})");
+            var v1 = SemVersion.Parse(left);
+            var v2 = SemVersion.Parse(right);
+            Assert.False(v1.Equals(v2), $"({v1}).Equals({v2})");
         }
 
         [Theory]
@@ -116,11 +91,12 @@ namespace Semver.Test
             Assert.False(r, $"({v1}).Equals({v2})");
         }
 
-        [Fact]
-        public void EqualsNullTest()
+        [Theory]
+        [MemberData(nameof(Versions))]
+        public void EqualsNullTest(string version)
         {
-            foreach (var version in VersionsInSortOrder)
-                Assert.False(version.Equals(null), version.ToString());
+            var v = SemVersion.Parse(version);
+            Assert.False(v.Equals(null), v.ToString());
         }
 
         [Fact]
@@ -136,7 +112,7 @@ namespace Semver.Test
         [InlineData(null, "1.2.3", false)]
         [InlineData("1.2.3", null, false)]
         [InlineData(null, null, true)]
-        public void StaticEqualsTest(string s1, string s2, bool expected)
+        public void StaticEqualsTest(string? s1, string? s2, bool expected)
         {
             var v1 = s1 is null ? null : SemVersion.Parse(s1);
             var v2 = s2 is null ? null : SemVersion.Parse(s2);
@@ -148,53 +124,56 @@ namespace Semver.Test
         #endregion
 
         #region GetHashCode
-        [Fact]
-        public void GetHashCodeOfEqualTest()
+        [Theory]
+        [MemberData(nameof(Versions))]
+        public void GetHashCodeOfEqualTest(string version)
         {
-            foreach (var v in VersionsInSortOrder)
-            {
-                // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
-                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
-                Assert.True(v.GetHashCode() == identical.GetHashCode(), v.ToString());
-            }
+            var v = SemVersion.Parse(version);
+            // Construct an identical version, but different instance
+            var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                v.PrereleaseIdentifiers, v.MetadataIdentifiers);
+            Assert.True(v.GetHashCode() == identical.GetHashCode(), v.ToString());
         }
 
-        [Fact]
-        public void GetHashCodeOfDifferentTest()
+        [Theory]
+        [MemberData(nameof(VersionPairs))]
+        public void GetHashCodeOfDifferentTest(string left, string right)
         {
-            foreach (var (v1, v2) in VersionPairs)
-                Assert.False(v1.GetHashCode() == v2.GetHashCode(), $"({v1}).GetHashCode() == ({v2}).GetHashCode()");
+            var v1 = SemVersion.Parse(left);
+            var v2 = SemVersion.Parse(right);
+            Assert.False(v1.GetHashCode() == v2.GetHashCode(), $"({v1}).GetHashCode() == ({v2}).GetHashCode()");
         }
         #endregion
 
         #region Operators
-        [Fact]
-        public void EqualsOperatorIdenticalTest()
+        [Theory]
+        [MemberData(nameof(Versions))]
+        public void EqualsOperatorIdenticalTest(string version)
         {
-            foreach (var v in VersionsInSortOrder)
-            {
-                // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
-                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
-                Assert.True(v == identical, v.ToString());
-            }
+            var v = SemVersion.Parse(version);
+            // Construct an identical version, but different instance
+            var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                v.PrereleaseIdentifiers, v.MetadataIdentifiers);
+            Assert.True(v == identical, v.ToString());
         }
 
-        [Fact]
-        public void EqualsOperatorSameTest()
+        [Theory]
+        [MemberData(nameof(Versions))]
+        public void EqualsOperatorSameTest(string version)
         {
-            foreach (var version in VersionsInSortOrder)
+            var v = SemVersion.Parse(version);
 #pragma warning disable CS1718 // Comparison made to same variable
-                Assert.True(version == version, version.ToString());
+            Assert.True(v == v, v.ToString());
 #pragma warning restore CS1718 // Comparison made to same variable
         }
 
-        [Fact]
-        public void EqualsOperatorDifferentTest()
+        [Theory]
+        [MemberData(nameof(VersionPairs))]
+        public void EqualsOperatorDifferentTest(string left, string right)
         {
-            foreach (var (v1, v2) in VersionPairs)
-                Assert.False(v1 == v2, $"{v1} == {v2}");
+            var v1 = SemVersion.Parse(left);
+            var v2 = SemVersion.Parse(right);
+            Assert.False(v1 == v2, $"{v1} == {v2}");
         }
 
         [Theory]
@@ -211,18 +190,19 @@ namespace Semver.Test
             Assert.False(r, $"{v1} == {v2}");
         }
 
-        [Fact]
-        public void EqualsOperatorNullTest()
+        [Theory]
+        [MemberData(nameof(Versions))]
+        public void EqualsOperatorNullTest(string version)
         {
-            foreach (var version in VersionsInSortOrder)
-                Assert.False(version == null, version.ToString());
+            var v = SemVersion.Parse(version);
+            Assert.False(v == null, v.ToString());
         }
 
         [Theory]
         [InlineData(null, "1.2.3", false)]
         [InlineData("1.2.3", null, false)]
         [InlineData(null, null, true)]
-        public void EqualsOperatorTest(string s1, string s2, bool expected)
+        public void EqualsOperatorTest(string? s1, string? s2, bool expected)
         {
             var v1 = s1 is null ? null : SemVersion.Parse(s1);
             var v2 = s2 is null ? null : SemVersion.Parse(s2);
@@ -232,32 +212,34 @@ namespace Semver.Test
             Assert.Equal(expected, r);
         }
 
-        [Fact]
-        public void NotEqualsOperatorIdenticalTest()
+        [Theory]
+        [MemberData(nameof(Versions))]
+        public void NotEqualsOperatorIdenticalTest(string version)
         {
-            foreach (var v in VersionsInSortOrder)
-            {
-                // Construct an identical version, but different instance
-                var identical = new SemVersion(v.Major, v.Minor, v.Patch,
-                    v.PrereleaseIdentifiers, v.MetadataIdentifiers);
-                Assert.False(v != identical, v.ToString());
-            }
+            var v = SemVersion.Parse(version);
+            // Construct an identical version, but different instance
+            var identical = new SemVersion(v.Major, v.Minor, v.Patch,
+                v.PrereleaseIdentifiers, v.MetadataIdentifiers);
+            Assert.False(v != identical, v.ToString());
         }
 
-        [Fact]
-        public void NotEqualsOperatorSameTest()
+        [Theory]
+        [MemberData(nameof(Versions))]
+        public void NotEqualsOperatorSameTest(string version)
         {
-            foreach (var version in VersionsInSortOrder)
+            var v = SemVersion.Parse(version);
 #pragma warning disable CS1718 // Comparison made to same variable
-                Assert.False(version != version, version.ToString());
+            Assert.False(v != v, v.ToString());
 #pragma warning restore CS1718 // Comparison made to same variable
         }
 
-        [Fact]
-        public void NotEqualsOperatorDifferentTest()
+        [Theory]
+        [MemberData(nameof(VersionPairs))]
+        public void NotEqualsOperatorDifferentTest(string left, string right)
         {
-            foreach (var (v1, v2) in VersionPairs)
-                Assert.True(v1 != v2, $"{v1} != {v2}");
+            var v1 = SemVersion.Parse(left);
+            var v2 = SemVersion.Parse(right);
+            Assert.True(v1 != v2, $"{v1} != {v2}");
         }
 
         [Theory]
@@ -274,18 +256,19 @@ namespace Semver.Test
             Assert.True(r, $"{v1} != {v2}");
         }
 
-        [Fact]
-        public void NotEqualsOperatorNullTest()
+        [Theory]
+        [MemberData(nameof(Versions))]
+        public void NotEqualsOperatorNullTest(string version)
         {
-            foreach (var version in VersionsInSortOrder)
-                Assert.True(version != null, version.ToString());
+            var v = SemVersion.Parse(version);
+            Assert.True(v != null, v.ToString());
         }
 
         [Theory]
         [InlineData(null, "1.2.3", true)]
         [InlineData("1.2.3", null, true)]
         [InlineData(null, null, false)]
-        public void NotEqualsOperatorTest(string s1, string s2, bool expected)
+        public void NotEqualsOperatorTest(string? s1, string? s2, bool expected)
         {
             var v1 = s1 is null ? null : SemVersion.Parse(s1);
             var v2 = s2 is null ? null : SemVersion.Parse(s2);
