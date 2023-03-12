@@ -7,16 +7,13 @@ using Xunit;
 namespace Semver.Test.Comparers
 {
     /// <summary>
-    /// Data for testing any comparison or equality related functionality of <see cref="SemVersion"/>.
-    /// This includes both standard comparison and precedence comparison. It also includes
-    /// <see cref="SemVersion.GetHashCode()"/> because this is connected to equality.
+    /// <para>Data for testing any comparison or equality related functionality of
+    /// <see cref="SemVersion"/>. This includes both standard comparison and precedence comparison.
+    /// It also includes <see cref="SemVersion.GetHashCode()"/> because this is connected to
+    /// equality.</para>
     ///
-    /// Because it is possible to construct invalid versions, the comparison
-    /// tests must be based off constructing <see cref="SemVersion"/> rather than just
-    /// using version strings. The approach used is to work from a list of versions
-    /// in their correct order and then compare versions within the list. To
-    /// avoid issues with xUnit serialization of <see cref="SemVersion"/>, this
-    /// is done within the test rather than using theory data.
+    /// <para>The approach used is to work from a list of versions in their correct order and then
+    /// compare versions within the list.</para>
     /// </summary>
     public static class ComparerTestData
     {
@@ -85,10 +82,17 @@ namespace Semver.Test.Comparers
             "2.1.0",
             "2.1.1",
         };
+        
+        public static readonly TheoryData<string,string> VersionPairs = CreateVersionParisTheoryData();
 
-        // TODO this could use string now
-        public static readonly IReadOnlyList<(SemVersion, SemVersion)> VersionPairs
-            = VersionsInSortOrder.Select(v => SemVersion.Parse((string)v[0])).ToReadOnlyList()
-                                 .AllPairs().ToReadOnlyList();
+        private static TheoryData<string, string> CreateVersionParisTheoryData()
+        {
+            var pairs = VersionsInSortOrder.Select(v => (string)v[0]).ToReadOnlyList().AllPairs();
+            var theoryData = new TheoryData<string, string>();
+            foreach (var (left, right) in pairs)
+                theoryData.Add(left, right);
+
+            return theoryData;
+        }
     }
 }
