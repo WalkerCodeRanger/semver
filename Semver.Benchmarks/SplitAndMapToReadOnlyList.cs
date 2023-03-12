@@ -16,7 +16,7 @@ namespace Semver.Benchmarks
         /// <remarks>Values of different length. The final one is chosen to be long enough to require
         /// two <see cref="List{T}"/> capacity increases.</remarks>
         [Params("", "hello", "hello.world", "hello.world.how.are.you.today?.I'm.good.thank.you")]
-        public string Value { get; set; }
+        public string Value { get; set; } = "";
 
         private static string Identity(string value) => value;
 

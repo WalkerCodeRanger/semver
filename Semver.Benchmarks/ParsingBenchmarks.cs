@@ -65,8 +65,8 @@ namespace Semver.Benchmarks
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
-                Previous.SemVersion.TryParse(versions[i], previousStyles, out var version, maxLength: int.MaxValue);
-                accumulator += version.Major;
+                if(Previous.SemVersion.TryParse(versions[i], previousStyles, out var version, maxLength: int.MaxValue))
+                    accumulator += version.Major;
             }
 
             return accumulator;
@@ -93,8 +93,8 @@ namespace Semver.Benchmarks
             long accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
-                SemVersion.TryParse(versions[i], currentStyles, out var version, maxLength: int.MaxValue);
-                accumulator += version.Major;
+                if(SemVersion.TryParse(versions[i], currentStyles, out var version, maxLength: int.MaxValue))
+                    accumulator += version.Major;
             }
 
             return accumulator;

@@ -53,7 +53,7 @@ namespace Semver.Benchmarks
         {
             var end = segment.Offset + segment.Length;
             for (int i = segment.Offset; i < end; i++)
-                yield return segment.Buffer[i];
+                yield return segment.Buffer![i];
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -61,7 +61,7 @@ namespace Semver.Benchmarks
         {
             var end = segment.Offset + segment.Length;
             for (int i = segment.Offset; i < end; i++)
-                action(segment.Buffer[i]);
+                action(segment.Buffer![i]);
         }
     }
 }
