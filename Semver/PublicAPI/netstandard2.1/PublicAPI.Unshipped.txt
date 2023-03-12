@@ -1,1 +1,4 @@
-﻿
+﻿*REMOVED*Semver.PrereleaseIdentifier.NumericValue.get -> int?
+Semver.PrereleaseIdentifier.NumericValue.get -> System.Numerics.BigInteger?
+*REMOVED*Semver.PrereleaseIdentifier.PrereleaseIdentifier(int value) -> void
+Semver.PrereleaseIdentifier.PrereleaseIdentifier(System.Numerics.BigInteger value) -> void

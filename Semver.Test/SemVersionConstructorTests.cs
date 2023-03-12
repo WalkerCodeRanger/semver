@@ -256,11 +256,18 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void ConstructWithStringIdentifiersPrereleaseTooLarge()
+        public void ConstructWithStringIdentifiersPrereleaseLargeNumber()
         {
-            var ex = Assert.Throws<OverflowException>(()
-                => new SemVersion(1, 2, 3, new[] { "bar", "99999999999999999" }));
-            Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
+            var v = new SemVersion(1, 2, 3, new[] { "bar", "99999999999999999" });
+
+            Assert.Equal(1, v.Major);
+            Assert.Equal(2, v.Minor);
+            Assert.Equal(3, v.Patch);
+            Assert.Equal("bar.99999999999999999", v.Prerelease);
+            var expectedPrereleaseIdentifiers = new[] { new PrereleaseIdentifier("bar"), new PrereleaseIdentifier("99999999999999999") };
+            Assert.Equal(expectedPrereleaseIdentifiers, v.PrereleaseIdentifiers);
+            Assert.Equal("", v.Metadata);
+            Assert.Empty(v.MetadataIdentifiers);
         }
 
         [Fact]
@@ -419,11 +426,18 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void ParsedFromPrereleaseTooLarge()
+        public void ParsedFromPrereleaseLargeNumber()
         {
-            var ex = Assert.Throws<OverflowException>(()
-               => SemVersion.ParsedFrom(1, 2, 3, "bar.99999999999999999"));
-            Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
+            var v = SemVersion.ParsedFrom(2, 3, 4, "bar.99999999999999999");
+
+            Assert.Equal(2, v.Major);
+            Assert.Equal(3, v.Minor);
+            Assert.Equal(4, v.Patch);
+            Assert.Equal("bar.99999999999999999", v.Prerelease);
+            var expectedPrereleaseIdentifiers = new[] { new PrereleaseIdentifier("bar"), new PrereleaseIdentifier("99999999999999999") };
+            Assert.Equal(expectedPrereleaseIdentifiers, v.PrereleaseIdentifiers);
+            Assert.Equal("", v.Metadata);
+            Assert.Empty(v.MetadataIdentifiers);
         }
 
         [Fact]

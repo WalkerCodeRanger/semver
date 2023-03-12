@@ -38,8 +38,8 @@ namespace Semver
         internal static MetadataIdentifier CreateUnsafe(string value)
         {
             DebugChecks.IsNotNull(value, nameof(value));
+            DebugChecks.IsNotEmpty(value, nameof(value));
 #if DEBUG
-            if (value.Length == 0) throw new ArgumentException("DEBUG: Metadata identifier cannot be empty.", nameof(value));
             if (!value.IsAlphanumericOrHyphens())
                 throw new ArgumentException($"DEBUG: A metadata identifier can contain only ASCII alphanumeric characters and hyphens '{value}'.", nameof(value));
 #endif

@@ -227,11 +227,11 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithParsedFromPrereleaseTooLarge()
+        public void WithParsedFromPrereleaseLargeNumber()
         {
-            var ex = Assert.Throws<OverflowException>(()
-               => Version.WithParsedFrom(prerelease: "bar.99999999999999999"));
-            Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
+            var v = Version.WithParsedFrom(prerelease: "bar.99999999999999999");
+
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "bar.99999999999999999", "metadata"), v);
         }
 
         [Fact]

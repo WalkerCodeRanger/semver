@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using Semver.Test.Helpers;
 using Xunit;
 
@@ -7,6 +9,23 @@ namespace Semver.Test
 {
     public class PrereleaseIdentifierTests
     {
+        /// <summary>
+        /// Microsoft Guidelines are that structs should be 16 bytes or less. Since
+        /// <see cref="PrereleaseIdentifier"/> contains a <see cref="BigInteger"/> that is composed
+        /// of a <see cref="Int32"/> and a <see cref="T:UInt32[]"/> and a <see cref="String"/>, its
+        /// size depends on the architecture. On a 32-bit system it should be 12 bytes which may get
+        /// padded to 16. However, on 64-bit systems it should be 20 bytes which may get padded out
+        /// to 24 or 32 bytes. Since <see cref="PrereleaseIdentifier"/> will be rarely passed and
+        /// copied by typically held in a collection, this has been deemed acceptable.
+        /// </summary>
+        [Fact]
+        public void SizeIsAcceptable()
+        {
+            var size = Unsafe.SizeOf<PrereleaseIdentifier>();
+
+            Assert.InRange(size, 0, 32);
+        }
+
         [Theory]
         [InlineData("ident", null)]
         [InlineData("42", 42)]
@@ -49,12 +68,16 @@ namespace Semver.Test
         [InlineData("a0", false, "a0", null)]
         [InlineData("0-1", false, "0-1", null)]
         [InlineData("-1", false, "-1", null)]
-        [InlineData("0", false, "0", 0)]
-        [InlineData("1", false, "1", 1)]
-        [InlineData("00", true, "0", 0)]
-        [InlineData("01", true, "1", 1)]
+        [InlineData("0", false, "0", 0u)]
+        [InlineData("1", false, "1", 1u)]
+        [InlineData("00", true, "0", 0u)]
+        [InlineData("01", true, "1", 1u)]
+        // int.MaxValue + 1
+        [InlineData("2147483648", false, "2147483648", 2147483648)]
+        // long.MaxValue + 1
+        [InlineData("9223372036854775808", false, "9223372036854775808", 9223372036854775808)]
         public void ConstructWithString(string value, bool allowLeadingZeros,
-            string expectedValue, int? expectedNumericValue)
+            string expectedValue, ulong? expectedNumericValue)
         {
             var identifier = new PrereleaseIdentifier(value, allowLeadingZeros);
 
@@ -63,12 +86,15 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void ConstructWithStringThrowsOverflowException()
+        public void ConstructWithStringThatWouldOverflow()
         {
-            // int.MaxValue + 1
-            var ex = Assert.Throws<OverflowException>(() => new PrereleaseIdentifier("2147483648"));
+            // ulong.MaxValue + 1
+            var identifier = new PrereleaseIdentifier("18446744073709551616");
 
-            Assert.Equal("Prerelease identifier '2147483648' was too large for Int32.", ex.Message);
+            Assert.Equal("18446744073709551616", identifier.Value);
+            BigInteger expected = 18446744073709551615;
+            expected += 1;
+            Assert.Equal(expected, identifier.NumericValue);
         }
 
         [Theory]
@@ -197,7 +223,7 @@ namespace Semver.Test
         [InlineData("1", "1", 0)]
         [InlineData("1", "42", -1)]
         [InlineData("beta", "rc", -1)] // Case that causes -16 for string comparison
-        // Numeric identifiers always have lower precedence than alphanumeric (even though '-' < '0')
+                                       // Numeric identifiers always have lower precedence than alphanumeric (even though '-' < '0')
         [InlineData("0", "a", -1)]
         [InlineData("9", "A", -1)]
         [InlineData("9", "-", -1)]

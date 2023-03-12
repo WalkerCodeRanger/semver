@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using Semver.Test.Builders;
 using Semver.Test.Helpers;
@@ -15,6 +16,8 @@ namespace Semver.Test
     /// </summary>
     public class SemVersionParsingTests
     {
+        private static readonly BigInteger ULongMaxPlusOne = ulong.MaxValue + BigInteger.One;
+
         /// <summary>
         /// This a very long but valid version number to test parsing long version numbers. It is
         /// generated using a random number generator seeded with specific value so that the same
@@ -237,7 +240,9 @@ namespace Semver.Test
             Invalid<OverflowException>("2147483648.2.3", ExceptionMessages.MajorOverflow, "2147483648"),
             Invalid<OverflowException>("1.2147483648.3", ExceptionMessages.MinorOverflow, "2147483648"),
             Invalid<OverflowException>("1.2.2147483648", ExceptionMessages.PatchOverflow, "2147483648"),
-            Invalid<OverflowException>("1.2.3-2147483648", ExceptionMessages.PrereleaseOverflow, "2147483648"),
+
+            // Supports ulong.Max+1
+            Valid("1.2.3-18446744073709551616", 1, 2, 3, Pre(ULongMaxPlusOne)),
 
             // Invalid characters in major, minor, or patch
             Invalid("1@.2.3", ExceptionMessages.InvalidCharacterInMajor, "@"),

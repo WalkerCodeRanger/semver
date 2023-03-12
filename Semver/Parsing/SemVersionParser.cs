@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Primitives;
 using Semver.Utility;
@@ -403,7 +404,7 @@ namespace Semver.Parsing
                     else
                         identifierString = identifier.ToString();
 
-                    if (!int.TryParse(identifierString, NumberStyles.None, null, out var numericValue))
+                    if (!BigInteger.TryParse(identifierString, NumberStyles.None, null, out var numericValue))
                         // Parsing validated this as a string of digits possibly proceeded by zero so the only
                         // possible issue is a numeric overflow for `int`
                         return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,

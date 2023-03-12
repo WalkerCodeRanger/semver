@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Globalization;
+using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Semver.Utility;
 
 namespace Semver
@@ -24,6 +26,7 @@ namespace Semver
     /// <see cref="Semver"/> namespace types do not accept and will not return such a
     /// <see cref="PrereleaseIdentifier"/>.</para>
     /// </remarks>
+    [StructLayout(LayoutKind.Auto)]
     public readonly struct PrereleaseIdentifier : IEquatable<PrereleaseIdentifier>, IComparable<PrereleaseIdentifier>, IComparable
     {
         internal static readonly PrereleaseIdentifier Zero = CreateUnsafe("0", 0);
@@ -46,7 +49,7 @@ namespace Semver
         /// <value>The numeric value of the prerelease identifier if it is a numeric identifier,
         /// otherwise <see langword="null"/>.</value>
         /// <remarks>The numeric value of a prerelease identifier will never be negative.</remarks>
-        public int? NumericValue { get; }
+        public BigInteger? NumericValue { get; }
 
         /// <summary>
         /// Construct a <see cref="PrereleaseIdentifier"/> without checking that any of the invariants
@@ -57,7 +60,7 @@ namespace Semver
         /// constructors are visible to the package users. So they see a class consistently
         /// using constructors without any create methods.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static PrereleaseIdentifier CreateUnsafe(string value, int? numericValue)
+        internal static PrereleaseIdentifier CreateUnsafe(string value, BigInteger? numericValue)
         {
             DebugChecks.IsNotNull(value, nameof(value));
 #if DEBUG
@@ -71,9 +74,9 @@ namespace Semver
             {
                 throw new ArgumentException("DEBUG: " + ex.Message, ex.ParamName, ex);
             }
-            catch (OverflowException ex)
+            catch (Exception ex)
             {
-                throw new OverflowException("DEBUG: " + ex.Message, ex);
+                throw new Exception("DEBUG: " + ex.Message, ex);
             }
             if (expected.Value != value)
                 throw new ArgumentException("DEBUG: String value has leading zeros.", nameof(value));
@@ -86,7 +89,7 @@ namespace Semver
         /// <summary>
         /// Private constructor used by <see cref="CreateUnsafe"/>.
         /// </summary>
-        private PrereleaseIdentifier(string value, int? numericValue)
+        private PrereleaseIdentifier(string value, BigInteger? numericValue)
         {
             Value = value;
             NumericValue = numericValue;
@@ -137,15 +140,7 @@ namespace Semver
                         throw new ArgumentException($"Leading zeros are not allowed on numeric prerelease identifiers '{value}'.", paramName);
                 }
 
-                try
-                {
-                    NumericValue = int.Parse(value, NumberStyles.None, CultureInfo.InvariantCulture);
-                }
-                catch (OverflowException)
-                {
-                    // Remake the overflow exception to give better message
-                    throw new OverflowException($"Prerelease identifier '{value}' was too large for {nameof(Int32)}.");
-                }
+                NumericValue = BigInteger.Parse(value, NumberStyles.None, CultureInfo.InvariantCulture);
             }
             else
             {
@@ -162,7 +157,7 @@ namespace Semver
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="value"/> is negative.</exception>
         /// <param name="value">The non-negative value of this identifier.</param>
-        public PrereleaseIdentifier(int value)
+        public PrereleaseIdentifier(BigInteger value)
         {
             if (value < 0)
                 throw new ArgumentOutOfRangeException(nameof(value), $"Numeric prerelease identifiers can't be negative: {value}.");
@@ -180,7 +175,7 @@ namespace Semver
         /// is equal to '<c>015</c>').</remarks>
         public bool Equals(PrereleaseIdentifier value)
         {
-            if (NumericValue is int numericValue) return numericValue == value.NumericValue;
+            if (NumericValue is BigInteger numericValue) return numericValue == value.NumericValue;
             return Value == value.Value;
         }
 
@@ -198,7 +193,7 @@ namespace Semver
         /// '<c>15</c>' has the same hash code as '<c>015</c>').</remarks>
         public override int GetHashCode()
         {
-            if (NumericValue is int numericValue) return HashCode.Combine(numericValue);
+            if (NumericValue is BigInteger numericValue) return HashCode.Combine(numericValue);
             return HashCode.Combine(Value);
         }
 
@@ -259,15 +254,15 @@ namespace Semver
         {
             // Handle the fact that numeric identifiers are always less than alphanumeric
             // and numeric identifiers are compared equal even with leading zeros.
-            if (NumericValue is int numericValue)
+            if (NumericValue is BigInteger numericValue)
             {
-                if (value.NumericValue is int otherNumericValue)
+                if (value.NumericValue is BigInteger otherNumericValue)
                     return numericValue.CompareTo(otherNumericValue);
 
                 return -1;
             }
 
-            if (value.NumericValue != null)
+            if (value.NumericValue is not null)
                 return 1;
 
             return IdentifierString.Compare(Value, value.Value);
@@ -332,7 +327,7 @@ namespace Semver
 
         internal PrereleaseIdentifier NextIdentifier()
         {
-            if (NumericValue is int numericValue)
+            if (NumericValue is BigInteger numericValue)
                 return numericValue == int.MaxValue
                     ? Hyphen
                     : new PrereleaseIdentifier(numericValue + 1);

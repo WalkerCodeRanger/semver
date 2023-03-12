@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using Xunit;
 
 namespace Semver.Test
@@ -68,7 +70,6 @@ namespace Semver.Test
             Assert.Equal(42, 42.GetHashCode());
         }
 
-#if NETCOREAPP
         [Fact]
         public void HashCodeCombineInt()
         {
@@ -80,7 +81,14 @@ namespace Semver.Test
         {
             Assert.NotEqual(0, HashCode.Combine<object>(null));
         }
-#endif
+
+        [Fact]
+        public void SizeOfBigInteger()
+        {
+            var bigIntSize = Unsafe.SizeOf<BigInteger>();
+
+            Assert.InRange(bigIntSize, 0, 16);
+        }
 
         private const string InvalidNumberStyleMessageStart = "An undefined NumberStyles value is being used.";
         private const string InvalidFormatMessage = "Input string was not in a correct format.";

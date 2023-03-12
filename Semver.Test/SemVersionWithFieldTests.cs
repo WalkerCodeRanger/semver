@@ -157,11 +157,11 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithPrereleaseParsedFromTooLarge()
+        public void WithPrereleaseParsedFromLargeNumber()
         {
-            var ex = Assert.Throws<OverflowException>(()
-               => Version.WithPrereleaseParsedFrom("bar.99999999999999999"));
-            Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
+            var v = Version.WithPrereleaseParsedFrom("bar.99999999999999999");
+
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "bar.99999999999999999", "metadata"), v);
         }
 
         [Fact]
@@ -240,18 +240,19 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithPrereleaseStringParamsTooLargeInFirst()
+        public void WithPrereleaseStringParamsLargeNumberInFirst()
         {
-            var ex = Assert.Throws<OverflowException>(() => Version.WithPrerelease("99999999999999999", "bar"));
-            Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
+            var v = Version.WithPrerelease("99999999999999999", "bar");
+
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "99999999999999999.bar", "metadata"), v);
         }
 
         [Fact]
-        public void WithPrereleaseStringParamsTooLargeInRest()
+        public void WithPrereleaseStringParamsLargeNumberInRest()
         {
-            var ex = Assert.Throws<OverflowException>(()
-                => Version.WithPrerelease("bar", "99999999999999999"));
-            Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
+            var v = Version.WithPrerelease("bar", "99999999999999999");
+
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "bar.99999999999999999", "metadata"), v);
         }
 
         [Fact]
@@ -335,11 +336,11 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void WithPrereleaseStringEnumerableTooLarge()
+        public void WithPrereleaseStringEnumerableLargeNumber()
         {
-            var ex = Assert.Throws<OverflowException>(()
-                => Version.WithPrerelease(new[] { "bar", "99999999999999999" }));
-            Assert.StartsWith("Prerelease identifier '99999999999999999' was too large for Int32.", ex.Message);
+            var v = Version.WithPrerelease(new[] { "bar", "99999999999999999" });
+
+            Assert.Equal(SemVersion.ParsedFrom(1, 2, 3, "bar.99999999999999999", "metadata"), v);
         }
 
         [Fact]

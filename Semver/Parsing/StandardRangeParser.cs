@@ -247,7 +247,7 @@ namespace Semver.Parsing
             for (int i = 0; i < identifiers.Count - 1; i++)
                 yield return identifiers[i];
 
-            var lastIdentifier = identifiers[identifiers.Count - 1];
+            var lastIdentifier = identifiers[^1];
 
             yield return lastIdentifier.NextIdentifier();
         }
