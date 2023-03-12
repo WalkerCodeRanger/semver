@@ -77,13 +77,13 @@ namespace Semver.Test.Helpers
             = "Missing a version number in hyphen range in '{range}'.";
         #endregion
 
-        public static string InjectValue(string format, string value)
+        public static string InjectValue(string format, string? value)
             => format.Replace("{value}", value);
 
-        public static string InjectVersion(string format, string version)
+        public static string InjectVersion(string format, string? version)
             => format.Replace("{version}", version.LimitLength());
 
-        public static string InjectRange(string format, string range)
+        public static string InjectRange(string format, string? range)
             => format.Replace("{range}", range.LimitLength());
     }
 }

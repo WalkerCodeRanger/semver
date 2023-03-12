@@ -38,7 +38,7 @@ namespace Semver.Test.Comparers
         [Fact]
         public void EqualsNullNullTest()
         {
-            Assert.True(Comparer.Equals(null, null));
+            Assert.True(Comparer.Equals(null!, null!));
         }
 
         [Theory]
@@ -46,8 +46,8 @@ namespace Semver.Test.Comparers
         public void EqualsNullTest(string version)
         {
             var v = SemVersion.Parse(version);
-            Assert.False(Comparer.Equals(v, null), $"Equals({v}, null)");
-            Assert.False(Comparer.Equals(null, v), $"Equals(null, {v})");
+            Assert.False(Comparer.Equals(v, null!), $"Equals({v}, null)");
+            Assert.False(Comparer.Equals(null!, v), $"Equals(null, {v})");
         }
         #endregion
 
@@ -124,7 +124,7 @@ namespace Semver.Test.Comparers
                 Assert.True(Comparer.Compare(null, v) == -1, $"Compare(null, {v}) == -1");
             }
 
-            Assert.True(Comparer.Compare(null, null) == 0, "Compare(null, null) == 0");
+            Assert.True(Comparer.Compare(null!, null!) == 0, "Compare(null, null) == 0");
         }
         #endregion
     }

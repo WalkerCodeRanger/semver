@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Semver.Test.Helpers;
 using Xunit;
 
@@ -14,7 +15,7 @@ namespace Semver.Test.TestCases
             => new NpmRangeParsingTestCase(range, includeAllPrerelease, maxLength, expected);
 
         public static NpmRangeParsingTestCase Invalid(
-            string range,
+            string? range,
             bool includeAllPrerelease,
             int maxLength,
             Type exceptionType,
@@ -22,7 +23,7 @@ namespace Semver.Test.TestCases
             => new NpmRangeParsingTestCase(range, includeAllPrerelease, maxLength, exceptionType, exceptionMessageFormat);
 
         private NpmRangeParsingTestCase(
-            string range,
+            string? range,
             bool includeAllPrerelease,
             int maxLength,
             SemVersionRange expected)
@@ -35,7 +36,7 @@ namespace Semver.Test.TestCases
         }
 
         private NpmRangeParsingTestCase(
-            string range,
+            string? range,
             bool includeAllPrerelease,
             int maxLength,
             Type exceptionType,
@@ -49,19 +50,22 @@ namespace Semver.Test.TestCases
             ExceptionMessageFormat = exceptionMessageFormat;
         }
 
-        public string Range { get; }
+        public string? Range { get; }
         public bool IncludeAllPrerelease { get; }
         public int MaxLength { get; }
+
+        [MemberNotNullWhen(true, nameof(Range), nameof(ExpectedRange))]
+        [MemberNotNullWhen(false, nameof(ExceptionType), nameof(ExceptionMessageFormat))]
         public bool IsValid { get; }
 
         #region Valid Values
-        public SemVersionRange ExpectedRange { get; }
+        public SemVersionRange? ExpectedRange { get; }
         #endregion
 
         #region Invalid Values
-        public Type ExceptionType { get; }
-        public string ExceptionMessageFormat { get; }
-
+        
+        public Type? ExceptionType { get; }
+        public string? ExceptionMessageFormat { get; }
         #endregion
 
         public void AssertParseNpm()
@@ -74,7 +78,7 @@ namespace Semver.Test.TestCases
             else
             {
                 var ex = Assert.Throws(ExceptionType,
-                    () => SemVersionRange.ParseNpm(Range, IncludeAllPrerelease, MaxLength));
+                    () => SemVersionRange.ParseNpm(Range!, IncludeAllPrerelease, MaxLength));
 
                 var expected = ExceptionMessages.InjectRange(ExceptionMessageFormat, Range);
 

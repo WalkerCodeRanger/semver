@@ -1163,7 +1163,7 @@ namespace Semver
         /// </list>
         /// </returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrecedenceOrder"]/*'/>
-        public int ComparePrecedenceTo(SemVersion other) => PrecedenceComparer.Compare(this, other);
+        public int ComparePrecedenceTo(SemVersion? other) => PrecedenceComparer.Compare(this, other!);
 
         /// <summary>
         /// Compares two versions and indicates whether this instance precedes, follows, or is equal
@@ -1195,7 +1195,7 @@ namespace Semver
         /// </list>
         /// </returns>
         /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="SortOrder"]/*'/>
-        public int CompareSortOrderTo(SemVersion other) => SortOrderComparer.Compare(this, other);
+        public int CompareSortOrderTo(SemVersion? other) => SortOrderComparer.Compare(this, other!);
 
         /// <summary>
         /// Compares two versions and indicates whether the first precedes, follows, or is in the same

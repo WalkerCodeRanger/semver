@@ -3,7 +3,9 @@
   <PropertyGroup>
     <TargetFrameworks>net462;netcoreapp3.1;net5.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	<LangVersion>9.0</LangVersion>
+	<Nullable>enable</Nullable>
     <DebugType>portable</DebugType>
     <AssemblyName>Semver.Test</AssemblyName>
     <PackageId>Semver.Test</PackageId>
@@ -11,7 +13,7 @@
     <Company />
     <Copyright>Copyright © 2013 Max Hauser</Copyright>
     <Product>Semver</Product>
-    <Authors>Max Hauser</Authors>
+    <Authors>Max Hauser, Jeff Walker</Authors>
     <Version>1.0.0-dev</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>

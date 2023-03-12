@@ -22,7 +22,7 @@ namespace Semver.Test
         [Fact]
         public void ConstructWithNullString()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => new MetadataIdentifier(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => new MetadataIdentifier(null!));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("value", ex.ParamName);

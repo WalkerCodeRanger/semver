@@ -219,7 +219,7 @@ namespace Semver.Test
             else
             {
                 var ex = Assert.Throws(testCase.ExceptionType,
-                    () => SemVersionRange.Parse(testCase.Range, testCase.Options, testCase.MaxLength));
+                    () => SemVersionRange.Parse(testCase.Range!, testCase.Options, testCase.MaxLength));
 
                 var expected = ExceptionMessages.InjectRange(testCase.ExceptionMessageFormat, testCase.Range);
 
@@ -299,7 +299,7 @@ namespace Semver.Test
             => RangeParsingTestCase.Valid(range, options, SemVersionRange.MaxRangeLength, SemVersionRange.Create(expectedRanges));
 
         internal static RangeParsingTestCase Invalid<T>(
-            string range,
+            string? range,
             string message,
             int maxLength = SemVersionRange.MaxRangeLength)
             => RangeParsingTestCase.Invalid(range, Strict, maxLength, typeof(T), message);
@@ -307,8 +307,8 @@ namespace Semver.Test
         private static RangeParsingTestCase Invalid(
             string range,
             string message = "",
-            string value = null,
-            string version = null,
+            string? value = null,
+            string? version = null,
             int maxLength = SemVersionRange.MaxRangeLength)
         {
             message = ExceptionMessages.InjectValue(message, value);

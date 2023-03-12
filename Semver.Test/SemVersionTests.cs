@@ -102,7 +102,7 @@ namespace Semver.Test
         [Fact]
         public void FromVersionNullTest()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.FromVersion(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => SemVersion.FromVersion(null!));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);

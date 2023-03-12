@@ -33,7 +33,7 @@ namespace Semver.Test
         public void IntParseOfNullAndInvalidNumberStyleThrowsInvalidNumberStyleArgumentException()
         {
             var ex = Assert.Throws<ArgumentException>(
-                () => int.Parse(null, InvalidNumberStyle, CultureInfo.InvariantCulture));
+                () => int.Parse(null!, InvalidNumberStyle, CultureInfo.InvariantCulture));
 
             Assert.StartsWith(InvalidNumberStyleMessageStart, ex.Message);
             Assert.Equal("style", ex.ParamName);
@@ -79,7 +79,7 @@ namespace Semver.Test
         [Fact]
         public void HashCodeCombineNull()
         {
-            Assert.NotEqual(0, HashCode.Combine<object>(null));
+            Assert.NotEqual(0, HashCode.Combine<object?>(null));
         }
 
         [Fact]

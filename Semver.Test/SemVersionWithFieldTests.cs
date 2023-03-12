@@ -117,7 +117,7 @@ namespace Semver.Test
         public void WithPrereleaseParsedFromNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithPrereleaseParsedFrom(null));
+                => Version.WithPrereleaseParsedFrom(null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prerelease", ex.ParamName);
         }
@@ -186,7 +186,7 @@ namespace Semver.Test
         [Fact]
         public void WithPrereleaseStringParamsFirstNull()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease(null, "more"));
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease(null!, "more"));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifier", ex.ParamName);
         }
@@ -194,7 +194,7 @@ namespace Semver.Test
         [Fact]
         public void WithPrereleaseStringParamsRestNull()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease("pre", null));
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease("pre", null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -218,7 +218,7 @@ namespace Semver.Test
         [Fact]
         public void WithPrereleaseStringParamsNullIdentifierInRest()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease("bar", "baz", null));
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease("bar", "baz", null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -295,7 +295,7 @@ namespace Semver.Test
         public void WithPrereleaseStringEnumerableNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithPrerelease((IEnumerable<string>)null));
+                => Version.WithPrerelease((IEnumerable<string>)null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -321,7 +321,7 @@ namespace Semver.Test
         public void WithPrereleaseStringEnumerableNullIdentifier()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithPrerelease(new[] { "bar", null }));
+                => Version.WithPrerelease(new[] { "bar", null! }));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -370,7 +370,7 @@ namespace Semver.Test
         public void WithPrereleaseIdentifierParamsRestNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(() => Version.WithPrerelease(
-                new PrereleaseIdentifier("bar"), null));
+                new PrereleaseIdentifier("bar"), null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -421,7 +421,7 @@ namespace Semver.Test
         public void WithPrereleaseIdentifiersNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithPrerelease((IEnumerable<PrereleaseIdentifier>)null));
+                => Version.WithPrerelease((IEnumerable<PrereleaseIdentifier>)null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prereleaseIdentifiers", ex.ParamName);
         }
@@ -483,7 +483,7 @@ namespace Semver.Test
         public void WithMetadataParsedFromNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithMetadataParsedFrom(null));
+                => Version.WithMetadataParsedFrom(null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadata", ex.ParamName);
         }
@@ -543,7 +543,7 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataStringParamsFirstNull()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(null, "rest"));
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata(null!, "rest"));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifier", ex.ParamName);
         }
@@ -551,7 +551,7 @@ namespace Semver.Test
         [Fact]
         public void WithMetadataStringParamsRestNull()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata("bar", null));
+            var ex = Assert.Throws<ArgumentNullException>(() => Version.WithMetadata("bar", null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -576,7 +576,7 @@ namespace Semver.Test
         public void WithMetadataStringParamsNullIdentifierInRest()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithMetadata("bar", "baz", null));
+                => Version.WithMetadata("bar", "baz", null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -655,7 +655,7 @@ namespace Semver.Test
         public void WithMetadataEnumerableNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithMetadata((IEnumerable<string>)null));
+                => Version.WithMetadata((IEnumerable<string>)null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -681,7 +681,7 @@ namespace Semver.Test
         public void WithMetadataEnumerableNullIdentifier()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithMetadata(new[] { "bar", null }));
+                => Version.WithMetadata(new[] { "bar", null! }));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -731,7 +731,7 @@ namespace Semver.Test
         public void WithMetadataIdentifierParamsRestNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithMetadata(new MetadataIdentifier("bar"), null));
+                => Version.WithMetadata(new MetadataIdentifier("bar"), null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }
@@ -782,7 +782,7 @@ namespace Semver.Test
         public void WithMetadataIdentifiersNull()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => Version.WithMetadata((IEnumerable<MetadataIdentifier>)null));
+                => Version.WithMetadata((IEnumerable<MetadataIdentifier>)null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadataIdentifiers", ex.ParamName);
         }

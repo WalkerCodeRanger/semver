@@ -29,16 +29,16 @@ namespace Semver.Test.Builders
             => NpmRangeParsingTestCase.Valid(range, includeAllPrerelease, SemVersionRange.MaxRangeLength, SemVersionRange.Create(expectedRanges));
 
         public static NpmRangeParsingTestCase Invalid<T>(
-            string range,
+            string? range,
             string message,
-            int maxLength = SemVersionRange.MaxRangeLength) =>
-            NpmRangeParsingTestCase.Invalid(range, false, maxLength, typeof(T), message);
+            int maxLength = SemVersionRange.MaxRangeLength)
+            => NpmRangeParsingTestCase.Invalid(range, false, maxLength, typeof(T), message);
 
         public static NpmRangeParsingTestCase Invalid(
-            string range,
+            string? range,
             string message = "",
-            string value = null,
-            string version = null,
+            string? value = null,
+            string? version = null,
             int maxLength = SemVersionRange.MaxRangeLength)
         {
             message = ExceptionMessages.InjectValue(message, value);

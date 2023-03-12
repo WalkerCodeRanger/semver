@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Semver.Utility;
 
 namespace Semver.Test.TestCases
@@ -21,7 +22,7 @@ namespace Semver.Test.TestCases
                 prereleaseIdentifiers, metadataIdentifiers, maxLength);
         }
         public static ParsingTestCase Invalid(
-            string version,
+            string? version,
             SemVersionStyles styles,
             Type exceptionType,
             string exceptionMessage,
@@ -52,7 +53,7 @@ namespace Semver.Test.TestCases
         }
 
         private ParsingTestCase(
-            string version,
+            string? version,
             SemVersionStyles styles,
             Type exceptionType,
             string exceptionMessageFormat,
@@ -68,15 +69,15 @@ namespace Semver.Test.TestCases
 
         private ParsingTestCase(
             bool isValid,
-            string version,
+            string? version,
             SemVersionStyles requiredStyles,
-            int major,
-            int minor,
-            int patch,
-            IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
-            IReadOnlyList<MetadataIdentifier> metadataIdentifiers,
-            Type exceptionType,
-            string exceptionMessageFormat,
+            int? major,
+            int? minor,
+            int? patch,
+            IReadOnlyList<PrereleaseIdentifier>? prereleaseIdentifiers,
+            IReadOnlyList<MetadataIdentifier>? metadataIdentifiers,
+            Type? exceptionType,
+            string? exceptionMessageFormat,
             int maxLength)
         {
             IsValid = isValid;
@@ -92,7 +93,7 @@ namespace Semver.Test.TestCases
             MaxLength = maxLength;
         }
 
-        public ParsingTestCase Change(string version = null, SemVersionStyles? styles = null)
+        public ParsingTestCase Change(string? version = null, SemVersionStyles? styles = null)
         {
             return new ParsingTestCase(IsValid, version  ?? Version, styles ?? Styles,
                 Major, Minor, Patch,
@@ -100,23 +101,26 @@ namespace Semver.Test.TestCases
                 ExceptionType, ExceptionMessageFormat, MaxLength);
         }
 
-        public string Version { get; }
+        public string? Version { get; }
         public SemVersionStyles Styles { get; }
         public int MaxLength { get; }
+
+        [MemberNotNullWhen(true, nameof(Version), nameof(Major), nameof(Minor), nameof(Patch), nameof(PrereleaseIdentifiers), nameof(MetadataIdentifiers))]
+        [MemberNotNullWhen(false, nameof(ExceptionType),nameof(ExceptionMessageFormat))]
         public bool IsValid { get; }
 
         #region Valid Values
-        public int Major { get; }
-        public int Minor { get; }
-        public int Patch { get; }
+        public int? Major { get; }
+        public int? Minor { get; }
+        public int? Patch { get; }
 
-        public IReadOnlyList<PrereleaseIdentifier> PrereleaseIdentifiers { get; }
-        public IReadOnlyList<MetadataIdentifier> MetadataIdentifiers { get; }
+        public IReadOnlyList<PrereleaseIdentifier>? PrereleaseIdentifiers { get; }
+        public IReadOnlyList<MetadataIdentifier>? MetadataIdentifiers { get; }
         #endregion
 
         #region Invalid Values
-        public Type ExceptionType { get; }
-        public string ExceptionMessageFormat { get; }
+        public Type? ExceptionType { get; }
+        public string? ExceptionMessageFormat { get; }
         #endregion
 
         public override string ToString()

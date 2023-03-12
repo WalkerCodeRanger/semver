@@ -404,7 +404,7 @@ namespace Semver.Test
             else
             {
                 var ex = Assert.Throws(testCase.ExceptionType,
-                    () => SemVersion.Parse(testCase.Version, testCase.Styles, testCase.MaxLength));
+                    () => SemVersion.Parse(testCase.Version!, testCase.Styles, testCase.MaxLength));
 
                 var expected = ExceptionMessages.InjectVersion(testCase.ExceptionMessageFormat, testCase.Version);
 
@@ -463,8 +463,11 @@ namespace Semver.Test
             SemVersion.TryParse(LongValidVersionString, Strict, out _, maxLength: int.MaxValue);
         }
 
-        private static void AssertVersionEqual(SemVersion version, ParsingTestCase testCase)
+        private static void AssertVersionEqual(SemVersion? version, ParsingTestCase testCase)
         {
+            Assert.NotNull(version);
+            Assert.True(testCase.IsValid);
+
             Assert.Equal(testCase.Major, version.Major);
             Assert.Equal(testCase.Minor, version.Minor);
             Assert.Equal(testCase.Patch, version.Patch);
@@ -506,7 +509,7 @@ namespace Semver.Test
 
                 var expectedVersion = expectedSemVersion.ToString();
                 var expectedMajorMinorPatch = expectedVersion.Split('-')[0];
-                var actualMajorMinorPatch = testCase.Version.Split('-')[0];
+                var actualMajorMinorPatch = testCase.Version!.Split('-')[0];
                 var leadingZeroInMajorMinorPatch = expectedMajorMinorPatch != actualMajorMinorPatch;
                 string message;
                 if (leadingZeroInMajorMinorPatch)
@@ -576,7 +579,8 @@ namespace Semver.Test
         {
             if (string.IsNullOrWhiteSpace(c.Version)) return false;
 
-            if (c.Version.StartsWith("v", StringComparison.Ordinal)
+            if (c.Version is null
+                || c.Version.StartsWith("v", StringComparison.Ordinal)
                 || c.Version.StartsWith("V", StringComparison.Ordinal)
                 || c.Version.StartsWith(" ", StringComparison.Ordinal)
                 || c.Version.StartsWith("\t", StringComparison.Ordinal))
@@ -591,8 +595,8 @@ namespace Semver.Test
             int major,
             int minor = 0,
             int patch = 0,
-            IEnumerable<PrereleaseIdentifier> prerelease = null,
-            IEnumerable<MetadataIdentifier> metadata = null)
+            IEnumerable<PrereleaseIdentifier>? prerelease = null,
+            IEnumerable<MetadataIdentifier>? metadata = null)
         {
             return ParsingTestCase.Valid(version, requiredStyles, major, minor, patch,
                 prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
@@ -604,8 +608,8 @@ namespace Semver.Test
             int major,
             int minor = 0,
             int patch = 0,
-            IEnumerable<PrereleaseIdentifier> prerelease = null,
-            IEnumerable<MetadataIdentifier> metadata = null)
+            IEnumerable<PrereleaseIdentifier>? prerelease = null,
+            IEnumerable<MetadataIdentifier>? metadata = null)
         {
             return ParsingTestCase.Valid(version, Strict, major, minor, patch,
             prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
@@ -671,10 +675,10 @@ namespace Semver.Test
         }
 
         private static ParsingTestCase Invalid<T>(
-            string version,
+            string? version,
             SemVersionStyles requiredStyles,
             string exceptionMessage = "",
-            string exceptionValue = null,
+            string? exceptionValue = null,
             int maxLength = SemVersion.MaxVersionLength)
             where T : Exception
         {
@@ -683,10 +687,10 @@ namespace Semver.Test
         }
 
         private static ParsingTestCase Invalid(
-            string version,
+            string? version,
             SemVersionStyles requiredStyles,
             string exceptionMessage = "",
-            string exceptionValue = null,
+            string? exceptionValue = null,
             int maxLength = SemVersion.MaxVersionLength)
         {
             exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);
@@ -695,9 +699,9 @@ namespace Semver.Test
         }
 
         private static ParsingTestCase Invalid<T>(
-            string version,
+            string? version,
             string exceptionMessage = "",
-            string exceptionValue = null,
+            string? exceptionValue = null,
             int maxLength = SemVersion.MaxVersionLength)
             where T : Exception
         {
@@ -706,9 +710,9 @@ namespace Semver.Test
         }
 
         private static ParsingTestCase Invalid(
-            string version,
+            string? version,
             string exceptionMessage = "",
-            string exceptionValue = null,
+            string? exceptionValue = null,
             int maxLength = SemVersion.MaxVersionLength)
         {
             exceptionMessage = ExceptionMessages.InjectValue(exceptionMessage, exceptionValue);

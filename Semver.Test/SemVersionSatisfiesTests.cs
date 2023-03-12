@@ -19,7 +19,7 @@ namespace Semver.Test
         public void SatisfiesNullPredicate()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => FakeVersion.Satisfies((Predicate<SemVersion>)null));
+                () => FakeVersion.Satisfies((Predicate<SemVersion>)null!));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("predicate", ex.ParamName);
@@ -28,8 +28,8 @@ namespace Semver.Test
         [Fact]
         public void SatisfiesPredicate()
         {
-            Assert.True(FakeVersion.Satisfies(v => true));
-            Assert.False(FakeVersion.Satisfies(v => false));
+            Assert.True(FakeVersion.Satisfies(_ => true));
+            Assert.False(FakeVersion.Satisfies(_ => false));
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace Semver.Test
         public void SatisfiesParsedNullRangeWithOptions()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => FakeVersion.Satisfies(null, SemVersionRangeOptions.Strict));
+                () => FakeVersion.Satisfies(null!, SemVersionRangeOptions.Strict));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("range", ex.ParamName);
@@ -98,7 +98,7 @@ namespace Semver.Test
         public void SatisfiesParsedNullRangeWithoutOptions()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => FakeVersion.Satisfies((string)null));
+                () => FakeVersion.Satisfies((string)null!));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("range", ex.ParamName);
@@ -129,7 +129,7 @@ namespace Semver.Test
         public void SatisfiesNullNpmRangeWithOptions()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => FakeVersion.SatisfiesNpm(null, true));
+                () => FakeVersion.SatisfiesNpm(null!, true));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("range", ex.ParamName);
@@ -161,7 +161,7 @@ namespace Semver.Test
         public void SatisfiesNullNpmRangeWithoutOptions()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => FakeVersion.SatisfiesNpm(null));
+                () => FakeVersion.SatisfiesNpm(null!));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("range", ex.ParamName);

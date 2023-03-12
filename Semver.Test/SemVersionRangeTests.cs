@@ -40,7 +40,7 @@ namespace Semver.Test
         [Fact]
         public void EqualsNullVersion()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.Equals(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.Equals(null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
@@ -72,7 +72,7 @@ namespace Semver.Test
         [Fact]
         public void GreaterThanNullVersion()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.GreaterThan(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.GreaterThan(null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
@@ -105,7 +105,7 @@ namespace Semver.Test
         [Fact]
         public void AtLeastNullVersion()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.AtLeast(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.AtLeast(null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
@@ -131,7 +131,7 @@ namespace Semver.Test
         [Fact]
         public void LessThanNullVersion()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.LessThan(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.LessThan(null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
@@ -179,7 +179,7 @@ namespace Semver.Test
         [Fact]
         public void AtMostNullVersion()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.AtMost(null));
+            var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.AtMost(null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("version", ex.ParamName);
         }
@@ -206,7 +206,7 @@ namespace Semver.Test
         public void InclusiveNullStartVersion()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => SemVersionRange.Inclusive(null, FakeVersion));
+                () => SemVersionRange.Inclusive(null!, FakeVersion));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
@@ -224,7 +224,7 @@ namespace Semver.Test
         public void InclusiveNullEndVersion()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => SemVersionRange.Inclusive(FakeVersion, null));
+                () => SemVersionRange.Inclusive(FakeVersion, null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
@@ -262,7 +262,7 @@ namespace Semver.Test
         public void InclusiveOfStartNullStartVersion()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => SemVersionRange.InclusiveOfStart(null, FakeVersion));
+                () => SemVersionRange.InclusiveOfStart(null!, FakeVersion));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
@@ -280,7 +280,7 @@ namespace Semver.Test
         public void InclusiveOfStartNullEndVersion()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => SemVersionRange.InclusiveOfStart(FakeVersion, null));
+                () => SemVersionRange.InclusiveOfStart(FakeVersion, null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
@@ -320,7 +320,7 @@ namespace Semver.Test
         public void InclusiveOfEndNullStartVersion()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => SemVersionRange.InclusiveOfEnd(null, FakeVersion));
+                () => SemVersionRange.InclusiveOfEnd(null!, FakeVersion));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
@@ -338,7 +338,7 @@ namespace Semver.Test
         public void InclusiveOfEndNullEndVersion()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => SemVersionRange.InclusiveOfEnd(FakeVersion, null));
+                () => SemVersionRange.InclusiveOfEnd(FakeVersion, null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
@@ -376,7 +376,7 @@ namespace Semver.Test
         public void ExclusiveNullStartVersion()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => SemVersionRange.Exclusive(null, FakeVersion));
+                () => SemVersionRange.Exclusive(null!, FakeVersion));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("start", ex.ParamName);
         }
@@ -394,7 +394,7 @@ namespace Semver.Test
         public void ExclusiveNullEndVersion()
         {
             var ex = Assert.Throws<ArgumentNullException>(
-                () => SemVersionRange.Exclusive(FakeVersion, null));
+                () => SemVersionRange.Exclusive(FakeVersion, null!));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("end", ex.ParamName);
         }
@@ -449,7 +449,7 @@ namespace Semver.Test
         public void CreateNullEnumerable()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => SemVersionRange.Create((IEnumerable<UnbrokenSemVersionRange>)null));
+                => SemVersionRange.Create((IEnumerable<UnbrokenSemVersionRange>)null!));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("ranges", ex.ParamName);
@@ -475,7 +475,7 @@ namespace Semver.Test
         public void CreateNullArray()
         {
             var ex = Assert.Throws<ArgumentNullException>(() =>
-                SemVersionRange.Create((UnbrokenSemVersionRange[])null));
+                SemVersionRange.Create((UnbrokenSemVersionRange[])null!));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("ranges", ex.ParamName);

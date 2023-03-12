@@ -45,7 +45,7 @@ namespace Semver.Test
         [InlineData(false)]
         public void ConstructWithNullString(bool allowLeadingZeros)
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => new PrereleaseIdentifier(null, allowLeadingZeros));
+            var ex = Assert.Throws<ArgumentNullException>(() => new PrereleaseIdentifier(null!, allowLeadingZeros));
 
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("value", ex.ParamName);

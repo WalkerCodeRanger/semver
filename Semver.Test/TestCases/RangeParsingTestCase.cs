@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using Xunit.Sdk;
 
 namespace Semver.Test.TestCases
 {
@@ -12,7 +14,7 @@ namespace Semver.Test.TestCases
             => new RangeParsingTestCase(range, options, maxLength, expected);
 
         public static RangeParsingTestCase Invalid(
-            string range,
+            string? range,
             SemVersionRangeOptions options,
             int maxLength,
             Type exceptionType,
@@ -33,7 +35,7 @@ namespace Semver.Test.TestCases
         }
 
         public RangeParsingTestCase(
-            string range,
+            string? range,
             SemVersionRangeOptions options,
             int maxLength,
             Type exceptionType,
@@ -47,18 +49,21 @@ namespace Semver.Test.TestCases
             ExceptionMessageFormat = exceptionMessageFormat;
         }
 
-        public string Range { get; }
+        public string? Range { get; }
         public SemVersionRangeOptions Options { get; }
         public int MaxLength { get; }
+
+        [MemberNotNullWhen(true, nameof(Range), nameof(ExpectedRange))]
+        [MemberNotNullWhen(false, nameof(ExceptionType), nameof(ExceptionMessageFormat))]
         public bool IsValid { get; }
 
         #region Valid Values
-        public SemVersionRange ExpectedRange { get; }
+        public SemVersionRange? ExpectedRange { get; }
         #endregion
 
         #region Invalid Values
-        public Type ExceptionType { get; }
-        public string ExceptionMessageFormat { get; }
+        public Type? ExceptionType { get; }
+        public string? ExceptionMessageFormat { get; }
         #endregion
 
         public override string ToString()

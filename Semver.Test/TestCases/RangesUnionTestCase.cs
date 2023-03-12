@@ -7,7 +7,7 @@ namespace Semver.Test.TestCases
         public RangesUnionTestCase(
             UnbrokenSemVersionRange x,
             UnbrokenSemVersionRange y,
-            UnbrokenSemVersionRange expected = null)
+            UnbrokenSemVersionRange? expected = null)
         {
             X = x ?? throw new ArgumentNullException(nameof(x));
             Y = y ?? throw new ArgumentNullException(nameof(y));
@@ -16,6 +16,6 @@ namespace Semver.Test.TestCases
 
         public UnbrokenSemVersionRange X { get; }
         public UnbrokenSemVersionRange Y { get; }
-        public UnbrokenSemVersionRange Expected { get; }
+        public UnbrokenSemVersionRange? Expected { get; }
     }
 }

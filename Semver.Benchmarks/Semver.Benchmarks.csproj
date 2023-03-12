@@ -7,6 +7,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>9.0</LangVersion>
 	<Nullable>enable</Nullable>
+	<Authors>Jeff Walker</Authors>
   </PropertyGroup>
 
     <ItemGroup>

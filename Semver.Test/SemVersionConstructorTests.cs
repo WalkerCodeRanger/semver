@@ -215,7 +215,7 @@ namespace Semver.Test
         [Fact]
         public void ConstructWithStringIdentifiersPrereleaseNull()
         {
-            var v = new SemVersion(1, 2, 3, (IEnumerable<string>)null);
+            var v = new SemVersion(1, 2, 3, (IEnumerable<string>?)null);
 
             Assert.Equal(new SemVersion(1, 2, 3), v);
         }
@@ -241,7 +241,7 @@ namespace Semver.Test
         public void ConstructWithStringIdentifiersPrereleaseNullIdentifier()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => new SemVersion(1, 2, 3, new[] { "bar", null }));
+                => new SemVersion(1, 2, 3, new[] { "bar", null! }));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("prerelease", ex.ParamName);
         }
@@ -282,7 +282,7 @@ namespace Semver.Test
         [Fact]
         public void ConstructWithStringIdentifiersMetadataNull()
         {
-            var v = new SemVersion(1, 2, 3, metadata: (IEnumerable<string>)null);
+            var v = new SemVersion(1, 2, 3, metadata: (IEnumerable<string>?)null);
 
             Assert.Equal(new SemVersion(1, 2, 3), v);
         }
@@ -308,7 +308,7 @@ namespace Semver.Test
         public void ConstructWithStringIdentifiersMetadataNullIdentifier()
         {
             var ex = Assert.Throws<ArgumentNullException>(()
-                => new SemVersion(1, 2, 3, metadata: new[] { "bar", null }));
+                => new SemVersion(1, 2, 3, metadata: new[] { "bar", null! }));
             Assert.StartsWith(ExceptionMessages.NotNull, ex.Message);
             Assert.Equal("metadata", ex.ParamName);
         }
