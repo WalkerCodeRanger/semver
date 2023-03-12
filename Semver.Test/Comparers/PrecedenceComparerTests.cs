@@ -141,15 +141,17 @@ namespace Semver.Test.Comparers
             Assert.Equal("Type of argument is not compatible with the generic comparer.", ex.Message);
         }
 
-        [Fact]
-        public void CompareNullTest()
+        [Theory]
+        [MemberData(nameof(ComparerTestData.VersionsInSortOrder), MemberType = typeof(ComparerTestData))]
+        public void CompareNullTest(string version)
         {
-            foreach (var v in ComparerTestData.VersionsInSortOrder)
-            {
-                Assert.True(Comparer.Compare(v, null) == 1, $"Compare({v}, null) == 1");
-                Assert.True(Comparer.Compare(null, v) == -1, $"Compare(null, {v}) == -1");
-            }
+            Assert.True(Comparer.Compare(version, null) == 1, $"Compare({version}, null) == 1");
+            Assert.True(Comparer.Compare(null, version) == -1, $"Compare(null, {version}) == -1");
+        }
 
+        [Fact]
+        public void CompareNullToNullTest()
+        {
             Assert.True(Comparer.Compare(null!, null!) == 0, "Compare(null, null) == 0");
         }
         #endregion
