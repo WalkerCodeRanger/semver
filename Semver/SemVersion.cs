@@ -374,7 +374,6 @@ namespace Semver
         /// </remarks>
         public Version ToVersion()
         {
-            if (Major < 0 || Minor < 0 || Patch < 0) throw new InvalidOperationException("Negative version numbers can't be converted to System.Version.");
             if (IsPrerelease) throw new InvalidOperationException("Prerelease version can't be converted to System.Version.");
             if (Metadata.Length != 0) throw new InvalidOperationException("Version with build metadata can't be converted to System.Version.");
 
@@ -404,7 +403,7 @@ namespace Semver
             if (maxLength < 0) throw new ArgumentOutOfRangeException(nameof(maxLength), InvalidMaxLengthMessage);
             var ex = SemVersionParser.Parse(version, style, null, maxLength, out var semver);
 
-            if (!(ex is null))
+            if (ex is not null)
                 throw ex;
             DebugChecks.IsNotNull(semver, nameof(semver));
 
@@ -437,11 +436,7 @@ namespace Semver
             if (maxLength < 0) throw new ArgumentOutOfRangeException(nameof(maxLength), InvalidMaxLengthMessage);
             var exception = SemVersionParser.Parse(version, style, VersionParsing.FailedException, maxLength, out semver);
 
-#if DEBUG
-            // This check ensures that SemVersionParser.Parse doesn't construct an exception, but always returns ParseFailedException
-            if (exception != null && exception != VersionParsing.FailedException)
-                throw new InvalidOperationException($"DEBUG: {nameof(SemVersionParser)}.{nameof(SemVersionParser.Parse)} returned exception other than {nameof(VersionParsing.FailedException)}", exception);
-#endif
+            DebugChecks.IsNotFailedException(exception, nameof(SemVersionParser), nameof(SemVersionParser.Parse));
 
             return exception is null;
         }

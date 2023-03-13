@@ -32,7 +32,7 @@ namespace Semver.Test.Comparers
             "0.0.1+12",
             "0.0.1+b",
             "0.0.1+bu",
-            "0.0.1+build.-",
+            "0.0.1+build.-", // Build metadata doesn't have numeric identifiers
             "0.0.1+build.12",
             "0.0.1+build.12.2",
             "0.0.1+build.13",
