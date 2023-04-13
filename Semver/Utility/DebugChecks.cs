@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Numerics;
 using Microsoft.Extensions.Primitives;
 using Semver.Parsing;
 
@@ -87,7 +88,7 @@ namespace Semver.Utility
         }
 
         [Conditional("DEBUG")]
-        public static void IsValidVersionNumber(int versionNumber, string kind, string paramName)
+        public static void IsValidVersionNumber(BigInteger versionNumber, string kind, string paramName)
         {
             if (versionNumber < 0)
                 throw new ArgumentException($"DEBUG: {kind} version must be greater than or equal to zero.", paramName);

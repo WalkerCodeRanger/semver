@@ -1,5 +1,6 @@
 ﻿extern alias previous;
 using System.Collections.Generic;
+using System.Numerics;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Previous = previous::Semver;
@@ -45,10 +46,10 @@ namespace Semver.Benchmarks
         }
 
         [Benchmark(OperationsPerInvoke = VersionCount, Baseline = true)]
-        public long Parse_Previous()
+        public BigInteger Parse_Previous()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
-            long accumulator = 0;
+            BigInteger accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
                 var version = Previous.SemVersion.Parse(versions[i], previousStyles, maxLength: int.MaxValue);
@@ -59,10 +60,10 @@ namespace Semver.Benchmarks
         }
 
         [Benchmark(OperationsPerInvoke = VersionCount)]
-        public long TryParse_Previous()
+        public BigInteger TryParse_Previous()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
-            long accumulator = 0;
+            BigInteger accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
                 if(Previous.SemVersion.TryParse(versions[i], previousStyles, out var version, maxLength: int.MaxValue))
@@ -73,10 +74,10 @@ namespace Semver.Benchmarks
         }
 
         [Benchmark(OperationsPerInvoke = VersionCount)]
-        public long Parse_Current()
+        public BigInteger Parse_Current()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
-            long accumulator = 0;
+            BigInteger accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
                 var version = SemVersion.Parse(versions[i], currentStyles, maxLength: int.MaxValue);
@@ -87,10 +88,10 @@ namespace Semver.Benchmarks
         }
 
         [Benchmark(OperationsPerInvoke = VersionCount)]
-        public long TryParse_Current()
+        public BigInteger TryParse_Current()
         {
             // The accumulator ensures the versions aren't dead code with minimal overhead
-            long accumulator = 0;
+            BigInteger accumulator = 0;
             for (int i = 0; i < VersionCount; i++)
             {
                 if(SemVersion.TryParse(versions[i], currentStyles, out var version, maxLength: int.MaxValue))

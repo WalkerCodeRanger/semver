@@ -69,7 +69,7 @@ namespace Semver.Test
 
         public static readonly TheoryData<ParsingTestCase> ParsingTestCases = ExpandTestCases(
             // version numbers given with the link in the spec to a regex for semver versions
-            Valid("0.0.4", 0, 0, 4),
+            Valid("0.0.4", (BigInteger)0, 0, 4),
             Valid("1.2.3", 1, 2, 3),
             Valid("10.20.30", 10, 20, 30),
             Valid("1.1.2-prerelease+meta", 1, 1, 2, Pre("prerelease"), Meta("meta")),
@@ -100,8 +100,8 @@ namespace Semver.Test
             Valid("1.2.3----RC-SNAPSHOT.12.9.1--.12", 1, 2, 3, Pre("---RC-SNAPSHOT", 12, 9, "1--", 12)),
             Valid("1.0.0+0.build.1-rc.10000aaa-kk-0.1", 1, 0, 0, Pre(), Meta("0", "build", "1-rc", "10000aaa-kk-0", "1")),
             Valid("1.0.0-0A.is.legal", 1, 0, 0, Pre("0A", "is", "legal")),
-            // This was given as a valid example, but isn't supported by the semver package because of overflow
-            Invalid<OverflowException>("99999999999999999999999.999999999999999999.99999999999999999", ExceptionMessages.MajorOverflow, "99999999999999999999999"),
+            Valid("99999999999999999999999.999999999999999999.99999999999999999",
+                BigInteger.Parse("99999999999999999999999"), 999999999999999999, 99999999999999999),
 
             // These are invalid version numbers given with the link in the spec to a regex for semver versions
             Invalid("1", ExceptionMessages.MissingMinor),
@@ -142,9 +142,9 @@ namespace Semver.Test
             Invalid("+justmeta", ExceptionMessages.EmptyMajor),
             Invalid("9.8.7+meta+meta", ExceptionMessages.InvalidCharacterInMetadata, "+"),
             Invalid("9.8.7-whatever+meta+meta", ExceptionMessages.InvalidCharacterInMetadata, "+"),
-            Invalid<OverflowException>(
+            Invalid(
                 "99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12",
-                ExceptionMessages.MajorOverflow, "99999999999999999999999"),
+                ExceptionMessages.LeadingZeroInPrerelease),
 
             // Basic valid versions
             Valid("1.2.3-a+b", 1, 2, 3, Pre("a"), Meta("b")),
@@ -236,10 +236,10 @@ namespace Semver.Test
             // Longer than max length
             Invalid("1.0.0-length", ExceptionMessages.TooLongVersion, "2", maxLength: 2),
 
-            // Overflow at int.Max+1
-            Invalid<OverflowException>("2147483648.2.3", ExceptionMessages.MajorOverflow, "2147483648"),
-            Invalid<OverflowException>("1.2147483648.3", ExceptionMessages.MinorOverflow, "2147483648"),
-            Invalid<OverflowException>("1.2.2147483648", ExceptionMessages.PatchOverflow, "2147483648"),
+            // Allows int.Max+1
+            Valid("2147483648.2.3", 2147483648, 2, 3),
+            Valid("1.2147483648.3", 1, 2147483648, 3), 
+            Valid("1.2.2147483648", 1, 2, 2147483648),
 
             // Supports ulong.Max+1
             Valid("1.2.3-18446744073709551616", 1, 2, 3, Pre(ULongMaxPlusOne)),
@@ -592,9 +592,9 @@ namespace Semver.Test
         private static ParsingTestCase Valid(
             string version,
             SemVersionStyles requiredStyles,
-            int major,
-            int minor = 0,
-            int patch = 0,
+            BigInteger major,
+            BigInteger minor = default,
+            BigInteger patch = default,
             IEnumerable<PrereleaseIdentifier>? prerelease = null,
             IEnumerable<MetadataIdentifier>? metadata = null)
         {
@@ -605,9 +605,9 @@ namespace Semver.Test
 
         private static ParsingTestCase Valid(
             string version,
-            int major,
-            int minor = 0,
-            int patch = 0,
+            BigInteger major,
+            BigInteger minor = default,
+            BigInteger patch = default,
             IEnumerable<PrereleaseIdentifier>? prerelease = null,
             IEnumerable<MetadataIdentifier>? metadata = null)
         {

@@ -127,7 +127,7 @@ namespace Semver.Parsing
             // Are leading zeros allowed
             var allowLeadingZeros = style.HasStyle(SemVersionStyles.AllowLeadingZeros);
 
-            int major, minor, patch;
+            BigInteger major, minor, patch;
             using (var versionNumbers = majorMinorPatchSegment.Split('.').GetEnumerator())
             {
                 const bool majorIsOptional = false;
@@ -261,7 +261,7 @@ namespace Semver.Parsing
             bool wildcardRequired,
             SemVersionParsingOptions options,
             Exception? ex,
-            out int number,
+            out BigInteger number,
             out bool isWildcard)
         {
             if (versionNumbers.MoveNext())
@@ -284,11 +284,11 @@ namespace Semver.Parsing
             bool wildcardRequired,
             SemVersionParsingOptions options,
             Exception? ex,
-            out int number,
+            out BigInteger number,
             out bool isWildcard)
         {
             // Assign once so it doesn't have to be done any time parse fails
-            number = 0;
+            number = BigInteger.Zero;
 
             if (segment.Length == 0)
             {
@@ -332,7 +332,7 @@ namespace Semver.Parsing
                     version.ToStringLimitLength(), kind);
 
             var numberString = segment.ToString();
-            if (!int.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
+            if (!BigInteger.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
                 // Parsing validated this as a string of digits possibly proceeded by zero so the only
                 // possible issue is a numeric overflow for `int`
                 return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,

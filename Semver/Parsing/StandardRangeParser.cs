@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Microsoft.Extensions.Primitives;
 using Semver.Ranges;
 using Semver.Utility;
@@ -136,22 +137,13 @@ namespace Semver.Parsing
                     return null;
                 case StandardOperator.Caret:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                    int major = 0, minor = 0, patch = 0;
+                    BigInteger major = 0, minor = 0, patch = 0;
                     if (semver.Major != 0)
-                    {
-                        if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         major = semver.Major + 1;
-                    }
                     else if (semver.Minor != 0)
-                    {
-                        if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         minor = semver.Minor + 1;
-                    }
                     else
-                    {
-                        if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                         patch = semver.Patch + 1;
-                    }
 
                     rightBound = rightBound.Min(new RightBoundedRange(new SemVersion(
                                     major, minor, patch,
@@ -160,7 +152,6 @@ namespace Semver.Parsing
                     return null;
                 case StandardOperator.Tilde:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                    if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                     rightBound = rightBound.Min(new RightBoundedRange(
                         semver.With(minor: semver.Minor + 1, patch: 0, prerelease: PrereleaseIdentifiers.Zero),
                         false));
@@ -181,7 +172,6 @@ namespace Semver.Parsing
                             return null;
                         case WildcardVersion.MinorPatchWildcard:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
-                            if (semver.Major == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                             rightBound = rightBound.Min(new RightBoundedRange(
                                 new SemVersion(semver.Major + 1, 0, 0,
                                     "0", PrereleaseIdentifiers.Zero,
@@ -189,7 +179,6 @@ namespace Semver.Parsing
                             return null;
                         case WildcardVersion.PatchWildcard:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
-                            if (semver.Minor == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                             rightBound = rightBound.Min(new RightBoundedRange(
                                 new SemVersion(semver.Major, semver.Minor + 1, 0,
                                     "0", PrereleaseIdentifiers.Zero,
@@ -229,7 +218,6 @@ namespace Semver.Parsing
                         PrereleaseWildcardUpperBoundPrereleaseIdentifiers(semver.PrereleaseIdentifiers));
                 else
                 {
-                    if (semver.Patch == int.MaxValue) return ex ?? RangeError.MaxVersion(versionSegment);
                     semver = new SemVersion(semver.Major, semver.Minor, semver.Patch + 1,
                         "0", PrereleaseIdentifiers.Zero, "", ReadOnlyList<MetadataIdentifier>.Empty);
                 }

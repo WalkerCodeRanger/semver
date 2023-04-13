@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 using System.Text;
@@ -69,12 +70,12 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/> version
         /// number is negative.</exception>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
-        public SemVersion(int major)
+        public SemVersion(BigInteger major)
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             Major = major;
-            Minor = 0;
-            Patch = 0;
+            Minor = BigInteger.Zero;
+            Patch = BigInteger.Zero;
             Prerelease = "";
             PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
             Metadata = "";
@@ -89,13 +90,13 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/> or
         /// <paramref name="minor"/> version number is negative.</exception>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
-        public SemVersion(int major, int minor)
+        public SemVersion(BigInteger major, BigInteger minor)
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
             Major = major;
             Minor = minor;
-            Patch = 0;
+            Patch = BigInteger.Zero;
             Prerelease = "";
             PrereleaseIdentifiers = ReadOnlyList<PrereleaseIdentifier>.Empty;
             Metadata = "";
@@ -111,7 +112,7 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         // Constructor needed to resolve ambiguity between other overloads with default parameters.
-        public SemVersion(int major, int minor, int patch)
+        public SemVersion(BigInteger major, BigInteger minor, BigInteger patch)
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
@@ -136,7 +137,9 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
-        public SemVersion(int major, int minor = 0, int patch = 0,
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public SemVersion(BigInteger major, BigInteger minor = default, BigInteger patch = default,
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
             IEnumerable<PrereleaseIdentifier>? prerelease = null,
             IEnumerable<MetadataIdentifier>? metadata = null)
         {
@@ -207,7 +210,9 @@ namespace Semver
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
         /// for <see cref="Int32"/>.</exception>
-        public SemVersion(int major, int minor = 0, int patch = 0,
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public SemVersion(BigInteger major, BigInteger minor = default, BigInteger patch = default,
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
             IEnumerable<string>? prerelease = null,
             IEnumerable<string>? metadata = null)
         {
@@ -305,7 +310,7 @@ namespace Semver
         /// contain invalid values and must be immutable. The <paramref name="prerelease"/>
         /// and <paramref name="metadata"/> must not be null and must be equal to the
         /// corresponding identifiers.</remarks>
-        internal SemVersion(int major, int minor, int patch,
+        internal SemVersion(BigInteger major, BigInteger minor, BigInteger patch,
             string prerelease, IReadOnlyList<PrereleaseIdentifier> prereleaseIdentifiers,
             string metadata, IReadOnlyList<MetadataIdentifier> metadataIdentifiers)
         {
@@ -377,7 +382,8 @@ namespace Semver
             if (IsPrerelease) throw new InvalidOperationException("Prerelease version can't be converted to System.Version.");
             if (Metadata.Length != 0) throw new InvalidOperationException("Version with build metadata can't be converted to System.Version.");
 
-            return new Version(Major, Minor, Patch);
+            // TODO check ranges and throw appropriate exceptions
+            return new Version((int)Major, (int)Minor, (int)Patch);
         }
         #endregion
 
@@ -468,19 +474,19 @@ namespace Semver
         /// <code>var modifiedVersion = version.With(minor: 2, patch: 4);</code>
         /// </example>
         public SemVersion With(
-            int? major = null,
-            int? minor = null,
-            int? patch = null,
+            BigInteger? major = null,
+            BigInteger? minor = null,
+            BigInteger? patch = null,
             IEnumerable<PrereleaseIdentifier>? prerelease = null,
             IEnumerable<MetadataIdentifier>? metadata = null)
         {
             // Note: It is tempting to null coalesce first, but then this method would report invalid
             // arguments on invalid SemVersion instances.
-            if (major is < 0)
+            if (major < 0)
                 throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
-            if (minor is < 0)
+            if (minor < 0)
                 throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
-            if (patch is < 0)
+            if (patch < 0)
                 throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
 
             IReadOnlyList<PrereleaseIdentifier>? prereleaseIdentifiers = null;
@@ -557,20 +563,20 @@ namespace Semver
         /// <code>var modifiedVersion = version.WithParsedFrom(patch: 4, prerelease: "alpha.5");</code>
         /// </example>
         public SemVersion WithParsedFrom(
-            int? major = null,
-            int? minor = null,
-            int? patch = null,
+            BigInteger? major = null,
+            BigInteger? minor = null,
+            BigInteger? patch = null,
             string? prerelease = null,
             string? metadata = null,
             bool allowLeadingZeros = false)
         {
             // Note: It is tempting to null coalesce first, but then this method would report invalid
             // arguments on invalid SemVersion instances.
-            if (major is < 0)
+            if (major < 0)
                 throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
-            if (minor is < 0)
+            if (minor < 0)
                 throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
-            if (patch is < 0)
+            if (patch < 0)
                 throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
 
             var prereleaseIdentifiers = prerelease?.SplitAndMapToReadOnlyList('.',
@@ -599,7 +605,7 @@ namespace Semver
         /// <param name="major">The value to replace the major version number.</param>
         /// <returns>The new version with the different major version number.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="major"/> is negative.</exception>
-        public SemVersion WithMajor(int major)
+        public SemVersion WithMajor(BigInteger major)
         {
             if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             if (Major == major) return this;
@@ -613,7 +619,7 @@ namespace Semver
         /// <param name="minor">The value to replace the minor version number.</param>
         /// <returns>The new version with the different minor version number.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="minor"/> is negative.</exception>
-        public SemVersion WithMinor(int minor)
+        public SemVersion WithMinor(BigInteger minor)
         {
             if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
             if (Minor == minor) return this;
@@ -627,7 +633,7 @@ namespace Semver
         /// <param name="patch">The value to replace the patch version number.</param>
         /// <returns>The new version with the different patch version number.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="patch"/> is negative.</exception>
-        public SemVersion WithPatch(int patch)
+        public SemVersion WithPatch(BigInteger patch)
         {
             if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
             if (Patch == patch) return this;
@@ -898,19 +904,19 @@ namespace Semver
         /// <value>The major version number.</value>
         /// <remarks>An increase in the major version number indicates a backwards
         /// incompatible change.</remarks>
-        public int Major { get; }
+        public BigInteger Major { get; }
 
         /// <summary>The minor version number.</summary>
         /// <value>The minor version number.</value>
         /// <remarks>An increase in the minor version number indicates backwards
         /// compatible changes.</remarks>
-        public int Minor { get; }
+        public BigInteger Minor { get; }
 
         /// <summary>The patch version number.</summary>
         /// <value>The patch version number.</value>
         /// <remarks>An increase in the patch version number indicates backwards
         /// compatible bug fixes.</remarks>
-        public int Patch { get; }
+        public BigInteger Patch { get; }
 
         /// <summary>
         /// The prerelease identifiers for this version.
@@ -979,17 +985,20 @@ namespace Semver
         /// </returns>
         public override string ToString()
         {
+            var major = Major.ToString();
+            var minor = Minor.ToString();
+            var patch = Patch.ToString();
             // Assume all separators ("..-+"), at most 4 extra chars
-            var estimatedLength = 4 + Major.DecimalDigits()
-                                    + Minor.DecimalDigits()
-                                    + Patch.DecimalDigits()
+            var estimatedLength = 4 + major.Length
+                                    + minor.Length
+                                    + patch.Length
                                     + Prerelease.Length + Metadata.Length;
             var version = new StringBuilder(estimatedLength);
-            version.Append(Major);
+            version.Append(major);
             version.Append('.');
-            version.Append(Minor);
+            version.Append(minor);
             version.Append('.');
-            version.Append(Patch);
+            version.Append(patch);
             if (Prerelease.Length > 0)
             {
                 version.Append('-');

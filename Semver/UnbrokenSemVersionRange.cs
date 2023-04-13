@@ -429,7 +429,7 @@ namespace Semver
                 {
                     // Caret ranges like ^1.2.3 and ^1.2.3-rc
                     // Subtract instead of add to avoid overflow
-                    if (Start.Major == End.Major - 1 && End is { Minor: 0, Patch: 0 })
+                    if (Start.Major == End.Major - 1 && End.Minor == 0 && End.Patch == 0)
                     {
                         result = (includesPrereleaseNotCoveredByEnds ? "*-* ^" : "^") + Start;
                         return true;

@@ -138,15 +138,15 @@ namespace Semver.Test
             Invalid("1.2.*-rc", ExceptionMessages.PrereleaseWithWildcardVersion),
             Invalid("1.2.*-rc.*", ExceptionMessages.PrereleaseWithWildcardVersion),
 
-            // Already at max version
-            Invalid("~1.2147483647.3", ExceptionMessages.MaxVersion, version: "1.2147483647.3"),
-            Invalid("^2147483647.2.3", ExceptionMessages.MaxVersion, version: "2147483647.2.3"),
-            Invalid("^0.2147483647.3", ExceptionMessages.MaxVersion, version: "0.2147483647.3"),
-            Invalid("^0.0.2147483647", ExceptionMessages.MaxVersion, version: "0.0.2147483647"),
-            Invalid("2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.*"),
-            Invalid("3.2147483647.*", ExceptionMessages.MaxVersion, version: "3.2147483647.*"),
-            Invalid("2147483647.2147483647.*", ExceptionMessages.MaxVersion, version: "2147483647.2147483647.*"),
-            Invalid("3.1.2147483647-*", ExceptionMessages.MaxVersion, version: "3.1.2147483647-*"),
+            // Going past max version
+            Valid("~1.2147483647.3", InclusiveOfStart("1.2147483647.3", "1.2147483648.0-0")),
+            Valid("^2147483647.2.3", InclusiveOfStart("2147483647.2.3", "2147483648.0.0-0")),
+            Valid("^0.2147483647.3", InclusiveOfStart("0.2147483647.3", "0.2147483648.0-0")),
+            Valid("^0.0.2147483647", InclusiveOfStart("0.0.2147483647", "0.0.2147483648-0")),
+            Valid("2147483647.*", InclusiveOfStart("2147483647.0.0", "2147483648.0.0-0")),
+            Valid("3.2147483647.*", InclusiveOfStart("3.2147483647.0", "3.2147483648.0-0")),
+            Valid("2147483647.2147483647.*", InclusiveOfStart("2147483647.2147483647.0", "2147483647.2147483648.0-0")),
+            Valid("3.1.2147483647-*", InclusiveOfStart("3.1.2147483647-0", "3.1.2147483648-0")),
 
             // Missing Comparison
             Invalid("", ExceptionMessages.MissingComparison, "0"),

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using Semver.Utility;
 
 namespace Semver.Test.TestCases
@@ -13,7 +14,7 @@ namespace Semver.Test.TestCases
         public static ParsingTestCase Valid(
             string version,
             SemVersionStyles requiredStyles,
-            int major, int minor, int patch,
+            BigInteger major, BigInteger minor, BigInteger patch,
             IEnumerable<PrereleaseIdentifier> prereleaseIdentifiers,
             IEnumerable<MetadataIdentifier> metadataIdentifiers,
             int maxLength = SemVersion.MaxVersionLength)
@@ -34,9 +35,9 @@ namespace Semver.Test.TestCases
         private ParsingTestCase(
             string version,
             SemVersionStyles requiredStyles,
-            int major,
-            int minor,
-            int patch,
+            BigInteger major,
+            BigInteger minor,
+            BigInteger patch,
             IEnumerable<PrereleaseIdentifier> prereleaseIdentifiers,
             IEnumerable<MetadataIdentifier> metadataIdentifiers,
             int maxLength)
@@ -71,9 +72,9 @@ namespace Semver.Test.TestCases
             bool isValid,
             string? version,
             SemVersionStyles requiredStyles,
-            int? major,
-            int? minor,
-            int? patch,
+            BigInteger? major,
+            BigInteger? minor,
+            BigInteger? patch,
             IReadOnlyList<PrereleaseIdentifier>? prereleaseIdentifiers,
             IReadOnlyList<MetadataIdentifier>? metadataIdentifiers,
             Type? exceptionType,
@@ -110,9 +111,9 @@ namespace Semver.Test.TestCases
         public bool IsValid { get; }
 
         #region Valid Values
-        public int? Major { get; }
-        public int? Minor { get; }
-        public int? Patch { get; }
+        public BigInteger? Major { get; }
+        public BigInteger? Minor { get; }
+        public BigInteger? Patch { get; }
 
         public IReadOnlyList<PrereleaseIdentifier>? PrereleaseIdentifiers { get; }
         public IReadOnlyList<MetadataIdentifier>? MetadataIdentifiers { get; }

@@ -40,7 +40,6 @@ namespace Semver.Test.Helpers
         public const string PrereleasePrefixedByDot = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{version}'.";
         public const string MissingPrereleaseIdentifier = "Missing prerelease identifier in '{version}'.";
         public const string LeadingZeroInPrerelease = "Leading zero in prerelease identifier in version '{version}'.";
-        public const string PrereleaseOverflow = "Prerelease identifier '{value}' was too large for Int32 in version '{version}'.";
         public const string InvalidCharacterInPrerelease = "Invalid character '{value}' in prerelease identifier in '{version}'.";
         public const string MissingMetadataIdentifier = "Missing metadata identifier in '{version}'.";
         public const string InvalidCharacterInMajor = "Major version contains invalid character '{value}' in '{version}'.";
@@ -61,8 +60,6 @@ namespace Semver.Test.Helpers
             = "Invalid whitespace character at {value} in '{range}'. Only the ASCII space character is allowed.";
         public const string MissingComparison
             = "Range is missing a comparison or limit at {value} in '{range}'.";
-        public const string MaxVersion
-            = "Cannot construct range because version number cannot be incremented beyond max value in '{version}'.";
         public const string InvalidWildcardInPrerelease
             = "Prerelease version is a wildcard and should contain only 1 character in '{range}'.";
         public const string PrereleaseWildcardMustBeLast
