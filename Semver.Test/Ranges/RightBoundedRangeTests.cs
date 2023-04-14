@@ -20,7 +20,6 @@ namespace Semver.Test.Ranges
             new RightBoundedRange(SemVersion.MinRelease, true),
             new RightBoundedRange(Version("1.2.3"), false),
             new RightBoundedRange(Version("1.2.3"), true),
-            new RightBoundedRange(SemVersion.Max, false),
             RightBoundedRange.Unbounded,
         }.AsReadOnly();
 

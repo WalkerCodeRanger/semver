@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Semver.Comparers;
 using Semver.Utility;
@@ -6,28 +7,37 @@ using Semver.Utility;
 namespace Semver.Ranges
 {
     /// <summary>
-    /// A range of versions that is bounded only on the right. That is a range defined by some version
-    /// <c>x</c> such that <c>v &lt; x</c> or <c>v &lt;= x</c> depending on whether it is inclusive.
-    /// A right-bounded range forms the upper limit for a version range.
+    /// A range of versions that is bounded only on the right. That is a range defined by some
+    /// version <c>x</c> such that <c>v &lt; x</c> or <c>v &lt;= x</c> depending on whether it is
+    /// inclusive. A right-bounded range forms the upper limit for a version range.
     /// </summary>
     /// <remarks>An "unbounded" right-bounded range is represented by an inclusive upper bound of
-    /// <see cref="SemVersion.Max"/>.</remarks>
+    /// <see langword="null"/> since there is no maximum <see cref="SemVersion"/>. This requires
+    /// special checking for comparison.</remarks>
     [StructLayout(LayoutKind.Auto)]
     internal readonly struct RightBoundedRange : IEquatable<RightBoundedRange>
     {
         public static readonly RightBoundedRange Unbounded
-            = new RightBoundedRange(SemVersion.Max, true);
+            = new RightBoundedRange(null, false);
 
-        public RightBoundedRange(SemVersion version, bool inclusive)
+        public RightBoundedRange(SemVersion? version, bool inclusive)
         {
-            DebugChecks.IsNotNull(version, nameof(version));
+#if DEBUG
+            // dotcover disable
+            if (version is null && inclusive)
+                throw new ArgumentException("DEBUG: Cannot be inclusive of end without end value.",
+                    nameof(inclusive));
+            // dotcover enable
+#endif
             DebugChecks.NoMetadata(version, nameof(version));
 
             Version = version;
             Inclusive = inclusive;
         }
 
-        public SemVersion Version { get; }
+        public SemVersion? Version { get; }
+
+        [MemberNotNullWhen(true, "Version")]
         public bool Inclusive { get; }
 
         /// <summary>
@@ -37,31 +47,21 @@ namespace Semver.Ranges
         /// A non-inclusive bound of X.Y.Z-0 doesn't actually include any prerelease versions.
         /// </remarks>
         public bool IncludesPrerelease
-            => Version.IsPrerelease && !(!Inclusive && Version.PrereleaseIsZero);
+            => Version?.IsPrerelease == true && !(!Inclusive && Version.PrereleaseIsZero);
 
         public bool Contains(SemVersion version)
         {
+            DebugChecks.IsNotNull(version, nameof(version));
+            if (Version is null) return true;
             var comparison = SemVersion.ComparePrecedence(version, Version);
             return Inclusive ? comparison <= 0 : comparison < 0;
         }
 
         public RightBoundedRange Min(RightBoundedRange other)
-        {
-            var comparison = SemVersion.ComparePrecedence(Version, other.Version);
-            if (comparison == 0)
-                // If the versions are equal, then non-inclusive will be min
-                return new RightBoundedRange(Version, Inclusive && other.Inclusive);
-            return comparison < 0 ? this : other;
-        }
+            => CompareTo(other) <= 0 ? this : other;
 
-        public RightBoundedRange Max(RightBoundedRange other)
-        {
-            var comparison = SemVersion.ComparePrecedence(Version, other.Version);
-            if (comparison == 0)
-                // If the versions are equal, then inclusive will be max
-                return new RightBoundedRange(Version, Inclusive || other.Inclusive);
-            return comparison < 0 ? other : this;
-        }
+        public RightBoundedRange Max(RightBoundedRange other) 
+            => CompareTo(other) >= 0 ? this : other;
 
         #region Equality
         public bool Equals(RightBoundedRange other)
@@ -82,11 +82,18 @@ namespace Semver.Ranges
 
         public int CompareTo(RightBoundedRange other)
         {
-            var comparison = PrecedenceComparer.Instance.Compare(Version, other.Version);
-            if (comparison != 0) return comparison;
-            return Inclusive.CompareTo(other.Inclusive);
+            switch (Version, other.Version)
+            {
+                case (null,null): return 0;
+                case (null, _): return 1;
+                case (_, null): return -1;
+                default:
+                    var comparison = PrecedenceComparer.Instance.Compare(Version!, other.Version!);
+                    if (comparison != 0) return comparison;
+                    return Inclusive.CompareTo(other.Inclusive);
+            }
         }
 
-        public override string ToString() => (Inclusive ? "<=" : "<") + Version;
+        public override string ToString() => (Inclusive ? "<=" : "<") + (Version?.ToString() ?? "null");
     }
 }

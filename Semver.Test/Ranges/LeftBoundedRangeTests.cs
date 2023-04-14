@@ -21,8 +21,6 @@ namespace Semver.Test.Ranges
             new LeftBoundedRange(SemVersion.MinRelease, false),
             new LeftBoundedRange(Version("1.2.3"), true),
             new LeftBoundedRange(Version("1.2.3"), false),
-            new LeftBoundedRange(SemVersion.Max, true),
-            new LeftBoundedRange(SemVersion.Max, false),
         }.AsReadOnly();
 
         internal static readonly IReadOnlyList<(LeftBoundedRange, LeftBoundedRange)> RangePairs

@@ -28,3 +28,5 @@ Semver.SemVersion.WithMajor(System.Numerics.BigInteger major) -> Semver.SemVersi
 Semver.SemVersion.WithMinor(System.Numerics.BigInteger minor) -> Semver.SemVersion!
 Semver.SemVersion.WithParsedFrom(System.Numerics.BigInteger? major = null, System.Numerics.BigInteger? minor = null, System.Numerics.BigInteger? patch = null, string? prerelease = null, string? metadata = null, bool allowLeadingZeros = false) -> Semver.SemVersion!
 Semver.SemVersion.WithPatch(System.Numerics.BigInteger patch) -> Semver.SemVersion!
+*REMOVED*Semver.UnbrokenSemVersionRange.End.get -> Semver.SemVersion!
+Semver.UnbrokenSemVersionRange.End.get -> Semver.SemVersion?

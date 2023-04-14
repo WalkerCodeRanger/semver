@@ -238,7 +238,7 @@ namespace Semver.Parsing
             switch (@operator)
             {
                 case StandardOperator.GreaterThan:
-                    return GreaterThan(includeAllPrerelease, ex, ref leftBound, versionSegment, semver, wildcardVersion);
+                    return GreaterThan(includeAllPrerelease, ex, ref leftBound, ref rightBound, versionSegment, semver, wildcardVersion);
                 case StandardOperator.GreaterThanOrEqual:
                     WildcardLowerBound(includeAllPrerelease, ref leftBound, semver, wildcardVersion);
                     return null;
@@ -319,6 +319,7 @@ namespace Semver.Parsing
             bool includeAllPrerelease,
             Exception? ex,
             ref LeftBoundedRange leftBound,
+            ref RightBoundedRange rightBound,
             StringSegment versionSegment,
             SemVersion semver,
             WildcardVersion wildcardVersion)
@@ -330,7 +331,7 @@ namespace Semver.Parsing
             {
                 case WildcardVersion.MajorMinorPatchWildcard:
                     // No version matches
-                    leftBound = leftBound.Max(new LeftBoundedRange(SemVersion.Max, false));
+                    rightBound = new RightBoundedRange(SemVersion.Min, false);
                     return null;
                 case WildcardVersion.MinorPatchWildcard:
                 {

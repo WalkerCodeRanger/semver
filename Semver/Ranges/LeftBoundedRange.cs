@@ -44,27 +44,16 @@ namespace Semver.Ranges
 
         public bool Contains(SemVersion version)
         {
+            DebugChecks.IsNotNull(version, nameof(version));
             var comparison = SemVersion.ComparePrecedence(Version, version);
             return Inclusive ? comparison <= 0 : comparison < 0;
         }
 
-        public LeftBoundedRange Min(LeftBoundedRange other)
-        {
-            var comparison = SemVersion.ComparePrecedence(Version, other.Version);
-            if (comparison == 0)
-                // If the versions are equal, then inclusive will be min
-                return new LeftBoundedRange(Version, Inclusive || other.Inclusive);
-            return comparison < 0 ? this : other;
-        }
+        public LeftBoundedRange Min(LeftBoundedRange other) 
+            => CompareTo(other) <= 0 ? this : other;
 
-        public LeftBoundedRange Max(LeftBoundedRange other)
-        {
-            var comparison = SemVersion.ComparePrecedence(Version, other.Version);
-            if (comparison == 0)
-                // If the versions are equal, then non-inclusive will be max
-                return new LeftBoundedRange(Version, Inclusive && other.Inclusive);
-            return comparison < 0 ? other : this;
-        }
+        public LeftBoundedRange Max(LeftBoundedRange other) 
+            => CompareTo(other) >= 0 ? this : other;
 
         #region Equality
         public bool Equals(LeftBoundedRange other)
@@ -85,7 +74,8 @@ namespace Semver.Ranges
 
         public int CompareTo(RightBoundedRange other)
         {
-            var comparison = SemVersion.PrecedenceComparer.Compare(Version!, other.Version);
+            if(other.Version is null) return -1;
+            var comparison = PrecedenceComparer.Instance.Compare(Version!, other.Version);
             if (comparison != 0) return comparison;
             return Inclusive && other.Inclusive ? 0 : 1;
         }

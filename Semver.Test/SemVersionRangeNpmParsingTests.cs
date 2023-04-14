@@ -152,11 +152,9 @@ namespace Semver.Test
             Valid("^*", true, All),
 
             // Going past max version
-            Valid(">2147483647.*.*", InclusiveOfStart("2147483647.0.0", "2147483648.0.0-0")),
-            Valid(">1.2147483647.*", InclusiveOfStart("1.2147483647.0", "1.2147483648.0-0")),
             Valid("~2147483647.*.*", InclusiveOfStart("2147483647.0.0", "2147483648.0.0-0")),
             Valid("~1.2147483647.3", InclusiveOfStart("1.2147483647.3", "1.2147483648.0-0")),
-            Valid("^2147483647.2.3", InclusiveOfStart("2147483647.0.0", "2147483648.0.0-0")),
+            Valid("^2147483647.2.3", InclusiveOfStart("2147483647.2.3", "2147483648.0.0-0")),
             Valid("^0.2147483647.3", InclusiveOfStart("0.2147483647.3", "0.2147483648.0-0")),
             Valid("^0.0.2147483647", InclusiveOfStart("0.0.2147483647", "0.0.2147483648-0")),
             Valid("2147483647.*", InclusiveOfStart("2147483647.0.0", "2147483648.0.0-0")),

@@ -21,7 +21,6 @@ namespace Semver
     {
         internal static readonly SemVersion Min = new SemVersion(0, 0, 0, new[] { new PrereleaseIdentifier(0) });
         internal static readonly SemVersion MinRelease = new SemVersion(0, 0, 0);
-        internal static readonly SemVersion Max = new SemVersion(int.MaxValue, int.MaxValue, int.MaxValue);
 
         internal const string InvalidSemVersionStylesMessage = "An invalid SemVersionStyles value was used.";
         private const string InvalidMajorVersionMessage = "Major version must be greater than or equal to zero.";
@@ -1075,7 +1074,7 @@ namespace Semver
         public static bool PrecedenceEquals(SemVersion? left, SemVersion? right)
             => PrecedenceComparer.Compare(left!, right!) == 0;
 
-        internal bool MajorMinorPatchEquals(SemVersion? other)
+        internal bool MajorMinorPatchEquals([NotNullWhen(true)] SemVersion? other)
         {
             if (other is null) return false;
 

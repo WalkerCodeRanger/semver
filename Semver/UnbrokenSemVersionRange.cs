@@ -27,25 +27,23 @@ namespace Semver
         /// inclusive would be empty.
         /// See https://en.wikipedia.org/wiki/Interval_(mathematics)#Classification_of_intervals</para>
         ///
-        /// <para>Since all <see cref="UnbrokenSemVersionRange"/> objects have a <see cref="Start"/> and
-        /// <see cref="End"/>, the only unique empty range is the one whose start is the max
-        /// version and end is the minimum version.</para>
+        /// <para>Since there is no maximum version the only unique empty range is <c>&lt;0.0.0-0</c>.</para>
         /// </remarks>
         public static UnbrokenSemVersionRange Empty { get; }
-            = new UnbrokenSemVersionRange(new LeftBoundedRange(SemVersion.Max, false),
+            = new UnbrokenSemVersionRange(new LeftBoundedRange(null, false),
                 new RightBoundedRange(SemVersion.Min, false), false, false);
 
         /// <summary>
         /// The range that contains all release versions but no prerelease versions.
         /// </summary>
         /// <value>The range that contains all release versions but no prerelease versions.</value>
-        public static UnbrokenSemVersionRange AllRelease { get; } = AtMost(SemVersion.Max);
+        public static UnbrokenSemVersionRange AllRelease { get; } = Create(null, false, null, false, false);
 
         /// <summary>
         /// The range that contains both all release and prerelease versions.
         /// </summary>
         /// <value>The range that contains both all release and prerelease versions.</value>
-        public static UnbrokenSemVersionRange All { get; } = AtMost(SemVersion.Max, true);
+        public static UnbrokenSemVersionRange All { get; } = Create(null, false, null, false, true);
 
         #region Static Factory Methods
         /// <summary>
@@ -64,7 +62,7 @@ namespace Semver
         /// than just those matching the given version if it is prerelease.</param>
         /// <returns>A range containing versions greater than the given version.</returns>
         public static UnbrokenSemVersionRange GreaterThan(SemVersion version, bool includeAllPrerelease = false)
-            => Create(Validate(version, nameof(version)), false, SemVersion.Max, true, includeAllPrerelease);
+            => Create(Validate(version, nameof(version)), false, null, false, includeAllPrerelease);
 
         /// <summary>
         /// Construct a range containing versions equal to or greater than the given version.
@@ -74,7 +72,7 @@ namespace Semver
         /// than just those matching the given version if it is prerelease.</param>
         /// <returns>A range containing versions greater than or equal to the given version.</returns>
         public static UnbrokenSemVersionRange AtLeast(SemVersion version, bool includeAllPrerelease = false)
-            => Create(Validate(version, nameof(version)), true, SemVersion.Max, true, includeAllPrerelease);
+            => Create(Validate(version, nameof(version)), true, null, false, includeAllPrerelease);
 
         /// <summary>
         /// Construct a range containing versions less than the given version.
@@ -156,7 +154,7 @@ namespace Semver
         private static UnbrokenSemVersionRange Create(
             SemVersion? startVersion,
             bool startInclusive,
-            SemVersion endVersion,
+            SemVersion? endVersion,
             bool endInclusive,
             bool includeAllPrerelease)
         {
@@ -175,19 +173,21 @@ namespace Semver
 
             var allPrereleaseCoveredByEnds = false;
 
-            // Equals ranges include all prerelease if they are prerelease
-            if (start.Version == end.Version)
-                allPrereleaseCoveredByEnds = includeAllPrerelease = start.Version.IsPrerelease;
-            // Some ranges have all the prerelease versions in them covered by the bounds
-            else if (!(start.Version is null) && (start.IncludesPrerelease || end.IncludesPrerelease))
+            if(start.Version is not null && end.Version is not null)
             {
-                if (start.Version.MajorMinorPatchEquals(end.Version))
-                    allPrereleaseCoveredByEnds = true;
-                else if ((end.IncludesPrerelease || end.Version.PrereleaseIsZero)
-                         && start.Version.Major == end.Version.Major && start.Version.Minor == end.Version.Minor
-                         // Subtract instead of add to avoid overflow
-                         && start.Version.Patch == end.Version.Patch - 1)
-                    allPrereleaseCoveredByEnds = true;
+                // Equals ranges include all prerelease if they are prerelease
+                if (start.Version == end.Version)
+                    allPrereleaseCoveredByEnds = includeAllPrerelease = start.Version.IsPrerelease;
+                // Some ranges have all the prerelease versions in them covered by the bounds
+                else if (start.IncludesPrerelease || end.IncludesPrerelease)
+                {
+                    if (start.Version.MajorMinorPatchEquals(end.Version))
+                        allPrereleaseCoveredByEnds = true;
+                    else if ((end.IncludesPrerelease || end.Version.PrereleaseIsZero)
+                             && start.Version.Major == end.Version.Major && start.Version.Minor == end.Version.Minor
+                             && start.Version.Patch + 1 == end.Version.Patch)
+                        allPrereleaseCoveredByEnds = true;
+                }
             }
 
             return new UnbrokenSemVersionRange(start, end, includeAllPrerelease, allPrereleaseCoveredByEnds);
@@ -234,10 +234,12 @@ namespace Semver
         public bool StartInclusive => LeftBound.Inclusive;
 
         /// <summary>
-        /// The end, right limit, or maximum of this range. Cannot be null.
+        /// The end, right limit, or maximum of this range. Can be <see langword="null"/>.
         /// </summary>
-        /// <value>The end, right limit, or maximum of this range. Cannot be null.</value>
-        public SemVersion End => RightBound.Version;
+        /// <value>The end, right limit, or maximum of this range. Can be <see langword="null"/>.</value>
+        /// <remarks>Ranges with no upper bound have an <see cref="End"/> value
+        /// of <see langword="null"/>.</remarks>
+        public SemVersion? End => RightBound.Version;
 
         /// <summary>
         /// Whether this range includes the <see cref="End"/> value.
@@ -269,7 +271,7 @@ namespace Semver
 
             // Prerelease versions must match either the start or end
             return Start?.IsPrerelease == true && version.MajorMinorPatchEquals(Start)
-                   || End.IsPrerelease && version.MajorMinorPatchEquals(End);
+                   || End?.IsPrerelease == true && version.MajorMinorPatchEquals(End);
         }
 
         /// <summary>
@@ -380,7 +382,7 @@ namespace Semver
         private bool TryToSpecialString(bool includesPrereleaseNotCoveredByEnds, [NotNullWhen(true)] out string? result)
         {
             // Most special ranges follow the pattern '>=X.Y.Z <P.Q.R-0'
-            if (StartInclusive && !RightBound.Inclusive && End.PrereleaseIsZero)
+            if (StartInclusive && !RightBound.Inclusive && End?.PrereleaseIsZero == true)
             {
                 // Wildcard Ranges like 2.*, 2.*-*, 2.3.*, and 2.3.*-*
                 if (Start.Patch == 0 && End.Patch == 0 && (!Start.IsPrerelease || Start.PrereleaseIsZero))
@@ -480,6 +482,9 @@ namespace Semver
 
         internal bool Overlaps(UnbrokenSemVersionRange other)
         {
+            // The empty range doesn't overlap anything, but passes the test below in some cases
+            if (Empty.Equals(this) || Empty.Equals(other)) return false;
+
             // see https://stackoverflow.com/a/3269471/268898
             return LeftBound.CompareTo(other.RightBound) <= 0
                    && other.LeftBound.CompareTo(RightBound) <= 0;
@@ -493,7 +498,7 @@ namespace Semver
             // actually abut things.
             if (Empty.Equals(this) || Empty.Equals(other)) return false;
 
-            // To check abutting, we just need to put them in the right order and check the gab between them
+            // To check abutting, we just need to put them in the right order and check the gap between them
             var isLessThanOrEqual = UnbrokenSemVersionRangeComparer.Instance.Compare(this, other) <= 0;
             var leftRangeEnd = (isLessThanOrEqual ? this : other).RightBound;
             var rightRangeStart = (isLessThanOrEqual ? other : this).LeftBound;
@@ -503,7 +508,7 @@ namespace Semver
 
             // If one of the ends is inclusive then it is sufficient for them to be the same version.
             if ((leftRangeEnd.Inclusive || rightRangeStart.Inclusive)
-                && leftRangeEnd.Version.Equals(rightRangeStart.Version))
+                && leftRangeEnd.Version?.Equals(rightRangeStart.Version) == true)
                 return true;
 
             // But they could also abut if the prerelease versions between them are being excluded.
@@ -512,7 +517,7 @@ namespace Semver
                 return false;
 
             return rightRangeStart.Inclusive
-                   && leftRangeEnd.Version.MajorMinorPatchEquals(rightRangeStart.Version);
+                   && leftRangeEnd.Version?.MajorMinorPatchEquals(rightRangeStart.Version) == true;
         }
 
         /// <summary>
@@ -546,7 +551,7 @@ namespace Semver
 
             // Make sure we include prerelease at the end
             return !other.RightBound.IncludesPrerelease
-                   || (End.IsPrerelease && End.MajorMinorPatchEquals(other.End));
+                   || (End?.IsPrerelease == true && End.MajorMinorPatchEquals(other.End));
         }
 
         /// <summary>
@@ -607,6 +612,9 @@ namespace Semver
 
         private static bool IsEmpty(LeftBoundedRange start, RightBoundedRange end, bool includeAllPrerelease)
         {
+            // Ranges with unbounded ends aren't empty
+            if (end.Version is null) return false;
+
             var comparison = SemVersion.ComparePrecedence(start.Version, end.Version);
             if (comparison > 0) return true;
             if (comparison == 0) return !(start.Inclusive && end.Inclusive);

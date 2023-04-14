@@ -96,13 +96,6 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void GreaterThanMaxVersionEmpty()
-        {
-            var range = SemVersionRange.GreaterThan(SemVersion.Max);
-            Assert.Same(SemVersionRange.Empty, range);
-        }
-
-        [Fact]
         public void AtLeastNullVersion()
         {
             var ex = Assert.Throws<ArgumentNullException>(() => SemVersionRange.AtLeast(null!));
@@ -425,15 +418,6 @@ namespace Semver.Test
         {
             var range = SemVersionRange.Exclusive(new SemVersion(1, 2, 3), new SemVersion(1, 2, 3),
                             includeAllPrerelease);
-            Assert.Same(SemVersionRange.Empty, range);
-        }
-
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void ExclusiveAtMaxEmpty(bool includeAllPrerelease)
-        {
-            var range = SemVersionRange.Exclusive(SemVersion.Max, SemVersion.Max, includeAllPrerelease);
             Assert.Same(SemVersionRange.Empty, range);
         }
 
