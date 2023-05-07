@@ -328,9 +328,7 @@ namespace Semver
         internal PrereleaseIdentifier NextIdentifier()
         {
             if (NumericValue is BigInteger numericValue)
-                return numericValue == int.MaxValue
-                    ? Hyphen
-                    : new PrereleaseIdentifier(numericValue + 1);
+                return new PrereleaseIdentifier(numericValue + BigInteger.One);
 
             return new PrereleaseIdentifier(Value + "-");
         }
