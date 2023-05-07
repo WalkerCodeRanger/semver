@@ -98,7 +98,7 @@ namespace Semver.Utility
         public static string LimitLength(this string value)
         {
             if (value.Length > Display.Limit)
-                return value.Substring(0, Display.Limit - 3) + "...";
+                return value[..(Display.Limit - 3)] + "...";
 
             return value;
         }

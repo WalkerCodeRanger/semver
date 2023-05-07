@@ -11,7 +11,7 @@ namespace Semver.Benchmarks
     /// Base class for parsing benchmarks so they share the set of benchmarked methods and
     /// other config.
     /// </summary>
-    [SimpleJob(RuntimeMoniker.Net462)]
+    [SimpleJob(RuntimeMoniker.Net471)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     [SimpleJob(RuntimeMoniker.Net60)]
     public abstract class ParsingBenchmarks

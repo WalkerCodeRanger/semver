@@ -78,8 +78,6 @@ namespace Semver
             {
                 throw new Exception("DEBUG: " + ex.Message, ex);
             }
-            if (expected.Value != value)
-                throw new ArgumentException("DEBUG: String value has leading zeros.", nameof(value));
             if (expected.NumericValue != numericValue)
                 throw new ArgumentException($"DEBUG: Numeric value {numericValue} doesn't match string value.", nameof(numericValue));
 #endif

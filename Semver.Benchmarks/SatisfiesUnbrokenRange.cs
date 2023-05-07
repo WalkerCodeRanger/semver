@@ -7,7 +7,7 @@ namespace Semver.Benchmarks
     /// <remarks>Demonstrates why it is worth having the <see cref="SemVersion.Satisfies(UnbrokenSemVersionRange)"/>
     /// overload rather than relying on implicit conversion to <see cref="Predicate{T}"/> of
     /// <see cref="SemVersion"/>.</remarks>
-    [SimpleJob(RuntimeMoniker.Net462)]
+    [SimpleJob(RuntimeMoniker.Net471)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     [SimpleJob(RuntimeMoniker.Net60)]
     public class SatisfiesUnbrokenRange

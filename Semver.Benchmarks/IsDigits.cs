@@ -4,7 +4,7 @@ using Semver.Utility;
 
 namespace Semver.Benchmarks
 {
-    [SimpleJob(RuntimeMoniker.Net462)]
+    [SimpleJob(RuntimeMoniker.Net471)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     [SimpleJob(RuntimeMoniker.Net60)]
     public class IsDigits

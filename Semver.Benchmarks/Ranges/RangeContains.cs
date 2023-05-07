@@ -10,7 +10,7 @@ namespace Semver.Benchmarks.Ranges
     /// on the performance of <see cref="SemVersionRange.Contains"/>. In .NET Core, even using a
     /// <c>for</c> loop rather than <c>foreach</c> helps.
     /// </remarks>
-    [SimpleJob(RuntimeMoniker.Net462)]
+    [SimpleJob(RuntimeMoniker.Net471)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
     [SimpleJob(RuntimeMoniker.Net60)]
     public class RangeContains
