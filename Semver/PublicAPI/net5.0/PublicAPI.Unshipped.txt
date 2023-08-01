@@ -30,3 +30,4 @@ Semver.SemVersion.WithParsedFrom(System.Numerics.BigInteger? major = null, Syste
 Semver.SemVersion.WithPatch(System.Numerics.BigInteger patch) -> Semver.SemVersion!
 *REMOVED*Semver.UnbrokenSemVersionRange.End.get -> Semver.SemVersion!
 Semver.UnbrokenSemVersionRange.End.get -> Semver.SemVersion?
+static Semver.SemVersion.ParsedFrom(System.Numerics.BigInteger major, System.Numerics.BigInteger? minor = null, System.Numerics.BigInteger? patch = null, string! prerelease = "", string! metadata = "", bool allowLeadingZeros = false) -> Semver.SemVersion!
