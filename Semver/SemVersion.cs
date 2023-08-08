@@ -274,6 +274,7 @@ namespace Semver
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
         /// for <see cref="int"/>.</exception>
+        // TODO is the doc comment still correct? Can OverflowException occur?
         public static SemVersion ParsedFrom(BigInteger major, BigInteger? minor = null, BigInteger? patch = null,
             string prerelease = "", string metadata = "", bool allowLeadingZeros = false)
         {
@@ -476,6 +477,7 @@ namespace Semver
         /// To change the minor and patch versions:
         /// <code>var modifiedVersion = version.With(minor: 2, patch: 4);</code>
         /// </example>
+        // TODO updated comment given that OverflowException may no longer be possible
         public SemVersion With(
             BigInteger? major = null,
             BigInteger? minor = null,
@@ -565,6 +567,7 @@ namespace Semver
         /// To change the patch version and prerelease identifiers version:
         /// <code>var modifiedVersion = version.WithParsedFrom(patch: 4, prerelease: "alpha.5");</code>
         /// </example>
+        // TODO updated comment given that OverflowException may no longer be possible
         public SemVersion WithParsedFrom(
             BigInteger? major = null,
             BigInteger? minor = null,

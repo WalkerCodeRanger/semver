@@ -333,6 +333,7 @@ namespace Semver.Parsing
 
             var numberString = segment.ToString();
             if (!BigInteger.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
+                // TODO this comment is no longer true, the exception may be unreachable
                 // Parsing validated this as a string of digits possibly proceeded by zero so the only
                 // possible issue is a numeric overflow for `int`
                 return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
@@ -405,6 +406,7 @@ namespace Semver.Parsing
                         identifierString = identifier.ToString();
 
                     if (!BigInteger.TryParse(identifierString, NumberStyles.None, null, out var numericValue))
+                        // TODO this comment is no longer true, the exception may be unreachable
                         // Parsing validated this as a string of digits possibly proceeded by zero so the only
                         // possible issue is a numeric overflow for `int`
                         return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,

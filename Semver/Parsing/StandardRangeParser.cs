@@ -74,6 +74,7 @@ namespace Semver.Parsing
             return null;
         }
 
+        // TODO this comment needs updated given that the int.MaxValue is no longer relevant
         /// <summary>
         /// Parse a comparison from the beginning of the segment.
         /// </summary>
