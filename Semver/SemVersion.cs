@@ -274,12 +274,16 @@ namespace Semver
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
         /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
         /// for <see cref="int"/>.</exception>
-        public static SemVersion ParsedFrom(int major, int minor = 0, int patch = 0,
+        public static SemVersion ParsedFrom(BigInteger major, BigInteger? minor = null, BigInteger? patch = null,
             string prerelease = "", string metadata = "", bool allowLeadingZeros = false)
         {
-            if (major < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
-            if (minor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
-            if (patch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
+            var internalMajor = major;//for uniformity
+            var internalMinor = minor ?? 0;
+            var internalPatch = patch ?? 0;
+
+            if (internalMajor < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
+            if (internalMinor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
+            if (internalPatch < 0) throw new ArgumentOutOfRangeException(nameof(patch), InvalidPatchVersionMessage);
 
             if (prerelease is null) throw new ArgumentNullException(nameof(prerelease));
             var prereleaseIdentifiers = prerelease.Length == 0
@@ -295,7 +299,7 @@ namespace Semver
                 ? ReadOnlyList<MetadataIdentifier>.Empty
                 : metadata.SplitAndMapToReadOnlyList('.', i => new MetadataIdentifier(i, nameof(metadata)));
 
-            return new SemVersion(major, minor, patch,
+            return new SemVersion(internalMajor, internalMinor, internalPatch,
                 prerelease, prereleaseIdentifiers, metadata, metadataIdentifiers);
         }
 
