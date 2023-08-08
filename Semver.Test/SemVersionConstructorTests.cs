@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Semver.Test.Helpers;
 using Xunit;
 
@@ -341,7 +342,7 @@ namespace Semver.Test
         }
         #endregion
 
-        #region SemVersion.ParsedFrom(int major, int minor = 0, int patch = 0, string prerelease, string build)
+        #region SemVersion.ParsedFrom(BigInteger major, BigInteger? minor = 0, BigInteger patch = 0, string prerelease, string build)
         [Fact]
         public void ParsedFromDefaultValuesTest()
         {
@@ -364,6 +365,23 @@ namespace Semver.Test
             Assert.Equal(2, v.Major);
             Assert.Equal(3, v.Minor);
             Assert.Equal(4, v.Patch);
+            Assert.Equal("pre.42", v.Prerelease);
+            var expectedPrereleaseIdentifiers = new[] { new PrereleaseIdentifier("pre"), new PrereleaseIdentifier(42) };
+            Assert.Equal(expectedPrereleaseIdentifiers, v.PrereleaseIdentifiers);
+            Assert.Equal("build.42", v.Metadata);
+            var expectedMetadata = new[] { new MetadataIdentifier("build"), new MetadataIdentifier("42") };
+            Assert.Equal(expectedMetadata, v.MetadataIdentifiers);
+        }
+
+        [Fact]
+        public void ParsedFromBigIntegersTest()
+        {
+            var largeNumber = BigInteger.Parse("99999999999999999999999");
+            var v = SemVersion.ParsedFrom(largeNumber, largeNumber + 1, largeNumber + 2, "pre.42", "build.42");
+
+            Assert.Equal(largeNumber, v.Major);
+            Assert.Equal(largeNumber + 1, v.Minor);
+            Assert.Equal(largeNumber + 2, v.Patch);
             Assert.Equal("pre.42", v.Prerelease);
             var expectedPrereleaseIdentifiers = new[] { new PrereleaseIdentifier("pre"), new PrereleaseIdentifier(42) };
             Assert.Equal(expectedPrereleaseIdentifiers, v.PrereleaseIdentifiers);

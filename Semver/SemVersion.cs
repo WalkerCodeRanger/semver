@@ -277,7 +277,7 @@ namespace Semver
         public static SemVersion ParsedFrom(BigInteger major, BigInteger? minor = null, BigInteger? patch = null,
             string prerelease = "", string metadata = "", bool allowLeadingZeros = false)
         {
-            var internalMajor = major;//for uniformity
+            var internalMajor = major; //for uniformity
             var internalMinor = minor ?? 0;
             var internalPatch = patch ?? 0;
 
