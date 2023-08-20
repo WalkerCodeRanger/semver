@@ -274,8 +274,8 @@ namespace Semver
             string prerelease = "", string metadata = "", bool allowLeadingZeros = false)
         {
             var internalMajor = major; //for uniformity
-            var internalMinor = minor ?? 0;
-            var internalPatch = patch ?? 0;
+            var internalMinor = minor ?? BigInteger.Zero;
+            var internalPatch = patch ?? BigInteger.Zero;
 
             if (internalMajor < 0) throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             if (internalMinor < 0) throw new ArgumentOutOfRangeException(nameof(minor), InvalidMinorVersionMessage);
@@ -475,8 +475,6 @@ namespace Semver
             IEnumerable<PrereleaseIdentifier>? prerelease = null,
             IEnumerable<MetadataIdentifier>? metadata = null)
         {
-            // Note: It is tempting to null coalesce first, but then this method would report invalid
-            // arguments on invalid SemVersion instances.
             if (major < 0)
                 throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             if (minor < 0)
@@ -563,8 +561,6 @@ namespace Semver
             string? metadata = null,
             bool allowLeadingZeros = false)
         {
-            // Note: It is tempting to null coalesce first, but then this method would report invalid
-            // arguments on invalid SemVersion instances.
             if (major < 0)
                 throw new ArgumentOutOfRangeException(nameof(major), InvalidMajorVersionMessage);
             if (minor < 0)
