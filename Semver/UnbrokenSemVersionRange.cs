@@ -387,12 +387,10 @@ namespace Semver
                 // Wildcard Ranges like 2.*, 2.*-*, 2.3.*, and 2.3.*-*
                 if (Start.Patch == 0 && End.Patch == 0 && (!Start.IsPrerelease || Start.PrereleaseIsZero))
                 {
-                    // Subtract instead of add to avoid overflow
-                    if (Start.Major == End.Major && Start.Minor == End.Minor - 1)
+                    if (Start.Major == End.Major && Start.Minor + 1 == End.Minor)
                         // Wildcard patch
                         result = $"{Start.Major}.{Start.Minor}.*";
-                    // Subtract instead of add to avoid overflow
-                    else if (Start.Major == End.Major - 1 && Start.Minor == 0 && End.Minor == 0)
+                    else if (Start.Major + 1 == End.Major && Start.Minor == 0 && End.Minor == 0)
                         // Wildcard minor
                         result = $"{Start.Major}.*";
                     else
@@ -408,8 +406,7 @@ namespace Semver
                 // Wildcard ranges like 2.1.4-* follow the pattern '>=X.Y.Z-0 <X.Y.(Z+1)-0'
                 if (Start.PrereleaseIsZero
                     && Start.Major == End.Major && Start.Minor == End.Minor
-                    // Subtract instead of add to avoid overflow
-                    && Start.Patch == End.Patch - 1)
+                    && Start.Patch + 1 == End.Patch)
                 {
                     result = $"{Start.Major}.{Start.Minor}.{Start.Patch}-*";
                     return true;
@@ -418,8 +415,7 @@ namespace Semver
             tilde:
                 // Tilde ranges like ~1.2.3, and ~1.2.3-rc
                 if (Start.Major == End.Major
-                    // Subtract instead of add to avoid overflow
-                    && Start.Minor == End.Minor - 1 && End.Patch == 0)
+                    && Start.Minor + 1 == End.Minor && End.Patch == 0)
                 {
                     result = (includesPrereleaseNotCoveredByEnds ? "*-* ~" : "~") + Start;
                     return true;
@@ -430,8 +426,7 @@ namespace Semver
                 if (Start.Major != 0)
                 {
                     // Caret ranges like ^1.2.3 and ^1.2.3-rc
-                    // Subtract instead of add to avoid overflow
-                    if (Start.Major == End.Major - 1 && End.Minor == 0 && End.Patch == 0)
+                    if (Start.Major + 1 == End.Major && End.Minor == 0 && End.Patch == 0)
                     {
                         result = (includesPrereleaseNotCoveredByEnds ? "*-* ^" : "^") + Start;
                         return true;
@@ -639,8 +634,7 @@ namespace Semver
 
             return start.Version.Major == end.Version.Major
                    && start.Version.Minor == end.Version.Minor
-                   // Subtract instead of add to avoid overflow
-                   && start.Version.Patch == end.Version.Patch - 1;
+                   && start.Version.Patch + 1 == end.Version.Patch;
         }
 
         private static SemVersion Validate(SemVersion version, string paramName)

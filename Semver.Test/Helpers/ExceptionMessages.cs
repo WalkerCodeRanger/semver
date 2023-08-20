@@ -33,9 +33,6 @@ namespace Semver.Test.Helpers
         public const string EmptyPatch = "Patch version missing in '{version}'.";
         public const string MissingMinor = "Minor version missing in '{version}'.";
         public const string MissingPatch = "Patch version missing in '{version}'.";
-        public const string MajorOverflow = "Major version '{value}' was too large for Int32 in '{version}'.";
-        public const string MinorOverflow = "Minor version '{value}' was too large for Int32 in '{version}'.";
-        public const string PatchOverflow = "Patch version '{value}' was too large for Int32 in '{version}'.";
         public const string FourthVersionNumber = "Fourth version number in '{version}'.";
         public const string PrereleasePrefixedByDot = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{version}'.";
         public const string MissingPrereleaseIdentifier = "Missing prerelease identifier in '{version}'.";

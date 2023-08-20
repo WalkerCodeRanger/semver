@@ -248,8 +248,6 @@ namespace Semver
         /// <exception cref="ArgumentNullException"><paramref name="range"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">The <paramref name="range"/> is invalid or not in a
         /// format compliant with <paramref name="options"/>.</exception>
-        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
-        /// is too large for an <see cref="Int32"/>.</exception>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static SemVersionRange Parse(
             string range,
@@ -281,8 +279,6 @@ namespace Semver
         /// <exception cref="ArgumentNullException"><paramref name="range"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">The <paramref name="range"/> is invalid or not in a
         /// format compliant with the <see cref="SemVersionRangeOptions.Strict"/> option.</exception>
-        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
-        /// is too large for an <see cref="Int32"/>.</exception>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static SemVersionRange Parse(
             string range,
@@ -364,8 +360,6 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than zero.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="range"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">The <paramref name="range"/> is invalid.</exception>
-        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
-        /// is too large for an <see cref="Int32"/>.</exception>
         /// <remarks>The npm "loose" option is not supported. The
         /// <see cref="Parse(string,SemVersionRangeOptions,int)"/> method provides more control over
         /// parsing. However, it does not accept all of the npm syntax.</remarks>
@@ -396,8 +390,6 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than zero.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="range"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">The <paramref name="range"/> is invalid.</exception>
-        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
-        /// is too large for an <see cref="Int32"/>.</exception>
         /// <remarks>The npm "loose" option is not supported. The
         /// <see cref="Parse(string,SemVersionRangeOptions,int)"/> method provides more control over
         /// parsing. However, it does not accept all of the npm syntax.</remarks>

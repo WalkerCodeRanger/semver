@@ -29,7 +29,7 @@ namespace Semver
     [StructLayout(LayoutKind.Auto)]
     public readonly struct PrereleaseIdentifier : IEquatable<PrereleaseIdentifier>, IComparable<PrereleaseIdentifier>, IComparable
     {
-        internal static readonly PrereleaseIdentifier Zero = CreateUnsafe("0", 0);
+        internal static readonly PrereleaseIdentifier Zero = CreateUnsafe("0", BigInteger.Zero);
         internal static readonly PrereleaseIdentifier Hyphen = CreateUnsafe("-", null);
 
         /// <summary>
@@ -104,7 +104,6 @@ namespace Semver
         /// <exception cref="ArgumentException">The <paramref name="value"/> is empty or contains invalid characters
         /// (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading zeros for
         /// a numeric identifier when <paramref name="allowLeadingZeros"/> is <see langword="false"/>.</exception>
-        /// <exception cref="OverflowException">The numeric identifier value is too large for <see cref="Int32"/>.</exception>
         /// <remarks>Because a valid numeric identifier does not have leading zeros, this constructor
         /// will never create a <see cref="PrereleaseIdentifier"/> with leading zeros even if
         /// <paramref name="allowLeadingZeros"/> is <see langword="true"/>. Any leading zeros will

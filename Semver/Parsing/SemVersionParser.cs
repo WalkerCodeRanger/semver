@@ -24,12 +24,10 @@ namespace Semver.Parsing
         private const string LeadingUpperVMessage = "Leading 'V' in '{0}'.";
         private const string LeadingZeroInMajorMinorOrPatchMessage = "{1} version has leading zero in '{0}'.";
         private const string EmptyMajorMinorOrPatchMessage = "{1} version missing in '{0}'.";
-        private const string MajorMinorOrPatchOverflowMessage = "{1} version '{2}' was too large for Int32 in '{0}'.";
         private const string FourthVersionNumberMessage = "Fourth version number in '{0}'.";
         private const string PrereleasePrefixedByDotMessage = "The prerelease identfiers should be prefixed by '-' instead of '.' in '{0}'.";
         private const string MissingPrereleaseIdentifierMessage = "Missing prerelease identifier in '{0}'.";
         private const string LeadingZeroInPrereleaseMessage = "Leading zero in prerelease identifier in version '{0}'.";
-        private const string PrereleaseOverflowMessage = "Prerelease identifier '{1}' was too large for Int32 in version '{0}'.";
         private const string InvalidCharacterInPrereleaseMessage = "Invalid character '{1}' in prerelease identifier in '{0}'.";
         private const string MissingMetadataIdentifierMessage = "Missing metadata identifier in '{0}'.";
         private const string InvalidCharacterInMajorMinorOrPatchMessage = "{1} version contains invalid character '{2}' in '{0}'.";
@@ -37,7 +35,9 @@ namespace Semver.Parsing
         private const string InvalidWildcardInMajorMinorOrPatchMessage = "{1} version is a wildcard and should contain only 1 character in '{0}'.";
         private const string MinorOrPatchMustBeWildcardVersionMessage = "{1} version should be a wildcard because the preceding version is a wildcard in '{0}'.";
         private const string InvalidWildcardInPrereleaseMessage = "Prerelease version is a wildcard and should contain only 1 character in '{0}'.";
-        private const string PrereleaseWildcardMustBeLast = "Prerelease identifier follows wildcard prerelease identifier in '{0}'.";
+        private const string PrereleaseWildcardMustBeLastMessage = "Prerelease identifier follows wildcard prerelease identifier in '{0}'.";
+        private const string MajorMinorOrPatchParsingFailedMessage = "{1} version '{2}' failed to parse in '{0}'.";
+        private const string PrereleaseParsingFailedMessage = "Prerelease identifier '{1}' failed to parse in '{0}'.";
 
         /// <summary>
         /// The internal method that all parsing is based on. Because this is called by both
@@ -333,11 +333,10 @@ namespace Semver.Parsing
 
             var numberString = segment.ToString();
             if (!BigInteger.TryParse(numberString, NumberStyles.None, CultureInfo.InvariantCulture, out number))
-                // TODO this comment is no longer true, the exception may be unreachable
-                // Parsing validated this as a string of digits possibly proceeded by zero so the only
-                // possible issue is a numeric overflow for `int`
-                return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
-                    MajorMinorOrPatchOverflowMessage, version.ToStringLimitLength(), kind, numberString));
+                // Parsing validated this as a string of digits possibly proceeded by zero so this
+                // failure shouldn't be possible.
+                return ex ?? new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
+                    MajorMinorOrPatchParsingFailedMessage, version.ToStringLimitLength(), kind, numberString));
 
             return null;
         }
@@ -362,7 +361,7 @@ namespace Semver.Parsing
             {
                 // Identifier after wildcard
                 if (isWildcard)
-                    return ex ?? NewFormatException(PrereleaseWildcardMustBeLast, version.ToStringLimitLength());
+                    return ex ?? NewFormatException(PrereleaseWildcardMustBeLastMessage, version.ToStringLimitLength());
 
                 // Empty identifiers not allowed
                 if (identifier.Length == 0)
@@ -406,11 +405,10 @@ namespace Semver.Parsing
                         identifierString = identifier.ToString();
 
                     if (!BigInteger.TryParse(identifierString, NumberStyles.None, null, out var numericValue))
-                        // TODO this comment is no longer true, the exception may be unreachable
-                        // Parsing validated this as a string of digits possibly proceeded by zero so the only
-                        // possible issue is a numeric overflow for `int`
-                        return ex ?? new OverflowException(string.Format(CultureInfo.InvariantCulture,
-                            PrereleaseOverflowMessage, version.ToStringLimitLength(), identifier));
+                        // Parsing validated this as a string of digits possibly proceeded by zero
+                        // so this failure shouldn't be possible.
+                        return ex ?? new FormatException(string.Format(CultureInfo.InvariantCulture,
+                            PrereleaseParsingFailedMessage, version.ToStringLimitLength(), identifier));
 
                     identifiers.Add(PrereleaseIdentifier.CreateUnsafe(identifierString, numericValue));
                 }

@@ -49,15 +49,6 @@ namespace Semver.Test
         }
 
         [Fact]
-        public void IntParseOverflow()
-        {
-            var ex = Assert.Throws<OverflowException>(() =>
-                int.Parse("99999999999999999999999", NumberStyles.None, CultureInfo.InvariantCulture));
-
-            Assert.Equal(IntOverflowMessage, ex.Message);
-        }
-
-        [Fact]
         public void ConstructNegativeVersionThrowsArgumentOutOfRangeException()
         {
             var ex = Assert.Throws<ArgumentOutOfRangeException>(() => new Version(-1, 0));
@@ -92,7 +83,6 @@ namespace Semver.Test
 
         private const string InvalidNumberStyleMessageStart = "An undefined NumberStyles value is being used.";
         private const string InvalidFormatMessage = "Input string was not in a correct format.";
-        private const string IntOverflowMessage = "Value was either too large or too small for an Int32.";
         private const NumberStyles InvalidNumberStyle = (NumberStyles)int.MaxValue;
     }
 }

@@ -207,8 +207,6 @@ namespace Semver
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
         /// zeros for a numeric identifier. Or, a metadata identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
-        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
-        /// for <see cref="Int32"/>.</exception>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public SemVersion(BigInteger major, BigInteger minor = default, BigInteger patch = default,
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -272,9 +270,6 @@ namespace Semver
         /// zeros for a numeric identifier when <paramref name="allowLeadingZeros"/> is
         /// <see langword="false"/>. Or, a metadata identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
-        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
-        /// for <see cref="int"/>.</exception>
-        // TODO is the doc comment still correct? Can OverflowException occur?
         public static SemVersion ParsedFrom(BigInteger major, BigInteger? minor = null, BigInteger? patch = null,
             string prerelease = "", string metadata = "", bool allowLeadingZeros = false)
         {
@@ -405,8 +400,6 @@ namespace Semver
         /// <exception cref="ArgumentNullException"><paramref name="version"/> is <see langword="null"/>.</exception>
         /// <exception cref="FormatException">The <paramref name="version"/> is invalid or not in a
         /// format compliant with <paramref name="style"/>.</exception>
-        /// <exception cref="OverflowException">A numeric part of <paramref name="version"/> is too
-        /// large for an <see cref="Int32"/>.</exception>
         public static SemVersion Parse(string version, SemVersionStyles style, int maxLength = MaxVersionLength)
         {
             if (!style.IsValid()) throw new ArgumentException(InvalidSemVersionStylesMessage, nameof(style));
@@ -467,8 +460,6 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException">The <paramref name="major"/>,
         /// <paramref name="minor"/>, or <paramref name="patch"/> version number is negative.</exception>
         /// <exception cref="ArgumentException">A prerelease or metadata identifier has the default value.</exception>
-        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
-        /// for <see cref="int"/>.</exception>
         /// <remarks>
         /// The <see cref="With"/> method is intended to be called using named argument syntax, passing only
         /// those fields to be changed.
@@ -477,7 +468,6 @@ namespace Semver
         /// To change the minor and patch versions:
         /// <code>var modifiedVersion = version.With(minor: 2, patch: 4);</code>
         /// </example>
-        // TODO updated comment given that OverflowException may no longer be possible
         public SemVersion With(
             BigInteger? major = null,
             BigInteger? minor = null,
@@ -557,8 +547,6 @@ namespace Semver
         /// zeros for a numeric identifier when <paramref name="allowLeadingZeros"/> is
         /// <see langword="false"/>. Or, a metadata identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens).</exception>
-        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
-        /// for <see cref="int"/>.</exception>
         /// <remarks>
         /// The <see cref="WithParsedFrom"/> method is intended to be called using named argument
         /// syntax, passing only those fields to be changed.
@@ -567,7 +555,6 @@ namespace Semver
         /// To change the patch version and prerelease identifiers version:
         /// <code>var modifiedVersion = version.WithParsedFrom(patch: 4, prerelease: "alpha.5");</code>
         /// </example>
-        // TODO updated comment given that OverflowException may no longer be possible
         public SemVersion WithParsedFrom(
             BigInteger? major = null,
             BigInteger? minor = null,
@@ -659,8 +646,6 @@ namespace Semver
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
         /// zeros for a numeric identifier when <paramref name="allowLeadingZeros"/> is <see langword="false"/>.</exception>
-        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
-        /// for <see cref="Int32"/>.</exception>
         /// <remarks>Because a valid numeric identifier does not have leading zeros, this constructor
         /// will never create a <see cref="PrereleaseIdentifier"/> with leading zeros even if
         /// <paramref name="allowLeadingZeros"/> is <see langword="true"/>. Any leading zeros will
@@ -692,8 +677,6 @@ namespace Semver
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
         /// zeros for a numeric identifier.</exception>
-        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
-        /// for <see cref="Int32"/>.</exception>
         public SemVersion WithPrerelease(string prereleaseIdentifier, params string[] prereleaseIdentifiers)
         {
             if (prereleaseIdentifier is null) throw new ArgumentNullException(nameof(prereleaseIdentifier));
@@ -716,8 +699,6 @@ namespace Semver
         /// <exception cref="ArgumentException">A prerelease identifier is empty or contains invalid
         /// characters (i.e. characters that are not ASCII alphanumerics or hyphens) or has leading
         /// zeros for a numeric identifier.</exception>
-        /// <exception cref="OverflowException">A numeric prerelease identifier value is too large
-        /// for <see cref="Int32"/>.</exception>
         public SemVersion WithPrerelease(IEnumerable<string> prereleaseIdentifiers)
         {
             if (prereleaseIdentifiers is null) throw new ArgumentNullException(nameof(prereleaseIdentifiers));
@@ -1341,8 +1322,6 @@ namespace Semver
         /// zero.</exception>
         /// <exception cref="FormatException">The <paramref name="range"/> is invalid or not in a
         /// format compliant with <paramref name="options"/>.</exception>
-        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
-        /// is too large for an <see cref="Int32"/>.</exception>
         /// <remarks>If checks against a range will be performed repeatedly, it is much more
         /// efficient to parse the range into a <see cref="SemVersionRange"/> once and use that
         /// object to repeatedly check for containment.</remarks>
@@ -1372,8 +1351,6 @@ namespace Semver
         /// zero.</exception>
         /// <exception cref="FormatException">The <paramref name="range"/> is invalid or not in a
         /// format compliant with <see cref="SemVersionRangeOptions.Strict"/>.</exception>
-        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
-        /// is too large for an <see cref="Int32"/>.</exception>
         /// <remarks>If checks against a range will be performed repeatedly, it is much more
         /// efficient to parse the range into a <see cref="SemVersionRange"/> once and use that
         /// object to repeatedly check for containment.</remarks>
@@ -1396,8 +1373,6 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
         /// zero.</exception>
         /// <exception cref="FormatException">The <paramref name="range"/> is invalid.</exception>
-        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
-        /// is too large for an <see cref="Int32"/>.</exception>
         /// <remarks>If checks against a range will be performed repeatedly, it is much more
         /// efficient to parse the range into a <see cref="SemVersionRange"/> once using
         /// <see cref="SemVersionRange.ParseNpm(string,bool,int)"/> and use that object to
@@ -1424,8 +1399,6 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than
         /// zero.</exception>
         /// <exception cref="FormatException">The <paramref name="range"/> is invalid.</exception>
-        /// <exception cref="OverflowException">A numeric part of a version in <paramref name="range"/>
-        /// is too large for an <see cref="Int32"/>.</exception>
         /// <remarks>If checks against a range will be performed repeatedly, it is much more
         /// efficient to parse the range into a <see cref="SemVersionRange"/> once using
         /// <see cref="SemVersionRange.ParseNpm(string,int)"/> and use that object to
