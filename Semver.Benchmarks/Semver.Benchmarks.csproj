@@ -14,7 +14,7 @@
 
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet">
-        <Version>0.13.5</Version>
+        <Version>0.13.7</Version>
       </PackageReference>
       <PackageReference Include="IndexRange" Version="1.0.2" />
       <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
