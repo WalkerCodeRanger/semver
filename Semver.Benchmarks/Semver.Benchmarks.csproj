@@ -10,6 +10,7 @@
     <Authors>Jeff Walker</Authors>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	<IsPackable>false</IsPackable>
   </PropertyGroup>
 
     <ItemGroup>
