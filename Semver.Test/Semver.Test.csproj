@@ -11,7 +11,7 @@
     <PackageId>Semver.Test</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <Company />
-    <Copyright>Copyright © 2013 Max Hauser</Copyright>
+    <Copyright>Copyright © 2013-2023 Max Hauser</Copyright>
     <Product>Semver</Product>
     <Authors>Max Hauser, Jeff Walker</Authors>
     <Version>1.0.0-dev</Version>

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Description>A SemVer implementation in .Net based on v2.0.0 of the spec found at http://semver.org</Description>
-    <Copyright>Copyright © 2013 Max Hauser, Jeff Walker</Copyright>
+    <Copyright>Copyright © 2013-2023 Max Hauser, Jeff Walker</Copyright>
     <AssemblyTitle>Semantic versioning</AssemblyTitle>
     <Authors>Max Hauser, Jeff Walker</Authors>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
