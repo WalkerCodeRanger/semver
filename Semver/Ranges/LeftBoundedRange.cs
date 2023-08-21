@@ -49,10 +49,10 @@ namespace Semver.Ranges
             return Inclusive ? comparison <= 0 : comparison < 0;
         }
 
-        public LeftBoundedRange Min(LeftBoundedRange other) 
+        public LeftBoundedRange Min(LeftBoundedRange other)
             => CompareTo(other) <= 0 ? this : other;
 
-        public LeftBoundedRange Max(LeftBoundedRange other) 
+        public LeftBoundedRange Max(LeftBoundedRange other)
             => CompareTo(other) >= 0 ? this : other;
 
         #region Equality

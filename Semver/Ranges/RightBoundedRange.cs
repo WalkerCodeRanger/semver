@@ -60,7 +60,7 @@ namespace Semver.Ranges
         public RightBoundedRange Min(RightBoundedRange other)
             => CompareTo(other) <= 0 ? this : other;
 
-        public RightBoundedRange Max(RightBoundedRange other) 
+        public RightBoundedRange Max(RightBoundedRange other)
             => CompareTo(other) >= 0 ? this : other;
 
         #region Equality

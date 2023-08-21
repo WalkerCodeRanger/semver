@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using Semver.Comparers;
 using Semver.Ranges;
@@ -185,7 +186,7 @@ namespace Semver
                         allPrereleaseCoveredByEnds = true;
                     else if ((end.IncludesPrerelease || end.Version.PrereleaseIsZero)
                              && start.Version.Major == end.Version.Major && start.Version.Minor == end.Version.Minor
-                             && start.Version.Patch + 1 == end.Version.Patch)
+                             && start.Version.Patch + BigInteger.One == end.Version.Patch)
                         allPrereleaseCoveredByEnds = true;
                 }
             }
@@ -387,10 +388,10 @@ namespace Semver
                 // Wildcard Ranges like 2.*, 2.*-*, 2.3.*, and 2.3.*-*
                 if (Start.Patch == 0 && End.Patch == 0 && (!Start.IsPrerelease || Start.PrereleaseIsZero))
                 {
-                    if (Start.Major == End.Major && Start.Minor + 1 == End.Minor)
+                    if (Start.Major == End.Major && Start.Minor + BigInteger.One == End.Minor)
                         // Wildcard patch
                         result = $"{Start.Major}.{Start.Minor}.*";
-                    else if (Start.Major + 1 == End.Major && Start.Minor == 0 && End.Minor == 0)
+                    else if (Start.Major + BigInteger.One == End.Major && Start.Minor == 0 && End.Minor == 0)
                         // Wildcard minor
                         result = $"{Start.Major}.*";
                     else
@@ -406,7 +407,7 @@ namespace Semver
                 // Wildcard ranges like 2.1.4-* follow the pattern '>=X.Y.Z-0 <X.Y.(Z+1)-0'
                 if (Start.PrereleaseIsZero
                     && Start.Major == End.Major && Start.Minor == End.Minor
-                    && Start.Patch + 1 == End.Patch)
+                    && Start.Patch + BigInteger.One == End.Patch)
                 {
                     result = $"{Start.Major}.{Start.Minor}.{Start.Patch}-*";
                     return true;
@@ -415,7 +416,7 @@ namespace Semver
             tilde:
                 // Tilde ranges like ~1.2.3, and ~1.2.3-rc
                 if (Start.Major == End.Major
-                    && Start.Minor + 1 == End.Minor && End.Patch == 0)
+                    && Start.Minor + BigInteger.One == End.Minor && End.Patch == 0)
                 {
                     result = (includesPrereleaseNotCoveredByEnds ? "*-* ~" : "~") + Start;
                     return true;
@@ -434,7 +435,7 @@ namespace Semver
                 }
                 else if (End.Major == 0
                          && Start.Minor == 0 && End.Minor == 0
-                         && Start.Patch == End.Patch - 1)
+                         && Start.Patch + BigInteger.One == End.Patch)
                 {
                     // Caret ranges like ^0.0.2 and ^0.0.2-rc
                     result = (includesPrereleaseNotCoveredByEnds ? "*-* ^" : "^") + Start;
@@ -634,7 +635,7 @@ namespace Semver
 
             return start.Version.Major == end.Version.Major
                    && start.Version.Minor == end.Version.Minor
-                   && start.Version.Patch + 1 == end.Version.Patch;
+                   && start.Version.Patch + BigInteger.One == end.Version.Patch;
         }
 
         private static SemVersion Validate(SemVersion version, string paramName)

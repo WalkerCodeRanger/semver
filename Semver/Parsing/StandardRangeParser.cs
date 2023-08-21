@@ -34,7 +34,7 @@ namespace Semver.Parsing
             foreach (var segment in GeneralRangeParser.SplitOnOrOperator(range))
             {
                 var exception = ParseUnbrokenRange(segment, rangeOptions, ex, maxLength, out var unbrokenRange);
-                if (!(exception is null)) return exception;
+                if (exception is not null) return exception;
                 DebugChecks.IsNotNull(unbrokenRange, nameof(unbrokenRange));
 
                 unbrokenRanges.Add(unbrokenRange);
@@ -74,21 +74,12 @@ namespace Semver.Parsing
             return null;
         }
 
-        // TODO this comment needs updated given that the int.MaxValue is no longer relevant
         /// <summary>
         /// Parse a comparison from the beginning of the segment.
         /// </summary>
         /// <remarks>
-        /// <para>Must have leading whitespace removed. Will consume trailing whitespace.</para>
-        ///
-        /// <para>When applying caret, tilde, or wildcards to versions already at
-        /// <see cref="int.MaxValue"/> there are ranges that would be equivalent to being able to
-        /// increment beyond max value. However, for simplicity, this is treated as an error instead.
-        /// This also makes sense given that these ranges would logically include versions valid
-        /// according to the spec that can't be represented by this library due to the limitations
-        /// of <see cref="int"/>. Finally, if these equivalent ranges were supported they would also
-        /// need special case handling in the <see cref="UnbrokenSemVersionRange.ToString"/> method.
-        /// </para></remarks>
+        /// Must have leading whitespace removed. Will consume trailing whitespace.
+        /// </remarks>
         private static Exception? ParseComparison(
             ref StringSegment segment,
             SemVersionRangeOptions rangeOptions,
@@ -106,7 +97,6 @@ namespace Semver.Parsing
             exception = GeneralRangeParser.ParseOptionalSpaces(ref segment, ex);
             if (exception != null) return exception;
 
-            var versionSegment = segment;
             exception = GeneralRangeParser.ParseVersion(ref segment, rangeOptions, ParsingOptions, ex, maxLength,
                             out var semver, out var wildcardVersion);
             if (exception != null) return exception;
@@ -138,13 +128,13 @@ namespace Semver.Parsing
                     return null;
                 case StandardOperator.Caret:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
-                    BigInteger major = 0, minor = 0, patch = 0;
+                    BigInteger major = BigInteger.Zero, minor = BigInteger.Zero, patch = BigInteger.Zero;
                     if (semver.Major != 0)
-                        major = semver.Major + 1;
+                        major = semver.Major + BigInteger.One;
                     else if (semver.Minor != 0)
-                        minor = semver.Minor + 1;
+                        minor = semver.Minor + BigInteger.One;
                     else
-                        patch = semver.Patch + 1;
+                        patch = semver.Patch + BigInteger.One;
 
                     rightBound = rightBound.Min(new RightBoundedRange(new SemVersion(
                                     major, minor, patch,
@@ -154,7 +144,7 @@ namespace Semver.Parsing
                 case StandardOperator.Tilde:
                     leftBound = leftBound.Max(new LeftBoundedRange(semver, true));
                     rightBound = rightBound.Min(new RightBoundedRange(
-                        semver.With(minor: semver.Minor + 1, patch: 0, prerelease: PrereleaseIdentifiers.Zero),
+                        semver.With(minor: semver.Minor + BigInteger.One, patch: BigInteger.Zero, prerelease: PrereleaseIdentifiers.Zero),
                         false));
                     return null;
                 case StandardOperator.None: // implied = (supports wildcard *)
@@ -167,21 +157,22 @@ namespace Semver.Parsing
                     {
                         case WildcardVersion.None:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
-                            return PrereleaseWildcardUpperBound(ex, ref rightBound, versionSegment, semver, prereleaseWildcard);
+                            PrereleaseWildcardUpperBound(ref rightBound, semver, prereleaseWildcard);
+                            return null;
                         case WildcardVersion.MajorMinorPatchWildcard:
                             // No further bound is places on the left and right bounds
                             return null;
                         case WildcardVersion.MinorPatchWildcard:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
                             rightBound = rightBound.Min(new RightBoundedRange(
-                                new SemVersion(semver.Major + 1, 0, 0,
+                                new SemVersion(semver.Major + BigInteger.One, BigInteger.Zero, BigInteger.Zero,
                                     "0", PrereleaseIdentifiers.Zero,
                                     "", ReadOnlyList<MetadataIdentifier>.Empty), false));
                             return null;
                         case WildcardVersion.PatchWildcard:
                             leftBound = leftBound.Max(WildcardLowerBound(semver, prereleaseWildcard));
                             rightBound = rightBound.Min(new RightBoundedRange(
-                                new SemVersion(semver.Major, semver.Minor + 1, 0,
+                                new SemVersion(semver.Major, semver.Minor + BigInteger.One, BigInteger.Zero,
                                     "0", PrereleaseIdentifiers.Zero,
                                     "", ReadOnlyList<MetadataIdentifier>.Empty), false));
                             return null;
@@ -204,10 +195,8 @@ namespace Semver.Parsing
             return new LeftBoundedRange(semver, true);
         }
 
-        private static Exception? PrereleaseWildcardUpperBound(
-            Exception? ex,
+        private static void PrereleaseWildcardUpperBound(
             ref RightBoundedRange rightBound,
-            StringSegment versionSegment,
             SemVersion semver,
             bool prereleaseWildcard)
         {
@@ -219,7 +208,7 @@ namespace Semver.Parsing
                         PrereleaseWildcardUpperBoundPrereleaseIdentifiers(semver.PrereleaseIdentifiers));
                 else
                 {
-                    semver = new SemVersion(semver.Major, semver.Minor, semver.Patch + 1,
+                    semver = new SemVersion(semver.Major, semver.Minor, semver.Patch + BigInteger.One,
                         "0", PrereleaseIdentifiers.Zero, "", ReadOnlyList<MetadataIdentifier>.Empty);
                 }
             }
@@ -227,7 +216,6 @@ namespace Semver.Parsing
                 inclusive = true;
 
             rightBound = rightBound.Min(new RightBoundedRange(semver, inclusive));
-            return null;
         }
 
         private static IEnumerable<PrereleaseIdentifier> PrereleaseWildcardUpperBoundPrereleaseIdentifiers(
