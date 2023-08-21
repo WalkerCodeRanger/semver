@@ -148,6 +148,19 @@ namespace Semver.Test
 
             Assert.Equal("Version with build metadata can't be converted to System.Version.", ex.Message);
         }
+
+        [Theory]
+        [InlineData("2147483648.2.3", "major")]
+        [InlineData("1.2147483648.3", "minor")]
+        [InlineData("1.2.2147483648", "patch")]
+        public void ToVersionFromOverflowTest(string version, string kind)
+        {
+            var v = SemVersion.Parse(version);
+
+            var ex = Assert.Throws<InvalidOperationException>(() => v.ToVersion());
+
+            Assert.Equal($"Version with {kind} version of 2147483648 can't be converted to System.Version because it is greater than Int32.MaxValue.", ex.Message);
+        }
         #endregion
 
         [Theory]

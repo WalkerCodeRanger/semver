@@ -29,6 +29,8 @@ namespace Semver
         private const string PrereleaseIdentifierIsDefaultMessage = "Prerelease identifier cannot be default/null.";
         private const string MetadataIdentifierIsDefaultMessage = "Metadata identifier cannot be default/null.";
         private const string InvalidMaxLengthMessage = "Must not be negative.";
+        private const string MajorMinorOrPatchVersionToLargeToConvertMessage =
+            "Version with {0} version of {1} can't be converted to System.Version because it is greater than Int32.MaxValue.";
         internal const int MaxVersionLength = 1024;
 
         /// <summary>
@@ -366,7 +368,8 @@ namespace Semver
         /// </summary>
         /// <returns>The equivalent <see cref="Version"/>.</returns>
         /// <exception cref="InvalidOperationException">The semantic version is a prerelease version
-        /// or has build metadata or has a negative major, minor, or patch version number.</exception>
+        /// or has build metadata or has a major, minor, or patch version number greater than
+        /// <see cref="int.MaxValue"/>.</exception>
         /// <remarks>
         /// A semantic version of the form <em>major</em>.<em>minor</em>.<em>patch</em>
         /// is converted to a <see cref="Version"/> of the form
@@ -380,8 +383,13 @@ namespace Semver
         {
             if (IsPrerelease) throw new InvalidOperationException("Prerelease version can't be converted to System.Version.");
             if (Metadata.Length != 0) throw new InvalidOperationException("Version with build metadata can't be converted to System.Version.");
+            if (Major > int.MaxValue)
+                throw new InvalidOperationException(string.Format(MajorMinorOrPatchVersionToLargeToConvertMessage, "major", Major));
+            if (Minor > int.MaxValue)
+                throw new InvalidOperationException(string.Format(MajorMinorOrPatchVersionToLargeToConvertMessage, "minor", Minor));
+            if (Patch > int.MaxValue)
+                throw new InvalidOperationException(string.Format(MajorMinorOrPatchVersionToLargeToConvertMessage, "patch", Patch));
 
-            // TODO check ranges and throw appropriate exceptions
             return new Version((int)Major, (int)Minor, (int)Patch);
         }
         #endregion
