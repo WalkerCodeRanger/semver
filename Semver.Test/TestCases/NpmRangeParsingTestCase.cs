@@ -63,7 +63,6 @@ namespace Semver.Test.TestCases
         #endregion
 
         #region Invalid Values
-        
         public Type? ExceptionType { get; }
         public string? ExceptionMessageFormat { get; }
         #endregion
