@@ -16,7 +16,7 @@ You may have noticed that this repository has moved between accounts recently (f
 [maxhauser](https://github.com/maxhauser) to [WalkerCodeRanger](https://github.com/WalkerCodeRanger)).
 This move reflects who has been the primary maintainer for the last five years. Nothing will change
 with how the project is managed or run. Look for the next major release, 3.0, to come out within the
-next month or two!
+next month or two! (Sept. or Oct. 2024)
 
 ## Parsing
 
