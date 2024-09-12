@@ -1,0 +1,8 @@
+# http://editorconfig.org
+
+# child EditorConfig file
+root = false
+
+# .NET formatting settings:
+[*.cs]
+csharp_style_expression_bodied_methods = false:silent

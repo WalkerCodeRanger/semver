@@ -253,7 +253,7 @@ namespace Semver.Test
         [InlineData("a")]
         [InlineData("42")]
         [InlineData(null)]
-        public void CompareToNullObject(string value)
+        public void CompareToNullObject(string? value)
         {
             var comparison = CreateOrDefault(value).CompareTo(null);
 
@@ -264,7 +264,7 @@ namespace Semver.Test
         [InlineData("a")]
         [InlineData("42")]
         [InlineData(null)]
-        public void CompareToObject(string value)
+        public void CompareToObject(string? value)
         {
             var ex = Assert.Throws<ArgumentException>(()
                 => CreateOrDefault(value).CompareTo(new object()));
@@ -279,7 +279,7 @@ namespace Semver.Test
         [InlineData("123")]
         [InlineData("1-2")]
         [InlineData(null)]
-        public void ImplicitConversionToString(string value)
+        public void ImplicitConversionToString(string? value)
         {
             var identifier = CreateOrDefault(value);
 
@@ -293,7 +293,7 @@ namespace Semver.Test
         [InlineData("123")]
         [InlineData("1-2")]
         [InlineData(null)]
-        public void ToStringTest(string value)
+        public void ToStringTest(string? value)
         {
             var identifier = CreateOrDefault(value);
 
