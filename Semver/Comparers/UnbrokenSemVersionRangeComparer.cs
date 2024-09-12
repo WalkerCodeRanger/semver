@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Semver.Comparers
 {
     /// <summary>
     /// Compare <see cref="UnbrokenSemVersionRange"/> by the left bound and then by the reversed
-    /// right bound. Thus wider ranges sort before narrower ones. Finally, sort ranges including
+    /// right bound. Thus, wider ranges sort before narrower ones. Finally, sort ranges including
     /// prerelease before those not including prerelease.
     /// </summary>
     /// <remarks>This order is important to the removal of fully contained ranges from

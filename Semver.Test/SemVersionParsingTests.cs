@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -47,7 +47,7 @@ namespace Semver.Test
 
             for (var i = 0; i < length; i++)
             {
-                var startOfIdentifier = s[s.Length - 1] == '.';
+                var startOfIdentifier = s[^1] == '.';
                 var validChars = startOfIdentifier ? chars.Length - 2 : chars.Length;
                 s.Append(chars[random.Next(0, validChars)]);
             }
@@ -238,7 +238,7 @@ namespace Semver.Test
 
             // Allows int.Max+1
             Valid("2147483648.2.3", 2147483648, 2, 3),
-            Valid("1.2147483648.3", 1, 2147483648, 3), 
+            Valid("1.2147483648.3", 1, 2147483648, 3),
             Valid("1.2.2147483648", 1, 2, 2147483648),
 
             // Supports ulong.Max+1
@@ -597,11 +597,9 @@ namespace Semver.Test
             BigInteger patch = default,
             IEnumerable<PrereleaseIdentifier>? prerelease = null,
             IEnumerable<MetadataIdentifier>? metadata = null)
-        {
-            return ParsingTestCase.Valid(version, requiredStyles, major, minor, patch,
+            => ParsingTestCase.Valid(version, requiredStyles, major, minor, patch,
                 prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
                 metadata ?? Enumerable.Empty<MetadataIdentifier>());
-        }
 
         private static ParsingTestCase Valid(
             string version,
@@ -610,11 +608,9 @@ namespace Semver.Test
             BigInteger patch = default,
             IEnumerable<PrereleaseIdentifier>? prerelease = null,
             IEnumerable<MetadataIdentifier>? metadata = null)
-        {
-            return ParsingTestCase.Valid(version, Strict, major, minor, patch,
-            prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
-            metadata ?? Enumerable.Empty<MetadataIdentifier>());
-        }
+            => ParsingTestCase.Valid(version, Strict, major, minor, patch,
+                prerelease ?? Enumerable.Empty<PrereleaseIdentifier>(),
+                metadata ?? Enumerable.Empty<MetadataIdentifier>());
 
         private static ParsingTestCase ValidLongVersion(int seed)
         {

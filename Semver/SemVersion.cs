@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -1008,7 +1008,7 @@ namespace Semver
         /// Determines whether two semantic versions are equal.
         /// </summary>
         /// <returns><see langword="true"/> if the two versions are equal, otherwise <see langword="false"/>.</returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus, two
         /// versions with the same precedence may not be equal.</remarks>
         public static bool Equals(SemVersion? left, SemVersion? right)
         {
@@ -1018,9 +1018,9 @@ namespace Semver
         }
 
         /// <summary>Determines whether the given object is equal to this version.</summary>
-        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this version;
+        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to this version;
         /// otherwise <see langword="false"/>.</returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus, two
         /// versions with the same precedence may not be equal.</remarks>
         public override bool Equals(object? obj)
             => obj is SemVersion version && Equals(version);
@@ -1028,9 +1028,9 @@ namespace Semver
         /// <summary>
         /// Determines whether two semantic versions are equal.
         /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the this version;
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to this version;
         /// otherwise <see langword="false"/>.</returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus, two
         /// versions with the same precedence may not be equal.</remarks>
         public bool Equals(SemVersion? other)
         {
@@ -1084,7 +1084,7 @@ namespace Semver
         /// A hash code for this instance, suitable for use in hashing algorithms
         /// and data structures like a hash table.
         /// </returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus, two
         /// versions with the same precedence may not have the same hash code.</remarks>
         public override int GetHashCode()
             => HashCode.Combine(Major, Minor, Patch, Prerelease, Metadata);
@@ -1093,7 +1093,7 @@ namespace Semver
         /// Determines whether two semantic versions are equal.
         /// </summary>
         /// <returns><see langword="true"/> if the two versions are equal, otherwise <see langword="false"/>.</returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus, two
         /// versions with the same precedence may not be equal.</remarks>
         public static bool operator ==(SemVersion? left, SemVersion? right) => Equals(left, right);
 
@@ -1101,7 +1101,7 @@ namespace Semver
         /// Determines whether two semantic versions are <em>not</em> equal.
         /// </summary>
         /// <returns><see langword="true"/> if the two versions are <em>not</em> equal, otherwise <see langword="false"/>.</returns>
-        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus two
+        /// <remarks>Two versions are equal if every part of the version numbers are equal. Thus, two
         /// versions with the same precedence may not be equal.</remarks>
         public static bool operator !=(SemVersion? left, SemVersion? right) => !Equals(left, right);
         #endregion

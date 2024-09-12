@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using Semver.Utility;
 
@@ -92,12 +92,12 @@ namespace Semver
         /// <summary>
         /// Determines whether two identifiers are equal.
         /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="value"/> is equal to the this identifier;
+        /// <returns><see langword="true"/> if <paramref name="value"/> is equal to this identifier;
         /// otherwise <see langword="false"/>.</returns>
         public bool Equals(MetadataIdentifier value) => Value == value.Value;
 
         /// <summary>Determines whether the given object is equal to this identifier.</summary>
-        /// <returns><see langword="true"/> if <paramref name="value"/> is equal to the this identifier;
+        /// <returns><see langword="true"/> if <paramref name="value"/> is equal to this identifier;
         /// otherwise <see langword="false"/>.</returns>
         public override bool Equals(object? value)
             => value is MetadataIdentifier other && Equals(other);

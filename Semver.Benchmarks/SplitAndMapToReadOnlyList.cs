@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -22,21 +22,15 @@ namespace Semver.Benchmarks
 
         [Benchmark(Baseline = true)]
         public IReadOnlyList<string> Standard()
-        {
-            return Value.SplitAndMapToReadOnlyList('.', Identity);
-        }
+            => Value.SplitAndMapToReadOnlyList('.', Identity);
 
         [Benchmark]
         public IReadOnlyList<string> WithoutCapacity()
-        {
-            return SplitAndMapToReadOnlyListWithoutCapacity(Value, '.', Identity);
-        }
+            => SplitAndMapToReadOnlyListWithoutCapacity(Value, '.', Identity);
 
         [Benchmark]
         public IReadOnlyList<string> WithLinqCount()
-        {
-            return SplitAndMapToReadOnlyListWithoutCapacity(Value, '.', Identity);
-        }
+            => SplitAndMapToReadOnlyListWithoutCapacity(Value, '.', Identity);
 
         /// <summary>
         /// This is the old Linq code that <see cref="StringExtensions.SplitAndMapToReadOnlyList{T}"/>
@@ -46,11 +40,7 @@ namespace Semver.Benchmarks
         /// original <see cref="SemVersion"/> code.</remarks>
         [Benchmark]
         public IReadOnlyList<string> Linq()
-        {
-            return Value.Split('.')
-                        .Select(Identity)
-                        .ToReadOnlyList();
-        }
+            => Value.Split('.').Select(Identity).ToReadOnlyList();
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static IReadOnlyList<T> SplitAndMapToReadOnlyListWithoutCapacity<T>(

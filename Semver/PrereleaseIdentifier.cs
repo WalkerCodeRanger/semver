@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -166,7 +166,7 @@ namespace Semver
         /// <summary>
         /// Determines whether two identifiers are equal.
         /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="value"/> is equal to the this identifier;
+        /// <returns><see langword="true"/> if <paramref name="value"/> is equal to this identifier;
         /// otherwise <see langword="false"/>.</returns>
         /// <remarks>Numeric identifiers with leading zeros are considered equal (e.g. '<c>15</c>'
         /// is equal to '<c>015</c>').</remarks>
@@ -177,7 +177,7 @@ namespace Semver
         }
 
         /// <summary>Determines whether the given object is equal to this identifier.</summary>
-        /// <returns><see langword="true"/> if <paramref name="value"/> is equal to the this identifier;
+        /// <returns><see langword="true"/> if <paramref name="value"/> is equal to this identifier;
         /// otherwise <see langword="false"/>.</returns>
         /// <remarks>Numeric identifiers with leading zeros are considered equal (e.g. '<c>15</c>'
         /// is equal to '<c>015</c>').</remarks>

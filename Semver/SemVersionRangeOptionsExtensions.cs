@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using static Semver.SemVersionRangeOptions;
 
@@ -16,12 +16,10 @@ namespace Semver
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsValid(this SemVersionRangeOptions options)
-        {
             // It is some combination of the flags
-            return (options & AllFlags) == options
-                   // Except for a flag for optional minor without optional patch
-                   && (options & OptionalMinorPatch) != OptionalMinorWithoutPatch;
-        }
+            => (options & AllFlags) == options
+               // Except for a flag for optional minor without optional patch
+               && (options & OptionalMinorPatch) != OptionalMinorWithoutPatch;
 
         /// <summary>
         /// The <see cref="Enum.HasFlag"/> method is surprisingly slow. This provides

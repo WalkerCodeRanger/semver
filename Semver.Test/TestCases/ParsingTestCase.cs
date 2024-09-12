@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
@@ -18,19 +18,16 @@ namespace Semver.Test.TestCases
             IEnumerable<PrereleaseIdentifier> prereleaseIdentifiers,
             IEnumerable<MetadataIdentifier> metadataIdentifiers,
             int maxLength = SemVersion.MaxVersionLength)
-        {
-            return new ParsingTestCase(version, requiredStyles, major, minor, patch,
+            => new(version, requiredStyles, major, minor, patch,
                 prereleaseIdentifiers, metadataIdentifiers, maxLength);
-        }
+
         public static ParsingTestCase Invalid(
             string? version,
             SemVersionStyles styles,
             Type exceptionType,
             string exceptionMessage,
             int maxLength = SemVersion.MaxVersionLength)
-        {
-            return new ParsingTestCase(version, styles, exceptionType, exceptionMessage, maxLength);
-        }
+            => new(version, styles, exceptionType, exceptionMessage, maxLength);
 
         private ParsingTestCase(
             string version,
@@ -95,19 +92,17 @@ namespace Semver.Test.TestCases
         }
 
         public ParsingTestCase Change(string? version = null, SemVersionStyles? styles = null)
-        {
-            return new ParsingTestCase(IsValid, version  ?? Version, styles ?? Styles,
+            => new(IsValid, version ?? Version, styles ?? Styles,
                 Major, Minor, Patch,
                 PrereleaseIdentifiers, MetadataIdentifiers,
                 ExceptionType, ExceptionMessageFormat, MaxLength);
-        }
 
         public string? Version { get; }
         public SemVersionStyles Styles { get; }
         public int MaxLength { get; }
 
         [MemberNotNullWhen(true, nameof(Version), nameof(Major), nameof(Minor), nameof(Patch), nameof(PrereleaseIdentifiers), nameof(MetadataIdentifiers))]
-        [MemberNotNullWhen(false, nameof(ExceptionType),nameof(ExceptionMessageFormat))]
+        [MemberNotNullWhen(false, nameof(ExceptionType), nameof(ExceptionMessageFormat))]
         public bool IsValid { get; }
 
         #region Valid Values

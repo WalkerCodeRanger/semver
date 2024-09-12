@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -20,11 +20,11 @@ namespace Semver.Parsing
             DebugChecks.IsValid(rangeOptions, nameof(rangeOptions));
             DebugChecks.IsValidMaxLength(maxLength, nameof(maxLength));
 
-            // Assign null once so it doesn't have to be done any time parse fails
+            // Assign null once, so it doesn't have to be done any time parse fails
             semverRange = null;
 
             // Note: this method relies on the fact that the null coalescing operator `??`
-            // is short circuiting to avoid constructing exceptions and exception messages
+            // is short-circuiting to avoid constructing exceptions and exception messages
             // when a non-null exception is passed in.
 
             if (range is null) return ex ?? new ArgumentNullException(nameof(range));
@@ -51,7 +51,7 @@ namespace Semver.Parsing
             int maxLength,
             out UnbrokenSemVersionRange? unbrokenRange)
         {
-            // Assign null once so it doesn't have to be done any time parse fails
+            // Assign null once, so it doesn't have to be done any time parse fails
             unbrokenRange = null;
 
             // Parse off leading whitespace
@@ -243,7 +243,7 @@ namespace Semver.Parsing
                 return null;
             }
 
-            // Assign invalid once so it doesn't have to be done any time parse fails
+            // Assign invalid once, so it doesn't have to be done any time parse fails
             @operator = 0;
             if (opSegment.Length > 2
                 || (opSegment.Length == 2 && opSegment[1] != '='))

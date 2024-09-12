@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Semver.Test.Helpers;
 using Xunit;
 
@@ -148,7 +148,7 @@ namespace Semver.Test
         [InlineData("01", "1", -1)]
         [InlineData("001", "01", -1)]
         [InlineData("beta", "rc", -1)] // Case that causes -16 for string comparison
-        public void CompareTo(string left, string right, int expected)
+        public void CompareTo(string? left, string? right, int expected)
         {
             var leftIdentifier = CreateOrDefault(left);
             var rightIdentifier = CreateOrDefault(right);
@@ -219,7 +219,7 @@ namespace Semver.Test
             Assert.Equal(value, convertedValue);
         }
 
-        private static MetadataIdentifier CreateOrDefault(string value)
+        private static MetadataIdentifier CreateOrDefault(string? value)
         {
             if (value is null) return default;
             return new MetadataIdentifier(value);

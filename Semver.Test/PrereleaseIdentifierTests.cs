@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -229,7 +229,7 @@ namespace Semver.Test
         [InlineData("9", "-", -1)]
         [InlineData("-", "9", 1)]
         [InlineData("0", "-100", -1)]
-        public void CompareTo(string left, string right, int expected)
+        public void CompareTo(string? left, string? right, int expected)
         {
             var leftIdentifier = CreateOrDefault(left);
             var rightIdentifier = CreateOrDefault(right);
@@ -302,7 +302,7 @@ namespace Semver.Test
             Assert.Equal(value, convertedValue);
         }
 
-        private static PrereleaseIdentifier CreateOrDefault(string value)
+        private static PrereleaseIdentifier CreateOrDefault(string? value)
         {
             if (value is null) return default;
             return new PrereleaseIdentifier(value);

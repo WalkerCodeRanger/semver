@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -413,6 +413,7 @@ namespace Semver.Test
         [Fact]
         public void ParsedFromPrereleaseEmptyString()
         {
+            // Pass empty prerelease string to force proper overload to be called
             var v = SemVersion.ParsedFrom(1, 2, 3, "");
 
             Assert.Equal(new SemVersion(1, 2, 3), v);

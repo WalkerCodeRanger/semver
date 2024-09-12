@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
@@ -95,7 +95,7 @@ namespace Semver.Parsing
             wildcardVersion = WildcardVersion.None;
 
             // Note: this method relies on the fact that the null coalescing operator `??`
-            // is short circuiting to avoid constructing exceptions and exception messages
+            // is short-circuiting to avoid constructing exceptions and exception messages
             // when a non-null exception is passed in.
 
             if (version.Length == 0) return ex ?? new FormatException(EmptyVersionMessage);

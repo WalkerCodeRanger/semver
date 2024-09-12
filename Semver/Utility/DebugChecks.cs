@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -19,7 +19,7 @@ namespace Semver.Utility
     /// been reached.
     /// <code>
     /// #if DEBUG
-    ///     if(condition) throw new Exception("...");
+    ///     if (condition) throw new Exception("...");
     /// #endif
     /// </code>
     /// </remarks>

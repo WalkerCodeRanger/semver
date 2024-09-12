@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Semver.Comparers;
 using Xunit;
@@ -35,7 +35,7 @@ namespace Semver.Test.Comparers
         {
             var v1 = SemVersion.Parse(left);
             var v2 = SemVersion.Parse(right);
- 
+
             var expected = EqualPrecedence(v1, v2);
             var actual = Comparer.Equals(v1, v2);
             if (expected)
@@ -161,12 +161,10 @@ namespace Semver.Test.Comparers
         #endregion
 
         private static bool EqualPrecedence(SemVersion v1, SemVersion v2)
-        {
-            return v1.Major == v2.Major
-                   && v1.Minor == v2.Minor
-                   && v1.Patch == v2.Patch
-                   && EqualPrecedence(v1.PrereleaseIdentifiers, v2.PrereleaseIdentifiers);
-        }
+            => v1.Major == v2.Major
+               && v1.Minor == v2.Minor
+               && v1.Patch == v2.Patch
+               && EqualPrecedence(v1.PrereleaseIdentifiers, v2.PrereleaseIdentifiers);
 
         private static bool EqualPrecedence(
             IReadOnlyList<PrereleaseIdentifier> xIdentifiers,

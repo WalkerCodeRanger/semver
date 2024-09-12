@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -362,7 +362,7 @@ namespace Semver
         /// <exception cref="FormatException">The <paramref name="range"/> is invalid.</exception>
         /// <remarks>The npm "loose" option is not supported. The
         /// <see cref="Parse(string,SemVersionRangeOptions,int)"/> method provides more control over
-        /// parsing. However, it does not accept all of the npm syntax.</remarks>
+        /// parsing. However, it does not accept all the npm syntax.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static SemVersionRange ParseNpm(
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -392,7 +392,7 @@ namespace Semver
         /// <exception cref="FormatException">The <paramref name="range"/> is invalid.</exception>
         /// <remarks>The npm "loose" option is not supported. The
         /// <see cref="Parse(string,SemVersionRangeOptions,int)"/> method provides more control over
-        /// parsing. However, it does not accept all of the npm syntax.</remarks>
+        /// parsing. However, it does not accept all the npm syntax.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static SemVersionRange ParseNpm(string range, int maxLength = MaxRangeLength)
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -414,7 +414,7 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than zero.</exception>
         /// <remarks>The npm "loose" option is not supported. The
         /// <see cref="TryParse(string,SemVersionRangeOptions,out SemVersionRange,int)"/> method
-        /// provides more control over parsing. However, it does not accept all of the npm syntax.</remarks>
+        /// provides more control over parsing. However, it does not accept all the npm syntax.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static bool TryParseNpm(
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -448,7 +448,7 @@ namespace Semver
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is less than zero.</exception>
         /// <remarks>The npm "loose" option is not supported. The
         /// <see cref="TryParse(string,SemVersionRangeOptions,out SemVersionRange,int)"/> method
-        /// provides more control over parsing. However, it does not accept all of the npm syntax.</remarks>
+        /// provides more control over parsing. However, it does not accept all the npm syntax.</remarks>
 #pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public static bool TryParseNpm(
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
@@ -498,7 +498,7 @@ namespace Semver
         /// be possible for two ranges to match the same set of versions but be expressed in
         /// different ways and so not be equal.
         /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the this range;
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to this range;
         /// otherwise <see langword="false"/>.</returns>
         public bool Equals(SemVersionRange? other)
         {
@@ -512,7 +512,7 @@ namespace Semver
         /// ranges, it may be possible for two ranges to match the same set of versions but be
         /// expressed in different ways and so not be equal.
         /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this range;
+        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to this range;
         /// otherwise <see langword="false"/>.</returns>
         public override bool Equals(object? obj)
             => obj is SemVersionRange other && Equals(other);

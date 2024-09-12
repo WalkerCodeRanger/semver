@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
-using Xunit.Sdk;
 
 namespace Semver.Test.TestCases
 {

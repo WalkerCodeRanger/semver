@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
@@ -174,7 +174,7 @@ namespace Semver
 
             var allPrereleaseCoveredByEnds = false;
 
-            if(start.Version is not null && end.Version is not null)
+            if (start.Version is not null && end.Version is not null)
             {
                 // Equals ranges include all prerelease if they are prerelease
                 if (start.Version == end.Version)
@@ -288,7 +288,7 @@ namespace Semver
         /// <summary>
         /// Determines whether two version ranges are equal.
         /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to the this range;
+        /// <returns><see langword="true"/> if <paramref name="other"/> is equal to this range;
         /// otherwise <see langword="false"/>.</returns>
         public bool Equals(UnbrokenSemVersionRange? other)
         {
@@ -302,7 +302,7 @@ namespace Semver
         /// <summary>
         /// Determines whether the given object is equal to this range.
         /// </summary>
-        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to the this range;
+        /// <returns><see langword="true"/> if <paramref name="obj"/> is equal to this range;
         /// otherwise <see langword="false"/>.</returns>
         public override bool Equals(object? obj)
             => obj is UnbrokenSemVersionRange other && Equals(other);
@@ -459,7 +459,7 @@ namespace Semver
                     return false;
 
                 // But they must be equal in prerelease up to the correct point
-                for (int i = 0; i < leftPrerelease.Count-2; i++)
+                for (int i = 0; i < leftPrerelease.Count - 2; i++)
                     if (leftPrerelease[i] != rightPrerelease[i])
                         return false;
 
@@ -468,7 +468,7 @@ namespace Semver
                     != rightPrerelease[^1])
                     return false;
 
-                var originalPrerelease = string.Join(".", leftPrerelease.Take(leftPrerelease.Count-1));
+                var originalPrerelease = string.Join(".", leftPrerelease.Take(leftPrerelease.Count - 1));
                 result = $"{Start.Major}.{Start.Minor}.{Start.Patch}-{originalPrerelease}.*";
                 return true;
             }
@@ -571,7 +571,7 @@ namespace Semver
                 return true;
             }
 
-            // Assign null once so it doesn't need to be assigned in every return case
+            // Assign null once, so it doesn't need to be assigned in every return case
             union = null;
 
             // Can't union ranges with different prerelease coverage
