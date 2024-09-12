@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net471;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>net481;netcoreapp3.1;net5.0</TargetFrameworks>
     <StartupObject>Semver.Benchmarks.Program</StartupObject>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>9.0</LangVersion>
@@ -10,7 +10,8 @@
     <Authors>Jeff Walker</Authors>
     <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	<IsPackable>false</IsPackable>
+	  <IsPackable>false</IsPackable>
+	  <Copyright>Copyright © 2013-2024 Jeff Walker, Max Hauser</Copyright>
   </PropertyGroup>
 
     <ItemGroup>

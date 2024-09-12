@@ -31,3 +31,13 @@ provide better null handling for properties in the range types. To provide bette
 earlier .NET versions. However, this adds types to the package that aren't needed in .NET 5. Thus
 publishing a .NET 5 version of the package allows for a smaller assembly and one that uses the type
 built into the framework when using .NET 5+.
+
+## Unit Test Frameworks
+
+In order to unit test each of the three published versions, the tests are run under the following
+framework versions below. For .NET Standard versions, the newest framework that tests the library is
+used. For .NET versions, the same framework version is used.
+
+* .NET Framework 4.8.1 (tests .NET Standard 2.0)
+* .NET Core 3.1 (tests .NET Standard 2.1)
+* .NET 5 (tests .NET 5)
