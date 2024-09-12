@@ -1,9 +1,8 @@
-﻿namespace Semver.Test.Helpers
+﻿namespace Semver.Test.Helpers;
+
+public enum Ordering
 {
-    public enum Ordering
-    {
-        Less = -1,
-        Equal = 0,
-        Greater = 1,
-    }
+    Less = -1,
+    Equal = 0,
+    Greater = 1,
 }

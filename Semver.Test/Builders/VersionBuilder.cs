@@ -1,7 +1,6 @@
-﻿namespace Semver.Test.Builders
+﻿namespace Semver.Test.Builders;
+
+public static class VersionBuilder
 {
-    public static class VersionBuilder
-    {
-        public static SemVersion Version(string version) => SemVersion.Parse(version);
-    }
+    public static SemVersion Version(string version) => SemVersion.Parse(version);
 }

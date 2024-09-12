@@ -2,12 +2,11 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace Semver.Utility
+namespace Semver.Utility;
+
+internal static class EnumerableExtensions
 {
-    internal static class EnumerableExtensions
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IReadOnlyList<T> ToReadOnlyList<T>(this IEnumerable<T> values)
-            => values.ToList().AsReadOnly();
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IReadOnlyList<T> ToReadOnlyList<T>(this IEnumerable<T> values)
+        => values.ToList().AsReadOnly();
 }

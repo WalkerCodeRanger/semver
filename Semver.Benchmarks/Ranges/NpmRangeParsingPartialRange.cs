@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using Semver.Benchmarks.Builders;
 using Semver.Utility;
 
-namespace Semver.Benchmarks.Ranges
+namespace Semver.Benchmarks.Ranges;
+
+public class NpmRangeParsingPartialRange : NpmRangeParsing
 {
-    public class NpmRangeParsingPartialRange : NpmRangeParsing
+    private const int Seed = 1450160939;
+
+    protected override IReadOnlyList<string> GetRanges()
     {
-        private const int Seed = 1450160939;
+        var random = new Random(Seed);
 
-        protected override IReadOnlyList<string> GetRanges()
-        {
-            var random = new Random(Seed);
-
-            return Enumerables.Generate(RangeCount, () => random.RandomPartialVersion(prependOperator: true)).ToReadOnlyList();
-        }
+        return Enumerables.Generate(RangeCount, () => random.RandomPartialVersion(prependOperator: true)).ToReadOnlyList();
     }
 }

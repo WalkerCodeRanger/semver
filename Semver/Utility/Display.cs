@@ -1,7 +1,6 @@
-﻿namespace Semver.Utility
+﻿namespace Semver.Utility;
+
+internal static class Display
 {
-    internal static class Display
-    {
-        public const int Limit = 100;
-    }
+    public const int Limit = 100;
 }
