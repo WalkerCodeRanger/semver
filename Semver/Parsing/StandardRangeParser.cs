@@ -280,5 +280,5 @@ internal static class StandardRangeParser
     }
 
     private static readonly SemVersionParsingOptions ParsingOptions
-        = new SemVersionParsingOptions(true, true, false, c => c == '*');
+        = new(true, true, false, c => c == '*');
 }

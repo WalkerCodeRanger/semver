@@ -498,5 +498,5 @@ internal static class NpmRangeParser
     }
 
     private static readonly SemVersionParsingOptions ParsingOptions
-        = new SemVersionParsingOptions(true, false, true, c => c is 'x' or 'X' or '*');
+        = new(true, false, true, c => c is 'x' or 'X' or '*');
 }

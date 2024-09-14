@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Primitives;
@@ -56,5 +56,5 @@ internal static class RangeError
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static FormatException NewFormatException(string messageTemplate, params object[] args)
-        => new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, args));
+        => new(string.Format(CultureInfo.InvariantCulture, messageTemplate, args));
 }

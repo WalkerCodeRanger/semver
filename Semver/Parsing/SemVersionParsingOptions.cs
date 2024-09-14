@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Semver.Parsing;
 
@@ -10,8 +10,7 @@ internal class SemVersionParsingOptions
     /// <summary>
     /// No special parsing options. Used when parsing versions outside of ranges.
     /// </summary>
-    public static SemVersionParsingOptions None
-        = new SemVersionParsingOptions(false, false, false, _ => false);
+    public static SemVersionParsingOptions None = new(false, false, false, _ => false);
 
     public SemVersionParsingOptions(
         bool allowWildcardMajorMinorPatch,

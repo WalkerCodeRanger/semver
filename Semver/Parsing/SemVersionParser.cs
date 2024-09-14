@@ -454,5 +454,5 @@ internal static class SemVersionParser
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static FormatException NewFormatException(string messageTemplate, params object[] args)
-        => new FormatException(string.Format(CultureInfo.InvariantCulture, messageTemplate, args));
+        => new(string.Format(CultureInfo.InvariantCulture, messageTemplate, args));
 }

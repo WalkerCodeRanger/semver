@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Primitives;
@@ -55,6 +55,7 @@ internal static class StringExtensions
 
         // Figure out how many items the resulting list will have
         int count = 1; // Always one more item than there are separators
+        // Use `for` instead of `foreach` to ensure performance
         for (int i = 0; i < value.Length; i++)
             if (value[i] == splitOn)
                 count++;
@@ -65,7 +66,7 @@ internal static class StringExtensions
         for (int i = 0; i < value.Length; i++)
             if (value[i] == splitOn)
             {
-                items.Add(func(value.Substring(start, i-start)));
+                items.Add(func(value.Substring(start, i - start)));
                 start = i + 1;
             }
         // Add the final items from the last separator to the end of the string
@@ -93,7 +94,7 @@ internal static class StringExtensions
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static StringSegment Slice(this string value, int offset, int length)
-        => new StringSegment(value, offset, length);
+        => new(value, offset, length);
 
     public static string LimitLength(this string value)
     {
