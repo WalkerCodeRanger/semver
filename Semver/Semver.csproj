@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>A SemVer implementation in .Net based on v2.0.0 of the spec found at http://semver.org</Description>
+    <Description>A semantic version library fully compliant with v2.0.0 of the spec found at http://semver.org.</Description>
     <Copyright>Copyright © 2013-2024 Jeff Walker, Max Hauser</Copyright>
     <AssemblyTitle>Semantic versioning</AssemblyTitle>
     <Authors>Jeff Walker, Max Hauser</Authors>
@@ -16,10 +16,10 @@
     <PackageId>Semver</PackageId>
     <Title>Semantic versioning</Title>
     <PackageTags>semver,semantic,version,versioning</PackageTags>
-    <PackageReleaseNotes>https://github.com/maxhauser/semver/releases</PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/maxhauser/semver</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/WalkerCodeRanger/semver/releases</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/WalkerCodeRanger/semver</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/maxhauser/semver.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/WalkerCodeRanger/semver</RepositoryUrl>
     <Company></Company>
     <Version>0.0.0-dev</Version>
     <InformationalVersion>0.0.0-dev+0000000000</InformationalVersion>
@@ -36,6 +36,7 @@
     <CompatibilitySuppressionFilePath>ApiCompatSuppressions.xml</CompatibilitySuppressionFilePath>
     <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
     <ApiCompatSuppressionOutputFile>ApiCompatSuppressions.xml</ApiCompatSuppressionOutputFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(CI)' == 'True'">
@@ -57,12 +58,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="2.0.0"
-                      Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="3.0.3"
-                      Condition="'$(TargetFramework)' == 'netstandard2.1'" />
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="5.0.1"
-                      Condition="'$(TargetFramework)' == 'net5.0'" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="2.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="3.0.3" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="5.0.1" Condition="'$(TargetFramework)' == 'net5.0'" />
 
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -76,5 +74,11 @@
   <ItemGroup>
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 </Project>
