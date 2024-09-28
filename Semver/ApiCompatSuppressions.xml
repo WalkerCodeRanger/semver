@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- https://learn.microsoft.com/en-us/dotnet/fundamentals/package-validation/diagnostic-ids -->
 <Suppressions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Suppression>
@@ -221,13 +221,6 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Semver.SemVersion.WithPatch(System.Int32)</Target>
-    <Left>lib/netstandard2.0/Semver.dll</Left>
-    <Right>lib/netstandard2.0/Semver.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0003</DiagnosticId>
-    <Target>Semver, Version=0.0.0.0, Culture=neutral, PublicKeyToken=ceed5a2e2c4df84d</Target>
     <Left>lib/netstandard2.0/Semver.dll</Left>
     <Right>lib/netstandard2.0/Semver.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>

@@ -30,7 +30,8 @@ These steps only need to be done for a non-prerelease version.
    package version to the newly released version. It may be necessary to update the
    `CompatibilitySuppressions.xml` file after that. (see [Detecting breaking changes between two
    versions of a NuGet package at packaging time](https://www.meziantou.net/detecting-breaking-changes-between-two-versions-of-a-nuget-package-at-packaging.htm)
-   for more info).
+   for more info). Note that the `CP0003` error about the version number should be higher occurs
+   locally, but on the build server suppressing it causes the build to fail.
 5. Update the `PublicAPI` files to reflect the newly published APIs.
 6. Update the benchmark to reference the new version as the previous version.
 7. Create a new `vX.Y.Z-readme` branch for the next version.
