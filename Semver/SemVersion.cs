@@ -916,7 +916,8 @@ public sealed class SemVersion : IEquatable<SemVersion>, ISerializable
     /// The prerelease identifiers for this version or empty string if this is a release version.
     /// </value>
     /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="PrereleaseIdentifiers"]/*'/>
-    // TODO v3.0.0 this should be null when there is no prerelease identifiers
+    // Design Note: `null` is not used to represent a release version because it is not possible to
+    // express a non-empty string type, but it is possible to express a non-null string type.
     public string Prerelease { get; }
 
     /// <summary>
@@ -959,7 +960,9 @@ public sealed class SemVersion : IEquatable<SemVersion>, ISerializable
     /// <value>The build metadata for this version or empty string if there
     /// is no metadata.</value>
     /// <include file='SemVersionDocParts.xml' path='docParts/part[@id="MetadataIdentifiers"]/*'/>
-    // TODO v3.0.0 this should be null when there is no metadata
+    // Design Note: `null` is not used to represent a version without metadata because it is not
+    // possible to express a non-empty string type, but it is possible to express a non-null string
+    // type.
     public string Metadata { get; }
 
     /// <summary>The build metadata identifiers for this version.</summary>
