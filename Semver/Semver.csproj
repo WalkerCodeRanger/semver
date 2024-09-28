@@ -31,6 +31,10 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Semver.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>2.3.0</PackageValidationBaselineVersion>
+    <GenerateCompatibilitySuppressionFile>false</GenerateCompatibilitySuppressionFile>
+    <CompatibilitySuppressionFilePath>ApiCompatSuppressions.xml</CompatibilitySuppressionFilePath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(CI)' == 'True'">
