@@ -1,4 +1,3 @@
-﻿using System.Linq;
 using Semver.Utility;
 using Xunit;
 
@@ -8,7 +7,7 @@ public static class TheoryDataExtensions
 {
     public static TheoryData<T, T> AllPairs<T>(this TheoryData<T> values)
     {
-        var pairs = values.Select(v => (T)v[0]).ToReadOnlyList().AllPairs();
+        var pairs = values.ToReadOnlyList<T>().AllPairs();
         var theoryData = new TheoryData<T, T>();
         foreach (var (left, right) in pairs)
             theoryData.Add(left, right);

@@ -355,14 +355,14 @@ public class SemVersionParsingTests
     public void CanConstructParsingTestCases()
     {
         // Also checks that ToString() doesn't throw an exception
-        _ = ParsingTestCases.Select(t => t[0].ToString()).ToList();
+        _ = ParsingTestCases.Select<ParsingTestCase, string>(t => t.ToString()).ToList();
     }
 
     [Fact]
     public void NoDuplicateParsingTestCases()
     {
         var duplicates = ParsingTestCases
-                         .Select(data => data[0]).Cast<ParsingTestCase>()
+                         .AsEnumerable<ParsingTestCase>()
                          .GroupBy(c => (c.Version, c.Styles), (k, g) => g.ToList())
                          .Where(g => g.Count > 1)
                          .Select(g => g.First()).ToList();
