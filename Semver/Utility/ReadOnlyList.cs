@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace Semver.Utility
+namespace Semver.Utility;
+
+/// <summary>
+/// Internal helper for efficiently creating empty read only lists
+/// </summary>
+internal static class ReadOnlyList<T>
 {
-    /// <summary>
-    /// Internal helper for efficiently creating empty read only lists
-    /// </summary>
-    internal static class ReadOnlyList<T>
-    {
-        public static readonly IReadOnlyList<T> Empty = new List<T>().AsReadOnly();
-    }
+    public static readonly IReadOnlyList<T> Empty = new List<T>().AsReadOnly();
 }

@@ -2,11 +2,16 @@ version: 3.0.0-dev.{build}
 pull_requests:
   do_not_increment_build_number: true
 skip_branch_with_pr: true
-image: Visual Studio 2019
+image: Visual Studio 2022
 
 configuration: Release
 
 init:
+- dotnet --list-sdks
+- ps: |
+    $VerbosePreference = "continue"
+    Invoke-WebRequest -Uri 'https://dot.net/v1/dotnet-install.ps1' -UseBasicParsing -OutFile "$env:temp\dotnet-install.ps1"
+    & $env:temp\dotnet-install.ps1 -Architecture x64 -Channel 5.0 -InstallDir "$env:ProgramFiles\dotnet"
 - ps: |
     git config --global core.autocrlf true
     Write-Host "Original Appveyor build version: $env:APPVEYOR_BUILD_VERSION"
@@ -45,7 +50,7 @@ dotnet_csproj:
 
 before_build:
   - dotnet restore
-  
+
 build:
   verbosity: minimal
   publish_nuget: true

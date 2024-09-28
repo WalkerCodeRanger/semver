@@ -1,17 +1,26 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net462;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>net481;netcoreapp3.1;net5.0</TargetFrameworks>
     <StartupObject>Semver.Benchmarks.Program</StartupObject>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <Authors>Jeff Walker</Authors>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	  <IsPackable>false</IsPackable>
+	  <Copyright>Copyright © 2013-2024 Jeff Walker, Max Hauser</Copyright>
   </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="BenchmarkDotNet">
-        <Version>0.13.1</Version>
+        <Version>0.14.0</Version>
       </PackageReference>
+      <PackageReference Include="IndexRange" Version="1.0.3" />
+      <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
+      <PackageReference Include="Microsoft.Extensions.Primitives" Version="5.0.1" />
       <PackageReference Include="Nullable" Version="1.3.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

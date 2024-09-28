@@ -3,23 +3,22 @@ using System.Collections.Generic;
 using Semver.Benchmarks.Builders;
 using Semver.Utility;
 
-namespace Semver.Benchmarks.Ranges
+namespace Semver.Benchmarks.Ranges;
+
+public class NpmRangeParsingHyphenRange : NpmRangeParsing
 {
-    public class NpmRangeParsingHyphenRange : NpmRangeParsing
+    private const int Seed = 1450160939;
+
+    protected override IReadOnlyList<string> GetRanges()
     {
-        private const int Seed = 1450160939;
+        var random = new Random(Seed);
 
-        protected override IReadOnlyList<string> GetRanges()
+        return Enumerables.Generate(RangeCount, () =>
         {
-            var random = new Random(Seed);
+            string a = random.VersionString();
+            string b = random.VersionString();
 
-            return Enumerables.Generate(RangeCount, () =>
-            {
-                string a = random.VersionString();
-                string b = random.VersionString();
-
-                return $"{a} - {b}";
-            }).ToReadOnlyList();
-        }
+            return $"{a} - {b}";
+        }).ToReadOnlyList();
     }
 }
