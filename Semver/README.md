@@ -1,4 +1,4 @@
-A Semantic Version Library for .Net
+A Semantic Version Library for .NET
 ===================================
 
 Create, parse, and manipulate semantic version numbers with the `SemVersion` class and semantic
@@ -51,7 +51,7 @@ if (version.IsPrerelease)
 Outputs:
 
 ```text
-Current: 1.1.0-rc.1+nightly.2345
+Current: 1.1.0-rc.1+e471d15
 Prerelease: rc.1
 Next release version is: 1.1.0
 ```
