@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 override Semver.MetadataIdentifier.Equals(object? value) -> bool
 override Semver.MetadataIdentifier.GetHashCode() -> int
 override Semver.MetadataIdentifier.ToString() -> string!
@@ -26,10 +26,10 @@ Semver.PrereleaseIdentifier
 Semver.PrereleaseIdentifier.CompareTo(object? value) -> int
 Semver.PrereleaseIdentifier.CompareTo(Semver.PrereleaseIdentifier value) -> int
 Semver.PrereleaseIdentifier.Equals(Semver.PrereleaseIdentifier value) -> bool
-Semver.PrereleaseIdentifier.NumericValue.get -> int?
+Semver.PrereleaseIdentifier.NumericValue.get -> System.Numerics.BigInteger?
 Semver.PrereleaseIdentifier.PrereleaseIdentifier() -> void
-Semver.PrereleaseIdentifier.PrereleaseIdentifier(int value) -> void
 Semver.PrereleaseIdentifier.PrereleaseIdentifier(string! value, bool allowLeadingZeros = false) -> void
+Semver.PrereleaseIdentifier.PrereleaseIdentifier(System.Numerics.BigInteger value) -> void
 Semver.PrereleaseIdentifier.Value.get -> string!
 Semver.SemVersion
 Semver.SemVersion.ComparePrecedenceTo(Semver.SemVersion? other) -> int
@@ -38,11 +38,11 @@ Semver.SemVersion.Equals(Semver.SemVersion? other) -> bool
 Semver.SemVersion.GetObjectData(System.Runtime.Serialization.SerializationInfo! info, System.Runtime.Serialization.StreamingContext context) -> void
 Semver.SemVersion.IsPrerelease.get -> bool
 Semver.SemVersion.IsRelease.get -> bool
-Semver.SemVersion.Major.get -> int
+Semver.SemVersion.Major.get -> System.Numerics.BigInteger
 Semver.SemVersion.Metadata.get -> string!
 Semver.SemVersion.MetadataIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.MetadataIdentifier>!
-Semver.SemVersion.Minor.get -> int
-Semver.SemVersion.Patch.get -> int
+Semver.SemVersion.Minor.get -> System.Numerics.BigInteger
+Semver.SemVersion.Patch.get -> System.Numerics.BigInteger
 Semver.SemVersion.PrecedenceEquals(Semver.SemVersion? other) -> bool
 Semver.SemVersion.Prerelease.get -> string!
 Semver.SemVersion.PrereleaseIdentifiers.get -> System.Collections.Generic.IReadOnlyList<Semver.PrereleaseIdentifier>!
@@ -53,25 +53,25 @@ Semver.SemVersion.Satisfies(string! range, Semver.SemVersionRangeOptions options
 Semver.SemVersion.Satisfies(System.Predicate<Semver.SemVersion!>! predicate) -> bool
 Semver.SemVersion.SatisfiesNpm(string! range, bool includeAllPrerelease, int maxLength = 2048) -> bool
 Semver.SemVersion.SatisfiesNpm(string! range, int maxLength = 2048) -> bool
-Semver.SemVersion.SemVersion(int major) -> void
-Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier>? prerelease = null, System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier>? metadata = null) -> void
-Semver.SemVersion.SemVersion(int major, int minor = 0, int patch = 0, System.Collections.Generic.IEnumerable<string!>? prerelease = null, System.Collections.Generic.IEnumerable<string!>? metadata = null) -> void
-Semver.SemVersion.SemVersion(int major, int minor) -> void
-Semver.SemVersion.SemVersion(int major, int minor, int patch) -> void
+Semver.SemVersion.SemVersion(System.Numerics.BigInteger major) -> void
+Semver.SemVersion.SemVersion(System.Numerics.BigInteger major, System.Numerics.BigInteger minor = default(System.Numerics.BigInteger), System.Numerics.BigInteger patch = default(System.Numerics.BigInteger), System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier>? prerelease = null, System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier>? metadata = null) -> void
+Semver.SemVersion.SemVersion(System.Numerics.BigInteger major, System.Numerics.BigInteger minor = default(System.Numerics.BigInteger), System.Numerics.BigInteger patch = default(System.Numerics.BigInteger), System.Collections.Generic.IEnumerable<string!>? prerelease = null, System.Collections.Generic.IEnumerable<string!>? metadata = null) -> void
+Semver.SemVersion.SemVersion(System.Numerics.BigInteger major, System.Numerics.BigInteger minor) -> void
+Semver.SemVersion.SemVersion(System.Numerics.BigInteger major, System.Numerics.BigInteger minor, System.Numerics.BigInteger patch) -> void
 Semver.SemVersion.ToVersion() -> System.Version!
-Semver.SemVersion.With(int? major = null, int? minor = null, int? patch = null, System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier>? prerelease = null, System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier>? metadata = null) -> Semver.SemVersion!
-Semver.SemVersion.WithMajor(int major) -> Semver.SemVersion!
+Semver.SemVersion.With(System.Numerics.BigInteger? major = null, System.Numerics.BigInteger? minor = null, System.Numerics.BigInteger? patch = null, System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier>? prerelease = null, System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier>? metadata = null) -> Semver.SemVersion!
+Semver.SemVersion.WithMajor(System.Numerics.BigInteger major) -> Semver.SemVersion!
 Semver.SemVersion.WithMetadata(Semver.MetadataIdentifier metadataIdentifier, params Semver.MetadataIdentifier[]! metadataIdentifiers) -> Semver.SemVersion!
 Semver.SemVersion.WithMetadata(string! metadataIdentifier, params string![]! metadataIdentifiers) -> Semver.SemVersion!
 Semver.SemVersion.WithMetadata(System.Collections.Generic.IEnumerable<Semver.MetadataIdentifier>! metadataIdentifiers) -> Semver.SemVersion!
 Semver.SemVersion.WithMetadata(System.Collections.Generic.IEnumerable<string!>! metadataIdentifiers) -> Semver.SemVersion!
 Semver.SemVersion.WithMetadataParsedFrom(string! metadata) -> Semver.SemVersion!
-Semver.SemVersion.WithMinor(int minor) -> Semver.SemVersion!
+Semver.SemVersion.WithMinor(System.Numerics.BigInteger minor) -> Semver.SemVersion!
 Semver.SemVersion.WithoutMetadata() -> Semver.SemVersion!
 Semver.SemVersion.WithoutPrerelease() -> Semver.SemVersion!
 Semver.SemVersion.WithoutPrereleaseOrMetadata() -> Semver.SemVersion!
-Semver.SemVersion.WithParsedFrom(int? major = null, int? minor = null, int? patch = null, string? prerelease = null, string? metadata = null, bool allowLeadingZeros = false) -> Semver.SemVersion!
-Semver.SemVersion.WithPatch(int patch) -> Semver.SemVersion!
+Semver.SemVersion.WithParsedFrom(System.Numerics.BigInteger? major = null, System.Numerics.BigInteger? minor = null, System.Numerics.BigInteger? patch = null, string? prerelease = null, string? metadata = null, bool allowLeadingZeros = false) -> Semver.SemVersion!
+Semver.SemVersion.WithPatch(System.Numerics.BigInteger patch) -> Semver.SemVersion!
 Semver.SemVersion.WithPrerelease(Semver.PrereleaseIdentifier prereleaseIdentifier, params Semver.PrereleaseIdentifier[]! prereleaseIdentifiers) -> Semver.SemVersion!
 Semver.SemVersion.WithPrerelease(string! prereleaseIdentifier, params string![]! prereleaseIdentifiers) -> Semver.SemVersion!
 Semver.SemVersion.WithPrerelease(System.Collections.Generic.IEnumerable<Semver.PrereleaseIdentifier>! prereleaseIdentifiers) -> Semver.SemVersion!
@@ -108,7 +108,7 @@ Semver.SemVersionStyles.OptionalPatch = 32 -> Semver.SemVersionStyles
 Semver.SemVersionStyles.Strict = 0 -> Semver.SemVersionStyles
 Semver.UnbrokenSemVersionRange
 Semver.UnbrokenSemVersionRange.Contains(Semver.SemVersion? version) -> bool
-Semver.UnbrokenSemVersionRange.End.get -> Semver.SemVersion!
+Semver.UnbrokenSemVersionRange.End.get -> Semver.SemVersion?
 Semver.UnbrokenSemVersionRange.EndInclusive.get -> bool
 Semver.UnbrokenSemVersionRange.Equals(Semver.UnbrokenSemVersionRange? other) -> bool
 Semver.UnbrokenSemVersionRange.IncludeAllPrerelease.get -> bool
@@ -128,7 +128,7 @@ static Semver.SemVersion.operator !=(Semver.SemVersion? left, Semver.SemVersion?
 static Semver.SemVersion.operator ==(Semver.SemVersion? left, Semver.SemVersion? right) -> bool
 static Semver.SemVersion.Parse(string! version, int maxLength = 1024) -> Semver.SemVersion!
 static Semver.SemVersion.Parse(string! version, Semver.SemVersionStyles style, int maxLength = 1024) -> Semver.SemVersion!
-static Semver.SemVersion.ParsedFrom(int major, int minor = 0, int patch = 0, string! prerelease = "", string! metadata = "", bool allowLeadingZeros = false) -> Semver.SemVersion!
+static Semver.SemVersion.ParsedFrom(System.Numerics.BigInteger major, System.Numerics.BigInteger? minor = null, System.Numerics.BigInteger? patch = null, string! prerelease = "", string! metadata = "", bool allowLeadingZeros = false) -> Semver.SemVersion!
 static Semver.SemVersion.PrecedenceComparer.get -> Semver.Comparers.ISemVersionComparer!
 static Semver.SemVersion.PrecedenceEquals(Semver.SemVersion? left, Semver.SemVersion? right) -> bool
 static Semver.SemVersion.SortOrderComparer.get -> Semver.Comparers.ISemVersionComparer!

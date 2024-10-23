@@ -34,5 +34,7 @@ These steps only need to be done for a non-prerelease version.
    for more info). Note that the `CP0003` error about the version number should be higher occurs
    locally, but on the build server suppressing it causes the build to fail.
 5. Update the `PublicAPI` files to reflect the newly published APIs.
+   * The easy way to do this is clear out the shipped and unshipped API files except for the
+     `#nullable enable` line, then run `dotnet format analyzers --diagnostics=RS0016`
 6. Update the benchmark to reference the new version as the previous version.
 7. Create a new `vX.Y.Z-readme` branch for the next version.
