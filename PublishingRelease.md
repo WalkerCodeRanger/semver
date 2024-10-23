@@ -9,13 +9,14 @@
 
 ## Steps to Publish Release
 
-1. Merge the `vX.Y.Z-readme` branch into `master`.
-2. Create an *annotated* tag of the version number being published prefixed with "v". The tag
+1. Update the NuGet package release notes link to the URL where notes for this version will be. This
+   will be `https://github.com/WalkerCodeRanger/semver/releases/tag/vX.Y.Z`.
+2. Merge the `vX.Y.Z-readme` branch into `master`.
+3. Create an *annotated* tag of the version number being published prefixed with "v". The tag
    description should match the tag name.
-3. Wait for the build of that tag to complete in Appveyor.
-4. Download the nupkg and snupkg files from Appveyor's assets tab.
-5. Upload those to NuGet with the new readme.
-   * Remove the build and NuGet status from the top of the readme before putting it in NuGet.
+4. Wait for the build of that tag to complete in Appveyor.
+5. Download the nupkg and snupkg files from Appveyor's assets tab.
+6. Upload those to NuGet.org. The readme should be populated from the package.
 
 ## After Publishing a Release
 

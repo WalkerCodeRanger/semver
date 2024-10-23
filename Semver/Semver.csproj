@@ -16,7 +16,7 @@
     <PackageId>Semver</PackageId>
     <Title>Semantic versioning</Title>
     <PackageTags>semver,semantic,version,versioning</PackageTags>
-    <PackageReleaseNotes>https://github.com/WalkerCodeRanger/semver/releases</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/WalkerCodeRanger/semver/releases/tag/v3.0.0</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/WalkerCodeRanger/semver</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/WalkerCodeRanger/semver</RepositoryUrl>
