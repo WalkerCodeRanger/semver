@@ -40,6 +40,30 @@ Outputs:
 1.1.0-rc.1+e471d15 sorts after 1.1.0-rc.1
 ```
 
+## Sorting and Enumerable Max/Min
+
+Since there are two ways of comparing semantic versions, the desired comparison must be specified
+when sorting or comparing.
+
+```csharp
+var examples = new List<Example> { ... };
+// Put in sort order
+var sorted = examples.OrderBy(e => e.Version, SemVersion.SortOrderComparer);
+// Order by precedence, then by release date
+var ordered = examples.OrderBy(e => e.Version, SemVersion.PrecedenceComparer)
+                      .ThenBy(e => e.Released);
+
+var versions = new List<SemVersion> { vNextRc, v1 };
+var max = versions.Max(SemVersion.SortOrderComparer);
+console.WriteLine($"Max version is {max}");
+```
+
+Outputs:
+
+```text
+Max version is 1.1.0-rc.1
+```
+
 ## Manipulating
 
 ```csharp
