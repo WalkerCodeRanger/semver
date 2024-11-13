@@ -13,7 +13,7 @@ namespace Semver.Comparers;
 /// the ranges they contain will be removed. Note that the <see cref="SemVersionRange"/> API
 /// will never expose this order exactly because contained ranges will not be included in the
 /// final <see cref="SemVersionRange"/>.</remarks>
-internal sealed class UnbrokenSemVersionRangeComparer : Comparer<UnbrokenSemVersionRange>
+internal sealed class UnbrokenSemVersionRangeComparer : Comparer<UnbrokenSemVersionRange?>
 {
     #region Singleton
     public static readonly UnbrokenSemVersionRangeComparer Instance = new();
