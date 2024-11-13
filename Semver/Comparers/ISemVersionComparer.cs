@@ -12,6 +12,6 @@ namespace Semver.Comparers;
 /// <see cref="SemVersion.SortOrderComparer"/> so that separate properties aren't needed for the
 /// <see cref="IEqualityComparer{T}"/> and <see cref="IComparer{T}"/> of <see cref="SemVersion"/>.
 /// </remarks>
-public interface ISemVersionComparer : IEqualityComparer<SemVersion>, IComparer<SemVersion>, IComparer
+public interface ISemVersionComparer : IEqualityComparer<SemVersion>, IComparer<SemVersion?>, IComparer
 {
 }

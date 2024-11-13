@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Semver.Comparers;
 
-internal sealed class PrecedenceComparer : Comparer<SemVersion>, ISemVersionComparer
+internal sealed class PrecedenceComparer : Comparer<SemVersion?>, ISemVersionComparer
 {
     #region Singleton
     public static readonly ISemVersionComparer Instance = new PrecedenceComparer();
