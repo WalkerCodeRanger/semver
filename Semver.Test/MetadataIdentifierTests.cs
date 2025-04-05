@@ -75,13 +75,13 @@ public class MetadataIdentifierTests
     public static readonly TheoryData<MetadataIdentifier, MetadataIdentifier, bool> EqualityCases
         = new TheoryData<MetadataIdentifier, MetadataIdentifier, bool>()
         {
-            {new MetadataIdentifier("hello"), new MetadataIdentifier("hello"), true},
-            {new MetadataIdentifier("hello"), new MetadataIdentifier("nope"), false},
-            {new MetadataIdentifier("42"), new MetadataIdentifier("42"), true},
-            {new MetadataIdentifier("42"), new MetadataIdentifier("0"), false},
-            {new MetadataIdentifier("hello"), new MetadataIdentifier("42"), false},
-            {new MetadataIdentifier("045"), new MetadataIdentifier("45"), false},
-            {new MetadataIdentifier("2147483648"), new MetadataIdentifier("2147483648"), true}, // int.MaxValue + 1
+            {new("hello"), new("hello"), true},
+            {new("hello"), new("nope"), false},
+            {new("42"), new("42"), true},
+            {new("42"), new("0"), false},
+            {new("hello"), new("42"), false},
+            {new("045"), new("45"), false},
+            {new("2147483648"), new("2147483648"), true}, // int.MaxValue + 1
             {default, default, true},
         };
 
@@ -220,8 +220,5 @@ public class MetadataIdentifierTests
     }
 
     private static MetadataIdentifier CreateOrDefault(string? value)
-    {
-        if (value is null) return default;
-        return new MetadataIdentifier(value);
-    }
+        => value is null ? default : new(value);
 }

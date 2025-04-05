@@ -149,8 +149,9 @@ public class PrecedenceComparerTests
     [MemberData(nameof(ComparerTestData.VersionsInSortOrder), MemberType = typeof(ComparerTestData))]
     public void CompareNullTest(string version)
     {
-        Assert.True(Comparer.Compare(version, null) == 1, $"Compare({version}, null) == 1");
-        Assert.True(Comparer.Compare(null, version) == -1, $"Compare(null, {version}) == -1");
+        var v = SemVersion.Parse(version);
+        Assert.True(Comparer.Compare(v, null!) == 1, $"Compare({v}, null) == 1");
+        Assert.True(Comparer.Compare(null!, v) == -1, $"Compare(null, {v}) == -1");
     }
 
     [Fact]

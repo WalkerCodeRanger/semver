@@ -1,4 +1,4 @@
-﻿using Semver.Comparers;
+using Semver.Comparers;
 using Xunit;
 
 namespace Semver.Test.Comparers;

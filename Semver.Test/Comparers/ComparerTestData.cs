@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
 using Semver.Test.Helpers;
-using Semver.Utility;
 using Xunit;
 
 namespace Semver.Test.Comparers;
@@ -82,6 +79,6 @@ public static class ComparerTestData
         "2.1.0",
         "2.1.1",
     };
-    
-    public static readonly TheoryData<string,string> VersionPairs = VersionsInSortOrder.AllPairs();
+
+    public static readonly TheoryData<string, string> VersionPairs = VersionsInSortOrder.AllPairs();
 }

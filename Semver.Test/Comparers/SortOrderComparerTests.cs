@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Semver.Comparers;
 using Xunit;
 
@@ -130,13 +132,49 @@ public class SortOrderComparerTests
     [Fact]
     public void CompareNullTest()
     {
-        foreach (var v in ComparerTestData.VersionsInSortOrder)
+        foreach (var version in ComparerTestData.VersionsInSortOrder)
         {
-            Assert.True(Comparer.Compare(v, null) == 1, $"Compare({v}, null) == 1");
-            Assert.True(Comparer.Compare(null, v) == -1, $"Compare(null, {v}) == -1");
+            var v = SemVersion.Parse(version);
+            Assert.True(Comparer.Compare(v, null!) == 1, $"Compare({v}, null) == 1");
+            Assert.True(Comparer.Compare(null!, v) == -1, $"Compare(null, {v}) == -1");
         }
 
         Assert.True(Comparer.Compare(null!, null!) == 0, "Compare(null, null) == 0");
+    }
+    #endregion
+
+    #region Passing to Operations
+    [Fact]
+    public void SortList()
+    {
+        var versions = new List<SemVersion?>() { null, new SemVersion(2, 0), null, new SemVersion(1, 0) };
+
+        // TODO remove ! with fix to comparer nullability
+        versions.Sort(SemVersion.SortOrderComparer!);
+
+        Assert.Equal([null, null, new SemVersion(1, 0), new SemVersion(2, 0)], versions);
+    }
+
+    [Fact]
+    public void OrderBy()
+    {
+        SemVersion?[] versions = [null, new SemVersion(2, 0), null, new SemVersion(1, 0)];
+
+        // TODO remove ! with fix to comparer nullability
+        var ordered = versions.OrderBy(x => x, SemVersion.SortOrderComparer!);
+
+        Assert.Equal([null, null, new SemVersion(1, 0), new SemVersion(2, 0)], ordered.ToArray());
+    }
+
+    [Fact]
+    public void Contains()
+    {
+        SemVersion?[] versions = [null, new SemVersion(2, 0), null, new SemVersion(1, 0)];
+
+        // TODO remove ! with fix to comparer nullability
+        var result = versions.Contains(new SemVersion(2, 0), SemVersion.SortOrderComparer!);
+
+        Assert.True(result);
     }
     #endregion
 }
