@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 
 namespace Semver.Comparers;
 
-internal sealed class PrecedenceComparer : Comparer<SemVersion?>, ISemVersionComparer
+internal sealed class PrecedenceComparer : SemVersionComparer
 {
     #region Singleton
     public static readonly ISemVersionComparer Instance = new PrecedenceComparer();
@@ -11,7 +10,7 @@ internal sealed class PrecedenceComparer : Comparer<SemVersion?>, ISemVersionCom
     private PrecedenceComparer() { }
     #endregion
 
-    public bool Equals(SemVersion? x, SemVersion? y)
+    public override bool Equals(SemVersion? x, SemVersion? y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (x is null || y is null) return false;
@@ -20,8 +19,8 @@ internal sealed class PrecedenceComparer : Comparer<SemVersion?>, ISemVersionCom
                && x.Prerelease == y.Prerelease;
     }
 
-    public int GetHashCode(SemVersion v)
-        => HashCode.Combine(v.Major, v.Minor, v.Patch, v.Prerelease);
+    public override int GetHashCode(SemVersion? v)
+        => v is null ? 0 : HashCode.Combine(v.Major, v.Minor, v.Patch, v.Prerelease);
 
     public override int Compare(SemVersion? x, SemVersion? y)
     {

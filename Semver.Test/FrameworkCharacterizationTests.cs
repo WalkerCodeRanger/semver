@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -81,7 +83,18 @@ public class FrameworkCharacterizationTests
         Assert.InRange(bigIntSize, 0, 16);
     }
 
+    [Fact]
+    public void EqualityOfWrongType()
+    {
+        var defaultComparer = (IEqualityComparer)EqualityComparer<SemVersion>.Default;
+
+        var ex = Assert.Throws<ArgumentException>(() => defaultComparer.Equals("not version1", "not version2"));
+
+        Assert.Equal(InvalidComparisonMessage, ex.Message);
+    }
+
     private const string InvalidNumberStyleMessageStart = "An undefined NumberStyles value is being used.";
     private const string InvalidFormatMessage = "Input string was not in a correct format.";
     private const NumberStyles InvalidNumberStyle = (NumberStyles)int.MaxValue;
+    private const string InvalidComparisonMessage = "Type of argument is not compatible with the generic comparer.";
 }

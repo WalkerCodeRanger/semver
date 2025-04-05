@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using Semver.Utility;
 
 namespace Semver.Comparers;
 
-internal sealed class SortOrderComparer : Comparer<SemVersion?>, ISemVersionComparer
+internal sealed class SortOrderComparer : SemVersionComparer
 {
     #region Singleton
     public static readonly ISemVersionComparer Instance = new SortOrderComparer();
@@ -12,7 +11,7 @@ internal sealed class SortOrderComparer : Comparer<SemVersion?>, ISemVersionComp
     private SortOrderComparer() { }
     #endregion
 
-    public bool Equals(SemVersion? x, SemVersion? y)
+    public override bool Equals(SemVersion? x, SemVersion? y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (x is null || y is null) return false;
@@ -22,8 +21,8 @@ internal sealed class SortOrderComparer : Comparer<SemVersion?>, ISemVersionComp
                && x.Metadata == y.Metadata;
     }
 
-    public int GetHashCode(SemVersion v)
-        => HashCode.Combine(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
+    public override int GetHashCode(SemVersion? v)
+        => v is null ? 0 : HashCode.Combine(v.Major, v.Minor, v.Patch, v.Prerelease, v.Metadata);
 
     public override int Compare(SemVersion? x, SemVersion? y)
     {

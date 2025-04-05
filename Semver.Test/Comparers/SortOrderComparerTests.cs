@@ -43,7 +43,7 @@ public class SortOrderComparerTests
     [Fact]
     public void EqualsNullNullTest()
     {
-        Assert.True(Comparer.Equals(null!, null!));
+        Assert.True(Comparer.Equals(null, null));
     }
 
     [Theory]
@@ -51,8 +51,16 @@ public class SortOrderComparerTests
     public void EqualsNullTest(string version)
     {
         var v = SemVersion.Parse(version);
-        Assert.False(Comparer.Equals(v, null!), $"Equals({v}, null)");
-        Assert.False(Comparer.Equals(null!, v), $"Equals(null, {v})");
+        Assert.False(Comparer.Equals(v, null), $"Equals({v}, null)");
+        Assert.False(Comparer.Equals(null, v), $"Equals(null, {v})");
+    }
+
+    [Fact]
+    public void EqualsObjectsTest()
+    {
+        var ex = Assert.Throws<ArgumentException>(() => Comparer.Equals(new object(), new object()));
+
+        Assert.Equal("Type of argument is not SemVersion.", ex.Message);
     }
     #endregion
 
@@ -77,6 +85,15 @@ public class SortOrderComparerTests
 
         Assert.False(Comparer.GetHashCode(v1) == Comparer.GetHashCode(v2),
             $"GetHashCode({v1}) == GetHashCode({v2})");
+    }
+
+    [Fact]
+    public void GetHashCodeNullTest()
+    {
+        // In .NET 4.8.1, `null` is an allowed value. In later frameworks it is disallowed.
+        var actual = Comparer.GetHashCode(null!);
+
+        Assert.Equal(0, actual);
     }
     #endregion
 
@@ -126,7 +143,7 @@ public class SortOrderComparerTests
         var ex = Assert.Throws<ArgumentException>(()
             => Comparer.Compare(new object(), new object()));
 
-        Assert.Equal("Type of argument is not compatible with the generic comparer.", ex.Message);
+        Assert.Equal("Type of argument is not SemVersion.", ex.Message);
     }
 
     [Fact]
@@ -135,11 +152,11 @@ public class SortOrderComparerTests
         foreach (var version in ComparerTestData.VersionsInSortOrder)
         {
             var v = SemVersion.Parse(version);
-            Assert.True(Comparer.Compare(v, null!) == 1, $"Compare({v}, null) == 1");
-            Assert.True(Comparer.Compare(null!, v) == -1, $"Compare(null, {v}) == -1");
+            Assert.True(Comparer.Compare(v, null) == 1, $"Compare({v}, null) == 1");
+            Assert.True(Comparer.Compare(null, v) == -1, $"Compare(null, {v}) == -1");
         }
 
-        Assert.True(Comparer.Compare(null!, null!) == 0, "Compare(null, null) == 0");
+        Assert.True(Comparer.Compare(null, null) == 0, "Compare(null, null) == 0");
     }
     #endregion
 
@@ -149,8 +166,8 @@ public class SortOrderComparerTests
     {
         var versions = new List<SemVersion?>() { null, new SemVersion(2, 0), null, new SemVersion(1, 0) };
 
-        // TODO remove ! with fix to comparer nullability
-        versions.Sort(SemVersion.SortOrderComparer!);
+        // Shows that it can be used on nullable elements
+        versions.Sort(SemVersion.SortOrderComparer);
 
         Assert.Equal([null, null, new SemVersion(1, 0), new SemVersion(2, 0)], versions);
     }
@@ -160,8 +177,8 @@ public class SortOrderComparerTests
     {
         SemVersion?[] versions = [null, new SemVersion(2, 0), null, new SemVersion(1, 0)];
 
-        // TODO remove ! with fix to comparer nullability
-        var ordered = versions.OrderBy(x => x, SemVersion.SortOrderComparer!);
+        // Shows that it can be used on nullable elements
+        var ordered = versions.OrderBy(x => x, SemVersion.SortOrderComparer);
 
         Assert.Equal([null, null, new SemVersion(1, 0), new SemVersion(2, 0)], ordered.ToArray());
     }
@@ -171,10 +188,23 @@ public class SortOrderComparerTests
     {
         SemVersion?[] versions = [null, new SemVersion(2, 0), null, new SemVersion(1, 0)];
 
-        // TODO remove ! with fix to comparer nullability
-        var result = versions.Contains(new SemVersion(2, 0), SemVersion.SortOrderComparer!);
+        // Shows that it can be used on nullable elements
+        var result = versions.Contains(new SemVersion(2, 0), SemVersion.SortOrderComparer);
 
         Assert.True(result);
+    }
+
+    /// <summary>
+    /// This test demonstrates that an <see cref="ISemVersionComparer"/> can be passed where a
+    /// <see cref="IComparer{T}"/> of <see cref="SemVersion"/> is expected. This is important for
+    /// v3.0.1 to not be a breaking change.
+    /// </summary>
+    [Fact]
+    public void StoringInNonNullableComparer()
+    {
+        IComparer<SemVersion> comparer = Comparer;
+
+        Assert.Same(Comparer, comparer);
     }
     #endregion
 }

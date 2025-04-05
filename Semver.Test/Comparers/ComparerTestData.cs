@@ -14,8 +14,8 @@ namespace Semver.Test.Comparers;
 /// </summary>
 public static class ComparerTestData
 {
-    public static readonly TheoryData<string> VersionsInSortOrder = new TheoryData<string>()
-    {
+    public static readonly TheoryData<string> VersionsInSortOrder =
+    [
         "0.0.0",
         "0.0.1-13",
         "0.0.1-b",
@@ -77,8 +77,8 @@ public static class ComparerTestData
         "1.4.0",
         "2.0.0",
         "2.1.0",
-        "2.1.1",
-    };
+        "2.1.1"
+    ];
 
     public static readonly TheoryData<string, string> VersionPairs = VersionsInSortOrder.AllPairs();
 }
