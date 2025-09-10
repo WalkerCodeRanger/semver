@@ -8,10 +8,12 @@ namespace Semver.Comparers;
 /// class.
 /// </summary>
 /// <remarks>
-/// This interface provides a type for the <see cref="SemVersion.PrecedenceComparer"/> and
+/// <para>This interface provides a type for the <see cref="SemVersion.PrecedenceComparer"/> and
 /// <see cref="SemVersion.SortOrderComparer"/> so that separate properties aren't needed for the
 /// <see cref="IEqualityComparer{T}"/> and <see cref="IComparer{T}"/> of <see cref="SemVersion"/>.
-/// Consumers of this library should not implement this interface.
+/// </para>
+/// <para>Consumers of this library should not implement this interface. Doing so may expose your
+/// code to breaking changes in a future release.</para>
 /// </remarks>
 public interface ISemVersionComparer : IEqualityComparer<SemVersion?>, IEqualityComparer, IComparer<SemVersion?>, IComparer
 {
