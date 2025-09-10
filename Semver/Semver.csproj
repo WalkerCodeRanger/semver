@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Description>A semantic version library fully compliant with v2.0.0 of the spec found at http://semver.org.</Description>
-    <Copyright>Copyright © 2013-2024 Jeff Walker, Max Hauser</Copyright>
+    <Copyright>Copyright © 2013-2025 Jeff Walker, Max Hauser</Copyright>
     <AssemblyTitle>Semantic versioning</AssemblyTitle>
     <Authors>Jeff Walker, Max Hauser</Authors>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
@@ -16,7 +16,7 @@
     <PackageId>Semver</PackageId>
     <Title>Semantic versioning</Title>
     <PackageTags>semver,semantic,version,versioning</PackageTags>
-    <PackageReleaseNotes>https://github.com/WalkerCodeRanger/semver/releases/tag/v3.0.0</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/WalkerCodeRanger/semver/releases/tag/v3.0.1</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/WalkerCodeRanger/semver</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/WalkerCodeRanger/semver</RepositoryUrl>
